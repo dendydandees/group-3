@@ -15,7 +15,15 @@
       "~/*": ["./*"],
       "@/*": ["./*"]
     },
-    "types": ["@nuxt/types", "@nuxtjs/axios", "@types/node"]
+    "types": [
+      "@nuxt/types",
+      "@nuxtjs/axios",
+      "@types/node",
+      "@nuxt/vue-app",
+      "@nuxtjs/vuetify",
+      "@nuxtjs/auth-next",
+      "@nuxt/image"
+    ]
   },
   "exclude": ["node_modules", ".nuxt", "dist"]
 }
