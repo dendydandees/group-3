@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: client-portal
+  name: client-portal
+  namespace: app
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: client-portal
+  template:
+    metadata:
+      labels:
+        app: client-portal
+    spec:
+      containers:
+        # Set here your Gitlab Registry address
+        - name: client-portal
+          image: "registry.gitlab.com/luwjistik1/client-portal:${CI_COMMIT_SHA}"
+          ports:
+            - containerPort: 8080
+          imagePullPolicy: Always
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "500Mi"
+            requests:
+              cpu: "250m"
+              memory: "250Mi"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            timeoutSeconds: 5
+            initialDelaySeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            timeoutSeconds: 5
+            initialDelaySeconds: 15
+          envFrom:
+            - configMapRef:
+                name: client-portal-configmap
+      restartPolicy: Always
+      # Secret needed to access to Gitlab Registry from EKS
+      imagePullSecrets:
+        - name: container-registry
