@@ -3,4 +3,5 @@ npm-debug*
 .nuxt
 .env
 .env.example
+.kubernetes
 
