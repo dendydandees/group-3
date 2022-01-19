@@ -6,5 +6,4 @@ const guest: Middleware = ({ store, redirect }) => {
   }
 }
 
-
 export default guest
