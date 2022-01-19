@@ -65,18 +65,6 @@ export default {
     '@nuxt/image',
   ],
 
-  // Axios module configuration: https://go.nuxtjs.dev/config-axios
-  axios: {
-    // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
-    proxy: true,
-    baseURL: process.env.PROXY,
-  },
-
-  // Proxy configuration:
-  proxy: {
-    '/api/': process.env.PROXY,
-  },
-
   // Auth modules configuration: https://auth.nuxtjs.org
   auth: {
     localStorage: false,
@@ -126,4 +114,18 @@ export default {
   build: {
     transpile: ['vee-validate/dist/rules'],
   },
+
+  ...(process.env.PROXY && {
+    // Axios module configuration: https://go.nuxtjs.dev/config-axios
+    axios: {
+      // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
+      proxy: true,
+      baseURL: process.env.PROXY,
+    },
+
+    // Proxy configuration:
+    proxy: {
+      '/api/': process.env.PROXY,
+    },
+  }),
 }
