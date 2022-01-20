@@ -34,14 +34,14 @@ spec:
             httpGet:
               path: /
               port: 80
-            timeoutSeconds: 5
-            initialDelaySeconds: 15
+            timeoutSeconds: 45
+            initialDelaySeconds: 80
           livenessProbe:
             httpGet:
               path: /
               port: 80
-            timeoutSeconds: 5
-            initialDelaySeconds: 15
+            timeoutSeconds: 45
+            initialDelaySeconds: 80
           envFrom:
             - configMapRef:
                 name: client-portal-configmap
