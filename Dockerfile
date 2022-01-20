@@ -1,4 +1,6 @@
-FROM node:16.13.2-alpine3.14
+FROM node:16.13.2-alpine3.14 as build-stage
+
+ENV NODE_ENV=production
 
 RUN mkdir -p /app
 
@@ -17,11 +19,14 @@ RUN npm cache verify
 
 RUN npm install
 
-RUN npm run build
+RUN npm run generate
 
-EXPOSE 8080
+FROM nginx:stable-alpine as production-stage
 
-ENV NUXT_HOST=0.0.0.0
-ENV NUXT_PORT=8080
+COPY --from=build-stage /app/dist /usr/share/nginx/html
 
-CMD ["npm", "start"]
+RUN chown nginx:nginx /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

@@ -21,7 +21,7 @@ spec:
         - name: client-portal
           image: "registry.gitlab.com/luwjistik1/client-portal:${CI_COMMIT_SHA}"
           ports:
-            - containerPort: 8080
+            - containerPort: 80
           imagePullPolicy: Always
           resources:
             limits:
