@@ -1,9 +1,7 @@
 import { RootStateOrders } from '~/store/orders'
 
 export interface VuexModuleOrders {
-  orders: {
-    orders: RootStateOrders
-  }
+  orders: RootStateOrders
 }
 
 export interface Orders {

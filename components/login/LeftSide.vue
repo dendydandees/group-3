@@ -19,7 +19,7 @@
           ref="loginFormObserver"
           v-slot="{ invalid }"
           tag="form"
-          @submit.stop.prevent="userLogin"
+          @submit.stop.prevent="doLogin"
         >
           <!-- Email field -->
           <ValidationProvider
@@ -80,11 +80,11 @@
           </v-btn>
 
           <v-alert
-            v-if="stateOfAlert.isShow && invalid"
+            v-if="alert.isShow && invalid"
             type="error"
             class="text-capitalize"
           >
-            {{ stateOfAlert.message }}
+            {{ alert.message }}
           </v-alert>
         </ValidationObserver>
       </v-col>
@@ -93,9 +93,25 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-import { mapState, mapMutations } from 'vuex'
+import {
+  computed,
+  ComputedRef,
+  Ref,
+  ref,
+  defineComponent,
+  reactive,
+  useContext,
+  useStore,
+} from '@nuxtjs/composition-api'
 import { ValidationObserver, ValidationProvider } from 'vee-validate'
+// Interface and type
+import { Login } from '@/types/login'
+import { Alert, VuexModuleApplications } from '@/types/applications'
+
+export type VForm = Vue & {
+  validate: () => boolean
+  reset: () => boolean
+}
 
 export default defineComponent({
   name: 'LeftSide',
@@ -103,40 +119,38 @@ export default defineComponent({
     ValidationProvider,
     ValidationObserver,
   },
-  data() {
-    return {
-      loading: false,
-      isShowPassword: false,
-      form: {
-        email: '',
-        password: '',
-      },
+  setup() {
+    const { $auth } = useContext()
+    const store = useStore<VuexModuleApplications>()
+    const stateOfApplicationsModule = store.state.applications
+    const loginFormObserver = ref(null) as unknown as Ref<VForm>
+    const alert = computed(
+      () => stateOfApplicationsModule.alert
+    ) as ComputedRef<Alert>
+    const loading = ref(false) as Ref<boolean>
+    const isShowPassword = ref(false) as Ref<boolean>
+    const form = reactive({
+      email: '',
+      password: '',
+    }) as Login
+    const setAlert = (value: Alert) => {
+      store.commit('applications/SET_ALERT', value)
     }
-  },
-  computed: {
-    ...mapState('applications', { stateOfAlert: 'alert' }),
-  },
-  methods: {
-    ...mapMutations('applications', {
-      setAlert: 'SET_ALERT',
-      resetAlert: 'RESET_ALERT',
-    }),
-    async userLogin() {
+    const resetAlert = () => {
+      store.commit('applications/RESET_ALERT')
+    }
+    const doLogin = async () => {
       try {
-        this.loading = true
-        this.resetAlert()
+        loading.value = true
+        resetAlert()
 
         // Check form validity before hit API endpoint
-        const isValid = await (
-          this.$refs.loginFormObserver as Vue & {
-            validate: () => boolean
-          }
-        ).validate()
+        const isValid = await loginFormObserver?.value?.validate()
 
         if (!isValid) return
 
-        const data = { ...this.form }
-        const response = await this.$auth.loginWith('local', {
+        const data = { ...form }
+        const response = await $auth.loginWith('local', {
           data,
         })
         const status = response?.status
@@ -148,30 +162,35 @@ export default defineComponent({
         const user = { clientId, role, email }
 
         // Set user data to local storage
-        this.$auth.setUser(user)
+        $auth.setUser(user)
         localStorage.setItem('user', JSON.stringify(user))
       } catch (error) {
-        this.form.password = ''
+        form.password = ''
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const reset = (
-          this.$refs.loginFormObserver as Vue & {
-            reset: () => boolean
-          }
-        ).reset()
+        const reset = await loginFormObserver?.value?.reset()
         const message =
           (error as any)?.response?.data?.message ??
           (error as any)?.response?.data?.error ??
           (error as Error)?.message
 
         // Show alert if login failed
-        this.setAlert({
+        setAlert({
           isShow: true,
           message,
         })
       } finally {
-        this.loading = false
+        loading.value = false
       }
-    },
+    }
+
+    return {
+      loading,
+      isShowPassword,
+      form,
+      alert,
+      doLogin,
+      loginFormObserver,
+    }
   },
 })
 </script>

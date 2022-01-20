@@ -11,19 +11,22 @@
 <script lang="ts">
 import {
   computed,
+  ComputedRef,
   defineComponent,
   useFetch,
   useStore,
 } from '@nuxtjs/composition-api'
 // Interfaces or types
-import { VuexModuleOrders } from '~/types/orders'
+import { Orders, VuexModuleOrders } from '~/types/orders'
 
 export default defineComponent({
   name: 'DashboardPage',
   setup() {
     const store = useStore<VuexModuleOrders>()
     const stateOfOrdersModule = store.state.orders
-    const orders = computed(() => stateOfOrdersModule.orders)
+    const orders = computed(() => stateOfOrdersModule.orders) as ComputedRef<
+      Orders[]
+    >
     const getOrders = () => {
       store.dispatch('orders/getOrders')
     }
