@@ -7,3 +7,9 @@ export interface Alert {
   isShow: boolean
   message: string
 }
+
+export interface NavigationLinks {
+  title: string
+  icon: string
+  to: string
+}

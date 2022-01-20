@@ -159,7 +159,12 @@ export default defineComponent({
         if (status !== 200) throw response
 
         const { clientId, role, email } = response?.data
-        const user = { clientId, role, email }
+        const user = {
+          clientId,
+          role: role.toLowerCase().replaceAll('_', ' '),
+          initial: email.charAt(0).toUpperCase(),
+          email,
+        }
 
         // Set user data to local storage
         $auth.setUser(user)
