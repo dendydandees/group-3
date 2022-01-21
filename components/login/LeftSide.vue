@@ -36,7 +36,6 @@
               label="Email Address"
               placeholder="Enter your email address..."
               type="email"
-              class="rounded-0"
               required
               outlined
               autocomplete
@@ -59,7 +58,6 @@
               :type="isShowPassword ? 'text' : 'password'"
               label="Password"
               placeholder="Enter your password..."
-              class="rounded-0"
               required
               outlined
               @click:append="isShowPassword = !isShowPassword"

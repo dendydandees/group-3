@@ -67,12 +67,10 @@
           :ripple="{ class: `red--text` }"
           @click="doShowUserActions"
         >
-          <v-list-item-avatar tile>
-            <v-avatar color="red" tile>
-              <span class="white--text text-h5 text-uppercase">
-                {{ user.initial }}
-              </span>
-            </v-avatar>
+          <v-list-item-avatar tile color="red">
+            <span class="white--text text-h5 text-uppercase">
+              {{ user.initial }}
+            </span>
           </v-list-item-avatar>
 
           <v-list-item-content>

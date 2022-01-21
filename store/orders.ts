@@ -1,20 +1,21 @@
 import { MutationTree, ActionTree } from 'vuex'
 // Interfaces
-import { Orders, ParamsFetch } from '~/types/orders'
+import { Orders, OrdersMeta } from '~/types/orders'
 
 export const state = () => ({
   orders: [] as Orders[] | [],
-  params: {
+  meta: {
     page: 1,
-    totalPage: 4,
-    totalCount: 64,
-  } as ParamsFetch,
+    totalPage: 1,
+    totalCount: 10,
+  } as OrdersMeta,
 })
 
 export type RootStateOrders = ReturnType<typeof state>
 
 export const mutations: MutationTree<RootStateOrders> = {
   SET_ORDERS: (state, value: Orders[] | []) => (state.orders = value),
+  SET_META: (state, value: OrdersMeta) => (state.meta = value),
 }
 
 export const actions: ActionTree<RootStateOrders, RootStateOrders> = {
@@ -78,8 +79,14 @@ export const actions: ActionTree<RootStateOrders, RootStateOrders> = {
           refID: 1748,
         },
       ]
+      const meta = {
+        page: 1,
+        totalPage: 4,
+        totalCount: 64,
+      }
 
       commit('SET_ORDERS', data)
+      commit('SET_META', meta)
 
       return data
     } catch (error: any) {

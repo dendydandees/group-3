@@ -9,7 +9,7 @@
 
     <AppBar :mini="mini" @doShowSideNav="doShowSideNav" />
 
-    <v-main>
+    <v-main class="base">
       <Nuxt />
     </v-main>
   </v-app>

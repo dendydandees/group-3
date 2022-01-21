@@ -14,9 +14,3 @@ export default defineComponent({
   middleware: 'guest',
 })
 </script>
-
-<style lang="scss">
-html {
-  overflow: hidden;
-}
-</style>

@@ -33,7 +33,7 @@ export interface Orders {
   refID: number
 }
 
-export interface ParamsFetch {
+export interface OrdersMeta {
   page: number
   totalPage: number
   totalCount: number
