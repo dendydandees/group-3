@@ -23,7 +23,8 @@
       "@nuxtjs/vuetify",
       "@nuxtjs/auth-next",
       "@nuxt/image"
-    ]
+    ],
+    "typeRoots": ["./types"]
   },
   "exclude": ["node_modules", ".nuxt", "dist"]
 }

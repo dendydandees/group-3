@@ -23,24 +23,6 @@
         >
           <v-icon> {{ setIcon }} </v-icon>
         </v-app-bar-nav-icon>
-
-        <v-badge
-          v-if="!$vuetify.breakpoint.smAndDown"
-          content="Client Portal"
-          value="Client Portal"
-          color="secondary"
-          overlap
-          class="my-2"
-        >
-          <NuxtLink to="/">
-            <NuxtImg
-              src="/images/Luwjistik Logo FA-01.png"
-              format="webp"
-              height="32"
-              preload
-            />
-          </NuxtLink>
-        </v-badge>
       </div>
     </client-only>
   </v-app-bar>
