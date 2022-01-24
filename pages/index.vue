@@ -2,14 +2,20 @@
   <section class="pa-4 pa-md-10 py-8">
     <v-row align="center">
       <v-col>
-        <h1 class="mb-6 display-1 font-weight-bold">Manage Orders</h1>
+        <h1 class="mb-6 display-1 font-weight-bold">
+          Manage Orders
+          <span class="text--secondary font-weight-medium title">
+            &bull; {{ meta.totalCount }} Total Orders
+          </span>
+        </h1>
       </v-col>
     </v-row>
 
     <v-row align="center">
       <v-col cols="12" md="6">
+        <!-- Search filter field -->
         <v-text-field
-          v-model="params.search"
+          v-model="filter.search"
           :loading="$fetchState.loading"
           label="Search by order code"
           placeholder="Enter your order code..."
@@ -25,100 +31,75 @@
     </v-row>
 
     <v-row align="center" class="my-10">
-      <v-col v-for="order in orders" :key="order.id" cols="12" md="4" lg="3">
-        <v-card :loading="$fetchState.loading" color="white" tile outlined>
-          <v-card-title class="title font-weight-bold text-capitalize">
-            {{ order.orderCode }}
-          </v-card-title>
+      <v-col cols="12">
+        <v-data-table
+          v-bind="tableSettings"
+          :items="orders"
+          :loading="$fetchState.loading"
+          :server-items-length="meta.totalCount"
+          :options.sync="tableOptions"
+          @update:options="fetchOrders"
+        >
+          <template #[`item`]="{ item }">
+            <tr>
+              <!-- Order code data -->
+              <td>
+                {{ item.orderCode }}
+                <span class="ml-1 text--secondary"> (#{{ item.refID }}) </span>
+              </td>
 
-          <v-card-subtitle> #{{ order.refID }} </v-card-subtitle>
+              <!-- Consignee data -->
+              <td>
+                <div class="text--secondary my-2">
+                  <p class="mb-2 font-weight-bold subtitle-2">
+                    {{ item.consigneeName }}
+                  </p>
 
-          <v-card-text>
-            <v-row align="start">
-              <v-col cols="auto">
-                <v-icon size="32"> mdi-home-account </v-icon>
-              </v-col>
+                  <p class="mb-1">
+                    {{ item.consigneeAddress }}
+                  </p>
 
-              <v-col>
-                <span
-                  class="text-capitalize subtitle-1 font-weight-medium mb-2"
+                  <p class="ma-0">
+                    {{ item.consigneeCity }}, {{ item.consigneeProvince }},
+                    {{ item.consigneeCountry }}, {{ item.consigneePostal }}
+                  </p>
+                </div>
+              </td>
+
+              <!-- Pickup data -->
+              <td>
+                <div class="text--secondary my-2">
+                  <p class="mb-2 font-weight-bold subtitle-2">
+                    {{ item.pickupContactName }}
+                  </p>
+
+                  <p class="mb-1">
+                    {{ item.pickupAddress }}
+                  </p>
+
+                  <p class="ma-0">
+                    {{ item.pickupCity }}, {{ item.pickupProvince }},
+                    {{ item.pickupCountry }}, {{ item.pickupPostal }}
+                  </p>
+                </div>
+              </td>
+
+              <!-- Actions button -->
+              <td>
+                <v-btn
+                  class="ma-2"
+                  :loading="$fetchState.loading"
+                  :disabled="$fetchState.loading"
+                  color="primary"
+                  nuxt
+                  :to="`/${item.id}`"
                 >
-                  {{ order.consigneeName }}
-                </span>
-
-                <span class="mb-1 d-block">
-                  {{ `${order.consigneeAddress}` }}
-                </span>
-
-                <span class="mb-1 d-block">
-                  {{
-                    `${order.consigneeCity}, ${order.consigneeCountry}, ${order.consigneePostal}`
-                  }}
-                </span>
-              </v-col>
-            </v-row>
-
-            <v-row align="start">
-              <v-col cols="auto">
-                <v-icon size="32" color="primary"> mdi-map-marker </v-icon>
-              </v-col>
-
-              <v-col>
-                <span
-                  class="text-capitalize subtitle-1 font-weight-medium mb-2"
-                >
-                  {{ order.pickupContactName }}
-                </span>
-
-                <span class="mb-1 d-block">
-                  {{ `${order.pickupAddress}` }}
-                </span>
-
-                <span class="mb-1 d-block">
-                  {{
-                    `${order.pickupCity}, ${order.pickupCountry}, ${order.pickupPostal}`
-                  }}
-                </span>
-              </v-col>
-            </v-row>
-          </v-card-text>
-
-          <v-card-actions class="pa-4">
-            <v-btn tile color="primary"> Full Report </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-col>
-    </v-row>
-
-    <v-row align="center" justify="space-between" class="my-10 white">
-      <v-col cols="12" md="auto">
-        <div class="d-flex align-center">
-          <span class="font-weight-bold mr-2">
-            Items
-            <span class="d-none d-md-inline-block"> per page </span>
-            :
-          </span>
-
-          <v-select
-            v-model="params.perPage"
-            :items="itemsPerPageOptions"
-            :loading="$fetchState.loading"
-            background-color="white"
-            dense
-            outlined
-            hide-details
-            eager
-          />
-        </div>
-      </v-col>
-
-      <v-col cols="12" md="6">
-        <v-pagination
-          v-model="params.page"
-          :disabled="$fetchState.loading"
-          :length="meta.totalPage"
-          :total-visible="7"
-        />
+                  Details
+                </v-btn>
+              </td>
+            </tr>
+          </template>
+        </v-data-table>
       </v-col>
     </v-row>
   </section>
@@ -132,50 +113,91 @@ import {
   useStore,
   reactive,
   watch,
+  ref,
 } from '@nuxtjs/composition-api'
 // Interfaces or types
 import { VuexModuleOrders } from '~/types/orders'
+import { FilterDetails } from '~/types/applications'
 
 export default defineComponent({
-  name: 'DashboardPage',
+  name: 'OrdersPages',
   layout: 'default',
   setup() {
     const store = useStore<VuexModuleOrders>()
     const orders = computed(() => store.state.orders.orders)
     const meta = computed(() => store.state.orders.meta)
-    const params = reactive({
+    const filter = reactive({
+      search: null,
+    })
+    const tableOptions = ref({
       page: 1,
-      perPage: 10,
-      search: '',
+      itemsPerPage: 10,
+      sortBy: [''],
+      sortDesc: [false],
     })
-    const itemsPerPageOptions = reactive([
-      {
-        text: '10',
-        value: 10,
+    const tableSettings = reactive({
+      itemKey: 'id',
+      headers: [
+        {
+          text: 'Order Code (#Ref)',
+          value: 'orderCode',
+        },
+        {
+          text: 'Consignee',
+          sortable: false,
+        },
+        {
+          text: 'Pickup',
+          sortable: false,
+        },
+        {
+          text: '',
+          sortable: false,
+        },
+      ],
+      footerProps: {
+        'items-per-page-options': [10, 20, -1],
+        'show-first-last-page': true,
+        'show-current-page': true,
       },
-      {
-        text: '20',
-        value: 20,
-      },
-      {
-        text: 'All',
-        value: -1,
-      },
-    ])
+    })
+    // Settings fetch options
+    const fetchOrders = async (params: FilterDetails) => {
+      let dataParams = {
+        page: params.page,
+        perPage: params.itemsPerPage,
+        orderCode: filter.search ?? null,
+        sortBy:
+          params.sortBy && params?.sortBy[0] === 'orderCode'
+            ? 'order_code'
+            : null,
+        sortDesc: params.sortDesc ? params?.sortDesc[0] : null,
+      }
+      dataParams =
+        dataParams.perPage !== -1
+          ? dataParams
+          : {
+              ...dataParams,
+              perPage: meta.value.totalCount,
+            }
 
-    useFetch(() => {
-      store.dispatch('orders/getOrders')
+      await store.dispatch('orders/getOrders', { params: dataParams })
+    }
+
+    const { fetch } = useFetch(async () => {
+      await fetchOrders(tableOptions.value)
     })
 
+    // If filter is changed, fetch data again
     watch(
-      () => params,
-      (newValue) => {
-        const newMeta = {
-          ...meta.value,
-          page: newValue.page,
+      () => filter,
+      (_newValue) => {
+        tableOptions.value = {
+          ...tableOptions.value,
+          page: 1,
         }
 
-        store.commit('orders/SET_META', newMeta)
+        fetch()
       },
       { deep: true }
     )
@@ -183,8 +205,10 @@ export default defineComponent({
     return {
       orders,
       meta,
-      params,
-      itemsPerPageOptions,
+      filter,
+      tableOptions,
+      tableSettings,
+      fetchOrders,
     }
   },
 })
