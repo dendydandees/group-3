@@ -9,7 +9,7 @@
     style="border: 1px solid; border-color: rgba(0, 0, 0, 0.12)"
   >
     <NuxtLink
-      v-if="$vuetify.breakpoint.smAndDown"
+      v-if="$vuetify.breakpoint.mobile"
       to="/"
       class="d-flex align-center"
     >
@@ -44,12 +44,12 @@ export default defineComponent({
       required: true,
     },
   },
-  setup({ mini }) {
+  setup(props) {
     const { $vuetify } = useContext()
     const setIcon = computed(() => {
-      return !$vuetify.breakpoint.smAndDown && !mini
+      return !$vuetify.breakpoint.mobile && !props.mini
         ? 'mdi-backburger'
-        : !$vuetify.breakpoint.smAndDown && mini
+        : !$vuetify.breakpoint.mobile && props.mini
         ? 'mdi-forwardburger'
         : 'mdi-menu'
     })

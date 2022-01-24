@@ -14,6 +14,11 @@ export default {
     height: '4px',
   },
 
+  // Router property: https://nuxtjs.org/docs/configuration-glossary/configuration-router/#base
+  router: {
+    base: '/orders',
+  },
+
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     title: 'Client Portal',
@@ -37,6 +42,12 @@ export default {
       { name: 'format-detection', content: 'telephone=no' },
     ],
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
+    script: [
+      {
+        src: 'https://polyfill.io/v3/polyfill.min.js?features=IntersectionObserver',
+        body: true,
+      },
+    ],
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
@@ -96,6 +107,9 @@ export default {
   vuetify: {
     customVariables: ['~/assets/scss/variables.scss'],
     treeShake: true,
+    breakpoint: {
+      mobileBreakpoint: 'sm',
+    },
     theme: {
       dark: false,
       themes: {

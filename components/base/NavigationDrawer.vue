@@ -45,6 +45,8 @@
         link
         active-class="secondary white--text"
         class="my-4 rounded-0"
+        nuxt
+        exact
       >
         <v-list-item-icon>
           <v-icon>
