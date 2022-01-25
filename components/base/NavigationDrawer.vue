@@ -7,7 +7,7 @@
     fixed
     app
   >
-    <v-list class="py-4 text--center">
+    <v-list class="py-2 text--center">
       <v-list-item class="justify-center">
         <v-badge
           v-if="!mini"
@@ -20,7 +20,7 @@
           <NuxtImg
             src="/images/Luwjistik Logo FA-01.png"
             format="webp"
-            height="32"
+            height="24"
             preload
           />
         </v-badge>
@@ -29,7 +29,7 @@
           v-else
           src="/images/Luwjistik Logo FA-02.png"
           format="webp"
-          height="32"
+          height="24"
           preload
         />
       </v-list-item>
@@ -53,7 +53,7 @@
           </v-icon>
         </v-list-item-icon>
 
-        <v-list-item-title class="subtitle-1">
+        <v-list-item-title>
           {{ link.title }}
         </v-list-item-title>
       </v-list-item>
@@ -68,8 +68,8 @@
           :ripple="{ class: `red--text` }"
           @click="doShowUserActions"
         >
-          <v-list-item-avatar tile color="red">
-            <span class="white--text text-h5 text-uppercase">
+          <v-list-item-avatar tile color="red" size="32">
+            <span class="white--text text-uppercase">
               {{ user.initial }}
             </span>
           </v-list-item-avatar>

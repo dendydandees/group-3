@@ -1,8 +1,8 @@
 <template>
   <section class="pa-4 pa-md-10 py-8">
-    <v-row align="center">
+    <v-row align="center" class="mb-6">
       <v-col>
-        <h1 class="mb-6 display-1 font-weight-bold">
+        <h1 class="headline font-weight-bold">
           Manage Orders
           <span class="text--secondary font-weight-medium title">
             &bull; {{ meta.totalCount }} Total Orders
@@ -16,7 +16,8 @@
         <!-- Search filter field -->
         <v-text-field
           v-model="filter.search"
-          :loading="$fetchState.loading"
+          :loading="$fetchState.pending"
+          :disabled="$fetchState.pending"
           label="Search by order code"
           placeholder="Enter your order code..."
           background-color="white"
@@ -25,94 +26,93 @@
           clearable
           solo
           flat
+          dense
           hide-details
         />
       </v-col>
     </v-row>
 
-    <v-row align="center" class="my-10">
+    <v-row align="center">
       <v-col cols="12">
         <v-data-table
           v-bind="tableSettings"
           :items="orders"
-          :loading="$fetchState.loading"
+          :loading="$fetchState.pending"
           :server-items-length="meta.totalCount"
           :options.sync="tableOptions"
           class="elevation-0"
           @update:options="fetchOrders"
         >
-          <template #[`item`]="{ item }">
-            <tr>
-              <!-- Order code data -->
-              <td>
-                {{ item.orderCode }}
-                <span class="ml-1 text--secondary"> (#{{ item.refID }}) </span>
-              </td>
+          <!-- Order code -->
+          <template #[`item.orderCode`]="{ item }">
+            {{ item.orderCode }}
 
-              <!-- Consignee data -->
-              <td>
-                <div class="text--secondary my-2">
-                  <p class="mb-2 font-weight-bold subtitle-2">
-                    {{ item.consigneeName }}
-                  </p>
+            <span class="ml-1 text--secondary"> (#{{ item.refID }}) </span>
+          </template>
 
-                  <p class="mb-1">
-                    {{ item.consigneeAddress }}
-                  </p>
+          <!-- Consignee data -->
+          <template #[`item.consignee`]="{ item }">
+            <div class="text--secondary my-2">
+              <p class="mb-2 font-weight-bold subtitle-2">
+                {{ item.consigneeName }}
+              </p>
 
-                  <p class="ma-0">
-                    {{
-                      $customUtils.setAddress([
-                        item.consigneeCity,
-                        item.consigneeProvince,
-                        item.consigneeCountry,
-                        item.consigneePostal,
-                      ])
-                    }}
-                  </p>
-                </div>
-              </td>
+              <p class="mb-1">
+                {{ item.consigneeAddress }}
+              </p>
 
-              <!-- Pickup data -->
-              <td>
-                <div class="text--secondary my-2">
-                  <p class="mb-2 font-weight-bold subtitle-2">
-                    {{ item.pickupContactName }}
-                  </p>
+              <p class="ma-0">
+                {{
+                  $customUtils.setAddress([
+                    item.consigneeCity,
+                    item.consigneeProvince,
+                    item.consigneeCountry,
+                    item.consigneePostal,
+                  ])
+                }}
+              </p>
+            </div>
+          </template>
 
-                  <p class="mb-1">
-                    {{ item.pickupAddress }}
-                  </p>
+          <!-- Pickup data -->
+          <template #[`item.pickup`]="{ item }">
+            <div class="text--secondary my-2">
+              <p class="mb-2 font-weight-bold subtitle-2">
+                {{ item.pickupContactName }}
+              </p>
 
-                  <p class="ma-0">
-                    {{
-                      $customUtils.setAddress([
-                        item.pickupCity,
-                        item.pickupProvince,
-                        item.pickupCountry,
-                        item.pickupPostal,
-                      ])
-                    }}
-                  </p>
-                </div>
-              </td>
+              <p class="mb-1">
+                {{ item.pickupAddress }}
+              </p>
 
-              <!-- Actions button -->
-              <td>
-                <v-btn
-                  nuxt
-                  tile
-                  :loading="$fetchState.loading"
-                  :disabled="$fetchState.loading"
-                  :to="`/orders/${item.id}`"
-                  color="primary"
-                  elevation="0"
-                  class="ma-2"
-                >
-                  Details
-                </v-btn>
-              </td>
-            </tr>
+              <p class="ma-0">
+                {{
+                  $customUtils.setAddress([
+                    item.pickupCity,
+                    item.pickupProvince,
+                    item.pickupCountry,
+                    item.pickupPostal,
+                  ])
+                }}
+              </p>
+            </div>
+          </template>
+
+          <!-- Actions button list -->
+          <template #[`item.actions`]="{ item }">
+            <v-btn
+              nuxt
+              tile
+              small
+              :loading="$fetchState.pending"
+              :disabled="$fetchState.pending"
+              :to="`/orders/${item.id}`"
+              color="primary"
+              elevation="0"
+              class="ma-2"
+            >
+              Details
+            </v-btn>
           </template>
         </v-data-table>
       </v-col>
@@ -159,14 +159,17 @@ export default defineComponent({
         },
         {
           text: 'Consignee',
+          value: 'consignee',
           sortable: false,
         },
         {
           text: 'Pickup',
+          value: 'pickup',
           sortable: false,
         },
         {
           text: '',
+          value: 'actions',
           sortable: false,
         },
       ],
