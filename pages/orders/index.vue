@@ -38,6 +38,7 @@
           :loading="$fetchState.loading"
           :server-items-length="meta.totalCount"
           :options.sync="tableOptions"
+          class="elevation-0"
           @update:options="fetchOrders"
         >
           <template #[`item`]="{ item }">
@@ -99,12 +100,14 @@
               <!-- Actions button -->
               <td>
                 <v-btn
-                  class="ma-2"
+                  nuxt
+                  tile
                   :loading="$fetchState.loading"
                   :disabled="$fetchState.loading"
-                  color="primary"
-                  nuxt
                   :to="`/orders/${item.id}`"
+                  color="primary"
+                  elevation="0"
+                  class="ma-2"
                 >
                   Details
                 </v-btn>

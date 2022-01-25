@@ -1,5 +1,14 @@
 <template>
   <section class="pa-4 pa-md-10 py-8">
+    <v-row align="center">
+      <v-col cols="12">
+        <v-btn text nuxt small to="/orders">
+          <v-icon left dark tite elevation="0"> mdi-arrow-left-thin </v-icon>
+          Back
+        </v-btn>
+      </v-col>
+    </v-row>
+
     <v-row align="stretch">
       <v-col cols="12" md="4">
         <v-row align="stretch">
@@ -31,7 +40,11 @@
                     {{ order.height }} (cm) &bull; {{ order.weight }}
                   </p>
 
-                  <v-chip small color="info" class="text-uppercase mb-2">
+                  <v-chip
+                    small
+                    color="success"
+                    class="text-uppercase mb-2 black--text"
+                  >
                     {{ order.paymentType }}
                   </v-chip>
                 </div>
@@ -147,7 +160,7 @@
                 class="mb-10"
               >
                 <v-row justify="space-between">
-                  <v-col cols="7">
+                  <v-col cols="auto">
                     <h3 class="font-weight-medium subtitle-1">
                       {{ update.partnerName }}
                     </h3>
@@ -156,16 +169,31 @@
                       {{ update.serviceType }}
                     </p>
                   </v-col>
-                  <v-col class="text-right" cols="5">
-                    <v-btn tile small elevation="0">
+                  <v-col class="text-right" cols="auto">
+                    <v-chip
+                      small
+                      :color="update.externalTrackingNumber ? 'primary' : ''"
+                      class="text-right text-uppercase"
+                    >
                       {{ update.externalTrackingNumber || 'Not submitted' }}
-                    </v-btn>
+                    </v-chip>
                   </v-col>
                 </v-row>
               </v-timeline-item>
             </v-timeline>
           </v-card-text>
         </v-card>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters align="center" class="my-10">
+      <v-col cols="12" class="white pa-3">
+        <v-data-table
+          v-bind="tableSettings"
+          :items="orderItems"
+          :loading="$fetchState.loading"
+          class="elevation-0"
+        />
       </v-col>
     </v-row>
   </section>
@@ -175,6 +203,7 @@
 import {
   computed,
   defineComponent,
+  reactive,
   useFetch,
   useRoute,
   useStore,
@@ -193,6 +222,37 @@ export default defineComponent({
     const orderAllocationUpdates = computed(
       () => store.state.orders.orderDetails.orderAllocationUpdates
     )
+    const orderItems = computed(
+      () => store.state.orders.orderDetails.orderItems
+    )
+    const tableSettings = reactive({
+      itemKey: 'id',
+      hideDefaultFooter: true,
+      disableSort: true,
+      headers: [
+        {
+          text: 'Product ID',
+        },
+        {
+          text: 'SKU',
+        },
+        {
+          text: 'Category',
+        },
+        {
+          text: 'Description',
+        },
+        {
+          text: 'Quantity',
+        },
+        {
+          text: 'Tax',
+        },
+        {
+          text: 'Value',
+        },
+      ],
+    })
 
     useFetch(async () => {
       await store.dispatch('orders/getOrderDetails', id.value)
@@ -202,6 +262,8 @@ export default defineComponent({
       id,
       order,
       orderAllocationUpdates,
+      orderItems,
+      tableSettings,
     }
   },
 })
