@@ -76,7 +76,7 @@
           </v-list-item-avatar>
 
           <v-list-item-content>
-            <v-list-item-title class="text-h6 text-capitalize">
+            <v-list-item-title class="font-weight-bold text-capitalize">
               {{ user.role }}
             </v-list-item-title>
             <v-list-item-subtitle>

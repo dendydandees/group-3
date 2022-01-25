@@ -1,21 +1,28 @@
 import { MutationTree, ActionTree } from 'vuex'
 // Interfaces
-import { Orders, OrdersMeta } from '~/types/orders'
+import { OrderDetails, Order, OrderMeta } from '~/types/orders'
 
 export const state = () => ({
-  orders: [] as Orders[] | [],
+  orders: [] as Order[] | [],
+  orderDetails: {
+    order: {},
+    orderItems: [],
+    orderAllocationUpdates: {},
+  } as OrderDetails,
   meta: {
     page: 1,
     totalPage: 1,
     totalCount: 10,
-  } as OrdersMeta,
+  } as OrderMeta,
 })
 
 export type RootStateOrders = ReturnType<typeof state>
 
 export const mutations: MutationTree<RootStateOrders> = {
-  SET_ORDERS: (state, value: Orders[] | []) => (state.orders = value),
-  SET_META: (state, value: OrdersMeta) => (state.meta = value),
+  SET_ORDERS: (state, value: Order[] | []) => (state.orders = value),
+  SET_ORDER_DETAILS: (state, value: OrderDetails) =>
+    (state.orderDetails = value),
+  SET_META: (state, value: OrderMeta) => (state.meta = value),
 }
 
 export const actions: ActionTree<RootStateOrders, RootStateOrders> = {
@@ -39,6 +46,32 @@ export const actions: ActionTree<RootStateOrders, RootStateOrders> = {
 
       return response
     } catch (error: any) {
+      return error
+    }
+  },
+  async getOrderDetails({ commit }, id: string) {
+    try {
+      const request = [
+        this.$axios.$get(`/api/clients/orders`, {
+          params: {
+            orderId: id,
+          },
+        }),
+        this.$axios.$get(`/api/clients/orders/${id}/items`),
+        this.$axios.$get(`/api/clients/orders/${id}/updates`),
+      ]
+      const [responseOrderDetails, responseOrderItems, responseOrderUpdates] =
+        await Promise.all(request)
+      const data = {
+        order: responseOrderDetails?.data[0] ?? {},
+        orderItems: responseOrderItems?.orderItems ?? [],
+        orderAllocationUpdates: responseOrderUpdates?.allocationUpdates ?? [],
+      }
+
+      commit('SET_ORDER_DETAILS', data)
+
+      return data
+    } catch (error) {
       return error
     }
   },

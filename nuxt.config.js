@@ -14,11 +14,6 @@ export default {
     height: '4px',
   },
 
-  // Router property: https://nuxtjs.org/docs/configuration-glossary/configuration-router/#base
-  router: {
-    base: '/orders',
-  },
-
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     title: 'Client Portal',
