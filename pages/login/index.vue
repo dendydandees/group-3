@@ -19,3 +19,9 @@ export default defineComponent({
   layout: 'guest',
 })
 </script>
+
+<style lang="scss">
+body {
+  overflow: hidden;
+}
+</style>

@@ -9,7 +9,7 @@
 
     <AppBar :mini="mini" @doShowSideNav="doShowSideNav" />
 
-    <v-main>
+    <v-main class="base">
       <Nuxt />
     </v-main>
   </v-app>
@@ -39,7 +39,7 @@ export default defineComponent({
     const drawer = ref(!context.$vuetify.breakpoint.smAndDown) as Ref<boolean>
     const mini = ref(!context.$vuetify.breakpoint.smAndDown) as Ref<boolean>
     const itemLinks = ref([
-      { title: 'Orders', icon: 'mdi-package', to: '/' },
+      { title: 'Orders', icon: 'mdi-package', to: '/orders' },
     ]) as Ref<NavigationLinks[]>
     const doShowSideNav = () => {
       const isMobile = context.$vuetify.breakpoint.smAndDown

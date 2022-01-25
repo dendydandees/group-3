@@ -45,6 +45,7 @@
         link
         active-class="secondary white--text"
         class="my-4 rounded-0"
+        nuxt
       >
         <v-list-item-icon>
           <v-icon>
@@ -67,16 +68,14 @@
           :ripple="{ class: `red--text` }"
           @click="doShowUserActions"
         >
-          <v-list-item-avatar tile>
-            <v-avatar color="red" tile>
-              <span class="white--text text-h5 text-uppercase">
-                {{ user.initial }}
-              </span>
-            </v-avatar>
+          <v-list-item-avatar tile color="red">
+            <span class="white--text text-h5 text-uppercase">
+              {{ user.initial }}
+            </span>
           </v-list-item-avatar>
 
           <v-list-item-content>
-            <v-list-item-title class="text-h6 text-capitalize">
+            <v-list-item-title class="font-weight-bold text-capitalize">
               {{ user.role }}
             </v-list-item-title>
             <v-list-item-subtitle>

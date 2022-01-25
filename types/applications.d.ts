@@ -13,3 +13,14 @@ export interface NavigationLinks {
   icon: string
   to: string
 }
+
+export interface FilterDetails {
+  page: number
+  itemsPerPage: number
+  sortBy?: string[]
+  sortDesc?: boolean[]
+  groupBy?: string[]
+  groupDesc?: boolean[]
+  multiSort?: boolean
+  mustSort?: boolean
+}
