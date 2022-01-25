@@ -2,7 +2,7 @@
   <section class="pa-4 pa-md-10 py-8">
     <v-row align="center">
       <v-col cols="12">
-        <v-btn text nuxt small to="/orders">
+        <v-btn text small @click="doBackTo">
           <v-icon left dark tite elevation="0"> mdi-arrow-left-thin </v-icon>
           Back
         </v-btn>
@@ -186,6 +186,7 @@
       </v-col>
     </v-row>
 
+    <!-- Order items -->
     <v-row no-gutters align="center" class="my-10">
       <v-col cols="12" class="white pa-3">
         <v-data-table
@@ -193,7 +194,22 @@
           :items="orderItems"
           :loading="$fetchState.loading"
           class="elevation-0"
-        />
+        >
+          <template #[`item.price`]="{ item }">
+            {{ item.currency }} {{ setPrice(item.price) }}
+          </template>
+
+          <template #footer>
+            <v-divider class="my-4" />
+
+            <p class="ma-0 text-right font-weight-bold">
+              Total
+              <span class="primary--text title ml-2">
+                {{ setTotal() }}
+              </span>
+            </p>
+          </template>
+        </v-data-table>
       </v-col>
     </v-row>
   </section>
@@ -206,16 +222,18 @@ import {
   reactive,
   useFetch,
   useRoute,
+  useRouter,
   useStore,
 } from '@nuxtjs/composition-api'
 // Interfaces or types
-import { VuexModuleOrders } from '~/types/orders'
+import { OrderItem, VuexModuleOrders } from '~/types/orders'
 
 export default defineComponent({
   name: 'OrderDetailsPages',
   layout: 'default',
   setup() {
     const route = useRoute()
+    const router = useRouter()
     const store = useStore<VuexModuleOrders>()
     const id = computed(() => route.value.params.id)
     const order = computed(() => store.state.orders.orderDetails.order)
@@ -228,31 +246,53 @@ export default defineComponent({
     const tableSettings = reactive({
       itemKey: 'id',
       hideDefaultFooter: true,
-      disableSort: true,
       headers: [
         {
-          text: 'Product ID',
+          text: 'Product Code',
+          value: 'productCode',
         },
         {
           text: 'SKU',
+          value: 'sku',
         },
         {
           text: 'Category',
+          value: 'category',
         },
         {
           text: 'Description',
+          value: 'description',
         },
         {
           text: 'Quantity',
+          value: 'quantity',
         },
         {
-          text: 'Tax',
-        },
-        {
-          text: 'Value',
+          text: 'Price',
+          value: 'price',
         },
       ],
     })
+    const doBackTo = () => {
+      router.go(-1)
+    }
+    const setPrice = (price: string) => {
+      return parseFloat(price).toFixed(2)
+    }
+    const setTotal = () => {
+      const orderItems = store.state.orders.orderDetails.orderItems
+      const totalPrice = orderItems.reduce(
+        (previous: number, current: OrderItem) => {
+          const total = previous + parseFloat(current.price)
+
+          return total
+        },
+        0
+      )
+      const currency = orderItems.length !== 0 ? orderItems[0].currency : ''
+
+      return `${currency} ${totalPrice.toFixed(2)}`
+    }
 
     useFetch(async () => {
       await store.dispatch('orders/getOrderDetails', id.value)
@@ -264,6 +304,9 @@ export default defineComponent({
       orderAllocationUpdates,
       orderItems,
       tableSettings,
+      doBackTo,
+      setPrice,
+      setTotal,
     }
   },
 })

@@ -1,13 +1,19 @@
 import { MutationTree, ActionTree } from 'vuex'
 // Interfaces
-import { OrderDetails, Order, OrderMeta } from '~/types/orders'
+import {
+  OrderDetails,
+  Order,
+  OrderMeta,
+  OrderItem,
+  OrderAllocationUpdate,
+} from '~/types/orders'
 
 export const state = () => ({
   orders: [] as Order[] | [],
   orderDetails: {
-    order: {},
-    orderItems: [],
-    orderAllocationUpdates: {},
+    order: {} as Order | {},
+    orderItems: [] as OrderItem | [],
+    orderAllocationUpdates: [] as OrderAllocationUpdate | [],
   } as OrderDetails,
   meta: {
     page: 1,

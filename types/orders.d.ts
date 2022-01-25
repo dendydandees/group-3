@@ -33,6 +33,32 @@ export interface Order {
   refID: number
 }
 
+export interface OrderItem {
+  id: string
+  orderId: string
+  description: string
+  quantity: number
+  productCode: string
+  sku: string
+  category: string
+  price: string
+  currency: string
+}
+
+export interface OrderAllocationUpdate {
+  id: string
+  orderID: string
+  orderCode: string
+  partnerID: string
+  partnerName: string
+  serviceType: string
+  externalTrackingNumber: string
+  externalTracking: {
+    id: string
+    partnerUpdates: string
+  }
+}
+
 export interface OrderMeta {
   page: number
   totalPage: number
@@ -40,16 +66,7 @@ export interface OrderMeta {
 }
 
 export interface OrderDetails {
-  order: Order
-  orderItems: []
-  orderAllocationUpdates: {
-    id: string
-    orderID: string
-    orderCode: string
-    partnerID: string
-    partnerName: string
-    serviceType: string
-    externalTrackingNumber: string
-    externalTracking: {}
-  }[]
+  order: Order | {}
+  orderItems: OrderItem[]
+  orderAllocationUpdates: OrderAllocationUpdate[]
 }

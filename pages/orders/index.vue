@@ -148,7 +148,7 @@ export default defineComponent({
       page: 1,
       itemsPerPage: 10,
       sortBy: [''],
-      sortDesc: [false],
+      sortDesc: [true],
     })
     const tableSettings = reactive({
       itemKey: 'id',
