@@ -72,7 +72,7 @@
 
                   <p class="mb-2">
                     {{
-                      setAddress([
+                      $customUtils.setAddress([
                         order.consigneeAddress,
                         order.consigneeCity,
                         order.consigneeProvince,
@@ -115,7 +115,7 @@
 
                   <p class="mb-2">
                     {{
-                      setAddress([
+                      $customUtils.setAddress([
                         order.pickupAddress,
                         order.pickupCity,
                         order.pickupProvince,
@@ -193,11 +193,6 @@ export default defineComponent({
     const orderAllocationUpdates = computed(
       () => store.state.orders.orderDetails.orderAllocationUpdates
     )
-    const setAddress = (data: string[]) => {
-      const setItem = data.filter((item: string) => item)
-
-      return setItem.join(', ')
-    }
 
     useFetch(async () => {
       await store.dispatch('orders/getOrderDetails', id.value)
@@ -207,7 +202,6 @@ export default defineComponent({
       id,
       order,
       orderAllocationUpdates,
-      setAddress,
     }
   },
 })

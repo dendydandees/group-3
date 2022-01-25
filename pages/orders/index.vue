@@ -60,8 +60,14 @@
                   </p>
 
                   <p class="ma-0">
-                    {{ item.consigneeCity }}, {{ item.consigneeProvince }},
-                    {{ item.consigneeCountry }}, {{ item.consigneePostal }}
+                    {{
+                      $customUtils.setAddress([
+                        item.consigneeCity,
+                        item.consigneeProvince,
+                        item.consigneeCountry,
+                        item.consigneePostal,
+                      ])
+                    }}
                   </p>
                 </div>
               </td>
@@ -78,8 +84,14 @@
                   </p>
 
                   <p class="ma-0">
-                    {{ item.pickupCity }}, {{ item.pickupProvince }},
-                    {{ item.pickupCountry }}, {{ item.pickupPostal }}
+                    {{
+                      $customUtils.setAddress([
+                        item.pickupCity,
+                        item.pickupProvince,
+                        item.pickupCountry,
+                        item.pickupPostal,
+                      ])
+                    }}
                   </p>
                 </div>
               </td>
@@ -92,7 +104,7 @@
                   :disabled="$fetchState.loading"
                   color="primary"
                   nuxt
-                  :to="`/${item.id}`"
+                  :to="`/orders/${item.id}`"
                 >
                   Details
                 </v-btn>
