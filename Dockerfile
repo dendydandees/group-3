@@ -1,6 +1,4 @@
-FROM node:16.13.2-alpine3.14 as build-stage
-
-ENV NODE_ENV=production
+FROM node:16.13.2-alpine3.14 as builder
 
 RUN mkdir -p /app
 
@@ -16,17 +14,20 @@ COPY . /app
 # https://stackoverflow.com/a/48750051
 RUN npm cache verify
 
-
 RUN npm install
 
-RUN npm run generate
+RUN npm run build
 
-FROM nginx:stable-alpine as production-stage
+FROM node:16.13.2-alpine3.14 as runner
 
-COPY --from=build-stage /app/dist /usr/share/nginx/html
+WORKDIR /app
 
-RUN chown nginx:nginx /usr/share/nginx/html
+COPY --from=builder /app  .
 
+ENV NUXT_HOST=0.0.0.0
+ENV NUXT_PORT=80
+ENV NUXT_PROXY=https://admin.dev.luwjistik.io
 EXPOSE 80
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD [ "npm", "run", "start" ]
+
