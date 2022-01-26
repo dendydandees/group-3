@@ -3,7 +3,6 @@
     :elevate-on-scroll="true"
     app
     color="white"
-    height="80px"
     outlined
     tile
     style="border: 1px solid; border-color: rgba(0, 0, 0, 0.12)"
@@ -16,7 +15,7 @@
       <NuxtImg
         src="/images/Luwjistik Logo FA-02.png"
         format="webp"
-        height="32"
+        height="24"
         preload
       />
     </NuxtLink>

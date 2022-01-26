@@ -19,7 +19,7 @@
               tile
               color="primary"
               elevation="0"
-              :loading="$fetchState.loading"
+              :loading="$fetchState.pending"
             >
               <template slot="progress">
                 <v-progress-linear color="info" height="8" indeterminate />
@@ -59,7 +59,7 @@
               tile
               color="primary"
               elevation="0"
-              :loading="$fetchState.loading"
+              :loading="$fetchState.pending"
             >
               <template slot="progress">
                 <v-progress-linear color="info" height="8" indeterminate />
@@ -106,7 +106,7 @@
               tile
               color="primary"
               elevation="0"
-              :loading="$fetchState.loading"
+              :loading="$fetchState.pending"
             >
               <template slot="progress">
                 <v-progress-linear color="info" height="8" indeterminate />
@@ -146,9 +146,9 @@
 
       <!-- Order updates -->
       <v-col cols="12" md="8">
-        <v-card tile elevation="0" :loading="$fetchState.loading" height="100%">
+        <v-card tile elevation="0" :loading="$fetchState.pending" height="100%">
           <template slot="progress">
-            <v-progress-linear color="info" height="8" indeterminate />
+            <v-progress-linear color="primary" height="8" indeterminate />
           </template>
 
           <v-card-text class="body-1 pa-6">
@@ -187,12 +187,12 @@
     </v-row>
 
     <!-- Order items -->
-    <v-row no-gutters align="center" class="my-10">
+    <v-row no-gutters align="center" class="mt-6">
       <v-col cols="12" class="white pa-3">
         <v-data-table
           v-bind="tableSettings"
           :items="orderItems"
-          :loading="$fetchState.loading"
+          :loading="$fetchState.pending"
           class="elevation-0"
         >
           <template #[`item.price`]="{ item }">
