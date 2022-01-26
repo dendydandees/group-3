@@ -13,7 +13,7 @@ COPY . /app
 # https://stackoverflow.com/a/48750051
 RUN npm cache verify
 
-RUN npm run ci
+RUN npm ci
 
 RUN npm run build
 
@@ -29,5 +29,3 @@ ENV NUXT_PROXY=https://admin.dev.luwjistik.io
 EXPOSE 80
 
 CMD [ "npm", "run", "start" ]
-
-RUN npm run build
