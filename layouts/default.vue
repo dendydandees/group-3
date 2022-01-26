@@ -1,10 +1,15 @@
 <template>
   <v-app>
-    <NavigationDrawer v-model="drawer" :mini="mini" :items="itemLinks" />
+    <NavigationDrawer
+      v-model="drawer"
+      :mini="mini"
+      :items="itemLinks"
+      @hideMiniSideNav="hideMiniSideNav"
+    />
 
     <AppBar :mini="mini" @doShowSideNav="doShowSideNav" />
 
-    <v-main>
+    <v-main class="base">
       <Nuxt />
     </v-main>
   </v-app>
@@ -16,10 +21,13 @@ import {
   useContext,
   useMeta,
   ref,
+  Ref,
 } from '@nuxtjs/composition-api'
 // Components
 import NavigationDrawer from '~/components/base/NavigationDrawer.vue'
 import AppBar from '~/components/base/AppBar.vue'
+// Interface and types
+import { NavigationLinks } from '~/types/applications'
 
 export default defineComponent({
   name: 'DefaultLayout',
@@ -28,15 +36,20 @@ export default defineComponent({
   setup() {
     useMeta({ titleTemplate: '%s | Orders' })
     const context = useContext()
-    const drawer = ref(!context.$vuetify.breakpoint.smAndDown)
-    const mini = ref(!context.$vuetify.breakpoint.smAndDown)
+    const drawer = ref(!context.$vuetify.breakpoint.smAndDown) as Ref<boolean>
+    const mini = ref(!context.$vuetify.breakpoint.smAndDown) as Ref<boolean>
     const itemLinks = ref([
-      { title: 'Orders', icon: 'mdi-file-table', to: '/' },
-    ])
+      { title: 'Orders', icon: 'mdi-package', to: '/orders' },
+    ]) as Ref<NavigationLinks[]>
     const doShowSideNav = () => {
       const isMobile = context.$vuetify.breakpoint.smAndDown
+
       if (isMobile) return (drawer.value = !drawer.value)
+
       return (mini.value = !mini.value)
+    }
+    const hideMiniSideNav = () => {
+      mini.value = false
     }
 
     return {
@@ -44,6 +57,7 @@ export default defineComponent({
       mini,
       itemLinks,
       doShowSideNav,
+      hideMiniSideNav,
     }
   },
   head: {},

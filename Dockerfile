@@ -7,14 +7,13 @@ WORKDIR /app
 RUN apk update && apk upgrade
 RUN apk add git
 
-
 COPY . /app
 
 # sometimes there will be a timeout error, this is the fix
 # https://stackoverflow.com/a/48750051
 RUN npm cache verify
 
-RUN npm install
+RUN npm run ci
 
 RUN npm run build
 
@@ -31,3 +30,4 @@ EXPOSE 80
 
 CMD [ "npm", "run", "start" ]
 
+RUN npm run build

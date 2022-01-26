@@ -1,48 +1,35 @@
 <template>
-  <v-app-bar :elevate-on-scroll="true" app color="white">
+  <v-app-bar
+    :elevate-on-scroll="true"
+    app
+    color="white"
+    outlined
+    tile
+    style="border: 1px solid; border-color: rgba(0, 0, 0, 0.12)"
+  >
     <NuxtLink
-      v-if="$vuetify.breakpoint.smAndDown"
+      v-if="$vuetify.breakpoint.mobile"
       to="/"
       class="d-flex align-center"
     >
       <NuxtImg
         src="/images/Luwjistik Logo FA-02.png"
         format="webp"
-        height="32"
+        height="24"
         preload
       />
     </NuxtLink>
 
     <v-spacer v-if="$vuetify.breakpoint.smAndDown" />
 
-    <client-only>
-      <div class="d-flex align-center">
-        <v-app-bar-nav-icon
-          :class="[!$vuetify.breakpoint.smAndDown ? 'mr-4' : '']"
-          @click.stop="$emit('doShowSideNav')"
-        >
-          <v-icon> {{ setIcon }} </v-icon>
-        </v-app-bar-nav-icon>
-
-        <v-badge
-          v-if="!$vuetify.breakpoint.smAndDown"
-          content="Client Portal"
-          value="Client Portal"
-          color="secondary"
-          overlap
-          class="my-2"
-        >
-          <NuxtLink to="/">
-            <NuxtImg
-              src="/images/Luwjistik Logo FA-01.png"
-              format="webp"
-              height="32"
-              preload
-            />
-          </NuxtLink>
-        </v-badge>
-      </div>
-    </client-only>
+    <div class="d-flex align-center">
+      <v-app-bar-nav-icon
+        :class="[!$vuetify.breakpoint.smAndDown ? 'mr-4' : '']"
+        @click.stop="$emit('doShowSideNav')"
+      >
+        <v-icon> {{ setIcon }} </v-icon>
+      </v-app-bar-nav-icon>
+    </div>
   </v-app-bar>
 </template>
 
@@ -56,12 +43,12 @@ export default defineComponent({
       required: true,
     },
   },
-  setup({ mini }) {
+  setup(props) {
     const { $vuetify } = useContext()
     const setIcon = computed(() => {
-      return !$vuetify.breakpoint.smAndDown && !mini
+      return !$vuetify.breakpoint.mobile && !props.mini
         ? 'mdi-backburger'
-        : !$vuetify.breakpoint.smAndDown && mini
+        : !$vuetify.breakpoint.mobile && props.mini
         ? 'mdi-forwardburger'
         : 'mdi-menu'
     })

@@ -1,9 +1,7 @@
-import { Middleware } from '@nuxt/types'
+import { defineNuxtMiddleware } from '@nuxtjs/composition-api'
 
-const guest: Middleware = ({ store, redirect }) => {
+export default defineNuxtMiddleware(({ store, redirect }): any => {
   if (store.state.auth.loggedIn) {
     return redirect('/')
   }
-}
-
-export default guest
+})

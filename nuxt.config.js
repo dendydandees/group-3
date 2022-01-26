@@ -37,13 +37,19 @@ export default {
       { name: 'format-detection', content: 'telephone=no' },
     ],
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
+    script: [
+      {
+        src: 'https://polyfill.io/v3/polyfill.min.js?features=IntersectionObserver',
+        body: true,
+      },
+    ],
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: ['~/assets/scss/main.scss'],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: ['~/plugins/vee-validate.ts'],
+  plugins: ['~/plugins/vee-validate.ts', '~/plugins/customUtils.ts'],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -55,6 +61,7 @@ export default {
     // https://go.nuxtjs.dev/vuetify
     '@nuxtjs/vuetify',
     '@nuxtjs/composition-api/module',
+    '@vueuse/nuxt',
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -94,6 +101,10 @@ export default {
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {
     customVariables: ['~/assets/scss/variables.scss'],
+    treeShake: true,
+    breakpoint: {
+      mobileBreakpoint: 'sm',
+    },
     theme: {
       dark: false,
       themes: {
