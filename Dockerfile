@@ -9,24 +9,16 @@ WORKDIR /app
 RUN apk update && apk upgrade
 RUN apk add git
 
-
 COPY . /app
 
-# sometimes there will be a timeout error, this is the fix
-# https://stackoverflow.com/a/48750051
-RUN npm cache verify
+RUN npm ci
+RUN npm run build
 
 
-RUN npm install
+FROM node:16.13.2-alpine3.14 as production
 
-RUN npm run generate
+ENV PORT=8000
+COPY --from=build-stage /app/ .
+EXPOSE 8000
 
-FROM nginx:stable-alpine as production-stage
-
-COPY --from=build-stage /app/dist /usr/share/nginx/html
-
-RUN chown nginx:nginx /usr/share/nginx/html
-
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["npm", "run", "start"]
