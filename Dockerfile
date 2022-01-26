@@ -1,7 +1,5 @@
 FROM node:16.13.2-alpine3.14 as build-stage
 
-ENV NODE_ENV=production
-
 RUN mkdir -p /app
 
 WORKDIR /app
