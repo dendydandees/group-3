@@ -15,6 +15,8 @@ RUN npm cache verify
 
 RUN npm ci
 
+ENV NUXT_PROXY=https://admin.dev.luwjistik.io
+
 RUN npm run build
 
 FROM node:16.13.2-alpine3.14 as runner
