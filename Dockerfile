@@ -15,8 +15,8 @@ RUN npm run build
 
 FROM node:16.13.2-alpine3.14 as production
 
-ENV PORT=8000
+ENV PORT=80
 COPY --from=build-stage /app/ .
-EXPOSE 8000
+EXPOSE 80
 
 CMD ["npm", "run", "start"]
