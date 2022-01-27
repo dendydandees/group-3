@@ -5,6 +5,7 @@ import { Alert } from '~/types/applications'
 export const state = () => ({
   alert: {
     isShow: false,
+    type: '',
     message: '',
   } as Alert,
 })
@@ -16,6 +17,7 @@ export const mutations: MutationTree<RootStateApplications> = {
   RESET_ALERT: (state) =>
     (state.alert = {
       isShow: false,
+      type: '',
       message: '',
     }),
 }

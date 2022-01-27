@@ -68,11 +68,11 @@
           :ripple="{ class: `red--text` }"
           @click="doShowUserActions"
         >
-          <v-list-item-avatar tile color="red" size="32">
-            <span class="white--text text-uppercase">
+          <v-avatar size="40" tile color="secondary" class="mr-4">
+            <span class="text-uppercase white--text font-weight-bold title">
               {{ user.initial }}
             </span>
-          </v-list-item-avatar>
+          </v-avatar>
 
           <v-list-item-content>
             <v-list-item-title class="font-weight-bold text-capitalize">
@@ -95,6 +95,18 @@
 
       <v-expand-transition>
         <div v-if="isShowUserActions" class="pa-4 mb-4">
+          <v-btn
+            block
+            tile
+            color="primary"
+            depressed
+            nuxt
+            to="/profiles"
+            class="mb-4"
+          >
+            Profile
+          </v-btn>
+
           <v-btn block tile outlined color="primary" @click="doLogout">
             Sign Out
           </v-btn>

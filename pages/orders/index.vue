@@ -1,15 +1,12 @@
 <template>
   <section class="pa-4 pa-md-10 py-8">
-    <v-row align="center" class="mb-6">
-      <v-col>
-        <h1 class="headline font-weight-bold">
-          Manage Orders
-          <span class="text--secondary font-weight-medium title">
-            &bull; {{ meta.totalCount }} Total Orders
-          </span>
-        </h1>
-      </v-col>
-    </v-row>
+    <BaseHeadlinePage title="Manage Orders">
+      <template slot="addition">
+        <span class="text--secondary font-weight-medium title">
+          &bull; {{ meta.totalCount }} Total Orders
+        </span>
+      </template>
+    </BaseHeadlinePage>
 
     <v-row align="center">
       <v-col cols="12" md="6">

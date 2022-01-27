@@ -34,12 +34,17 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, useContext } from '@nuxtjs/composition-api'
+import {
+  computed,
+  defineComponent,
+  useContext,
+  PropType,
+} from '@nuxtjs/composition-api'
 
 export default defineComponent({
   props: {
     mini: {
-      type: Boolean as () => boolean,
+      type: Boolean as PropType<boolean>,
       required: true,
     },
   },

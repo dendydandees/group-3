@@ -1,5 +1,5 @@
-import { MutationTree, ActionTree } from 'vuex'
 // Interfaces
+import { MutationTree, ActionTree } from 'vuex'
 import {
   OrderDetails,
   Order,
@@ -51,7 +51,7 @@ export const actions: ActionTree<RootStateOrders, RootStateOrders> = {
       commit('SET_META', meta)
 
       return response
-    } catch (error: any) {
+    } catch (error) {
       return error
     }
   },
