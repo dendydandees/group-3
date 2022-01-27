@@ -124,23 +124,22 @@ export default {
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
     transpile: ['vee-validate/dist/rules'],
-    loaders : {
+    loaders: {
       vue: {
-        prettify: false
-      }
-    }
+        prettify: false,
+      },
+    },
   },
 
-    // Axios module configuration: https://go.nuxtjs.dev/config-axios
-    axios: {
-      // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
-      proxy: true,
-      baseURL: process.env.PROXY,
-      browserBaseURL: "/",
-    },
+  // Axios module configuration: https://go.nuxtjs.dev/config-axios
+  axios: {
+    // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
+    proxy: process.env.NODE_ENV === 'development',
+    browserBaseURL: '/',
+  },
 
-    // Proxy configuration:
-    proxy: {
-      '/api/': process.env.PROXY,
-    },
+  // Proxy configuration: https://axios.nuxtjs.org
+  proxy: {
+    '/api/': process.env.PROXY,
+  },
 }
