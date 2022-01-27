@@ -49,7 +49,7 @@ export default {
   css: ['~/assets/scss/main.scss'],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: ['~/plugins/vee-validate.ts', '~/plugins/customUtils.ts'],
+  plugins: ['~/plugins/vee-validate.js', '~/plugins/customUtils.ts'],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,

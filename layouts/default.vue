@@ -1,13 +1,13 @@
 <template>
   <v-app>
-    <NavigationDrawer
+    <BaseNavigationDrawer
       v-model="drawer"
       :mini="mini"
       :items="itemLinks"
       @hideMiniSideNav="hideMiniSideNav"
     />
 
-    <AppBar :mini="mini" @doShowSideNav="doShowSideNav" />
+    <BaseAppBar :mini="mini" @doShowSideNav="doShowSideNav" />
 
     <v-main class="base">
       <Nuxt />
@@ -23,15 +23,11 @@ import {
   ref,
   Ref,
 } from '@nuxtjs/composition-api'
-// Components
-import NavigationDrawer from '~/components/base/NavigationDrawer.vue'
-import AppBar from '~/components/base/AppBar.vue'
 // Interface and types
 import { NavigationLinks } from '~/types/applications'
 
 export default defineComponent({
   name: 'DefaultLayout',
-  components: { NavigationDrawer, AppBar },
   middleware: 'auth',
   setup() {
     useMeta({ titleTemplate: '%s | Orders' })

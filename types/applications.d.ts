@@ -5,6 +5,7 @@ export interface VuexModuleApplications {
 
 export interface Alert {
   isShow: boolean
+  type: string
   message: string
 }
 
@@ -23,4 +24,9 @@ export interface FilterDetails {
   groupDesc?: boolean[]
   multiSort?: boolean
   mustSort?: boolean
+}
+
+export type VForm = Vue & {
+  validate: () => boolean
+  reset: () => boolean
 }
