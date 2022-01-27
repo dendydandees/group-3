@@ -13,7 +13,6 @@
         <!-- Search filter field -->
         <v-text-field
           v-model="filter.search"
-          :loading="$fetchState.pending"
           :disabled="$fetchState.pending"
           label="Search by order code"
           placeholder="Enter your order code..."
