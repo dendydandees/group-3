@@ -3,6 +3,7 @@
     v-bind="tableSettings"
     :items="orderItems"
     :loading="fetchState.pending"
+    :items-per-page="-1"
     class="elevation-0"
   >
     <template #[`item.price`]="{ item }">

@@ -68,7 +68,12 @@
           :ripple="{ class: `red--text` }"
           @click="doShowUserActions"
         >
-          <v-avatar size="40" tile color="secondary" class="mr-4">
+          <v-avatar
+            size="40"
+            tile
+            color="secondary"
+            :class="mini ? 'mr-0' : 'mr-4'"
+          >
             <span class="text-uppercase white--text font-weight-bold title">
               {{ user.initial }}
             </span>

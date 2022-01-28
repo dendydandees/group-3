@@ -19,7 +19,7 @@
       <v-col cols="12">
         <BaseTableListServer
           item-key="id"
-          :fetch-state="$fetchState"
+          :loading="$fetchState.pending"
           :items="orders"
           :headers="headers"
           :meta="meta"

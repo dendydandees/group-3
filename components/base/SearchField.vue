@@ -14,13 +14,13 @@
   />
 </template>
 
-<script>
-import { computed, defineComponent } from '@nuxtjs/composition-api'
+<script lang="ts">
+import { computed, defineComponent, PropType } from '@nuxtjs/composition-api'
 
 export default defineComponent({
   props: {
     value: {
-      type: String,
+      type: String as PropType<String>,
       default: null,
     },
   },

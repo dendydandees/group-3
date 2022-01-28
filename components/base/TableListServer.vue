@@ -6,7 +6,7 @@
     :footer-props="footerProps"
     :server-items-length="meta.totalCount"
     :options.sync="tableOptions"
-    :loading="fetchState.pending"
+    :loading="loading"
     class="elevation-0"
     @update:options="fetch"
   >
@@ -73,8 +73,8 @@
         v-if="isShowActions.detail"
         tile
         small
-        :loading="fetchState.pending"
-        :disabled="fetchState.pending"
+        :loading="loading"
+        :disabled="loading"
         color="primary"
         elevation="0"
         class="ma-2"
@@ -87,38 +87,44 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref } from '@nuxtjs/composition-api'
+import {
+  defineComponent,
+  reactive,
+  ref,
+  PropType,
+} from '@nuxtjs/composition-api'
 // Interfaces and types
-import { FilterDetails } from '~/types/applications'
+import { DataOptions, DataTableHeader, ItemGroup } from 'vuetify'
+import { ActionsTable, FilterDetails, Meta } from '~/types/applications'
 
 export default defineComponent({
   props: {
-    fetchState: {
-      type: Object,
-      required: true,
+    loading: {
+      type: Boolean as PropType<Boolean>,
+      default: false,
     },
     itemKey: {
-      type: String,
+      type: String as PropType<String>,
       required: true,
     },
     items: {
-      type: Array,
+      type: Array as unknown as () => PropType<ItemGroup<[]>>,
       required: true,
     },
     headers: {
-      type: Array,
+      type: Array as unknown as PropType<DataTableHeader<[]>>,
       required: true,
     },
     meta: {
-      type: Object,
+      type: Object as PropType<Meta>,
       required: true,
     },
     options: {
-      type: Object,
+      type: Object as PropType<DataOptions>,
       required: true,
     },
     isShowActions: {
-      type: Object,
+      type: Object as PropType<ActionsTable>,
       default: () => ({
         detail: false,
         edit: false,
