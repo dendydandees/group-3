@@ -30,3 +30,21 @@ export type VForm = Vue & {
   validate: () => boolean
   reset: () => boolean
 }
+
+
+export interface ActionsTable {
+  detail: boolean,
+  edit: boolean,
+  delete: boolean,
+}
+
+export interface Meta {
+  page: number
+  totalPage: number
+  totalCount: number
+}
+
+export interface FetchState {
+  pending: boolean
+  error: boolean
+}
