@@ -1,5 +1,7 @@
 import colors from 'vuetify/es5/util/colors'
 
+const development = process.env.NODE_ENV === 'development'
+
 export default {
   // Server property: https://nuxtjs.org/docs/configuration-glossary/configuration-server#the-server-property
   server: {
@@ -87,7 +89,7 @@ export default {
           autoFetch: false,
         },
         endpoints: {
-          login: { url: '/api/login', method: 'post' },
+          login: { url: '/login', method: 'post' },
           user: false,
           logout: false,
         },
@@ -134,12 +136,12 @@ export default {
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
     // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
-    proxy: process.env.NODE_ENV === 'development',
-    browserBaseURL: '/',
+    proxy: development,
+    baseURL: development ? '' : process.env.API_URL,
   },
 
   // Proxy configuration: https://axios.nuxtjs.org
   proxy: {
-    '/api/': process.env.PROXY,
+    '/api/': process.env.API_URL,
   },
 }

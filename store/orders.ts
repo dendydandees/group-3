@@ -34,7 +34,7 @@ export const mutations: MutationTree<RootStateOrders> = {
 export const actions: ActionTree<RootStateOrders, RootStateOrders> = {
   async getOrders({ commit }, { params }) {
     try {
-      const response = await this?.$axios?.$get('/api/clients/orders', {
+      const response = await this?.$axios?.$get('/clients/orders', {
         params,
       })
       const { data, page, totalPage, totalCount } = response
@@ -58,13 +58,13 @@ export const actions: ActionTree<RootStateOrders, RootStateOrders> = {
   async getOrderDetails({ commit }, id: string) {
     try {
       const request = [
-        this.$axios.$get(`/api/clients/orders`, {
+        this.$axios.$get(`/clients/orders`, {
           params: {
             orderId: id,
           },
         }),
-        this.$axios.$get(`/api/clients/orders/${id}/items`),
-        this.$axios.$get(`/api/clients/orders/${id}/updates`),
+        this.$axios.$get(`/clients/orders/${id}/items`),
+        this.$axios.$get(`/clients/orders/${id}/updates`),
       ]
       const [responseOrderDetails, responseOrderItems, responseOrderUpdates] =
         await Promise.all(request)
