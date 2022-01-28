@@ -89,7 +89,7 @@ export default {
           autoFetch: false,
         },
         endpoints: {
-          login: { url: '/login', method: 'post' },
+          login: { url: '/api/login', method: 'post' },
           user: false,
           logout: false,
         },
