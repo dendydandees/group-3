@@ -3,16 +3,18 @@
     <BaseHeadlinePage title="Manage Profile" />
 
     <!-- Profile information -->
-    <client-only placeholder="Loading...">
+    <client-only>
       <v-expand-x-transition>
-        <ProfilesInformation :user="user" @show="doShowChangePasswordForm" />
+        <ProfilesInformations :user="user" @show="doShowChangePasswordForm" />
       </v-expand-x-transition>
+
+      <BaseLoading slot="placeholder" />
     </client-only>
 
     <!-- The next features -->
     <!-- Update password form -->
     <v-expand-transition>
-      <ProfilesUpdatePasswordForm v-if="false" :data="user" />
+      <ProfilesManagePassword v-if="false" :data="user" />
     </v-expand-transition>
   </section>
 </template>

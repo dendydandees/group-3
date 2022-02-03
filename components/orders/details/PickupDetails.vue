@@ -9,27 +9,31 @@
 
       <v-divider class="grey lighten-4 my-4" />
 
-      <div>
-        <h3 class="font-weight-medium subtitle-1">
-          {{ order.pickupContactName }}
-        </h3>
+      <BaseLoading v-if="fetchState.pending" color="white" />
 
-        <p class="mb-4">
-          {{ order.pickupContactNumber }}
-        </p>
+      <v-expand-transition>
+        <div v-if="!fetchState.pending">
+          <h3 class="font-weight-medium subtitle-1">
+            {{ order.pickupContactName }}
+          </h3>
 
-        <p class="mb-2">
-          {{
-            $customUtils.setAddress([
-              order.pickupAddress,
-              order.pickupCity,
-              order.pickupProvince,
-              order.pickupCountry,
-              order.pickupPostal,
-            ])
-          }}
-        </p>
-      </div>
+          <p class="mb-4">
+            {{ order.pickupContactNumber }}
+          </p>
+
+          <p class="mb-2">
+            {{
+              $customUtils.setAddress([
+                order.pickupAddress,
+                order.pickupCity,
+                order.pickupProvince,
+                order.pickupCountry,
+                order.pickupPostal,
+              ])
+            }}
+          </p>
+        </div>
+      </v-expand-transition>
     </v-card-text>
   </v-card>
 </template>

@@ -4,37 +4,41 @@
       <v-progress-linear color="primary" height="8" indeterminate />
     </template>
 
-    <v-card-text class="body-1 pa-6">
-      <v-timeline dense clipped align-top>
-        <v-timeline-item
-          v-for="update in orderAllocationUpdates"
-          :key="update.id"
-          small
-          class="mb-10"
-        >
-          <v-row justify="space-between">
-            <v-col cols="auto">
-              <h3 class="font-weight-medium subtitle-1">
-                {{ update.partnerName }}
-              </h3>
+    <BaseLoading v-if="fetchState.pending" />
 
-              <p class="ma-0 caption">
-                {{ update.serviceType }}
-              </p>
-            </v-col>
-            <v-col class="text-right" cols="auto">
-              <v-chip
-                small
-                :color="update.externalTrackingNumber ? 'primary' : ''"
-                class="text-right text-uppercase"
-              >
-                {{ update.externalTrackingNumber || 'Not submitted' }}
-              </v-chip>
-            </v-col>
-          </v-row>
-        </v-timeline-item>
-      </v-timeline>
-    </v-card-text>
+    <v-expand-transition>
+      <v-card-text v-if="!fetchState.pending" class="body-1 pa-6">
+        <v-timeline dense clipped align-top>
+          <v-timeline-item
+            v-for="update in orderAllocationUpdates"
+            :key="update.id"
+            small
+            class="mb-10"
+          >
+            <v-row justify="space-between">
+              <v-col cols="auto">
+                <h3 class="font-weight-medium subtitle-1">
+                  {{ update.partnerName }}
+                </h3>
+
+                <p class="ma-0 caption">
+                  {{ update.serviceType }}
+                </p>
+              </v-col>
+              <v-col class="text-right" cols="auto">
+                <v-chip
+                  small
+                  :color="update.externalTrackingNumber ? 'primary' : ''"
+                  class="text-right text-uppercase"
+                >
+                  {{ update.externalTrackingNumber || 'Not submitted' }}
+                </v-chip>
+              </v-col>
+            </v-row>
+          </v-timeline-item>
+        </v-timeline>
+      </v-card-text>
+    </v-expand-transition>
   </v-card>
 </template>
 

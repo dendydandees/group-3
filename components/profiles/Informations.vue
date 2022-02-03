@@ -42,7 +42,7 @@ import { defineComponent, PropType } from '@nuxtjs/composition-api'
 import { User } from '~/types/login'
 
 export default defineComponent({
-  name: 'ProfileInformation',
+  name: 'ProfileInformations',
   props: {
     user: {
       type: Object as PropType<User>,

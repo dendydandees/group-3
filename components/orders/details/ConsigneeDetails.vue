@@ -8,32 +8,35 @@
       <h2 class="font-weight-bold title">Consignee Details</h2>
 
       <v-divider class="grey lighten-4 my-4" />
+      <BaseLoading v-if="fetchState.pending" color="white" />
 
-      <div>
-        <h3 class="font-weight-medium subtitle-1">
-          {{ order.consigneeName }}
-        </h3>
+      <v-expand-transition>
+        <div v-if="!fetchState.pending">
+          <h3 class="font-weight-medium subtitle-1">
+            {{ order.consigneeName }}
+          </h3>
 
-        <p class="ma-0">
-          {{ order.consigneeEmail }}
-        </p>
+          <p class="ma-0">
+            {{ order.consigneeEmail }}
+          </p>
 
-        <p class="mb-4">
-          {{ order.consigneeNumber }}
-        </p>
+          <p class="mb-4">
+            {{ order.consigneeNumber }}
+          </p>
 
-        <p class="mb-2">
-          {{
-            $customUtils.setAddress([
-              order.consigneeAddress,
-              order.consigneeCity,
-              order.consigneeProvince,
-              order.consigneeCountry,
-              order.consigneePostal,
-            ])
-          }}
-        </p>
-      </div>
+          <p class="mb-2">
+            {{
+              $customUtils.setAddress([
+                order.consigneeAddress,
+                order.consigneeCity,
+                order.consigneeProvince,
+                order.consigneeCountry,
+                order.consigneePostal,
+              ])
+            }}
+          </p>
+        </div>
+      </v-expand-transition>
     </v-card-text>
   </v-card>
 </template>

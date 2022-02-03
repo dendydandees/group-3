@@ -9,20 +9,24 @@
 
       <v-divider class="grey lighten-4 my-4" />
 
-      <div>
-        <h3 class="font-weight-medium subtitle-1">
-          {{ order.orderCode }}
-        </h3>
+      <BaseLoading v-if="fetchState.pending" color="white" />
 
-        <p class="mb-4">
-          {{ order.length }} (cm) x {{ order.width }} (cm) x
-          {{ order.height }} (cm) &bull; {{ order.weight }}
-        </p>
+      <v-expand-transition>
+        <div v-if="!fetchState.pending">
+          <h3 class="font-weight-medium subtitle-1">
+            {{ order.orderCode }}
+          </h3>
 
-        <v-chip small color="success" class="text-uppercase mb-2 black--text">
-          {{ order.paymentType }}
-        </v-chip>
-      </div>
+          <p class="mb-4">
+            {{ order.length }} (cm) x {{ order.width }} (cm) x
+            {{ order.height }} (cm) &bull; {{ order.weight }}
+          </p>
+
+          <v-chip small color="success" class="text-uppercase mb-2 black--text">
+            {{ order.paymentType }}
+          </v-chip>
+        </div>
+      </v-expand-transition>
     </v-card-text>
   </v-card>
 </template>
