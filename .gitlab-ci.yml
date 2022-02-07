@@ -71,4 +71,4 @@ deploy-sandbox:
     SERVICE: sandbox-lj-client-service
     NAME: lj-sandbox-client-taskdef
   only:
-    - /^sandbox\/.*$
+    - /^sandbox\/.*$/
