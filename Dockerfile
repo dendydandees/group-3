@@ -15,7 +15,7 @@ RUN npm cache verify
 
 RUN npm ci
 
-ENV NUXT_PROXY=https://admin.dev.luwjistik.io
+ENV NUXT_API_URL=https://admin.dev.luwjistik.io
 
 RUN npm run build
 
@@ -27,7 +27,7 @@ COPY --from=builder /app  .
 
 ENV NUXT_HOST=0.0.0.0
 ENV NUXT_PORT=80
-ENV NUXT_PROXY=https://admin.dev.luwjistik.io
+ENV NUXT_API_URL=https://admin.dev.luwjistik.io
 EXPOSE 80
 
 CMD [ "npm", "run", "start" ]

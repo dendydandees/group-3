@@ -68,6 +68,7 @@
             block
             x-large
             tile
+            depressed
             color="primary"
             type="submit"
             class="mr-4 my-8"
@@ -79,7 +80,7 @@
 
           <v-alert
             v-if="alert.isShow && invalid"
-            type="error"
+            :type="alert.type"
             class="text-capitalize"
           >
             {{ alert.message }}
@@ -104,12 +105,7 @@ import {
 import { ValidationObserver, ValidationProvider } from 'vee-validate'
 // Interface and type
 import { Login } from '@/types/login'
-import { Alert, VuexModuleApplications } from '@/types/applications'
-
-export type VForm = Vue & {
-  validate: () => boolean
-  reset: () => boolean
-}
+import { Alert, VuexModuleApplications, VForm } from '@/types/applications'
 
 export default defineComponent({
   name: 'LeftSide',
@@ -170,7 +166,7 @@ export default defineComponent({
       } catch (error) {
         form.password = ''
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const reset = await loginFormObserver?.value?.reset()
+        await loginFormObserver?.value?.reset()
         const message =
           (error as any)?.response?.data?.message ??
           (error as any)?.response?.data?.error ??
@@ -179,6 +175,7 @@ export default defineComponent({
         // Show alert if login failed
         setAlert({
           isShow: true,
+          type: 'error',
           message,
         })
       } finally {

@@ -1,5 +1,7 @@
 import colors from 'vuetify/es5/util/colors'
 
+const development = process.env.NODE_ENV === 'development'
+
 export default {
   // Server property: https://nuxtjs.org/docs/configuration-glossary/configuration-server#the-server-property
   server: {
@@ -49,7 +51,7 @@ export default {
   css: ['~/assets/scss/main.scss'],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: ['~/plugins/vee-validate.ts', '~/plugins/customUtils.ts'],
+  plugins: ['~/plugins/vee-validate.js', '~/plugins/customUtils.ts'],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -124,23 +126,22 @@ export default {
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
     transpile: ['vee-validate/dist/rules'],
-    loaders : {
+    loaders: {
       vue: {
-        prettify: false
-      }
-    }
+        prettify: false,
+      },
+    },
   },
 
-    // Axios module configuration: https://go.nuxtjs.dev/config-axios
-    axios: {
-      // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
-      proxy: true,
-      baseURL: process.env.PROXY,
-      browserBaseURL: "/",
-    },
+  // Axios module configuration: https://go.nuxtjs.dev/config-axios
+  axios: {
+    // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
+    proxy: development,
+    baseURL: development ? '' : process.env.API_URL,
+  },
 
-    // Proxy configuration:
-    proxy: {
-      '/api/': process.env.PROXY,
-    },
+  // Proxy configuration: https://axios.nuxtjs.org
+  proxy: {
+    '/api/': process.env.API_URL,
+  },
 }
