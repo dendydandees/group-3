@@ -26,7 +26,7 @@ build-development:
     DOCKERFILE: "${CI_PROJECT_DIR}/Dockerfile"
   before_script:
     - VERSION="${CI_COMMIT_SHA}"
-    - IMAGE_DESTINATION="${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
+    - IMAGE_DESTINATION="${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}"
   only:
     refs:
       - main
