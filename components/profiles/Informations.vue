@@ -2,22 +2,26 @@
   <v-row>
     <v-col cols="12">
       <v-card dark tile color="primary" elevation="0">
-        <v-card-text
-          class="d-flex flex-wrap flex-row align-center body-1 white--text pa-6"
-        >
-          <v-avatar size="48" tile color="secondary">
-            <span class="text-uppercase font-weight-bold title">
-              {{ user.initial }}
-            </span>
-          </v-avatar>
+        <v-card-text class="body-1 white--text pa-6">
+          <v-row align="center">
+            <v-col cols="12" md="auto">
+              <v-avatar size="48" tile color="secondary">
+                <span class="text-uppercase font-weight-bold title">
+                  {{ user.initial }}
+                </span>
+              </v-avatar>
+            </v-col>
 
-          <div class="ml-6">
-            <h2 class="text-capitalize font-weight-bold title mb-1">
-              {{ user.role }}
-            </h2>
+            <v-col cols="12" md="auto">
+              <div>
+                <h2 class="text-capitalize font-weight-bold title">
+                  {{ user.role }}
+                </h2>
 
-            <p class="ma-0">{{ user.email }}</p>
-          </div>
+                <p class="ma-0">{{ user.email }}</p>
+              </div>
+            </v-col>
+          </v-row>
 
           <!-- Next features -->
           <v-btn
@@ -42,7 +46,7 @@ import { defineComponent, PropType } from '@nuxtjs/composition-api'
 import { User } from '~/types/login'
 
 export default defineComponent({
-  name: 'ProfileInformation',
+  name: 'ProfileInformations',
   props: {
     user: {
       type: Object as PropType<User>,

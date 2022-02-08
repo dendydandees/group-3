@@ -10,7 +10,7 @@
           class="mb-4"
         />
 
-        <h1 class="display-2 font-weight-bold mb-10 mb-md-15">
+        <h1 class="display-2 font-weight-black mb-10 mb-md-15">
           Welcome to Client Portal
         </h1>
 

@@ -35,9 +35,9 @@ export default defineComponent({
   background: repeating-linear-gradient(
     -45deg,
     #2196f3,
-    #2196f3 17.5px,
+    #424242 17.5px,
     #e5e5f7 17.5px,
-    #e5e5f7 87.5px
+    #424242 87.5px
   );
   min-width: 100%;
   min-height: 100%;

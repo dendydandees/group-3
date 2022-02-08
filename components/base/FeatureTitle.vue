@@ -1,16 +1,13 @@
 <template>
-  <v-row align="center" class="mb-6">
-    <v-col cols="12" sm="8" md="6">
-      <h1 class="headline font-weight-bold mb-2 text-capitalize">
-        {{ title }}
-        <slot name="addition" />
-      </h1>
+  <div>
+    <h2 class="mb-2 title font-weight-medium text-capitalize">
+      {{ title }}
+    </h2>
 
-      <v-subheader v-if="subtitle" class="pa-0 subtitle-1">
-        {{ subtitle }}
-      </v-subheader>
-    </v-col>
-  </v-row>
+    <v-subheader v-if="subtitle" class="pa-0 subtitle-1">
+      {{ subtitle }}
+    </v-subheader>
+  </div>
 </template>
 
 <script lang="ts">

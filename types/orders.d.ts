@@ -59,12 +59,6 @@ export interface OrderAllocationUpdate {
   }
 }
 
-export interface OrderMeta {
-  page: number
-  totalPage: number
-  totalCount: number
-}
-
 export interface OrderDetails {
   order: Order | {}
   orderItems: OrderItem[]

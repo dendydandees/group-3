@@ -1,9 +1,9 @@
 // Interfaces
 import { MutationTree, ActionTree } from 'vuex'
+import { Meta } from '~/types/applications'
 import {
   OrderDetails,
   Order,
-  OrderMeta,
   OrderItem,
   OrderAllocationUpdate,
 } from '~/types/orders'
@@ -19,7 +19,7 @@ export const state = () => ({
     page: 1,
     totalPage: 1,
     totalCount: 10,
-  } as OrderMeta,
+  } as Meta,
 })
 
 export type RootStateOrders = ReturnType<typeof state>
@@ -28,7 +28,7 @@ export const mutations: MutationTree<RootStateOrders> = {
   SET_ORDERS: (state, value: Order[] | []) => (state.orders = value),
   SET_ORDER_DETAILS: (state, value: OrderDetails) =>
     (state.orderDetails = value),
-  SET_META: (state, value: OrderMeta) => (state.meta = value),
+  SET_META: (state, value: Meta) => (state.meta = value),
 }
 
 export const actions: ActionTree<RootStateOrders, RootStateOrders> = {
