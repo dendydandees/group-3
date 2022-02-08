@@ -16,13 +16,7 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  useContext,
-  useMeta,
-  ref,
-  Ref,
-} from '@nuxtjs/composition-api'
+import { defineComponent, useContext, ref, Ref } from '@nuxtjs/composition-api'
 // Interface and types
 import { NavigationLinks } from '~/types/applications'
 
@@ -30,7 +24,6 @@ export default defineComponent({
   name: 'DefaultLayout',
   middleware: 'auth',
   setup() {
-    useMeta({ titleTemplate: '%s | Orders' })
     const context = useContext()
     const drawer = ref(!context.$vuetify.breakpoint.smAndDown) as Ref<boolean>
     const mini = ref(!context.$vuetify.breakpoint.smAndDown) as Ref<boolean>
@@ -56,6 +49,5 @@ export default defineComponent({
       hideMiniSideNav,
     }
   },
-  head: {},
 })
 </script>

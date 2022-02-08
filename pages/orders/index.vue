@@ -1,6 +1,9 @@
 <template>
   <section class="pa-4 pa-md-10 py-8">
-    <BaseHeadlinePage title="Manage Orders">
+    <BaseHeadlinePage
+      title="Manage Orders"
+      subtitle="View details of each order or make changes to any existing orders."
+    >
       <template slot="addition">
         <span class="text--secondary font-weight-medium title">
           &bull; {{ meta.totalCount }} Total Orders
@@ -42,6 +45,7 @@ import {
   reactive,
   watch,
   ref,
+  useMeta,
   useRouter,
 } from '@nuxtjs/composition-api'
 // Interfaces or types
@@ -52,6 +56,7 @@ export default defineComponent({
   name: 'OrdersPages',
   layout: 'default',
   setup() {
+    useMeta({ titleTemplate: '%s | Orders' })
     const store = useStore<VuexModuleOrders>()
     const router = useRouter()
     const orders = computed(() => store.state.orders.orders)
@@ -144,6 +149,7 @@ export default defineComponent({
       isShowActions,
     }
   },
+  head: {},
 })
 </script>
 
