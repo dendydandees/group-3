@@ -15,8 +15,6 @@ RUN npm cache verify
 
 RUN npm ci
 
-ENV NUXT_API_URL=https://admin.dev.luwjistik.io
-
 RUN npm run build
 
 FROM node:16.13.2-alpine3.14 as runner
@@ -25,9 +23,11 @@ WORKDIR /app
 
 COPY --from=builder /app  .
 
+ARG NUXT_PROXY
+ENV NUXT_PROXY ${NUXT_PROXY}
 ENV NUXT_HOST=0.0.0.0
 ENV NUXT_PORT=80
-ENV NUXT_API_URL=https://admin.dev.luwjistik.io
+
 EXPOSE 80
 
 CMD [ "npm", "run", "start" ]
