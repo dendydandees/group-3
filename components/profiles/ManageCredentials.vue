@@ -1,121 +1,95 @@
 <template>
-  <v-expand-transition>
-    <v-row class="mt-8">
-      <v-col cols="12" md="4">
-        <BaseFeatureTitle
-          title="Key Credentials"
-          subtitle="Generate a new credentials or revoke the existing credentials."
-        />
-      </v-col>
+  <article>
+    <v-expand-transition>
+      <v-row class="mt-8">
+        <v-col cols="12" md="4">
+          <BaseFeatureTitle
+            title="Key Credentials"
+            subtitle="Generate a new credentials or revoke the existing credentials."
+          />
+        </v-col>
 
-      <v-col cols="12" md="8">
-        <v-card tile color="white" elevation="0">
-          <v-card-text>
-            <v-alert tile type="warning">
-              Your secret key grants you access to our API. Treat your API key
-              like a passwords, don't expose them in your application code and
-              don't share it on Github or anywhere else online.
-            </v-alert>
-
-            <!-- alert user actions (clipboard, revoke, generate key) -->
-            <v-expand-transition>
-              <v-alert
-                v-if="alert.isShow && alert.message.includes('Key')"
-                tile
-                dismissible
-                :type="alert.type"
-              >
-                {{ alert.message }}
+        <v-col cols="12" md="8">
+          <v-card tile color="white" elevation="0">
+            <v-card-text>
+              <v-alert tile type="warning">
+                Your secret key grants you access to our API. Treat your API key
+                like a passwords, don't expose them in your application code and
+                don't share it on Github or anywhere else online.
               </v-alert>
-            </v-expand-transition>
 
-            <!-- list of keys -->
-            <v-list>
-              <template v-for="(credential, index) in credentials">
-                <v-list-item :key="credential.id">
-                  <v-list-item-content>
-                    <v-list-item-title class="d-flex align-center">
-                      <span class="font-weight-medium">
-                        {{ credential.keyName }}
-                      </span>
+              <!-- alert user actions (clipboard, revoke, generate key) -->
+              <v-expand-transition>
+                <v-alert
+                  v-if="alert.isShow && alert.message.includes('Key')"
+                  tile
+                  dismissible
+                  :type="alert.type"
+                >
+                  {{ alert.message }}
+                </v-alert>
+              </v-expand-transition>
 
-                      <span
-                        :title="credential.token"
-                        class="d-inline-block text-truncate"
-                        :style="{
-                          'max-width': $vuetify.breakpoint.smAndDown
-                            ? '7rem'
-                            : '15rem',
-                        }"
-                      >
-                        --- {{ credential.token }} ---
-                      </span>
-
-                      <v-chip
-                        :color="credential.revokedAt ? 'error' : 'success'"
-                        small
-                      >
-                        {{ credential.revokedAt ? 'revoked' : 'active' }}
-                      </v-chip>
-
-                      <v-btn
-                        v-if="!credential.revokedAt"
-                        icon
-                        depressed
-                        :disabled="status.copied"
-                        @click="doCopy(credential.token)"
-                      >
-                        <v-icon>mdi-content-copy</v-icon>
-                      </v-btn>
-                    </v-list-item-title>
-                  </v-list-item-content>
-
-                  <v-list-item-action>
-                    <v-btn
-                      v-if="!credential.revokedAt"
-                      tile
-                      depressed
-                      text
-                      color="error"
-                      :disabled="status.copied"
-                      class="mx-2"
-                      @click="$emit('toggleConfirmRevoke', credential.id)"
-                    >
-                      Revoke key
-                    </v-btn>
-                  </v-list-item-action>
-                </v-list-item>
-
-                <v-divider v-if="index < credentials.length - 1" :key="index" />
+              <!-- list of keys -->
+              <template v-if="metaCredentials.totalCount === 0">
+                <p>No keys available</p>
               </template>
-            </v-list>
 
-            <v-pagination
-              :value="pagination.page"
-              :length="metaCredentials.totalPage"
-              :total-visible="7"
-              class="my-6"
-              @input="changePagination"
-            />
-          </v-card-text>
+              <template v-else>
+                <ProfilesCredentialList
+                  :credentials="credentials"
+                  :status="status"
+                  @doCopy="doCopy"
+                  @toggleConfirmRevoke="toggleConfirmRevoke"
+                />
 
-          <v-card-actions class="pa-4">
-            <v-spacer />
+                <v-pagination
+                  :value="pagination.page"
+                  :length="metaCredentials.totalPage"
+                  :total-visible="7"
+                  class="my-6"
+                  @input="changePagination"
+                />
+              </template>
+            </v-card-text>
 
-            <v-btn
-              tile
-              depressed
-              outlined
-              color="primary"
-              :disabled="status.copied"
-            >
-              Generate new key
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-expand-transition>
+            <v-card-actions class="pa-4">
+              <v-spacer />
+
+              <v-btn
+                tile
+                depressed
+                outlined
+                color="primary"
+                :disabled="status.copied"
+                @click="toggleGenerateKey"
+              >
+                Generate new key
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-expand-transition>
+
+    <!-- Modal confirm -->
+    <BaseModalConfirm
+      v-model="dialog.confirm"
+      :dialog-settings="dialogSettings"
+      @doSubmit="doRevoke"
+    />
+
+    <!-- Modal form -->
+    <BaseModalForm
+      v-model="dialog.form"
+      :dialog-settings="dialogSettings"
+      @doSubmit="doGenerateKey"
+    >
+      <template #modalFields>
+        <ProfilesGenerateKeyFields v-model="form" />
+      </template>
+    </BaseModalForm>
+  </article>
 </template>
 
 <script lang="ts">
@@ -125,15 +99,18 @@ import {
   useStore,
   useFetch,
   computed,
+  ref,
+  Ref,
+  watch,
 } from '@nuxtjs/composition-api'
 import { useClipboard } from '@vueuse/core'
 // Interfaces and types
-import { VuexModuleApplications } from '~/types/applications'
+import { ModalConfirm, VuexModuleApplications } from '~/types/applications'
 import { VuexModuleCredentials } from '~/types/credentials'
 
 export default defineComponent({
   setup() {
-    // store
+    // manage store
     const storeCredentials = useStore<VuexModuleCredentials>()
     const storeApplications = useStore<VuexModuleApplications>()
     const alert = computed(() => storeApplications.state.applications.alert)
@@ -143,7 +120,6 @@ export default defineComponent({
     const metaCredentials = computed(
       () => storeCredentials.state.credentials.meta
     )
-    // manage pagination
     const pagination = computed({
       get() {
         return { ...storeApplications.state.applications.pagination }
@@ -152,6 +128,8 @@ export default defineComponent({
         storeApplications.commit('applications/SET_PAGINATION', value)
       },
     })
+
+    // manage pagination
     pagination.value = {
       page: 1,
       perPage: 5,
@@ -163,6 +141,7 @@ export default defineComponent({
       })
       fetch()
     }
+
     // manage clipboard
     const { text, copy, copied, isSupported } = useClipboard()
     const status = reactive({
@@ -183,6 +162,147 @@ export default defineComponent({
       }, 3000)
     }
 
+    // manage modal
+    const selected = ref('')
+    const form = ref({
+      keyName: '',
+    })
+    const dialog = ref({
+      confirm: false,
+      form: false,
+    })
+    const dialogSettings = ref({
+      loading: false,
+      title: '',
+      content: '',
+      cancelText: '',
+      submitText: '',
+      submitColor: '',
+    }) as Ref<ModalConfirm>
+
+    watch(
+      () => dialog,
+      (newValue) => {
+        if (newValue.value.confirm !== false || newValue.value.form !== false)
+          return
+
+        selected.value = ''
+        form.value = {
+          keyName: '',
+        }
+        dialogSettings.value = {
+          loading: false,
+          title: '',
+          content: '',
+          cancelText: '',
+          submitText: '',
+          submitColor: '',
+        }
+      },
+      { deep: true }
+    )
+
+    // manage revoke key credentials
+    const toggleConfirmRevoke = (id: string) => {
+      selected.value = id
+      dialogSettings.value = {
+        loading: false,
+        title: 'Are you sure ?',
+        content:
+          'You are going to revoke the credential key, revoked credential keys will not be able to use our API',
+        cancelText: 'Cancel',
+        submitText: 'Revoke',
+        submitColor: 'error',
+      }
+      dialog.value.confirm = true
+    }
+    const doRevoke = async () => {
+      try {
+        dialogSettings.value.loading = true
+        // call rest endpoint to revoke key
+        const response = await storeApplications.dispatch(
+          'credentials/revokeKey',
+          { id: selected.value }
+        )
+
+        if (!response?.revokedAt) throw response
+
+        await storeCredentials.dispatch('credentials/getCredentials', {
+          params: pagination.value,
+        })
+        storeApplications.commit('applications/SET_ALERT', {
+          isShow: true,
+          type: 'success',
+          message: 'Key successfully revoked!',
+        })
+      } catch (error) {
+        const message =
+          (error as any)?.response?.data?.message ??
+          (error as any)?.response?.data?.error ??
+          (error as Error)?.message
+
+        storeApplications.commit('applications/SET_ALERT', {
+          isShow: true,
+          type: 'error',
+          message: `Key ${message}`,
+        })
+      } finally {
+        dialogSettings.value.loading = false
+        dialog.value.confirm = false
+        setTimeout(() => {
+          storeApplications.commit('applications/RESET_ALERT')
+        }, 3000)
+      }
+    }
+
+    // manage generate a new key
+    const toggleGenerateKey = () => {
+      dialogSettings.value = {
+        loading: false,
+        title: 'Generate new key credentials',
+        content: '',
+        cancelText: 'Cancel',
+        submitText: 'Submit',
+        submitColor: 'primary',
+      }
+      dialog.value.form = true
+    }
+    const doGenerateKey = async () => {
+      try {
+        dialogSettings.value.loading = true
+        // call endpoint to generate a new key
+        const response = await storeCredentials.dispatch(
+          'credentials/generateKey',
+          { body: form.value }
+        )
+        const { token } = response
+
+        if (!token) throw response
+
+        await storeCredentials.dispatch('credentials/getCredentials', {
+          params: pagination.value,
+        })
+        storeApplications.commit('applications/SET_ALERT', {
+          isShow: true,
+          type: 'success',
+          message: 'Successfully generating a new Key Credential!',
+        })
+        dialog.value.form = false
+      } catch (error) {
+        storeApplications.commit('applications/SET_ALERT', {
+          isShow: true,
+          type: 'error',
+          message:
+            'Generating a new credential key failed because the generated credential key already exists!',
+        })
+      } finally {
+        dialogSettings.value.loading = false
+        setTimeout(() => {
+          storeApplications.commit('applications/RESET_ALERT')
+        }, 3000)
+      }
+    }
+
     const { fetch } = useFetch(async () => {
       await storeCredentials.dispatch('credentials/getCredentials', {
         params: pagination.value,
@@ -197,6 +317,14 @@ export default defineComponent({
       changePagination,
       doCopy,
       status,
+      selected,
+      dialog,
+      dialogSettings,
+      toggleConfirmRevoke,
+      doRevoke,
+      form,
+      toggleGenerateKey,
+      doGenerateKey,
     }
   },
 })

@@ -1,6 +1,6 @@
 import { MutationTree, ActionTree } from 'vuex'
 import { Meta } from '~/types/applications'
-import { Credential } from '~/types/credentials'
+import { Credential, GenerateCredential } from '~/types/credentials'
 
 export const state = () => ({
   credentials: [] as Credential[] | [],
@@ -44,6 +44,15 @@ export const actions: ActionTree<RootStateCredentials, RootStateCredentials> = {
       const response = await this?.$axios?.$patch(
         `/api/clients/credentials/${id}`
       )
+
+      return response
+    } catch (error) {
+      return error
+    }
+  },
+  async generateKey(_store, { body }: { body: GenerateCredential }) {
+    try {
+      const response = await this.$axios.$post('api/clients/credentials', body)
 
       return response
     } catch (error) {
