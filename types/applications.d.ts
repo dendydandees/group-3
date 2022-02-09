@@ -49,6 +49,7 @@ export interface FetchState {
 }
 
 export interface ModalConfirm {
+  loading: boolean
   title: string
   content: string
   cancelText: string

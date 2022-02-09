@@ -12,13 +12,23 @@
       <v-card-actions class="px-6 pb-6">
         <v-spacer></v-spacer>
 
-        <v-btn tile depressed text class="mx-2" @click="doClose">
+        <v-btn
+          tile
+          depressed
+          text
+          :loading="dialogSettings.loading"
+          :disabled="dialogSettings.loading"
+          class="mx-2"
+          @click="doClose"
+        >
           {{ dialogSettings.cancelText }}
         </v-btn>
 
         <v-btn
           tile
           depressed
+          :loading="dialogSettings.loading"
+          :disabled="dialogSettings.loading"
           :color="dialogSettings.submitColor"
           @click="$emit('doSubmit')"
         >
