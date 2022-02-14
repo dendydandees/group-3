@@ -124,16 +124,15 @@
 <script lang="ts">
 import {
   computed,
-  useContext,
-  useRouter,
   defineComponent,
   ref,
   Ref,
   watch,
+  useStore,
 } from '@nuxtjs/composition-api'
 import { useStorage } from '@vueuse/core'
 // Interfaces and types
-import { NavigationLinks } from '~/types/applications'
+import { NavigationLinks, VuexModuleApplications } from '~/types/applications'
 
 export default defineComponent({
   props: {
@@ -152,8 +151,7 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
-    const context = useContext()
-    const router = useRouter()
+    const storeOfApplications = useStore<VuexModuleApplications>()
     const drawer = computed({
       get(): boolean {
         return props.value
@@ -165,13 +163,7 @@ export default defineComponent({
     // Logout user
     const doLogout = async () => {
       try {
-        await context.$auth.logout()
-
-        setTimeout(() => {
-          context.$auth.setUser({})
-          localStorage.removeItem('user')
-          router.push('/login')
-        }, 300)
+        await storeOfApplications.dispatch('applications/logout')
       } catch (error) {
         return error
       }

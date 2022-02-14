@@ -22,18 +22,6 @@
               </div>
             </v-col>
           </v-row>
-
-          <!-- Next features -->
-          <v-btn
-            v-if="false"
-            depressed
-            tile
-            :block="$vuetify.breakpoint.xsOnly"
-            class="mt-6 mt-sm-0 ml-auto"
-            @click="$emit('show')"
-          >
-            Reset Password
-          </v-btn>
         </v-card-text>
       </v-card>
     </v-col>

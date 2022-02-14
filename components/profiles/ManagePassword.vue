@@ -19,60 +19,71 @@
           >
             <v-card-text>
               <!-- Success and error messages -->
-              <v-alert
-                v-if="alert.isShow && invalid"
-                tile
-                type="error"
-                class="text-capitalize mb-10"
-              >
-                {{ alert.message }}
-              </v-alert>
+              <v-expand-transition>
+                <v-alert
+                  v-if="
+                    alert.isShow &&
+                    alert.message.includes('Password')
+                  "
+                  :type="alert.type"
+                  tile
+                  class="mb-10"
+                >
+                  {{ alert.message }}
+                </v-alert>
+              </v-expand-transition>
 
-              <!-- Email field -->
+              <!-- Old password field -->
               <ValidationProvider
                 v-slot="{ errors }"
                 slim
-                name="Email Address"
-                rules="required|email"
+                name="Old Password"
+                rules="required|min:8|max:16"
                 tag="div"
-                class="my-4"
+                class="mb-4"
               >
                 <v-text-field
-                  v-model="form.email"
+                  v-model="form.oldPassword"
                   :error-messages="errors"
-                  label="Email Address"
-                  placeholder="Enter your email address..."
-                  type="email"
+                  :append-icon="
+                    formSettings.isShowOldPassword ? 'mdi-eye-off' : 'mdi-eye'
+                  "
+                  :type="formSettings.isShowOldPassword ? 'text' : 'password'"
+                  label="Old Password"
+                  placeholder="Enter your old password..."
                   required
                   outlined
-                  autocomplete
-                  disabled
+                  @click:append="
+                    formSettings.isShowOldPassword =
+                      !formSettings.isShowOldPassword
+                  "
                 />
               </ValidationProvider>
 
-              <!-- Password field -->
+              <!-- New Password field -->
               <ValidationProvider
                 v-slot="{ errors }"
                 slim
-                name="Password"
+                name="New Password"
                 rules="required|min:8|max:16"
                 vid="confirm"
                 tag="div"
                 class="mb-4"
               >
                 <v-text-field
-                  v-model="form.password"
+                  v-model="form.newPassword"
                   :error-messages="errors"
                   :append-icon="
-                    formSettings.isShowPassword ? 'mdi-eye-off' : 'mdi-eye'
+                    formSettings.isShowNewPassword ? 'mdi-eye-off' : 'mdi-eye'
                   "
-                  :type="formSettings.isShowPassword ? 'text' : 'password'"
-                  label="Password"
-                  placeholder="Enter your password..."
+                  :type="formSettings.isShowNewPassword ? 'text' : 'password'"
+                  label="New Password"
+                  placeholder="Enter your new password..."
                   required
                   outlined
                   @click:append="
-                    formSettings.isShowPassword = !formSettings.isShowPassword
+                    formSettings.isShowNewPassword =
+                      !formSettings.isShowNewPassword
                   "
                 />
               </ValidationProvider>
@@ -81,7 +92,7 @@
               <ValidationProvider
                 v-slot="{ errors }"
                 slim
-                name="Password"
+                name="Confirmation Password"
                 rules="required|confirmed:confirm"
                 tag="div"
                 class="mb-4"
@@ -160,6 +171,7 @@ import { ValidationObserver, ValidationProvider } from 'vee-validate'
 // Interface and types
 import { User } from '~/types/login'
 import { Alert, VForm, VuexModuleApplications } from '~/types/applications'
+import { ResetPasswordParams, VuexModuleProfiles } from '~/types/profiles'
 
 export default defineComponent({
   components: {
@@ -172,35 +184,39 @@ export default defineComponent({
       required: true,
     },
   },
-  setup(props) {
+  setup(_props) {
     // Using applications store
-    const store = useStore<VuexModuleApplications>()
-    const stateOfApplicationsModule = store.state.applications
+    const storeOfApplications = useStore<VuexModuleApplications>()
+    const storeOfProfile = useStore<VuexModuleProfiles>()
+    const stateOfApplicationsModule = storeOfApplications.state.applications
     const alert = computed(
       () => stateOfApplicationsModule.alert
     ) as ComputedRef<Alert>
     const setAlert = (value: Alert) => {
-      store.commit('applications/SET_ALERT', value)
+      storeOfApplications.commit('applications/SET_ALERT', value)
     }
     const resetAlert = () => {
-      store.commit('applications/RESET_ALERT')
+      storeOfApplications.commit('applications/RESET_ALERT')
+    }
+    const doResetPassword = async (body: ResetPasswordParams) => {
+      return await storeOfProfile.dispatch('profiles/resetPassword', {
+        body,
+      })
     }
 
+    // Manage form
     const formSettings = reactive({
       loading: false,
-      isShowPassword: false,
+      isShowOldPassword: false,
+      isShowNewPassword: false,
       isShowConfirmationPassword: false,
     })
     const form = ref({
-      email: props.data.email,
-      password: '',
+      oldPassword: '',
+      newPassword: '',
       confirmPassword: '',
     })
-
-    // Form obeserver
     const updatePasswordFormObserver = ref(null) as unknown as Ref<VForm>
-
-    // Submit form method
     const doSubmit = async () => {
       try {
         formSettings.loading = true
@@ -212,36 +228,46 @@ export default defineComponent({
         if (!isValid) return
 
         const data = {
-          email: form.value.email,
-          password: form.value.password,
+          newPassword: form.value.newPassword,
+          oldPassword: form.value.oldPassword,
         }
+        const response = await doResetPassword(data)
 
-        return data
+        if (!response?.ID) throw response
+
+        form.value = {
+          oldPassword: '',
+          newPassword: '',
+          confirmPassword: '',
+        }
+        await updatePasswordFormObserver?.value?.reset()
+        setAlert({
+          isShow: true,
+          type: 'success',
+          message: `Password successfully updated!`,
+        })
+        await storeOfApplications.dispatch('applications/logout')
       } catch (error) {
         const message =
           (error as any)?.response?.data?.message ??
           (error as any)?.response?.data?.error ??
           (error as Error)?.message
 
-        // Show alert if login failed
         setAlert({
           isShow: true,
           type: 'error',
-          message,
+          message: `Password ${message}`,
         })
       } finally {
         formSettings.loading = false
       }
     }
-
-    // Reset form method
     const doReset = async () => {
       form.value = {
-        email: props.data.email,
-        password: '',
+        oldPassword: '',
+        newPassword: '',
         confirmPassword: '',
       }
-
       await updatePasswordFormObserver?.value?.reset()
     }
 
