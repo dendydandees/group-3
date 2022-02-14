@@ -57,7 +57,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from '@nuxtjs/composition-api'
-import { Credential } from '~/types/credentials'
+import { Credential } from '~/types/profiles'
 
 export default defineComponent({
   props: {
