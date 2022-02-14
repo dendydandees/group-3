@@ -1,4 +1,4 @@
-import { MutationTree } from 'vuex'
+import { MutationTree, ActionTree } from 'vuex'
 // Interfaces
 import { Alert, Pagination } from '~/types/applications'
 
@@ -31,3 +31,20 @@ export const mutations: MutationTree<RootStateApplications> = {
       perPage: 10,
     }),
 }
+
+export const actions: ActionTree<RootStateApplications, RootStateApplications> =
+  {
+    async logout(_store) {
+      try {
+        await this.$auth.logout()
+
+        setTimeout(() => {
+          this.$auth.setUser({})
+          localStorage.removeItem('user')
+          this.$router.push('/login')
+        }, 300)
+      } catch (error) {
+        return error
+      }
+    },
+  }

@@ -31,8 +31,10 @@
               </v-expand-transition>
 
               <!-- list of keys -->
-              <template v-if="metaCredentials.totalCount === 0">
-                <p>No keys available</p>
+              <template v-if="credentials.length === 0">
+                <h2 class="text-center mt-6 subtitle-1">
+                  No keys available
+                </h2>
               </template>
 
               <template v-else>
@@ -106,19 +108,19 @@ import {
 import { useClipboard } from '@vueuse/core'
 // Interfaces and types
 import { ModalConfirm, VuexModuleApplications } from '~/types/applications'
-import { VuexModuleCredentials } from '~/types/credentials'
+import { VuexModuleProfiles } from '~/types/profiles'
 
 export default defineComponent({
   setup() {
     // manage store
-    const storeCredentials = useStore<VuexModuleCredentials>()
+    const storeProfiles = useStore<VuexModuleProfiles>()
     const storeApplications = useStore<VuexModuleApplications>()
     const alert = computed(() => storeApplications.state.applications.alert)
     const credentials = computed(
-      () => storeCredentials.state.credentials.credentials
+      () => storeProfiles.state.profiles.credentials
     )
     const metaCredentials = computed(
-      () => storeCredentials.state.credentials.meta
+      () => storeProfiles.state.profiles.meta
     )
     const pagination = computed({
       get() {
@@ -220,14 +222,14 @@ export default defineComponent({
       try {
         dialogSettings.value.loading = true
         // call rest endpoint to revoke key
-        const response = await storeApplications.dispatch(
-          'credentials/revokeKey',
+        const response = await storeProfiles.dispatch(
+          'profiles/revokeKey',
           { id: selected.value }
         )
 
         if (!response?.revokedAt) throw response
 
-        await storeCredentials.dispatch('credentials/getCredentials', {
+        await storeProfiles.dispatch('profiles/getCredentials', {
           params: pagination.value,
         })
         storeApplications.commit('applications/SET_ALERT', {
@@ -271,15 +273,15 @@ export default defineComponent({
       try {
         dialogSettings.value.loading = true
         // call endpoint to generate a new key
-        const response = await storeCredentials.dispatch(
-          'credentials/generateKey',
+        const response = await storeProfiles.dispatch(
+          'profiles/generateKey',
           { body: form.value }
         )
         const { token } = response
 
         if (!token) throw response
 
-        await storeCredentials.dispatch('credentials/getCredentials', {
+        await storeProfiles.dispatch('profiles/getCredentials', {
           params: pagination.value,
         })
         storeApplications.commit('applications/SET_ALERT', {
@@ -304,7 +306,7 @@ export default defineComponent({
     }
 
     const { fetch } = useFetch(async () => {
-      await storeCredentials.dispatch('credentials/getCredentials', {
+      await storeProfiles.dispatch('profiles/getCredentials', {
         params: pagination.value,
       })
     })

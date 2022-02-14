@@ -8,7 +8,7 @@
     <!-- Profile information -->
     <client-only>
       <v-expand-x-transition>
-        <ProfilesInformations :user="user" @show="doShowChangePasswordForm" />
+        <ProfilesInformations :user="user" />
       </v-expand-x-transition>
 
       <BaseLoading slot="placeholder" />
@@ -17,10 +17,10 @@
     <!-- manage credential fetures -->
     <ProfilesManageCredentials />
 
-    <v-divider v-if="false" class="my-6" />
+    <v-divider class="my-6" />
 
     <!-- Manage password fetures **the next features** -->
-    <ProfilesManagePassword v-if="false" :data="user" />
+    <ProfilesManagePassword :data="user" />
   </section>
 </template>
 
@@ -39,19 +39,12 @@ export default defineComponent({
     useMeta({ titleTemplate: '%s | Profiles' })
     const user = ref({})
 
-    // change password options
-    const showChangePasswordForm = ref(false)
-    const doShowChangePasswordForm = () =>
-      (showChangePasswordForm.value = !showChangePasswordForm.value)
-
     onMounted(() => {
       user.value = JSON.parse(localStorage.getItem('user') ?? '')
     })
 
     return {
       user,
-      showChangePasswordForm,
-      doShowChangePasswordForm,
     }
   },
   head: {},

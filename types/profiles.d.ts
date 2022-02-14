@@ -1,7 +1,7 @@
-import { RootStateCredentials } from '~/store/credentials'
+import { RootStateProfiles } from '~/store/profiles'
 
-export interface VuexModuleCredentials {
-  credentials: RootStateCredentials
+export interface VuexModuleProfiles {
+  profiles: RootStateProfiles
 }
 
 export interface Credential {
@@ -16,4 +16,9 @@ export interface Credential {
 
 export interface GenerateCredential {
   keyName: string
+}
+
+export interface ResetPasswordParams {
+  newPassword: string,
+  oldPassword: string
 }

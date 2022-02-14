@@ -24,7 +24,7 @@
 import { defineComponent, computed, PropType } from '@nuxtjs/composition-api'
 import { ValidationProvider } from 'vee-validate'
 // Interfaces and types
-import { GenerateCredential } from '~/types/credentials'
+import { GenerateCredential } from '~/types/profiles'
 
 export default defineComponent({
   components: {
