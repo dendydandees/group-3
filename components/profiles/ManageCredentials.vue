@@ -31,8 +31,10 @@
               </v-expand-transition>
 
               <!-- list of keys -->
-              <template v-if="metaCredentials.totalCount === 0">
-                <p>No keys available</p>
+              <template v-if="credentials.length === 0">
+                <h2 class="text-center mt-6 subtitle-1">
+                  No keys available
+                </h2>
               </template>
 
               <template v-else>
