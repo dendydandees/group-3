@@ -67,6 +67,9 @@ build-sandbox:
 deploy-sandbox:
   stage: deploy
   extends: .deploy_ecs_template
+  before_script:
+    - VERSION=$(printf "${CI_COMMIT_TAG}" | sed 's/sandbox\//sandbox-/' )
+    - IMAGE_DESTINATION="${CI_REGISTRY_IMAGE}:${VERSION}"
   variables:
     OUTPUTDIR: output.json
     CLUSTER: sandbox-lj-ecs-cluster
