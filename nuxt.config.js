@@ -72,6 +72,7 @@ export default {
     '@nuxtjs/axios',
     '@nuxtjs/auth-next',
     '@nuxt/image',
+    '@nuxtjs/sentry',
   ],
 
   // Auth modules configuration: https://auth.nuxtjs.org
@@ -144,4 +145,8 @@ export default {
   proxy: {
     '/api/': process.env.API_URL,
   },
+
+  sentry : {
+    dsn: process.env.SENTRY_DSN
+  }
 }
