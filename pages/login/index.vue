@@ -5,6 +5,9 @@
 
       <LoginRightSide />
     </v-row>
+    <v-row>
+      <v-btn @click="throwError()">Throw error</v-btn>
+    </v-row>
   </section>
 </template>
 
@@ -14,6 +17,12 @@ import { defineComponent } from '@nuxtjs/composition-api'
 export default defineComponent({
   name: 'LoginPage',
   layout: 'guest',
+  methods: {
+    throwError: function () {
+      console.error("throw dev client error")
+      throw new Error("throw dev client error")
+    }
+  }
 })
 </script>
 
