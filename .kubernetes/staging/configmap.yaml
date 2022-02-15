@@ -7,4 +7,4 @@ data:
   API_URL: dev.luwjistik.io
   PORT: "80"
   HOST: "0.0.0.0"
-  SENTRY_DSN: "https://5002a9ae268b4654836ebd2ca35e2b53@o1141218.ingest.sentry.io/6205573"
+  SENTRY_DSN: "https://aaab7374bcc146b68c3847fc5dd36b77@o1141218.ingest.sentry.io/6208578"

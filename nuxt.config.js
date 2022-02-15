@@ -2,6 +2,9 @@ import colors from 'vuetify/es5/util/colors'
 
 const development = process.env.NODE_ENV === 'development'
 
+console.log("inHere")
+console.log(process.env.SENTRY_DSN)
+
 export default {
   // Server property: https://nuxtjs.org/docs/configuration-glossary/configuration-server#the-server-property
   server: {
