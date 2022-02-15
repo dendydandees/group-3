@@ -150,6 +150,10 @@ export default {
   },
 
   sentry : {
-    dsn: process.env.SENTRY_DSN
+    dsn: process.env.SENTRY_DSN,
+    publishRealse: true,
+    config: {
+      release: process.env.RELEASE || ""
+    }
   }
 }

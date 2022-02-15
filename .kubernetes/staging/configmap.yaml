@@ -8,3 +8,4 @@ data:
   PORT: "80"
   HOST: "0.0.0.0"
   SENTRY_DSN: "https://aaab7374bcc146b68c3847fc5dd36b77@o1141218.ingest.sentry.io/6208578"
+  SENTRY_AUTH_TOKEN: c056d5ae8e6011ec80447e972c65567d
