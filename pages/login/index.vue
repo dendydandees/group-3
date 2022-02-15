@@ -2,11 +2,10 @@
   <section class="base">
     <v-row align="stretch" no-gutters style="min-height: 100vh">
       <LoginLeftSide />
-
       <LoginRightSide />
-    </v-row>
-    <v-row>
-      <v-btn @click="throwError()">Throw error</v-btn>
+      <v-row>
+        <v-btn @click="throwError()">Throw error</v-btn>
+      </v-row>
     </v-row>
   </section>
 </template>
@@ -19,7 +18,6 @@ export default defineComponent({
   layout: 'guest',
   methods: {
     throwError: function () {
-      console.error("throw dev client error")
       throw new Error("throw dev client error")
     }
   }
