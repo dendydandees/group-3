@@ -30,7 +30,7 @@ build-development:
     - NUXT_PROXY=https://dev.luwjistik.io
   only:
     refs:
-      - main
+      - sentry
   except:
     refs:
       - tags
@@ -50,7 +50,7 @@ deploy_staging:
     - envsubst < ./.kubernetes/staging/service.yaml | kubectl -n app apply -f -
   only:
     refs:
-      - main
+      - sentry
 
 build-sandbox:
   extends: .build_template
