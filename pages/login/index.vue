@@ -2,8 +2,9 @@
   <section class="base">
     <v-row align="stretch" no-gutters style="min-height: 100vh">
       <LoginLeftSide />
-
       <LoginRightSide />
+      <v-row>
+      </v-row>
     </v-row>
   </section>
 </template>
