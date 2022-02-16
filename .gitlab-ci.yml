@@ -30,7 +30,7 @@ build-development:
     - echo SENTRY_DSN="https://aaab7374bcc146b68c3847fc5dd36b77@o1141218.ingest.sentry.io/6208578" >> .env
   only:
     refs:
-      - sentry
+      - main
   except:
     refs:
       - tags
@@ -50,7 +50,7 @@ deploy_staging:
     - envsubst < ./.kubernetes/staging/service.yaml | kubectl -n app apply -f -
   only:
     refs:
-      - sentry
+      - main
 
 build-sandbox:
   extends: .build_template
