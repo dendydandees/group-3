@@ -18,7 +18,7 @@ export default defineComponent({
   layout: 'guest',
   methods: {
     throwError: function () {
-      throw new Error("throw dev client error v2")
+      throw new Error("throw dev client error v3")
     }
   }
 })
