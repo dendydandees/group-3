@@ -37,27 +37,7 @@
 
     <v-divider></v-divider>
 
-    <v-list nav dense class="py-4 px-4">
-      <v-list-item
-        v-for="link in items"
-        :key="link.title"
-        :to="link.to"
-        link
-        active-class="secondary white--text"
-        class="my-4 rounded-0"
-        nuxt
-      >
-        <v-list-item-icon>
-          <v-icon>
-            {{ link.icon }}
-          </v-icon>
-        </v-list-item-icon>
-
-        <v-list-item-title>
-          {{ link.title }}
-        </v-list-item-title>
-      </v-list-item>
-    </v-list>
+    <BaseNavigationDrawerList @hideMiniSideNav="$emit('hideMiniSideNav')" />
 
     <template #append>
       <v-divider></v-divider>
@@ -126,15 +106,15 @@ import {
   computed,
   defineComponent,
   ref,
-  Ref,
   watch,
   useStore,
+  useContext,
 } from '@nuxtjs/composition-api'
-import { useStorage } from '@vueuse/core'
 // Interfaces and types
-import { NavigationLinks, VuexModuleApplications } from '~/types/applications'
+import { VuexModuleApplications } from '~/types/applications'
 
 export default defineComponent({
+  name: 'BaseNavigationDrawer',
   props: {
     value: {
       type: Boolean as () => boolean,
@@ -144,13 +124,9 @@ export default defineComponent({
       type: Boolean as () => boolean,
       required: true,
     },
-    items: {
-      type: Array as () => NavigationLinks[],
-      required: true,
-      default: () => [],
-    },
   },
   setup(props, { emit }) {
+    const { $auth } = useContext()
     const storeOfApplications = useStore<VuexModuleApplications>()
     const drawer = computed({
       get(): boolean {
@@ -169,13 +145,13 @@ export default defineComponent({
       }
     }
     // Show user actions button list
-    const isShowUserActions = ref(false) as Ref<Boolean>
+    const isShowUserActions = ref(false)
     const doShowUserActions = () => {
       emit('hideMiniSideNav')
       isShowUserActions.value = !isShowUserActions.value
     }
     // Get user data
-    const user = useStorage('user', {})
+    const user = computed(() => $auth.$storage.getUniversal('user'))
 
     watch(
       () => props.mini,
@@ -194,3 +170,10 @@ export default defineComponent({
   },
 })
 </script>
+
+<style lang="scss">
+.v-list--nav .v-list-item,
+.v-list--nav .v-list-item:before {
+  border-radius: 0 !important;
+}
+</style>

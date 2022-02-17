@@ -3,7 +3,6 @@
     <BaseNavigationDrawer
       v-model="drawer"
       :mini="mini"
-      :items="itemLinks"
       @hideMiniSideNav="hideMiniSideNav"
     />
 
@@ -17,8 +16,6 @@
 
 <script lang="ts">
 import { defineComponent, useContext, ref, Ref } from '@nuxtjs/composition-api'
-// Interface and types
-import { NavigationLinks } from '~/types/applications'
 
 export default defineComponent({
   name: 'DefaultLayout',
@@ -27,9 +24,6 @@ export default defineComponent({
     const context = useContext()
     const drawer = ref(!context.$vuetify.breakpoint.smAndDown) as Ref<boolean>
     const mini = ref(!context.$vuetify.breakpoint.smAndDown) as Ref<boolean>
-    const itemLinks = ref([
-      { title: 'Orders', icon: 'mdi-package', to: '/orders' },
-    ]) as Ref<NavigationLinks[]>
     const doShowSideNav = () => {
       const isMobile = context.$vuetify.breakpoint.smAndDown
 
@@ -44,7 +38,6 @@ export default defineComponent({
     return {
       drawer,
       mini,
-      itemLinks,
       doShowSideNav,
       hideMiniSideNav,
     }

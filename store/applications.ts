@@ -40,7 +40,7 @@ export const actions: ActionTree<RootStateApplications, RootStateApplications> =
 
         setTimeout(() => {
           this.$auth.setUser({})
-          localStorage.removeItem('user')
+          this.$auth.$storage.removeUniversal('user')
           this.$router.push('/login')
         }, 300)
       } catch (error) {

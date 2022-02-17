@@ -11,8 +11,8 @@ export interface Alert {
 
 export interface NavigationLinks {
   title: string
-  icon: string
   to: string
+  icon?: string
 }
 
 export interface FilterDetails {

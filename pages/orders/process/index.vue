@@ -1,12 +1,12 @@
 <template>
   <section class="pa-4 pa-md-10 py-8">
     <BaseHeadlinePage
-      title="Manage Orders"
-      subtitle="View details of each order or make changes to any existing orders."
+      title="Manage Process Orders"
+      subtitle="View the details of each order or make changes to a processed order."
     >
       <template slot="addition">
         <span class="text--secondary font-weight-medium title">
-          &bull; {{ meta.totalCount }} Total Orders
+          &bull; {{ meta.totalCount }} Total Process Orders
         </span>
       </template>
     </BaseHeadlinePage>
@@ -53,7 +53,7 @@ import { Order, VuexModuleOrders } from '~/types/orders'
 import { FilterDetails } from '~/types/applications'
 
 export default defineComponent({
-  name: 'OrdersPages',
+  name: 'OrdersProcessPages',
   layout: 'default',
   setup() {
     useMeta({ titleTemplate: '%s | Orders' })
@@ -95,7 +95,7 @@ export default defineComponent({
       detail: true,
     })
     const doGetDetails = (data: Order) => {
-      router.push(`/orders/${data.id}`)
+      router.push(`/orders/process/${data.id}`)
     }
 
     // Settings fetch options

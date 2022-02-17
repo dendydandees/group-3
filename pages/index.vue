@@ -9,7 +9,7 @@ export default defineComponent({
   name: 'IndexPage',
   layout: 'default',
   middleware({ redirect }) {
-    return redirect('/orders')
+    return redirect('/orders/process')
   },
 })
 </script>
