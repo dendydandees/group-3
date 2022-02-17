@@ -77,13 +77,13 @@ export default {
 
   // Auth modules configuration: https://auth.nuxtjs.org
   auth: {
-    localStorage: false,
     strategies: {
       local: {
         token: {
           property: 'token',
           required: true,
           type: '',
+          maxAge: 86400,
         },
         user: {
           property: false,
@@ -139,18 +139,18 @@ export default {
     // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
     proxy: development,
     baseURL: development ? '/' : process.env.API_URL,
-    browserBaseURL: '/'
+    browserBaseURL: '/',
   },
 
   proxy: {
     '/api/': process.env.API_URL,
   },
 
-  sentry : {
-    dsn: process.env.SENTRY_DSN || "",
+  sentry: {
+    dsn: process.env.SENTRY_DSN || '',
     publishRealse: true,
     config: {
-      release: process.env.RELEASE || ""
-    }
-  }
+      release: process.env.RELEASE || '',
+    },
+  },
 }

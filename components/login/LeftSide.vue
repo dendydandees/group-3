@@ -152,17 +152,18 @@ export default defineComponent({
         // Throw error if user not exist
         if (status !== 200) throw response
 
-        const { clientId, role, email } = response?.data
+        const { clientId, role, email, partnerProfiles } = response?.data
         const user = {
           clientId,
           role: role.toLowerCase().replaceAll('_', ' '),
           initial: email.charAt(0).toUpperCase(),
           email,
+          partnerProfiles,
         }
 
         // Set user data to local storage
         $auth.setUser(user)
-        localStorage.setItem('user', JSON.stringify(user))
+        $auth.$storage.setUniversal('user', user)
       } catch (error) {
         form.password = ''
         // eslint-disable-next-line @typescript-eslint/no-unused-vars

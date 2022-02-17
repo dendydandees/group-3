@@ -21,10 +21,7 @@
               <!-- Success and error messages -->
               <v-expand-transition>
                 <v-alert
-                  v-if="
-                    alert.isShow &&
-                    alert.message.includes('Password')
-                  "
+                  v-if="alert.isShow && alert.message.includes('Password')"
                   :type="alert.type"
                   tile
                   class="mb-10"
@@ -160,7 +157,6 @@
 import {
   defineComponent,
   ref,
-  PropType,
   Ref,
   useStore,
   computed,
@@ -169,7 +165,6 @@ import {
 } from '@nuxtjs/composition-api'
 import { ValidationObserver, ValidationProvider } from 'vee-validate'
 // Interface and types
-import { User } from '~/types/login'
 import { Alert, VForm, VuexModuleApplications } from '~/types/applications'
 import { ResetPasswordParams, VuexModuleProfiles } from '~/types/profiles'
 
@@ -178,13 +173,7 @@ export default defineComponent({
     ValidationProvider,
     ValidationObserver,
   },
-  props: {
-    data: {
-      type: Object as PropType<User>,
-      required: true,
-    },
-  },
-  setup(_props) {
+  setup() {
     // Using applications store
     const storeOfApplications = useStore<VuexModuleApplications>()
     const storeOfProfile = useStore<VuexModuleProfiles>()

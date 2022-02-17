@@ -6,13 +6,7 @@
     />
 
     <!-- Profile information -->
-    <client-only>
-      <v-expand-x-transition>
-        <ProfilesInformations :user="user" />
-      </v-expand-x-transition>
-
-      <BaseLoading slot="placeholder" />
-    </client-only>
+    <ProfilesInformations :user="user" />
 
     <!-- manage credential fetures -->
     <ProfilesManageCredentials />
@@ -20,16 +14,16 @@
     <v-divider class="my-6" />
 
     <!-- Manage password fetures **the next features** -->
-    <ProfilesManagePassword :data="user" />
+    <ProfilesManagePassword />
   </section>
 </template>
 
 <script lang="ts">
 import {
   defineComponent,
-  onMounted,
-  ref,
+  computed,
   useMeta,
+  useContext,
 } from '@nuxtjs/composition-api'
 
 export default defineComponent({
@@ -37,11 +31,8 @@ export default defineComponent({
   layout: 'default',
   setup() {
     useMeta({ titleTemplate: '%s | Profiles' })
-    const user = ref({})
-
-    onMounted(() => {
-      user.value = JSON.parse(localStorage.getItem('user') ?? '')
-    })
+    const { $auth } = useContext()
+    const user = computed(() => $auth.$storage.getUniversal('user'))
 
     return {
       user,
