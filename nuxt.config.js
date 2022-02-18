@@ -3,6 +3,8 @@ import colors from 'vuetify/es5/util/colors'
 const development = process.env.NODE_ENV === 'development'
 
 export default {
+  // Rendering property : https://nuxtjs.org/docs/features/rendering-modes
+  ssr: false,
   // Server property: https://nuxtjs.org/docs/configuration-glossary/configuration-server#the-server-property
   server: {
     port: process.env.PORT,

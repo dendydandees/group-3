@@ -1,78 +1,80 @@
 <template>
   <article>
-    <v-expand-transition>
-      <v-row class="mt-8">
-        <v-col cols="12" md="4">
-          <BaseFeatureTitle
-            title="Key Credentials"
-            subtitle="Generate a new credentials or revoke the existing credentials."
-          />
-        </v-col>
+    <v-row class="mt-8">
+      <v-col cols="12" md="4">
+        <BaseFeatureTitle
+          title="Key Credentials"
+          subtitle="Generate a new credentials or revoke the existing credentials."
+        />
+      </v-col>
 
-        <v-col cols="12" md="8">
-          <v-card tile color="white" elevation="0">
-            <v-card-text>
-              <v-alert tile type="warning">
-                Your secret key grants you access to our API. Treat your API key
-                like a passwords, don't expose them in your application code and
-                don't share it on Github or anywhere else online.
+      <v-col cols="12" md="8">
+        <v-card tile color="white" elevation="0">
+          <v-card-text>
+            <v-alert tile type="warning">
+              Your secret key grants you access to our API. Treat your API key
+              like a passwords, don't expose them in your application code and
+              don't share it on Github or anywhere else online.
+            </v-alert>
+
+            <!-- alert user actions (clipboard, revoke, generate key) -->
+            <v-expand-transition>
+              <v-alert
+                v-if="alert.isShow && alert.message.includes('Key')"
+                tile
+                dismissible
+                :type="alert.type"
+              >
+                {{ alert.message }}
               </v-alert>
+            </v-expand-transition>
 
-              <!-- alert user actions (clipboard, revoke, generate key) -->
-              <v-expand-transition>
-                <v-alert
-                  v-if="alert.isShow && alert.message.includes('Key')"
-                  tile
-                  dismissible
-                  :type="alert.type"
-                >
-                  {{ alert.message }}
-                </v-alert>
-              </v-expand-transition>
+            <BaseLoading v-if="$fetchState.pending" color="primary" />
 
-              <!-- list of keys -->
-              <template v-if="credentials.length === 0">
-                <h2 class="text-center mt-6 subtitle-1">
-                  No keys available
-                </h2>
-              </template>
+            <!-- if credentials key is empty -->
+            <template v-if="credentials.length === 0">
+              <h2 class="text-center mt-6 subtitle-1">No keys available</h2>
+            </template>
 
-              <template v-else>
+            <template v-else>
+              <v-scroll-x-transition>
                 <ProfilesCredentialList
+                  v-if="!$fetchState.pending"
                   :credentials="credentials"
                   :status="status"
                   @doCopy="doCopy"
                   @toggleConfirmRevoke="toggleConfirmRevoke"
                 />
+              </v-scroll-x-transition>
 
-                <v-pagination
-                  :value="pagination.page"
-                  :length="metaCredentials.totalPage"
-                  :total-visible="7"
-                  class="my-6"
-                  @input="changePagination"
-                />
-              </template>
-            </v-card-text>
+              <v-pagination
+                :value="pagination.page"
+                :length="metaCredentials.totalPage"
+                :total-visible="7"
+                class="my-6"
+                @input="changePagination"
+              />
+            </template>
+          </v-card-text>
 
-            <v-card-actions class="pa-4">
-              <v-spacer />
+          <v-card-actions class="pa-4">
+            <v-spacer />
 
-              <v-btn
-                tile
-                depressed
-                outlined
-                color="primary"
-                :disabled="status.copied"
-                @click="toggleGenerateKey"
-              >
-                Generate new key
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-expand-transition>
+            <v-btn
+              tile
+              depressed
+              outlined
+              color="primary"
+              :disabled="$fetchState.pending || status.copied"
+              :loading="$fetchState.pending"
+              @click="toggleGenerateKey"
+            >
+              Generate new key
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-col>
+    </v-row>
 
     <!-- Modal confirm -->
     <BaseModalConfirm
@@ -116,12 +118,8 @@ export default defineComponent({
     const storeProfiles = useStore<VuexModuleProfiles>()
     const storeApplications = useStore<VuexModuleApplications>()
     const alert = computed(() => storeApplications.state.applications.alert)
-    const credentials = computed(
-      () => storeProfiles.state.profiles.credentials
-    )
-    const metaCredentials = computed(
-      () => storeProfiles.state.profiles.meta
-    )
+    const credentials = computed(() => storeProfiles.state.profiles.credentials)
+    const metaCredentials = computed(() => storeProfiles.state.profiles.meta)
     const pagination = computed({
       get() {
         return { ...storeApplications.state.applications.pagination }
@@ -222,10 +220,9 @@ export default defineComponent({
       try {
         dialogSettings.value.loading = true
         // call rest endpoint to revoke key
-        const response = await storeProfiles.dispatch(
-          'profiles/revokeKey',
-          { id: selected.value }
-        )
+        const response = await storeProfiles.dispatch('profiles/revokeKey', {
+          id: selected.value,
+        })
 
         if (!response?.revokedAt) throw response
 
@@ -273,10 +270,9 @@ export default defineComponent({
       try {
         dialogSettings.value.loading = true
         // call endpoint to generate a new key
-        const response = await storeProfiles.dispatch(
-          'profiles/generateKey',
-          { body: form.value }
-        )
+        const response = await storeProfiles.dispatch('profiles/generateKey', {
+          body: form.value,
+        })
         const { token } = response
 
         if (!token) throw response
