@@ -118,9 +118,17 @@ export default defineComponent({
               perPage: meta.value.totalCount,
             }
 
-      await store.dispatch('orders/getOrders', { params: dataParams })
+      try {
+        $fetchState.pending = true
+
+        await store.dispatch('orders/getOrders', { params: dataParams })
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
     }
-    const { fetch } = useFetch(async () => {
+    const { $fetchState, fetch } = useFetch(async () => {
       await fetchOrders(options.value)
     })
 
