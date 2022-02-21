@@ -19,7 +19,7 @@
 
           <p class="mb-4">
             {{ order.length }} (cm) x {{ order.width }} (cm) x
-            {{ order.height }} (cm) &bull; {{ order.weight }}
+            {{ order.height }} (cm) &bull; {{ order.weight }} (kg)
           </p>
 
           <v-chip small color="success" class="text-uppercase mb-2 black--text">

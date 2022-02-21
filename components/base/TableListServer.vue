@@ -74,7 +74,6 @@
         tile
         small
         :loading="loading"
-        :disabled="loading"
         color="primary"
         elevation="0"
         class="ma-2"
