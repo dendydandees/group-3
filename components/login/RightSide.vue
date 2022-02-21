@@ -30,18 +30,11 @@ export default defineComponent({
 
 <style lang="scss">
 .patterns {
-  background-color: #e5e5f7;
-  opacity: 0.1;
-  background: repeating-linear-gradient(
-    -45deg,
-    #2196f3,
-    #424242 17.5px,
-    #e5e5f7 17.5px,
-    #424242 87.5px
+  background: rgb(33, 150, 243);
+  background: linear-gradient(
+    180deg,
+    rgba(33, 150, 243, 1) 75%,
+    rgba(0, 183, 252, 1) 100%
   );
-  min-width: 100%;
-  min-height: 100%;
-  position: absolute;
-  top: 0;
 }
 </style>
