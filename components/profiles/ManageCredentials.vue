@@ -17,44 +17,83 @@
               don't share it on Github or anywhere else online.
             </v-alert>
 
-            <!-- alert user actions (clipboard, revoke, generate key) -->
-            <v-expand-transition>
-              <v-alert
-                v-if="alert.isShow && alert.message.includes('Key')"
-                tile
-                dismissible
-                :type="alert.type"
-              >
-                {{ alert.message }}
-              </v-alert>
-            </v-expand-transition>
+            <!-- client id -->
+            <div>
+              <v-subheader class="subtitle-1"> Client ID </v-subheader>
 
-            <BaseLoading v-if="$fetchState.pending" color="primary" />
+              <v-expand-transition>
+                <v-alert
+                  v-if="alert.isShow && alert.message.includes('ID')"
+                  tile
+                  dismissible
+                  :type="alert.type"
+                >
+                  {{ alert.message }}
+                </v-alert>
+              </v-expand-transition>
 
-            <!-- if credentials key is empty -->
-            <template v-if="credentials.length === 0">
-              <h2 class="text-center mt-6 subtitle-1">No keys available</h2>
-            </template>
-
-            <template v-else>
-              <v-scroll-x-transition>
-                <ProfilesCredentialList
-                  v-if="!$fetchState.pending"
-                  :credentials="credentials"
-                  :status="status"
-                  @doCopy="doCopy"
-                  @toggleConfirmRevoke="toggleConfirmRevoke"
-                />
-              </v-scroll-x-transition>
-
-              <v-pagination
-                :value="pagination.page"
-                :length="metaCredentials.totalPage"
-                :total-visible="7"
-                class="my-6"
-                @input="changePagination"
+              <v-text-field
+                v-model="user.clientId"
+                single-line
+                outlined
+                readonly
+                :success="alert.message.includes('ID')"
+                append-icon="mdi-content-copy"
+                type="text"
+                label="Client ID"
+                class="my-4"
+                @click:append="doCopy(user.clientId, 'id')"
               />
-            </template>
+            </div>
+
+            <v-divider class="my-6" />
+
+            <!-- key list -->
+            <div>
+              <v-subheader class="subtitle-1">
+                Key Credentials List
+              </v-subheader>
+
+              <!-- alert user actions (clipboard, revoke, generate key) -->
+              <v-expand-transition>
+                <v-alert
+                  v-if="alert.isShow && alert.message.includes('Key')"
+                  tile
+                  dismissible
+                  :type="alert.type"
+                >
+                  {{ alert.message }}
+                </v-alert>
+              </v-expand-transition>
+
+              <BaseLoading v-if="$fetchState.pending" color="primary" />
+
+              <!-- if credentials key is empty -->
+              <template v-if="credentials.length === 0">
+                <h2 class="text-center mt-6 subtitle-1">No keys available</h2>
+              </template>
+
+              <template v-else>
+                <v-scroll-x-transition>
+                  <ProfilesCredentialList
+                    v-if="!$fetchState.pending"
+                    :credentials="credentials"
+                    :status="status"
+                    @doCopy="doCopy"
+                    @toggleConfirmRevoke="toggleConfirmRevoke"
+                  />
+                </v-scroll-x-transition>
+
+                <v-pagination
+                  :value="pagination.page"
+                  :disabled="status.copied"
+                  :length="metaCredentials.totalPage"
+                  :total-visible="7"
+                  class="my-6"
+                  @input="changePagination"
+                />
+              </template>
+            </div>
           </v-card-text>
 
           <v-card-actions class="pa-4">
@@ -106,6 +145,7 @@ import {
   ref,
   Ref,
   watch,
+  useContext,
 } from '@nuxtjs/composition-api'
 import { useClipboard } from '@vueuse/core'
 // Interfaces and types
@@ -114,6 +154,8 @@ import { VuexModuleProfiles } from '~/types/profiles'
 
 export default defineComponent({
   setup() {
+    const { $auth } = useContext()
+    const user = computed(() => $auth.$storage.getUniversal('user'))
     // manage store
     const storeProfiles = useStore<VuexModuleProfiles>()
     const storeApplications = useStore<VuexModuleApplications>()
@@ -149,11 +191,17 @@ export default defineComponent({
       copied,
       isSupported,
     })
-    const doCopy = (data: string) => {
+    const doCopy = (data: string, section: string) => {
+      const defaultMessage = 'successfully copied!'
+      const message =
+        section === 'id'
+          ? `Client ID ${defaultMessage}`
+          : `Key ${defaultMessage}`
+
       storeApplications.commit('applications/SET_ALERT', {
         isShow: true,
         type: 'success',
-        message: 'Key successfully copied!',
+        message,
       })
       copy(data)
 
@@ -308,6 +356,7 @@ export default defineComponent({
     })
 
     return {
+      user,
       alert,
       credentials,
       metaCredentials,

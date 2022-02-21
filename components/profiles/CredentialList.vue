@@ -27,7 +27,7 @@
               icon
               depressed
               :disabled="status.copied"
-              @click="$emit('doCopy', credential.token)"
+              @click="$emit('doCopy', credential.token, 'key')"
             >
               <v-icon>mdi-content-copy</v-icon>
             </v-btn>
@@ -50,7 +50,11 @@
         </v-list-item-action>
       </v-list-item>
 
-      <v-divider v-if="index < credentials.length - 1" :key="index" />
+      <v-divider
+        v-if="index < credentials.length - 1"
+        :key="index"
+        class="mx-4"
+      />
     </template>
   </v-list>
 </template>
