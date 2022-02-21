@@ -72,10 +72,10 @@
             color="primary"
             type="submit"
             class="mr-4 my-8"
-            :disabled="invalid || loading"
+            :disabled="invalid"
             :loading="loading"
           >
-            Submit
+            Sign In
           </v-btn>
 
           <v-alert
