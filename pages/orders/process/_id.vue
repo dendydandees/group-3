@@ -46,6 +46,7 @@ import {
   useRoute,
   useRouter,
   useStore,
+  useMeta,
 } from '@nuxtjs/composition-api'
 // Interfaces or types
 import { VuexModuleOrders } from '~/types/orders'
@@ -65,6 +66,7 @@ export default defineComponent({
   },
   layout: 'default',
   setup() {
+    useMeta({ titleTemplate: '%s | Order Details' })
     const route = useRoute()
     const router = useRouter()
     const store = useStore<VuexModuleOrders>()
@@ -82,5 +84,6 @@ export default defineComponent({
       doBackTo,
     }
   },
+  head: {},
 })
 </script>

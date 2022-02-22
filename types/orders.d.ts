@@ -64,3 +64,7 @@ export interface OrderDetails {
   orderItems: OrderItem[]
   orderAllocationUpdates: OrderAllocationUpdate[]
 }
+
+export interface FilterOrders {
+  search: ''
+}

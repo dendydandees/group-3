@@ -24,7 +24,8 @@
       "@nuxtjs/vuetify",
       "@nuxtjs/auth-next",
       "@nuxt/image",
-      "@nuxtjs/sentry"
+      "@nuxtjs/sentry",
+      "nuxt-webpack-optimisations"
     ],
     "typeRoots": ["./types"]
   },

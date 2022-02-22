@@ -18,6 +18,10 @@ export default {
     height: '4px',
   },
 
+  router: {
+    middleware: 'resetState',
+  },
+
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     title: 'Client Portal',
@@ -66,6 +70,8 @@ export default {
     '@nuxtjs/vuetify',
     '@nuxtjs/composition-api/module',
     '@vueuse/nuxt',
+    // https://github.com/harlan-zw/nuxt-webpack-optimisations
+    'nuxt-webpack-optimisations',
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -154,5 +160,11 @@ export default {
     config: {
       release: process.env.RELEASE || '',
     },
+  },
+
+  webpackOptimisations: {
+    // hard source is the riskiest, if you have issues don't enable it
+    hardSourcePlugin: development,
+    parallelPlugin: development,
   },
 }
