@@ -2,16 +2,20 @@ import { MutationTree, ActionTree } from 'vuex'
 // Interfaces
 import { Alert, Pagination } from '~/types/applications'
 
+const pagination = {
+  page: 1,
+  itemsPerPage: 10,
+  sortBy: [''],
+  sortDesc: [true],
+}
+
 export const state = () => ({
   alert: {
     isShow: false,
     type: '',
     message: '',
   } as Alert,
-  pagination: {
-    page: 1,
-    perPage: 10,
-  } as Pagination,
+  pagination: pagination as Pagination,
 })
 
 export type RootStateApplications = ReturnType<typeof state>
@@ -25,11 +29,7 @@ export const mutations: MutationTree<RootStateApplications> = {
       message: '',
     }),
   SET_PAGINATION: (state, value: Pagination) => (state.pagination = value),
-  RESET_PAGINATION: (state) =>
-    (state.pagination = {
-      page: 1,
-      perPage: 10,
-    }),
+  RESET_PAGINATION: (state) => (state.pagination = pagination),
 }
 
 export const actions: ActionTree<RootStateApplications, RootStateApplications> =

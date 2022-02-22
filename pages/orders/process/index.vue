@@ -21,15 +21,15 @@
     <v-row align="center">
       <v-col cols="12">
         <BaseTableListServer
+          v-model="pagination"
           item-key="id"
           :loading="$fetchState.pending"
           :items="orders"
           :headers="headers"
           :meta="meta"
-          :options="options"
           :is-show-actions="isShowActions"
           @doGetDetails="doGetDetails"
-          @fetchOrders="fetchOrders"
+          @fetch="fetchOrders"
         />
       </v-col>
     </v-row>
@@ -50,26 +50,26 @@ import {
 } from '@nuxtjs/composition-api'
 // Interfaces or types
 import { Order, VuexModuleOrders } from '~/types/orders'
-import { FilterDetails } from '~/types/applications'
+import { FilterDetails, VuexModuleApplications } from '~/types/applications'
 
 export default defineComponent({
   name: 'OrdersProcessPages',
   layout: 'default',
   setup() {
     useMeta({ titleTemplate: '%s | Orders' })
-    const store = useStore<VuexModuleOrders>()
     const router = useRouter()
-    const orders = computed(() => store.state.orders.orders)
-    const meta = computed(() => store.state.orders.meta)
-    const filter = reactive({
-      search: null,
+    // store manage
+    const storeOrders = useStore<VuexModuleOrders>()
+    const storeApplications = useStore<VuexModuleApplications>()
+    const orders = computed(() => storeOrders.state.orders.orders)
+    const meta = computed(() => storeOrders.state.orders.meta)
+    const pagination = ref({
+      ...storeApplications.state.applications.pagination,
     })
-    const options = ref({
-      page: 1,
-      itemsPerPage: 10,
-      sortBy: [''],
-      sortDesc: [true],
+    const filter = ref({
+      ...storeOrders.state.orders.filter,
     })
+
     const headers = reactive([
       {
         text: 'Order Code (#Ref)',
@@ -97,31 +97,22 @@ export default defineComponent({
     const doGetDetails = (data: Order) => {
       router.push(`/orders/process/${data.id}`)
     }
-
-    // Settings fetch options
     const fetchOrders = async (params: FilterDetails) => {
-      let dataParams = {
-        page: params.page,
-        perPage: params.itemsPerPage,
-        orderCode: filter?.search ?? null,
-        sortBy:
-          params.sortBy && params?.sortBy[0] === 'orderCode'
-            ? 'order_code'
-            : null,
-        sortDesc: params.sortDesc ? params?.sortDesc[0] : null,
+      const { page, itemsPerPage, sortBy, sortDesc } = params
+      const perPage = itemsPerPage !== -1 ? itemsPerPage : meta.value.totalCount
+      const orderCode = filter?.value.search ?? null
+      const dataParams = {
+        page,
+        perPage,
+        orderCode,
+        sortBy: sortBy && sortBy[0] === 'orderCode' ? 'order_code' : null,
+        sortDesc: sortDesc ? sortDesc[0] : null,
       }
-      dataParams =
-        dataParams.perPage !== -1
-          ? dataParams
-          : {
-              ...dataParams,
-              perPage: meta.value.totalCount,
-            }
 
       try {
         $fetchState.pending = true
 
-        await store.dispatch('orders/getOrders', { params: dataParams })
+        await storeOrders.dispatch('orders/getOrders', { params: dataParams })
       } catch (error) {
         return error
       } finally {
@@ -129,19 +120,33 @@ export default defineComponent({
       }
     }
     const { $fetchState, fetch } = useFetch(async () => {
-      await fetchOrders(options.value)
+      await fetchOrders(pagination.value)
     })
 
-    // If filter is changed, fetch data again
+    // manage filter on changed
     watch(
-      () => filter,
-      (_newValue) => {
-        options.value = {
-          ...options.value,
+      filter,
+      (newFilter) => {
+        pagination.value = {
+          ...pagination.value,
           page: 1,
         }
+        storeApplications.commit('orders/SET_FILTER', {
+          ...newFilter,
+        })
 
         fetch()
+      },
+      { deep: true }
+    )
+
+    // manage pagination on changed
+    watch(
+      pagination,
+      (newPagination) => {
+        storeApplications.commit('applications/SET_PAGINATION', {
+          ...newPagination,
+        })
       },
       { deep: true }
     )
@@ -149,8 +154,8 @@ export default defineComponent({
     return {
       orders,
       meta,
+      pagination,
       filter,
-      options,
       headers,
       fetchOrders,
       doGetDetails,

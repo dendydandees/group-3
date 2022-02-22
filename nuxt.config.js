@@ -18,6 +18,10 @@ export default {
     height: '4px',
   },
 
+  router: {
+    middleware: 'resetState',
+  },
+
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     title: 'Client Portal',

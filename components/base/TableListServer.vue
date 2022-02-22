@@ -5,7 +5,7 @@
     :headers="headers"
     :footer-props="footerProps"
     :server-items-length="meta.totalCount"
-    :options.sync="tableOptions"
+    :options.sync="pagination"
     :loading="loading"
     class="elevation-0"
     @update:options="fetch"
@@ -89,7 +89,7 @@
 import {
   defineComponent,
   reactive,
-  ref,
+  computed,
   PropType,
 } from '@nuxtjs/composition-api'
 // Interfaces and types
@@ -98,6 +98,10 @@ import { ActionsTable, FilterDetails, Meta } from '~/types/applications'
 
 export default defineComponent({
   props: {
+    value: {
+      type: Object as PropType<DataOptions>,
+      required: true,
+    },
     loading: {
       type: Boolean as PropType<Boolean>,
       default: false,
@@ -107,7 +111,7 @@ export default defineComponent({
       required: true,
     },
     items: {
-      type: Array as unknown as () => PropType<ItemGroup<[]>>,
+      type: Array as () => PropType<ItemGroup<[]>>,
       required: true,
     },
     headers: {
@@ -116,10 +120,6 @@ export default defineComponent({
     },
     meta: {
       type: Object as PropType<Meta>,
-      required: true,
-    },
-    options: {
-      type: Object as PropType<DataOptions>,
       required: true,
     },
     isShowActions: {
@@ -132,21 +132,24 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
-    const tableOptions = ref(props.options)
+    const pagination = computed({
+      get: () => props.value,
+      set: (value: DataOptions) => emit('input', value),
+    })
     const footerProps = reactive({
-      'items-per-page-options': [10, 20, -1],
+      'items-per-page-options': [5, 10, 15, 20, -1],
       'show-first-last-page': true,
       'show-current-page': true,
     })
     const fetch = (data: FilterDetails) => {
-      emit('fetchOrders', data)
+      emit('fetch', data)
     }
     const getDetailItem = (data: {}) => {
       emit('doGetDetails', data)
     }
 
     return {
-      tableOptions,
+      pagination,
       footerProps,
       fetch,
       getDetailItem,

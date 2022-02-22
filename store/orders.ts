@@ -6,11 +6,16 @@ import {
   Order,
   OrderItem,
   OrderAllocationUpdate,
+  FilterOrders,
 } from '~/types/orders'
 
 interface GetOrders {
   params: Meta
 }
+
+const filter = {
+  search: '',
+} as FilterOrders
 
 export const state = () => ({
   orders: [] as Order[] | [],
@@ -24,6 +29,7 @@ export const state = () => ({
     totalPage: 1,
     totalCount: 10,
   } as Meta,
+  filter: filter as FilterOrders,
 })
 
 export type RootStateOrders = ReturnType<typeof state>
@@ -33,6 +39,8 @@ export const mutations: MutationTree<RootStateOrders> = {
   SET_ORDER_DETAILS: (state, value: OrderDetails) =>
     (state.orderDetails = value),
   SET_META: (state, value: Meta) => (state.meta = value),
+  SET_FILTER: (state, value: FilterOrders) => (state.filter = value),
+  RESET_FILTER: (state) => (state.filter = filter),
 }
 
 export const actions: ActionTree<RootStateOrders, RootStateOrders> = {
