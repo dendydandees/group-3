@@ -8,6 +8,10 @@ import {
   OrderAllocationUpdate,
 } from '~/types/orders'
 
+interface GetOrders {
+  params: Meta
+}
+
 export const state = () => ({
   orders: [] as Order[] | [],
   orderDetails: {
@@ -32,7 +36,7 @@ export const mutations: MutationTree<RootStateOrders> = {
 }
 
 export const actions: ActionTree<RootStateOrders, RootStateOrders> = {
-  async getOrders({ commit }, { params }) {
+  async getOrders({ commit }, { params }: GetOrders) {
     try {
       const response = await this?.$axios?.$get('/api/clients/orders', {
         params,

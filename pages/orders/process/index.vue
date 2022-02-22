@@ -160,11 +160,3 @@ export default defineComponent({
   head: {},
 })
 </script>
-
-<style lang="scss">
-@media screen and (min-width: 1024px) {
-  .v-pagination {
-    justify-content: flex-end !important;
-  }
-}
-</style>
