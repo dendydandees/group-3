@@ -47,7 +47,7 @@ export const actions: ActionTree<RootStateProfiles, RootStateProfiles> = {
       })
       const { data = [], page, totalPage, totalCount } = response
 
-      commit('SET_CREDENTIALS', data)
+      commit('SET_CREDENTIALS', data ?? [])
       commit('SET_META', {
         page,
         totalPage,
