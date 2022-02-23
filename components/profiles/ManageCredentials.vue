@@ -17,43 +17,8 @@
               don't share it on Github or anywhere else online.
             </v-alert>
 
-            <!-- client id -->
-            <div>
-              <v-subheader class="subtitle-1"> Client ID </v-subheader>
-
-              <v-expand-transition>
-                <v-alert
-                  v-if="alert.isShow && alert.message.includes('ID')"
-                  tile
-                  dismissible
-                  :type="alert.type"
-                >
-                  {{ alert.message }}
-                </v-alert>
-              </v-expand-transition>
-
-              <v-text-field
-                v-model="user.clientId"
-                single-line
-                outlined
-                readonly
-                :success="alert.message.includes('ID')"
-                append-icon="mdi-content-copy"
-                type="text"
-                label="Client ID"
-                class="my-4"
-                @click:append="doCopy(user.clientId, 'id')"
-              />
-            </div>
-
-            <v-divider class="my-6" />
-
             <!-- key list -->
             <div>
-              <v-subheader class="subtitle-1">
-                Key Credentials List
-              </v-subheader>
-
               <!-- alert user actions (clipboard, revoke, generate key) -->
               <v-expand-transition>
                 <v-alert
@@ -68,30 +33,32 @@
 
               <BaseLoading v-if="$fetchState.pending" color="primary" />
 
-              <!-- if credentials key is empty -->
-              <template v-if="credentials.length === 0">
-                <h2 class="text-center mt-6 subtitle-1">No keys available</h2>
-              </template>
-
               <template v-else>
-                <v-scroll-x-transition>
-                  <ProfilesCredentialList
-                    v-if="!$fetchState.pending"
-                    :credentials="credentials"
-                    :status="status"
-                    @doCopy="doCopy"
-                    @toggleConfirmRevoke="toggleConfirmRevoke"
-                  />
-                </v-scroll-x-transition>
+                <!-- if credentials key is empty -->
+                <template v-if="credentials.length === 0">
+                  <h2 class="text-center mt-6 subtitle-1">No keys available</h2>
+                </template>
 
-                <v-pagination
-                  :value="pagination.page"
-                  :disabled="status.copied"
-                  :length="metaCredentials.totalPage"
-                  :total-visible="7"
-                  class="my-6"
-                  @input="changePagination"
-                />
+                <template v-else>
+                  <v-scroll-x-transition>
+                    <ProfilesCredentialList
+                      v-if="!$fetchState.pending"
+                      :credentials="credentials"
+                      :status="status"
+                      @doCopy="doCopy"
+                      @toggleConfirmRevoke="toggleConfirmRevoke"
+                    />
+                  </v-scroll-x-transition>
+
+                  <v-pagination
+                    :value="pagination.page"
+                    :disabled="status.copied"
+                    :length="metaCredentials.totalPage"
+                    :total-visible="7"
+                    class="my-6"
+                    @input="changePagination"
+                  />
+                </template>
               </template>
             </div>
           </v-card-text>
@@ -174,7 +141,7 @@ export default defineComponent({
     // manage pagination
     pagination.value = {
       page: 1,
-      perPage: 5,
+      perPage: 3,
     }
     const changePagination = (value: number) => {
       storeApplications.commit('applications/SET_PAGINATION', {
@@ -321,9 +288,9 @@ export default defineComponent({
         const response = await storeProfiles.dispatch('profiles/generateKey', {
           body: form.value,
         })
-        const { token } = response
+        const { id } = response
 
-        if (!token) throw response
+        if (!id) throw response
 
         await storeProfiles.dispatch('profiles/getCredentials', {
           params: pagination.value,

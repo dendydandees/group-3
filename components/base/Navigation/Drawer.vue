@@ -35,12 +35,12 @@
       </v-list-item>
     </v-list>
 
-    <v-divider></v-divider>
+    <v-divider />
 
     <BaseNavigationClientMenu @hideMiniSideNav="$emit('hideMiniSideNav')" />
 
     <template #append>
-      <v-divider></v-divider>
+      <v-divider />
 
       <v-list class="py-4">
         <v-list-item
@@ -86,7 +86,7 @@
             color="primary"
             depressed
             nuxt
-            to="/profiles"
+            to="/account-profiles"
             class="mb-4"
           >
             Profile
