@@ -35,12 +35,12 @@
       </v-list-item>
     </v-list>
 
-    <v-divider></v-divider>
+    <v-divider />
 
-    <BaseNavigationDrawerList @hideMiniSideNav="$emit('hideMiniSideNav')" />
+    <BaseNavigationClientMenu @hideMiniSideNav="$emit('hideMiniSideNav')" />
 
     <template #append>
-      <v-divider></v-divider>
+      <v-divider />
 
       <v-list class="py-4">
         <v-list-item
@@ -86,7 +86,7 @@
             color="primary"
             depressed
             nuxt
-            to="/profiles"
+            to="/account-profiles"
             class="mb-4"
           >
             Profile
@@ -104,6 +104,7 @@
 <script lang="ts">
 import {
   computed,
+  ComputedRef,
   defineComponent,
   ref,
   watch,
@@ -112,6 +113,7 @@ import {
 } from '@nuxtjs/composition-api'
 // Interfaces and types
 import { VuexModuleApplications } from '~/types/applications'
+import { User } from '~/types/login'
 
 export default defineComponent({
   name: 'BaseNavigationDrawer',
@@ -151,7 +153,9 @@ export default defineComponent({
       isShowUserActions.value = !isShowUserActions.value
     }
     // Get user data
-    const user = computed(() => $auth.$storage.getUniversal('user'))
+    const user = computed(() =>
+      $auth.$storage.getUniversal('user')
+    ) as ComputedRef<User>
 
     watch(
       () => props.mini,

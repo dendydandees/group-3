@@ -1,12 +1,12 @@
 <template>
   <section class="pa-4 pa-md-10 py-8">
     <BaseHeadlinePage
-      title="Manage Process Orders"
-      subtitle="View the details of each order or make changes to a processed order."
+      title="Manage Orders"
+      subtitle="View the details of each order or make changes to a order."
     >
       <template slot="addition">
         <span class="text--secondary font-weight-medium title">
-          &bull; {{ meta.totalCount }} Total Process Orders
+          &bull; {{ meta.totalCount }} Total Orders
         </span>
       </template>
     </BaseHeadlinePage>
@@ -95,7 +95,7 @@ export default defineComponent({
       detail: true,
     })
     const doGetDetails = (data: Order) => {
-      router.push(`/orders/process/${data.id}`)
+      router.push(`/orders/${data.id}`)
     }
     const fetchOrders = async (params: FilterDetails) => {
       const { page, itemsPerPage, sortBy, sortDesc } = params
