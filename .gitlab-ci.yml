@@ -35,22 +35,23 @@ build-development:
     refs:
       - tags
 
-deploy_staging:
+deploy-dev:
   stage: deploy
+  extends: .deploy_ecs_template
   before_script:
-    - export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
-    - export AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION
-    - export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
-    - aws eks update-kubeconfig --name brain-staging-cluster
-  script:
-    - kubectl -n app set image deployment/client-portal client-portal=registry.gitlab.com/luwjistik1/client-portal:${CI_COMMIT_SHA}
-    - envsubst < ./.kubernetes/staging/configmap.yaml | kubectl -n app apply -f -
-    - envsubst < ./.kubernetes/staging/deployment.yaml | kubectl -n app apply -f -
-    - envsubst < ./.kubernetes/staging/ingress.yaml | kubectl -n app apply -f -
-    - envsubst < ./.kubernetes/staging/service.yaml | kubectl -n app apply -f -
+    - VERSION="${CI_COMMIT_SHA}"
+    - IMAGE_DESTINATION="${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}"
+  variables:
+    OUTPUTDIR: output.json
+    CLUSTER: dev-lj-ecs-cluster
+    SERVICE: dev-lj-client-service
+    NAME: lj-dev-client-taskdef
   only:
     refs:
       - main
+  except:
+    refs:
+      - tags
 
 build-sandbox:
   extends: .build_template
@@ -77,3 +78,30 @@ deploy-sandbox:
     NAME: lj-sandbox-client-taskdef
   only:
     - /^sandbox\/.*$/
+
+
+build-prod:
+  extends: .build_template
+  stage: build
+  variables:
+    DOCKERFILE: "${CI_PROJECT_DIR}/Dockerfile"
+  before_script:
+    - VERSION=$(printf "${CI_COMMIT_TAG}" | sed 's/prod\//prod-/' )
+    - IMAGE_DESTINATION="${CI_REGISTRY_IMAGE}:${VERSION}"
+    - echo SENTRY_DSN="https://aaab7374bcc146b68c3847fc5dd36b77@o1141218.ingest.sentry.io/6208578" >> .env
+  only:
+    - /^prod\/.*$/
+
+deploy-prod:
+  stage: deploy
+  extends: .deploy_ecs_template
+  before_script:
+    - VERSION=$(printf "${CI_COMMIT_TAG}" | sed 's/prod\//prod-/' )
+    - IMAGE_DESTINATION="${CI_REGISTRY_IMAGE}:${VERSION}"
+  variables:
+    OUTPUTDIR: output.json
+    CLUSTER: prod-lj-ecs-cluster
+    SERVICE: prod-lj-client-service
+    NAME: lj-prod-client-taskdef
+  only:
+    - /^prod\/.*$/
