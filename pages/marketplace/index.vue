@@ -8,11 +8,15 @@
     <v-row align="center">
       <v-col cols="12" md="7">
         <!-- Search filter field -->
-        <BaseSearchFieldCustom v-model="filter.search" />
+        <BaseSearchFieldCustom
+          v-model="filter.search"
+          :filter="showFilter"
+          :icon="filterIcon"
+        />
       </v-col>
     </v-row>
     <v-row
-      v-if="filter.search"
+      v-if="filter.search || showFilter.status"
     >
       <v-col cols="4" md="3">
         <v-select
@@ -49,6 +53,7 @@
         <div>
           <v-chip-group
             v-model="selection"
+            multiple
             active-class="blue accent-4 white--text"
 
             column
@@ -87,8 +92,55 @@
             :key="i"
             :index="i"
           >
-            <span class="title">Featured Partners #{{i + 1}}</span>
-            <p>Ninja Van</p>
+            <!-- <span class="title">Featured Partners #{{i + 1}}</span>
+            <p>Ninja Van</p> -->
+            <v-img
+              height="100%"
+              class="align-end opacity opacity-custom"
+
+              src="https://cdn.vuetifyjs.com/images/cards/cooking.png"
+            >
+              <div
+                class="pa-4 "
+              >
+                <div
+                  class="title white--text"
+                >
+                  Ninja Van
+                </div>
+                <div
+                  class="pb-1 body-2 white--text aling-center d-flex"
+                >
+                  <v-icon
+                    small
+                    color="white"
+                    class="mr-1"
+                  >
+                    mdi-pin
+                  </v-icon>
+                  Malaysia - Kuala Lumpur
+                </div>
+                <div
+                  class="d-flex"
+                >
+                  <v-chip-group
+                    class="card-chip-group"
+                  >
+                    <v-chip
+                      v-for="(mile, i) in miles"
+                      :key="i"
+                      class="mr-1 my-0"
+                      color="pink"
+                      text-color="white"
+                      x-small
+                      disabled
+                    >
+                      {{mile.name}}
+                    </v-chip>
+                  </v-chip-group>
+                </div>
+              </div>
+            </v-img>
           </slide>
         </carousel-3d>
       </v-col>
@@ -121,38 +173,24 @@
                 elevation="1"
                 shaped
                 tile
-                class="pa-4 rounded-xl d-flex flex-column justify-space-between"
-                height="175px"
+                class="rounded-xl d-flex flex-column justify-space-between"
                 width="100%"
                 color="blue"
               >
-                <div>
-                  <div
-                    class="d-flex justify-end"
-                  >
-                    <v-btn
-                      fab
-                      small
-                      plain
-                      @click="addPartner"
-                    >
-                      <v-icon
-                        dense
-                        color="white"
-                      >
-                        mdi-account-plus
-                      </v-icon>
-                    </v-btn>
-                  </div>
-                </div>
-                <div>
+                <v-img
+                  height="250"
+                  src="https://cdn.vuetifyjs.com/images/cards/cooking.png"
+                ></v-img>
+                <div
+                  class="pa-4 "
+                >
                   <div
                     class="title white--text"
                   >
                     Ninja Van
                   </div>
                   <div
-                    class="pb-2 body-2 white--text aling-center d-flex"
+                    class="pb-1 body-2 white--text aling-center d-flex"
                   >
                     <v-icon
                       small
@@ -166,18 +204,40 @@
                   <div
                     class="d-flex"
                   >
-                    <v-chip
-                      v-for="(mile, i) in miles"
-                      :key="i"
-                      class="mr-1"
-                      color="pink"
-                      text-color="white"
-                      x-small
+                    <v-chip-group
+                      class="card-chip-group"
                     >
-                      {{mile.name}}
-                    </v-chip>
+                      <v-chip
+                        v-for="(mile, i) in miles"
+                        :key="i"
+                        class="mr-1 my-0"
+                        color="pink"
+                        text-color="white"
+                        x-small
+                        disabled
+                      >
+                        {{mile.name}}
+                      </v-chip>
+                    </v-chip-group>
                   </div>
                 </div>
+                <v-btn
+                  fab
+                  small
+                  plain
+                  absolute
+                  top
+                  right
+                  class="pt-12"
+                  @click="addPartner"
+                >
+                  <v-icon
+                    dense
+                    color="white"
+                  >
+                    mdi-account-plus
+                  </v-icon>
+                </v-btn>
               </v-card>
             </v-col>
           </v-row>
@@ -194,7 +254,7 @@
                   dense
                   color="black"
                 >
-                  mdi-arrow-left
+                  mdi-menu-left
                 </v-icon>
               </v-btn>
             </div>
@@ -213,7 +273,7 @@
                   dense
                   color="black"
                 >
-                  mdi-arrow-right
+                  mdi-menu-right
                 </v-icon>
               </v-btn>
             </div>
@@ -250,6 +310,13 @@ export default defineComponent({
   setup() {
     const slides = 7
     const chips = 6
+    const showFilter = reactive({
+      status: false
+    })
+    const filterIcon = reactive({
+      active: 'mdi-view-stream',
+      passive: 'mdi-view-stream-outline'
+    })
     const method = reactive({
       opt: 'add'
     })
@@ -275,12 +342,12 @@ export default defineComponent({
       {
         name: 'Custom Import'
       },
-      // {
-      //   name: 'Custom Import'
-      // },
-      // {
-      //   name: 'Custom Import'
-      // }
+      {
+        name: 'Custom Import'
+      },
+      {
+        name: 'Custom Import'
+      }
     ])
     const toggle = () => {
       if (method.opt === 'add' || method.opt === 'edit') {
@@ -300,7 +367,9 @@ export default defineComponent({
       toggle,
       addPartner,
       slides,
-      chips
+      chips,
+      showFilter,
+      filterIcon
     }
   },
   head: {},
@@ -312,12 +381,18 @@ export default defineComponent({
     .carousel-3d-slide {
       border: unset;
       border-radius: 20px;
-      padding: 20px;
+      /* padding: 20px; */
       background: #48a3ee;
       color: white;
       box-shadow: 0px 0px 40px 0px #36363626;
       &.current {
         background: #2196F3;
+        .opacity-custom {
+          opacity: 1;
+        }
+      }
+      .opacity-custom {
+        opacity: .7;
       }
     }
     .custom-select {
@@ -344,6 +419,23 @@ export default defineComponent({
       color: #2196F3;
       background: transparent !important;
       border: 1px solid #2196F3;
+    }
+  }
+  .card-chip-group {
+    .v-slide-group__next, .v-slide-group__prev {
+      min-width: unset;
+      flex: unset;
+      i {
+        color: rgba(255, 255, 255, 0.534);
+        font-size: 18px;
+      }
+    }
+
+    .v-chip--disabled {
+      opacity: 1;
+    }
+    .v-slide-group__prev--disabled, .v-slide-group__next--disabled {
+      display: none;
     }
   }
 </style>

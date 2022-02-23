@@ -13,6 +13,9 @@
     rounded
     outlined
     class="input-custom"
+    :suffix="!search ? 'Filter' : null"
+    :append-icon="customAppendIcon(showFilterComp.status, search, icon)"
+    @click:append="showFilterComp.status = !showFilterComp.status"
   />
 </template>
 
@@ -25,8 +28,24 @@ export default defineComponent({
       type: String as PropType<String>,
       default: null,
     },
+    filter: {
+      type: Boolean as PropType<Boolean>,
+      default: false,
+    },
+    icon: {
+      type: String as PropType<String>,
+      default: null,
+    },
   },
   setup(props, { emit }) {
+    const showFilterComp = computed({
+      get: () => {
+        return props.filter
+      },
+      set: (value) => {
+        emit('input', value)
+      },
+    })
     const search = computed({
       get: () => {
         return props.value
@@ -36,8 +55,23 @@ export default defineComponent({
       },
     })
 
+    // :append-icon="showFilterComp.status ? icon.active : icon.passive"
+    const customAppendIcon = (status: Boolean, keyword: String, iconFilter: { active: string; passive: string }) => {
+      if(!keyword) {
+        if(status) {
+          return iconFilter.active
+        } else{
+          return iconFilter.passive
+        }
+      } else {
+        return null
+      }
+    }
+
     return {
       search,
+      showFilterComp,
+      customAppendIcon
     }
   },
 })
