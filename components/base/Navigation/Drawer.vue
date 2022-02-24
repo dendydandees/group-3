@@ -11,8 +11,8 @@
       <v-list-item class="justify-center">
         <v-badge
           v-if="!mini"
-          content="Client Portal"
-          value="Client Portal"
+          :content="isOnPartnersPortal ? 'Partner Portal' : 'Client Portal'"
+          :value="isOnPartnersPortal ? 'Partner Portal' : 'Client Portal'"
           color="secondary"
           overlap
           class="mt-2 mr-10"
@@ -37,7 +37,17 @@
 
     <v-divider />
 
-    <BaseNavigationClientMenu @hideMiniSideNav="$emit('hideMiniSideNav')" />
+    <BaseNavigationClientMenu
+      v-if="!isOnPartnersPortal"
+      @hideMiniSideNav="$emit('hideMiniSideNav')"
+    />
+
+    <BaseNavigationPartnerMenu
+      v-if="isPartners"
+      :mini="mini"
+      :is-on-partners-portal="isOnPartnersPortal"
+      @hideMiniSideNav="$emit('hideMiniSideNav')"
+    />
 
     <template #append>
       <v-divider />
@@ -110,6 +120,7 @@ import {
   watch,
   useStore,
   useContext,
+  useRoute,
 } from '@nuxtjs/composition-api'
 // Interfaces and types
 import { VuexModuleApplications } from '~/types/applications'
@@ -129,6 +140,7 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const { $auth } = useContext()
+    const route = useRoute()
     const storeOfApplications = useStore<VuexModuleApplications>()
     const drawer = computed({
       get(): boolean {
@@ -156,6 +168,10 @@ export default defineComponent({
     const user = computed(() =>
       $auth.$storage.getUniversal('user')
     ) as ComputedRef<User>
+    const isPartners = computed(() => user.value.partnerProfiles.length !== 0)
+    const isOnPartnersPortal = computed(() =>
+      route.value.path.includes('portals')
+    )
 
     watch(
       () => props.mini,
@@ -170,6 +186,8 @@ export default defineComponent({
       isShowUserActions,
       doShowUserActions,
       user,
+      isPartners,
+      isOnPartnersPortal,
     }
   },
 })

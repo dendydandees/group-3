@@ -19,6 +19,6 @@ export interface GenerateCredential {
 }
 
 export interface ResetPasswordParams {
-  newPassword: string,
+  newPassword: string
   oldPassword: string
 }
