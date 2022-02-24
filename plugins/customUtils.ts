@@ -7,6 +7,9 @@ export default defineNuxtPlugin((_context, inject) => {
 
       return setItem.join(', ')
     },
+    setServiceType: (data: string): string => {
+      return data.replaceAll('_', ' ')
+    },
   }
 
   inject('customUtils', customUtils)

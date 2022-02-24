@@ -67,6 +67,96 @@
     </template>
     <!-- End Order List Page -->
 
+    <!-- Incoming Order List Page -->
+    <!-- Order code -->
+    <template #[`item.incomingOrderCode`]="{ item }">
+      {{ item.orderCode }}
+
+      <span v-if="item.order.refID" class="ml-1 text--secondary">
+        (#{{ item.order.refID }})
+      </span>
+    </template>
+
+    <!-- Consignee data -->
+    <template #[`item.incomingConsignee`]="{ item }">
+      <div class="text--secondary my-2">
+        <p class="mb-2 font-weight-bold subtitle-2">
+          {{ item.order.consigneeName }}
+        </p>
+
+        <p class="mb-1">
+          {{ item.order.consigneeAddress }}
+        </p>
+
+        <p class="ma-0">
+          {{
+            $customUtils.setAddress([
+              item.order.consigneeCity,
+              item.order.consigneeProvince,
+              item.order.consigneeCountry,
+              item.order.consigneePostal,
+            ])
+          }}
+        </p>
+      </div>
+    </template>
+
+    <!-- Pickup data -->
+    <template #[`item.incomingPickup`]="{ item }">
+      <div class="text--secondary my-2">
+        <p class="mb-2 font-weight-bold subtitle-2">
+          {{ item.order.pickupContactName }}
+        </p>
+
+        <p class="mb-1">
+          {{ item.order.pickupAddress }}
+        </p>
+
+        <p class="ma-0">
+          {{
+            $customUtils.setAddress([
+              item.order.pickupCity,
+              item.order.pickupProvince,
+              item.order.pickupCountry,
+              item.order.pickupPostal,
+            ])
+          }}
+        </p>
+      </div>
+    </template>
+
+    <!-- Service type -->
+    <template #[`item.serviceType`]="{ item }">
+      <v-chip small color="info" class="text-uppercase mb-2 white--text">
+        {{ $customUtils.setServiceType(item.serviceType) }}
+      </v-chip>
+    </template>
+    <!-- End Incoming Order List Page -->
+
+    <!-- Client Connections Page -->
+    <template #[`item.status`]="{ item }">
+      <v-switch
+        inset
+        flat
+        :true-value="'Connected'"
+        :false-value="'Pending'"
+        :input-value="item.status"
+        :loading="loading"
+        @change="doChangeStatus"
+      >
+        <template #label>
+          <v-chip
+            label
+            :color="item.status === 'Connected' ? 'primary' : ''"
+            class="rounded-0"
+          >
+            {{ item.status }}
+          </v-chip>
+        </template>
+      </v-switch>
+    </template>
+    <!-- End Client Connections Page -->
+
     <!-- Actions button list -->
     <template #[`item.actions`]="{ item }">
       <v-btn
@@ -147,12 +237,16 @@ export default defineComponent({
     const getDetailItem = (data: {}) => {
       emit('doGetDetails', data)
     }
+    const doChangeStatus = (data: boolean) => {
+      console.log(data)
+    }
 
     return {
       pagination,
       footerProps,
       fetch,
       getDetailItem,
+      doChangeStatus,
     }
   },
 })
