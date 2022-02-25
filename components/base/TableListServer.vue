@@ -159,18 +159,36 @@
 
     <!-- Actions button list -->
     <template #[`item.actions`]="{ item }">
-      <v-btn
-        v-if="isShowActions.detail"
-        tile
-        small
-        :loading="loading"
-        color="primary"
-        elevation="0"
-        class="ma-2"
-        @click="getDetailItem(item)"
-      >
-        Details
-      </v-btn>
+      <div class="d-flex align-center">
+        <v-btn
+          v-if="isShowActions.detail"
+          tile
+          small
+          depressed
+          :loading="loading"
+          color="primary"
+          elevation="0"
+          class="ma-2"
+          @click="getDetailItem(item)"
+        >
+          Details
+        </v-btn>
+
+        <v-btn
+          v-if="isShowActions.download"
+          tile
+          small
+          depressed
+          download
+          :href="item.labelPath || ''"
+          :loading="loading"
+          color="primary"
+          elevation="0"
+          class="ma-2"
+        >
+          Download
+        </v-btn>
+      </div>
     </template>
   </v-data-table>
 </template>
@@ -216,6 +234,7 @@ export default defineComponent({
       type: Object as PropType<ActionsTable>,
       default: () => ({
         detail: false,
+        download: false,
         edit: false,
         delete: false,
       }),
