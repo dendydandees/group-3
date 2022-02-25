@@ -33,6 +33,7 @@ export default defineComponent({
   setup() {
     const clientMenu = ref([
       { title: 'Orders', icon: 'mdi-file-document', to: '/orders' },
+      { title: 'Marketplace', icon: 'mdi-target', to: '/marketplace' },
     ]) as Ref<NavigationLinks[]>
 
     return {

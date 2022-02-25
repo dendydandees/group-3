@@ -29,12 +29,12 @@ export default defineComponent({
       default: null,
     },
     filter: {
-      type: Boolean as PropType<Boolean>,
-      default: false,
+      type: Object as PropType<{status: boolean}>,
+      default: () => ({status: false}),
     },
     icon: {
-      type: String as PropType<String>,
-      default: null,
+      type: Object as PropType<{active: string, passive: string}>,
+      default: () => ({active: null, passive: null}),
     },
   },
   setup(props, { emit }) {
