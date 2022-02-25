@@ -182,7 +182,8 @@
           download
           :href="item.labelPath || ''"
           :loading="loading"
-          color="primary"
+          :disabled="!item.labelPath"
+          color="info"
           elevation="0"
           class="ma-2"
         >
