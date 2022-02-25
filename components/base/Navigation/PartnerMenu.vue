@@ -1,19 +1,14 @@
 <template>
   <div>
-    <!-- this partners menu divider show only on client portal -->
-    <template v-if="!isOnPartnersPortal">
-      <v-divider v-if="mini" />
-
-      <div v-else class="d-flex align-center">
-        <v-divider />
-
-        <span class="caption mx-4 text--secondary">Partners</span>
-
-        <v-divider />
-      </div>
-    </template>
+    <v-divider />
 
     <v-list nav dense class="py-4 px-4">
+      <v-slide-x-transition hide-on-leave>
+        <v-subheader v-if="!mini" class="text-uppercase">
+          Partner Portal
+        </v-subheader>
+      </v-slide-x-transition>
+
       <v-list-item
         v-for="(partner, index) in partnerMenus"
         :key="index"
@@ -40,15 +35,7 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  ref,
-  Ref,
-  PropType,
-  watch,
-  useRoute,
-  nextTick,
-} from '@nuxtjs/composition-api'
+import { defineComponent, ref, Ref, PropType } from '@nuxtjs/composition-api'
 // Interfaces and types
 import { NavigationLinks } from '~/types/applications'
 
@@ -58,51 +45,25 @@ export default defineComponent({
       type: Boolean as PropType<Boolean>,
       required: true,
     },
-    isOnPartnersPortal: {
-      type: Boolean as PropType<Boolean>,
-      required: true,
-    },
   },
-  setup(props) {
-    const route = useRoute()
+  setup() {
     const partnerMenus = ref([
       {
-        title: 'Partner Profiles',
-        icon: 'mdi-account',
+        title: 'Incoming Orders',
+        icon: 'mdi-file-clock',
+        to: `/partners/portals/incoming-orders`,
+      },
+      {
+        title: 'Client Connections',
+        icon: 'mdi-power-plug',
+        to: `/partners/portals/client-connections`,
+      },
+      {
+        title: 'Edit Profile',
+        icon: 'mdi-account-cog',
         to: '/partners/profiles',
       },
     ]) as Ref<NavigationLinks[]>
-    const setPartnerMenus = (isOnPortal: Boolean) => {
-      if (isOnPortal) {
-        partnerMenus.value.unshift(
-          {
-            title: 'Incoming Orders',
-            icon: 'mdi-file-clock',
-            to: `/partners/portals/${route?.value?.params?.id}/incoming-orders`,
-          },
-          {
-            title: 'Client Connections',
-            icon: 'mdi-power-plug',
-            to: `/partners/portals/${route?.value?.params?.id}/client-connections`,
-          }
-        )
-      } else {
-        partnerMenus.value = partnerMenus.value.filter(
-          (partner) => partner.title === 'Partner Profiles'
-        )
-      }
-    }
-
-    watch(
-      () => props.isOnPartnersPortal,
-      (newValue) => {
-        setPartnerMenus(newValue)
-      }
-    )
-
-    nextTick(() => {
-      setPartnerMenus(props.isOnPartnersPortal)
-    })
 
     return {
       partnerMenus,

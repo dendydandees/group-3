@@ -11,6 +11,13 @@
       </template>
     </BaseHeadlinePage>
 
+    <v-row align="center" class="white my-8 mx-0">
+      <v-col cols="12" md="6">
+        <!-- Search filter field -->
+        <BaseSearchField v-model="filter.search" />
+      </v-col>
+    </v-row>
+
     <v-row align="center">
       <v-col cols="12">
         <BaseTableListServer
@@ -32,22 +39,24 @@ import {
   defineComponent,
   useFetch,
   useMeta,
-  useRoute,
   useStore,
   computed,
   ref,
   watch,
   reactive,
+  useContext,
+  ComputedRef,
 } from '@nuxtjs/composition-api'
 import { FilterDetails, VuexModuleApplications } from '~/types/applications'
 // Interface and types
 import { VuexModuleIncomingOrders } from '~/types/incomingOrders'
+import { User } from '~/types/login'
 
 export default defineComponent({
   name: 'OrdersIncomingPages',
   middleware: 'partner',
   setup() {
-    const route = useRoute()
+    const { $auth } = useContext()
     // manage store
     const storeIncomingOrders = useStore<VuexModuleIncomingOrders>()
     const storeApplications = useStore<VuexModuleApplications>()
@@ -58,7 +67,13 @@ export default defineComponent({
     const pagination = ref({
       ...storeApplications.state.applications.pagination,
     })
+    const filter = ref({
+      ...storeIncomingOrders.state.incomingOrders.filter,
+    })
 
+    const user = computed(() =>
+      $auth.$storage.getUniversal('user')
+    ) as ComputedRef<User>
     const headers = reactive([
       {
         text: 'Order Code (#Ref)',
@@ -81,12 +96,14 @@ export default defineComponent({
       },
     ])
     const fetchIncomingOrders = async (params: FilterDetails) => {
-      const id = route.value.params.id
+      const id = user.value?.partnerProfiles[0]?.partnerId
       const { page, itemsPerPage } = params
       const perPage = itemsPerPage !== -1 ? itemsPerPage : meta.value.totalCount
+      const orderCode = filter?.value.search ?? null
       const dataParams = {
         page,
         perPage,
+        orderCode,
       }
       try {
         $fetchState.pending = true
@@ -102,6 +119,23 @@ export default defineComponent({
       }
     }
 
+    // manage filter on changed
+    watch(
+      filter,
+      (newFilter) => {
+        pagination.value = {
+          ...pagination.value,
+          page: 1,
+        }
+        storeApplications.commit('incomingOrders/SET_FILTER', {
+          ...newFilter,
+        })
+
+        fetch()
+      },
+      { deep: true }
+    )
+
     // manage pagination on changed
     watch(
       pagination,
@@ -113,7 +147,7 @@ export default defineComponent({
       { deep: true }
     )
 
-    const { $fetchState } = useFetch(async () => {
+    const { $fetchState, fetch } = useFetch(async () => {
       await fetchIncomingOrders(pagination.value)
     })
 
@@ -123,6 +157,7 @@ export default defineComponent({
       incomingOrders,
       meta,
       pagination,
+      filter,
       headers,
       fetchIncomingOrders,
     }

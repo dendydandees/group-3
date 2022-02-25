@@ -2,6 +2,11 @@
 import { MutationTree, ActionTree } from 'vuex'
 import { Meta } from '~/types/applications'
 import { IncomingOrder } from '~/types/incomingOrders'
+import { FilterOrders } from '~/types/orders'
+
+const filter = {
+  search: '',
+} as FilterOrders
 
 export const state = () => ({
   incomingOrders: [] as IncomingOrder | [],
@@ -10,6 +15,7 @@ export const state = () => ({
     totalPage: 1,
     totalCount: 10,
   } as Meta,
+  filter: filter as FilterOrders,
 })
 
 export type RootStateIncomingOrders = ReturnType<typeof state>
@@ -18,6 +24,8 @@ export const mutations: MutationTree<RootStateIncomingOrders> = {
   SET_CLIENT_CONNECTIONS: (state, value: IncomingOrder) =>
     (state.incomingOrders = value),
   SET_META: (state, value: Meta) => (state.meta = value),
+  SET_FILTER: (state, value: FilterOrders) => (state.filter = value),
+  RESET_FILTER: (state) => (state.filter = filter),
 }
 
 export const actions: ActionTree<

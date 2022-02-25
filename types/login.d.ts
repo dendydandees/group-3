@@ -3,10 +3,14 @@ export interface Login {
   password: string
 }
 
+export interface PartnerProfiles {
+  partnerId: string
+}
+
 export interface User {
   email: string
   role: string
   clientId: string
-  partnerProfiles: []
+  partnerProfiles: PartnerProfiles[]
   initial?: string
 }
