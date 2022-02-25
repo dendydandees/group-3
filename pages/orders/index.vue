@@ -11,7 +11,7 @@
       </template>
     </BaseHeadlinePage>
 
-    <v-row align="center">
+    <v-row align="center" class="white my-8 mx-0">
       <v-col cols="12" md="6">
         <!-- Search filter field -->
         <BaseSearchField v-model="filter.search" />
@@ -93,6 +93,7 @@ export default defineComponent({
     ])
     const isShowActions = reactive({
       detail: true,
+      download: true,
     })
     const doGetDetails = (data: Order) => {
       router.push(`/orders/${data.id}`)
@@ -119,6 +120,7 @@ export default defineComponent({
         $fetchState.pending = false
       }
     }
+
     const { $fetchState, fetch } = useFetch(async () => {
       await fetchOrders(pagination.value)
     })

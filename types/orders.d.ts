@@ -31,6 +31,7 @@ export interface Order {
   pickupCountry: string
   pickupAddress: string
   refID: number
+  labelPath: string
 }
 
 export interface OrderItem {
