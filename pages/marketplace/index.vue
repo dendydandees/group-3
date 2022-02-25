@@ -155,7 +155,7 @@
           v-else-if="filter.search"
           class="blue--text subtitle-2 pl-1"
         >
-          7 RESULTS
+          {{meta.totalCount}} RESULTS
         </div>
         <v-container
           fluid
@@ -164,7 +164,7 @@
           <v-row
           >
             <v-col
-              v-for="(partner, u) in nearPartners"
+              v-for="(partner, u) in marketplaces"
               :key="u"
               cols="3"
               class="d-flex align-center justify-space-between pa-4"
@@ -176,6 +176,7 @@
                 class="rounded-xl d-flex flex-column justify-space-between"
                 width="100%"
                 color="blue"
+                :disabled="$fetchState.pending"
               >
                 <v-img
                   height="250"
@@ -185,30 +186,32 @@
                   class="pa-4 "
                 >
                   <div
-                    class="title white--text"
+                    class="title white--text  text-truncate"
                   >
-                    Ninja Van
+                    {{partner.name}}
                   </div>
                   <div
                     class="pb-1 body-2 white--text aling-center d-flex"
                   >
                     <v-icon
+                      v-if="partner.partnerServiceTypes.length > 0"
                       small
                       color="white"
                       class="mr-1"
                     >
                       mdi-pin
                     </v-icon>
-                    Malaysia - Kuala Lumpur
+                    {{locationMapping(partner.partnerServiceZones)}}
                   </div>
                   <div
                     class="d-flex"
                   >
                     <v-chip-group
                       class="card-chip-group"
+
                     >
                       <v-chip
-                        v-for="(mile, i) in miles"
+                        v-for="(mile, i) in partner.partnerServiceTypes"
                         :key="i"
                         class="mr-1 my-0"
                         color="pink"
@@ -249,6 +252,8 @@
                 fab
                 small
                 plain
+                :disabled="(filter.page === 1) || $fetchState.pending"
+                @click="nextOrPrev('-')"
               >
                 <v-icon
                   dense
@@ -261,13 +266,15 @@
             <div
               class="px-3"
             >
-              3
+              {{meta.page}}
             </div>
             <div>
               <v-btn
                 fab
                 small
                 plain
+                :disabled="(filter.page === meta.totalPage) || $fetchState.pending"
+                @click="nextOrPrev('+')"
               >
                 <v-icon
                   dense
@@ -302,12 +309,26 @@ import {
   useRouter,
 } from '@nuxtjs/composition-api'
 // Interfaces or types
+import { Marketplace, VuexModuleMarketplaces,FilterDetails, PartnerServiceZone } from '~/types/marketplace'
+import { VuexModuleApplications } from '~/types/applications'
 
 
 export default defineComponent({
   name: 'MarketPlace',
   layout: 'default',
   setup() {
+    // store manage
+    const storeMarketplaces = useStore<VuexModuleMarketplaces>()
+    const storeApplications = useStore<VuexModuleApplications>()
+    const marketplaces = computed(() => storeMarketplaces.state.marketplaces.marketplaces)
+    const meta = computed(() => storeMarketplaces.state.marketplaces.meta)
+    const filter = ref({ ...storeMarketplaces.state.marketplaces.filter })
+    const pageCustom = computed({
+      get: () => filter.value.page,
+      set: (val) => {
+        filter.value.page = val
+      }
+    })
     const slides = 7
     const chips = 6
     const showFilter = reactive({
@@ -322,9 +343,6 @@ export default defineComponent({
     })
     const dialog = reactive({
       status: false
-    })
-    const filter = reactive({
-      search: null,
     })
     const yourPartners =reactive([
       1, 2, 3 , 4, 5, 6
@@ -357,7 +375,69 @@ export default defineComponent({
     const addPartner = () => {
       toggle()
     }
+    const fetchMarketplace = async (params: FilterDetails) => {
+      const { page, itemsPerPage, search, country,service} = params
+      const perPage = itemsPerPage !== -1 ? itemsPerPage : meta.value.totalCount
+      const dataParams = {
+        page,
+        perPage,
+        search,
+        // country,
+        // service
+      }
+
+      try {
+        $fetchState.pending = true
+
+        await storeMarketplaces.dispatch('marketplaces/getMarketplaces', { params: dataParams })
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+    const { $fetchState, fetch } = useFetch(async () => {
+      await fetchMarketplace(filter.value)
+    })
+
+    const locationMapping = (partnerServiceZones: PartnerServiceZone[]) => {
+      if(partnerServiceZones && partnerServiceZones.length > 0) {
+        const tempZone = partnerServiceZones.map((el, i) => {
+          return el.zone_country
+        })
+        return tempZone.join(', ')
+      } else {
+        return ''
+      }
+    }
+
+    const nextOrPrev = (type: string) => {
+      switch (type) {
+        case '+':
+          pageCustom.value = pageCustom.value + 1
+          break;
+        case '-':
+          pageCustom.value = pageCustom.value - 1
+          break
+        default:
+          break;
+      }
+    }
+
+    watch(
+      filter,
+      (newFilter) => {
+        storeApplications.commit('marketplaces/SET_FILTER', {
+          ...newFilter,
+        })
+
+        fetch()
+      },
+      { deep: true }
+    )
+
     return {
+      marketplaces,
       filter,
       dialog,
       yourPartners,
@@ -369,7 +449,10 @@ export default defineComponent({
       slides,
       chips,
       showFilter,
-      filterIcon
+      filterIcon,
+      locationMapping,
+      meta,
+      nextOrPrev
     }
   },
   head: {},
