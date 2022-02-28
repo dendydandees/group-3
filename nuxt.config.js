@@ -1,6 +1,6 @@
-import colors from 'vuetify/es5/util/colors'
+import colors from 'vuetify/es5/util/colors';
 
-const development = process.env.NODE_ENV === 'development'
+const development = process.env.NODE_ENV === 'development';
 
 export default {
   // Rendering property : https://nuxtjs.org/docs/features/rendering-modes
@@ -57,7 +57,7 @@ export default {
   css: ['~/assets/scss/main.scss'],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: ['~/plugins/vee-validate.js', '~/plugins/customUtils.ts'],
+  plugins: ['~/plugins/vee-validate.js', '~/plugins/customUtils.ts', { src: '~plugins/vue-carousel-3d', ssr: false }],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -167,4 +167,4 @@ export default {
     hardSourcePlugin: development,
     parallelPlugin: development,
   },
-}
+};
