@@ -61,17 +61,12 @@ export default defineComponent({
     }
   },
   setup(props, {emit}) {
-    const dialogComp = computed({
-      get: () => props.dialog,
-      set: (value: boolean) => emit('input', value)
-    })
     const toggle = () => {
       emit('toggle')
       // this.$nuxt.$emit('toggle')
     }
     return {
       toggle,
-      dialogComp
     }
   },
 })
