@@ -53,7 +53,7 @@ import { Order, VuexModuleOrders } from '~/types/orders'
 import { FilterDetails, VuexModuleApplications } from '~/types/applications'
 
 export default defineComponent({
-  name: 'OrdersProcessPages',
+  name: 'OrderPages',
   layout: 'default',
   setup() {
     useMeta({ titleTemplate: '%s | Orders' })

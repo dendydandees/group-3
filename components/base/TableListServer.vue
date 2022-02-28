@@ -15,7 +15,9 @@
     <template #[`item.orderCode`]="{ item }">
       {{ item.orderCode }}
 
-      <span class="ml-1 text--secondary"> (#{{ item.refID }}) </span>
+      <span v-if="item.refID" class="ml-1 text--secondary">
+        (#{{ item.refID }})
+      </span>
     </template>
 
     <!-- Consignee data -->
