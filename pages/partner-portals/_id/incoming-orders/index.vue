@@ -44,19 +44,17 @@ import {
   ref,
   watch,
   reactive,
-  useContext,
-  ComputedRef,
+  useRoute,
 } from '@nuxtjs/composition-api'
 import { FilterDetails, VuexModuleApplications } from '~/types/applications'
 // Interface and types
 import { VuexModuleIncomingOrders } from '~/types/incomingOrders'
-import { User } from '~/types/login'
 
 export default defineComponent({
   name: 'OrdersIncomingPages',
   middleware: 'partner',
   setup() {
-    const { $auth } = useContext()
+    const route = useRoute()
     // manage store
     const storeIncomingOrders = useStore<VuexModuleIncomingOrders>()
     const storeApplications = useStore<VuexModuleApplications>()
@@ -71,13 +69,11 @@ export default defineComponent({
       ...storeIncomingOrders.state.incomingOrders.filter,
     })
 
-    const user = computed(() =>
-      $auth.$storage.getUniversal('user')
-    ) as ComputedRef<User>
     const headers = reactive([
       {
         text: 'Order Code (#Ref)',
         value: 'incomingOrderCode',
+        sortable: false,
       },
       {
         text: 'Consignee',
@@ -96,7 +92,7 @@ export default defineComponent({
       },
     ])
     const fetchIncomingOrders = async (params: FilterDetails) => {
-      const id = user.value?.partnerProfiles[0]?.partnerId
+      const id = route.value.params.id
       const { page, itemsPerPage } = params
       const perPage = itemsPerPage !== -1 ? itemsPerPage : meta.value.totalCount
       const orderCode = filter?.value.search ?? null

@@ -35,9 +35,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, Ref, PropType } from '@nuxtjs/composition-api'
+import {
+  defineComponent,
+  ref,
+  Ref,
+  PropType,
+  useContext,
+  computed,
+  ComputedRef,
+} from '@nuxtjs/composition-api'
 // Interfaces and types
 import { NavigationLinks } from '~/types/applications'
+import { User } from '~/types/login'
 
 export default defineComponent({
   props: {
@@ -47,22 +56,27 @@ export default defineComponent({
     },
   },
   setup() {
+    const { $auth } = useContext()
+    const user = computed(() =>
+      $auth.$storage.getUniversal('user')
+    ) as ComputedRef<User>
+    const partnerId = computed(() => user.value?.partnerProfiles[0]?.partnerId)
     const partnerMenus = ref([
       {
         title: 'Incoming Orders',
         icon: 'mdi-file-clock',
-        to: `/partners/portals/incoming-orders`,
+        to: `/partner-portals/${partnerId.value}/incoming-orders/`,
       },
-      {
-        title: 'Client Connections',
-        icon: 'mdi-power-plug',
-        to: `/partners/portals/client-connections`,
-      },
-      {
-        title: 'Edit Profile',
-        icon: 'mdi-account-cog',
-        to: '/partners/profiles',
-      },
+      // {
+      //   title: 'Client Connections',
+      //   icon: 'mdi-power-plug',
+      //   to: `/partners/portals/client-connections`,
+      // },
+      // {
+      //   title: 'Edit Profile',
+      //   icon: 'mdi-account-cog',
+      //   to: `/partner-portals/${partnerId.value}/profiles/edit`,
+      // },
     ]) as Ref<NavigationLinks[]>
 
     return {
