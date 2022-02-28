@@ -1,18 +1,11 @@
 <template>
   <div>
-    <v-dialog v-model="dialogComp.status" persistent max-width="450">
+    <v-dialog v-model="dialogComp" persistent max-width="450">
       <v-card
         class="rounded-xl pa-2"
       >
-        <v-alert
-          v-for="feedback in feedbacks"
-          :key="feedback.message"
-          :type="feedback.type"
-        >
-          {{ feedback.message }}
-        </v-alert>
         <v-card-title class="h-5 text-break">
-          Are you sure you want to connect with Ninja Van?
+          Are you sure you want to connect with {{data.name}}?
         </v-card-title>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -25,6 +18,7 @@
           </v-btn>
           <v-btn
             color="blue darken-1 white--text"
+            @click="addConnection()"
           >
             Connect
           </v-btn>
@@ -46,6 +40,7 @@ import {
   useMeta,
   useRouter,
 } from '@nuxtjs/composition-api'
+import { VuexModuleMarketplaces} from '~/types/marketplace'
 
 interface FeedbackMessage {
   alert: boolean
@@ -56,26 +51,34 @@ interface FeedbackMessage {
 export default defineComponent({
   props: {
     dialog: {
-      type: Boolean,
-      default: false,
+      type: Object,
+      default: () => ({}),
     },
     item: {
       type: Object,
       default: () => ({}),
-    }
+    },
+    data: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   setup(props, {emit}) {
     const dialogComp = computed({
-      get: () => props.dialog,
+      get: () => props.dialog.status,
       set: (value: boolean) => emit('input', value)
     })
     const toggle = () => {
       emit('toggle')
       // this.$nuxt.$emit('toggle')
     }
+    const addConnection = () => {
+      emit('add')
+    }
     return {
       toggle,
-      dialogComp
+      dialogComp,
+      addConnection
     }
   },
 })

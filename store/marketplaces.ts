@@ -60,5 +60,14 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
     } catch (error) {
       return error;
     }
+  },
+  async addConnection({ commit }, { id }: { id: String; }) {
+    try {
+      const response = await this?.$axios?.$post(`/api/clients/connections/${ id }`);
+
+      return response;
+    } catch (error) {
+      return error;
+    }
   }
 };

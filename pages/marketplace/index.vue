@@ -20,27 +20,33 @@
     >
       <v-col cols="4" md="3">
         <v-select
-          :items="items"
+          v-model="selectedZone.value"
+          :items="zones"
+          item-text="country"
+          item-value="country"
           label="Country"
           outlined
           rounded
           dense
           color="blue"
           class="custom-select pb-3"
+          clearable
         >
         </v-select>
         <v-select
-          :items="items"
+          :items="[]"
           label="Ports"
           outlined
           rounded
           dense
           color="blue"
           class="custom-select"
+          clearable
         >
         </v-select>
       </v-col>
       <v-col
+        v-if="serviceTypes && serviceTypes.length > 0"
         align-self="center"
         cols="4"
         md="4"
@@ -50,32 +56,33 @@
         >
           Types
         </div>
-        <div>
+        <div
+        >
           <v-chip-group
-            v-model="selection"
+            v-model="selectedServiceTypes.arrValue"
             multiple
             active-class="blue accent-4 white--text"
 
             column
           >
             <v-chip
-              v-for="(chip, i) in chips"
+              v-for="(chip, i) in serviceTypes"
               :key="i"
+              :value="chip.name"
               small
               class="custom-chips"
             >
-              First Mile
+              {{chip.name}}
             </v-chip>
 
           </v-chip-group>
         </div>
       </v-col>
     </v-row>
-
     <v-row
       class="mt-6"
     >
-      <v-col v-if="!filter.search" cols="12" md="12">
+      <v-col v-if="!filter.search && !filter.country && !filter.service" cols="12" md="12">
         <h1 class="headline font-weight-bold mb-2 text-capitalize">
           Featured Network <br>
           Partners
@@ -86,6 +93,7 @@
           :display="5"
           :height="350"
           :width="500"
+          :autoplay="true"
         >
           <slide
             v-for="(slide, i) in slides"
@@ -127,7 +135,7 @@
                     class="card-chip-group"
                   >
                     <v-chip
-                      v-for="(mile, i) in miles"
+                      v-for="(mile, i) in 4"
                       :key="i"
                       class="mr-1 my-0"
                       color="pink"
@@ -135,7 +143,7 @@
                       x-small
                       disabled
                     >
-                      {{mile.name}}
+                      First Mile
                     </v-chip>
                   </v-chip-group>
                 </div>
@@ -147,12 +155,12 @@
     </v-row>
     <v-row>
       <v-col>
-        <h1 v-if="!filter.search" class="headline font-weight-bold mb-2 text-capitalize">
+        <h1 v-if="!filter.search && !filter.country && !filter.service" class="headline font-weight-bold mb-2 text-capitalize">
           Network Partners in<br>
           your area
         </h1>
         <div
-          v-else-if="filter.search"
+          v-else
           class="blue--text subtitle-2 pl-1"
         >
           {{meta.totalCount}} RESULTS
@@ -232,13 +240,29 @@
                   top
                   right
                   class="pt-12"
-                  @click="addPartner"
+                  :disabled="partner.status === 'pending'"
+                  @click="addPartner(partner)"
                 >
                   <v-icon
+                    v-if="partner.status === 'none'"
                     dense
                     color="white"
                   >
                     mdi-account-plus
+                  </v-icon>
+                  <v-icon
+                    v-else-if="partner.status === 'pending'"
+                    dense
+                    color="white"
+                  >
+                    mdi-account-minus
+                  </v-icon>
+                  <v-icon
+                    v-else
+                    dense
+                    color="white"
+                  >
+                    mdi-account-multiple-check
                   </v-icon>
                 </v-btn>
               </v-card>
@@ -273,7 +297,7 @@
                 fab
                 small
                 plain
-                :disabled="(filter.page === meta.totalPage) || $fetchState.pending"
+                :disabled="(filter.page >= meta.totalPage) || $fetchState.pending"
                 @click="nextOrPrev('+')"
               >
                 <v-icon
@@ -290,8 +314,9 @@
     </v-row>
     <MarketplaceAddForm
       :dialog="dialog"
-      :item="deletedItem"
+      :data="idPartner"
       @toggle="toggle()"
+      @add="addConnection(idPartner.value)"
     />
   </section>
 </template>
@@ -307,9 +332,11 @@ import {
   ref,
   useMeta,
   useRouter,
+  Ref
 } from '@nuxtjs/composition-api'
 // Interfaces or types
 import { Marketplace, VuexModuleMarketplaces,FilterDetails, PartnerServiceZone } from '~/types/marketplace'
+import { VuexModuleFilters, Zone, ServiceType} from '~/types/filters'
 import { VuexModuleApplications } from '~/types/applications'
 
 
@@ -319,16 +346,35 @@ export default defineComponent({
   setup() {
     // store manage
     const storeMarketplaces = useStore<VuexModuleMarketplaces>()
+    const storeFilters= useStore<VuexModuleFilters>()
     const storeApplications = useStore<VuexModuleApplications>()
     const marketplaces = computed(() => storeMarketplaces.state.marketplaces.marketplaces)
     const meta = computed(() => storeMarketplaces.state.marketplaces.meta)
     const filter = ref({ ...storeMarketplaces.state.marketplaces.filter })
+    const zones = ref([]) as Ref<Zone[]>
+    const serviceTypes = ref({ ...storeFilters.state.filters.serviceTypes })
+    const idPartner = reactive ({
+      value: '' as String,
+      name: '' as String
+    })
+    // status connect - none - pending - connected
+    const statusConnect = reactive ({
+      status: 'none'
+    })
+    const selectedZone = reactive ({
+      value: ''
+    })
+    const selectedServiceTypes = reactive ({
+      arrValue: []
+    })
     const pageCustom = computed({
       get: () => filter.value.page,
       set: (val) => {
         filter.value.page = val
       }
     })
+
+
     const slides = 7
     const chips = 6
     const showFilter = reactive({
@@ -344,37 +390,40 @@ export default defineComponent({
     const dialog = reactive({
       status: false
     })
-    const yourPartners =reactive([
-      1, 2, 3 , 4, 5, 6
-    ])
-    const nearPartners =reactive([
-      1, 2, 3 , 4, 5, 6, 7, 8, 9, 10, 11, 12
-    ])
-    const miles =reactive([
-      {
-        name: 'First Mile'
-      },
-      {
-        name: 'Last Mile'
-      },
-      {
-        name: 'Custom Import'
-      },
-      {
-        name: 'Custom Import'
-      },
-      {
-        name: 'Custom Import'
-      }
-    ])
     const toggle = () => {
       if (method.opt === 'add' || method.opt === 'edit') {
         dialog.status = !dialog.status
       }
     }
-    const addPartner = () => {
+    const addPartner = (partner: Marketplace) => {
+      idPartner.value = partner.id
+      idPartner.name = partner.name
       toggle()
     }
+    const addConnection = async (id: String) => {
+      try {
+        $fetchState.pending = true
+
+        await storeMarketplaces.dispatch('marketplaces/addConnection', {id})
+        dialog.status = false
+        fetch()
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+
+    watch(
+      [dialog],
+      ([newDialog]) => {
+        if(!newDialog.status) {
+          idPartner.value = ''
+        }
+      },
+      { deep: true }
+    )
+
     const fetchMarketplace = async (params: FilterDetails) => {
       const { page, itemsPerPage, search, country,service} = params
       const perPage = itemsPerPage !== -1 ? itemsPerPage : meta.value.totalCount
@@ -382,8 +431,8 @@ export default defineComponent({
         page,
         perPage,
         search,
-        // country,
-        // service
+        country,
+        service
       }
 
       try {
@@ -396,8 +445,22 @@ export default defineComponent({
         $fetchState.pending = false
       }
     }
+
+    const fetchServiceZoneOnce = async () => {
+      try {
+        $fetchState.pending = true
+
+        await storeMarketplaces.dispatch('filters/getOnce')
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
     const { $fetchState, fetch } = useFetch(async () => {
       await fetchMarketplace(filter.value)
+      await fetchServiceZoneOnce()
+      zones.value =  [ ...storeFilters.state.filters.zones]
     })
 
     const locationMapping = (partnerServiceZones: PartnerServiceZone[]) => {
@@ -427,7 +490,7 @@ export default defineComponent({
     watch(
       filter,
       (newFilter) => {
-        storeApplications.commit('marketplaces/SET_FILTER', {
+        storeFilters.commit('marketplaces/SET_FILTER', {
           ...newFilter,
         })
 
@@ -436,13 +499,26 @@ export default defineComponent({
       { deep: true }
     )
 
+    watch(
+      selectedServiceTypes,
+      (newService) => {
+        filter.value.service = newService.arrValue.join(',')
+      },
+      { deep: true }
+    )
+
+    watch(
+      selectedZone,
+      (newZone) => {
+        filter.value.country = newZone.value
+      },
+      { deep: true }
+    )
+
     return {
       marketplaces,
       filter,
       dialog,
-      yourPartners,
-      nearPartners,
-      miles,
       method,
       toggle,
       addPartner,
@@ -452,7 +528,14 @@ export default defineComponent({
       filterIcon,
       locationMapping,
       meta,
-      nextOrPrev
+      nextOrPrev,
+      statusConnect,
+      zones,
+      selectedZone,
+      serviceTypes,
+      selectedServiceTypes,
+      addConnection,
+      idPartner
     }
   },
   head: {},
