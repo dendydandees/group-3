@@ -78,6 +78,7 @@ export default defineComponent({
       {
         text: 'Order Code (#Ref)',
         value: 'incomingOrderCode',
+        sortable: false,
       },
       {
         text: 'Consignee',
