@@ -185,7 +185,6 @@ import {
   useFetch,
   Ref,
   PropType,
-  reactive,
 } from '@nuxtjs/composition-api'
 import { ValidationObserver, ValidationProvider } from 'vee-validate'
 // Interfaces and types
