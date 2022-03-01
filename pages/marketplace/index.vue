@@ -276,7 +276,7 @@
                 fab
                 small
                 plain
-                :disabled="(filter.page === 1) || $fetchState.pending"
+                :disabled="(pagination.page === 1) || $fetchState.pending"
                 @click="nextOrPrev('-')"
               >
                 <v-icon
@@ -297,7 +297,7 @@
                 fab
                 small
                 plain
-                :disabled="(filter.page >= meta.totalPage) || $fetchState.pending"
+                :disabled="(pagination.page >= meta.totalPage) || $fetchState.pending"
                 @click="nextOrPrev('+')"
               >
                 <v-icon
@@ -350,7 +350,12 @@ export default defineComponent({
     const storeApplications = useStore<VuexModuleApplications>()
     const marketplaces = computed(() => storeMarketplaces.state.marketplaces.marketplaces)
     const meta = computed(() => storeMarketplaces.state.marketplaces.meta)
-    const filter = ref({ ...storeMarketplaces.state.marketplaces.filter })
+    const pagination = ref({
+      ...storeApplications.state.applications.pagination,
+    })
+    const filter = ref({
+      ...storeMarketplaces.state.marketplaces.filter
+    })
     const zones = ref([]) as Ref<Zone[]>
     const serviceTypes = ref({ ...storeFilters.state.filters.serviceTypes })
     const idPartner = reactive ({
@@ -366,12 +371,6 @@ export default defineComponent({
     })
     const selectedServiceTypes = reactive ({
       arrValue: []
-    })
-    const pageCustom = computed({
-      get: () => filter.value.page,
-      set: (val) => {
-        filter.value.page = val
-      }
     })
 
 
@@ -429,7 +428,7 @@ export default defineComponent({
       const perPage = itemsPerPage !== -1 ? itemsPerPage : meta.value.totalCount
       const dataParams = {
         page,
-        perPage,
+        perPage: 8,
         search,
         country,
         service
@@ -458,7 +457,12 @@ export default defineComponent({
       }
     }
     const { $fetchState, fetch } = useFetch(async () => {
-      await fetchMarketplace(filter.value)
+      await fetchMarketplace(
+        {
+          ...filter.value,
+          ...pagination.value
+        }
+      )
       await fetchServiceZoneOnce()
       zones.value =  [ ...storeFilters.state.filters.zones]
     })
@@ -477,10 +481,17 @@ export default defineComponent({
     const nextOrPrev = (type: string) => {
       switch (type) {
         case '+':
-          pageCustom.value = pageCustom.value + 1
+
+          pagination.value = {
+            ...pagination.value,
+            page: pagination.value.page + 1,
+          }
           break;
         case '-':
-          pageCustom.value = pageCustom.value - 1
+          pagination.value = {
+            ...pagination.value,
+            page: pagination.value.page - 1,
+          }
           break
         default:
           break;
@@ -488,12 +499,29 @@ export default defineComponent({
     }
 
     watch(
-      filter,
-      (newFilter) => {
+      [filter],
+      ([newFilter]) => {
+        pagination.value = {
+          ...pagination.value,
+          page: 1,
+        }
+
         storeFilters.commit('marketplaces/SET_FILTER', {
-          ...newFilter,
+          ...newFilter
         })
 
+        fetch()
+      },
+      { deep: true }
+    )
+
+    // manage pagination on changed
+    watch(
+      pagination,
+      (newPagination) => {
+        storeApplications.commit('applications/SET_PAGINATION', {
+          ...newPagination,
+        })
         fetch()
       },
       { deep: true }
@@ -535,7 +563,8 @@ export default defineComponent({
       serviceTypes,
       selectedServiceTypes,
       addConnection,
-      idPartner
+      idPartner,
+      pagination
     }
   },
   head: {},

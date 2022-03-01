@@ -34,3 +34,8 @@ export interface FilterDetails {
 export interface FilterMarketplaces {
   search: '';
 }
+
+export interface PaginationMarketplaces {
+  page: Number,
+  itemsPerPage: Number,
+}
