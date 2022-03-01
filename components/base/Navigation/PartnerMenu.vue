@@ -72,11 +72,11 @@ export default defineComponent({
       //   icon: 'mdi-power-plug',
       //   to: `/partners/portals/client-connections`,
       // },
-      // {
-      //   title: 'Edit Profile',
-      //   icon: 'mdi-account-cog',
-      //   to: `/partner-portals/${partnerId.value}/profiles/edit`,
-      // },
+      {
+        title: 'Partner Profile',
+        icon: 'mdi-account-multiple',
+        to: `/partner-portals/${partnerId.value}/profiles`,
+      },
     ]) as Ref<NavigationLinks[]>
 
     return {

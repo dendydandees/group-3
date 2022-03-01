@@ -3,19 +3,19 @@ import { MutationTree, ActionTree } from 'vuex'
 import { Profile } from '~/types/partnerPortals/profiles'
 
 export const state = () => ({
-  profiles: {} as Profile,
+  profile: {} as Profile,
 })
 
 export type RootStateProfiles = ReturnType<typeof state>
 
 export const mutations: MutationTree<RootStateProfiles> = {
   SET_PROFILE: (state, value: Profile) => {
-    state.profiles = value
+    state.profile = value
   },
 }
 
 export const actions: ActionTree<RootStateProfiles, RootStateProfiles> = {
-  async getProfiles({ commit }, id: string) {
+  async getProfile({ commit }, id: string) {
     try {
       const data = await this?.$axios?.$get(
         `/api/clients/partners/${id}/profile`
@@ -24,6 +24,18 @@ export const actions: ActionTree<RootStateProfiles, RootStateProfiles> = {
       commit('SET_PROFILE', data)
 
       return data
+    } catch (error) {
+      return error
+    }
+  },
+  async editProfile(_store, { id, data }: { id: string; data: Profile }) {
+    try {
+      const response = await this.$axios.$patch(
+        `/api/clients/partners/${id}/profile`,
+        data
+      )
+
+      return response
     } catch (error) {
       return error
     }
