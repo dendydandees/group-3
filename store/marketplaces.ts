@@ -3,7 +3,8 @@ import { MutationTree, ActionTree } from 'vuex';
 import { Meta } from '~/types/applications';
 import {
   Marketplace,
-  FilterDetails
+  FilterDetails,
+  PaginationMarketplaces
 } from '~/types/marketplace';
 
 interface GetMarketplaces {
@@ -11,8 +12,8 @@ interface GetMarketplaces {
 }
 
 const filter = {
-  page: 1,
-  itemsPerPage: 8,
+  // page: 1,
+  // itemsPerPage: 8,
   search: '',
   country: '',
   service: ''
@@ -23,9 +24,9 @@ export const state = () => ({
   meta: {
     page: 1,
     totalPage: 1,
-    totalCount: 10,
+    totalCount: 8,
   } as Meta,
-  filter,
+  filter
 });
 
 export type RootStateMarketplaces = ReturnType<typeof state>;
