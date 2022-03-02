@@ -43,8 +43,20 @@
           </div>
           <div>
             <LcontrolRulePartner
+              v-for="(x, i) in arrPartner.data"
+              :key="i"
+              v-model:ruleDefinitions="x.ruleDefinitions"
+              v-model:partner="x.partnerID"
+              :index="i"
             />
           </div>
+          <v-btn
+            v-if="arrPartner.data.length < 3"
+            color="blue darken-1 white--text"
+            @click="addDeleteRule('+')"
+          >
+            + add network partner
+          </v-btn>
         </div>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -78,12 +90,8 @@ import {
   useMeta,
   useRouter,
 } from '@nuxtjs/composition-api'
-
-interface FeedbackMessage {
-  alert: boolean
-  type: string
-  message: string | unknown
-}
+// Interfaces or types
+import { RuleDefinitions,Rules,LControl } from '~/types/lcontrol'
 
 export default defineComponent({
   props: {
@@ -97,6 +105,16 @@ export default defineComponent({
     }
   },
   setup(props, {emit}) {
+    const arrPartner = reactive({
+      data: [
+        {
+          "priority": 1,
+          "partnerID": "partner1",
+          "ruleDefinitions": []
+        }
+      ] as Rules[]
+    })
+
     const dialogComp = computed({
       get: () => props.dialog,
       set: (value: boolean) => emit('input', value)
@@ -106,16 +124,40 @@ export default defineComponent({
     })
     const toggle = () => {
       emit('toggle')
-      // this.$nuxt.$emit('toggle')
     }
     const actionAddRule = () => {
       isAddRule.status = !isAddRule.status
     }
+
+    const addDeleteRule = (status: String, index: number)=> {
+      switch (status) {
+        case '+':
+          arrPartner.data.push({
+            "priority": arrPartner.data.length + 1,
+            "partnerID": ``,
+            "ruleDefinitions": []
+          })
+          break;
+        case '-':
+          arrPartner.data.splice(index,1);
+          break;
+        default:
+          break;
+      }
+    }
+    watch(
+      arrPartner,
+      (newData) => {
+        console.log('Parent', newData.data)
+      }
+    )
     return {
       toggle,
       dialogComp,
       isAddRule,
-      actionAddRule
+      actionAddRule,
+      arrPartner,
+      addDeleteRule,
     }
   },
 })
