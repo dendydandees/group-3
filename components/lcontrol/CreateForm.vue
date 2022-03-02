@@ -42,11 +42,16 @@
             Rule
           </div>
           <div>
+            <!-- <LcontrolRulePartner
+              v-for="(x, i) in arrPartner.data"
+              :key="i"
+              v-model="arrPartner.data[i]"
+              :index="i"
+            /> -->
             <LcontrolRulePartner
               v-for="(x, i) in arrPartner.data"
               :key="i"
-              v-model:ruleDefinitions="x.ruleDefinitions"
-              v-model:partner="x.partnerID"
+              v-model="x.ruleDefinitions"
               :index="i"
             />
           </div>

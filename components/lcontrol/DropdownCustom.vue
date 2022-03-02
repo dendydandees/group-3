@@ -92,7 +92,8 @@ export default defineComponent({
       (newData) => {
         partnerComp.value = newData.value
         // console.log('selected', newData.value, partnerComp.value)
-      }
+      },
+      { deep: true }
     )
     return {
       toggle,
