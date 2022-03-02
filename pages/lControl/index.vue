@@ -50,10 +50,6 @@ export default defineComponent({
   layout: 'default',
   setup() {
     // store manage
-    const storeMarketplaces = useStore<VuexModuleMarketplaces>()
-    const storeApplications = useStore<VuexModuleApplications>()
-    const marketplaces = computed(() => storeMarketplaces.state.marketplaces.marketplaces)
-    const meta = computed(() => storeMarketplaces.state.marketplaces.meta)
     const filter = reactive({
       search: ''
     })
@@ -80,7 +76,6 @@ export default defineComponent({
     }
 
     return {
-      marketplaces,
       filter,
       dialog,
       method,
@@ -88,7 +83,6 @@ export default defineComponent({
       addPartner,
       showFilter,
       filterIcon,
-      meta,
     }
   },
   head: {},

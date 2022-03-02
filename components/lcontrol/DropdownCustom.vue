@@ -9,8 +9,11 @@
       {{label}}
     </div>
     <v-select
+      v-model="selectedValue.value"
       :label="title"
       :items="data"
+      item-text="name"
+      item-value="value"
       :placeholder="placeholder"
       outlined
       rounded
@@ -33,6 +36,7 @@ import {
   ref,
   useMeta,
   useRouter,
+  PropType
 } from '@nuxtjs/composition-api'
 
 interface FeedbackMessage {
@@ -58,21 +62,49 @@ export default defineComponent({
     data: {
       type: Array,
       default: () => ([]),
+    },
+    partner: {
+      type: String as PropType<String | ''>,
+      default: '',
+    },
+    value: {
+      type: String as PropType<String | ''>,
+      default: '',
     }
   },
   setup(props, {emit}) {
     const toggle = () => {
       emit('toggle')
-      // this.$nuxt.$emit('toggle')
     }
+    const selectedValue = reactive ({
+      value: ''
+    })
+    const partnerComp = computed({
+      get: () => props.value,
+      set: (value: String) => {
+        // console.log(value)
+        emit('input', value)
+      }
+    })
+
+    watch(
+      selectedValue,
+      (newData) => {
+        partnerComp.value = newData.value
+        // console.log('selected', newData.value, partnerComp.value)
+      },
+      { deep: true }
+    )
     return {
       toggle,
+      selectedValue
     }
   },
 })
 </script>
 <style lang="scss">
   .dropdown-custom {
+    width: 100%;
     .custom-select {
       .v-select__slot {
         label {
