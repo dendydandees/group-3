@@ -10,6 +10,7 @@
     solo
     flat
     dense
+    rounded
     hide-details
   />
 </template>
