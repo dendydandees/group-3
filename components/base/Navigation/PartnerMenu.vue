@@ -67,11 +67,11 @@ export default defineComponent({
         icon: 'mdi-file-clock',
         to: `/partner-portals/${partnerId.value}/incoming-orders/`,
       },
-      // {
-      //   title: 'Client Connections',
-      //   icon: 'mdi-power-plug',
-      //   to: `/partners/portals/client-connections`,
-      // },
+      {
+        title: 'Client Connections',
+        icon: 'mdi-power-plug',
+        to: `/partner-portals/${partnerId.value}/client-connections`,
+      },
       {
         title: 'Partner Profile',
         icon: 'mdi-account-multiple',

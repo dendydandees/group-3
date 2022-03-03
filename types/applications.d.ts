@@ -60,6 +60,6 @@ export interface ModalConfirm {
 export interface Pagination {
   page: number
   itemsPerPage: number
-  sortBy: string[]
-  sortDesc: boolean[]
+  sortBy?: string[]
+  sortDesc?: boolean[]
 }

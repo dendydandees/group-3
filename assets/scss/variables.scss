@@ -1,15 +1,19 @@
 // Ref: https://github.com/nuxt-community/vuetify-module#customvariables
-//
-// The variables you want to modify
+
+// font
 $font-size-root: 16px;
-
+// text field
 $text-field-border-radius: 0px;
-
+// timeline
 $timeline-item-padding: 0px;
 $timeline-divider-width: 80px;
-
+// table
 $data-table-border-radius: 0px;
-
-$pagination-border-radius: 0px;
-
-// $dialog-border-radius: 20px;
+// button
+$btn-border-radius: 16px;
+// card
+$card-actions-padding: 16px;
+$card-elevation: 0;
+$card-border-radius: 24px;
+// menu
+$menu-content-border-radius: 16px;

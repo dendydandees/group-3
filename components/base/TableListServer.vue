@@ -135,30 +135,6 @@
     </template>
     <!-- End Incoming Order List Page -->
 
-    <!-- Client Connections Page -->
-    <template #[`item.status`]="{ item }">
-      <v-switch
-        inset
-        flat
-        :true-value="'Connected'"
-        :false-value="'Pending'"
-        :input-value="item.status"
-        :loading="loading"
-        @change="doChangeStatus"
-      >
-        <template #label>
-          <v-chip
-            label
-            :color="item.status === 'Connected' ? 'primary' : ''"
-            class="rounded-0"
-          >
-            {{ item.status }}
-          </v-chip>
-        </template>
-      </v-switch>
-    </template>
-    <!-- End Client Connections Page -->
-
     <!-- Actions button list -->
     <template #[`item.actions`]="{ item }">
       <div class="d-flex align-center">
@@ -259,16 +235,12 @@ export default defineComponent({
     const getDetailItem = (data: {}) => {
       emit('doGetDetails', data)
     }
-    const doChangeStatus = (data: boolean) => {
-      console.log(data)
-    }
 
     return {
       pagination,
       footerProps,
       fetch,
       getDetailItem,
-      doChangeStatus,
     }
   },
 })

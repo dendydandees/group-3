@@ -11,19 +11,140 @@
       </template>
     </BaseHeadlinePage>
 
-    <v-row align="center">
-      <v-col cols="12">
-        <BaseTableListServer
-          v-model="pagination"
-          item-key="id"
-          :loading="$fetchState.pending"
-          :items="incomingOrders"
-          :headers="headers"
-          :meta="meta"
-          @fetch="fetchIncomingOrders"
+    <v-row align="center" justify="space-between" class="mb-4 rounded-xl">
+      <v-col cols="12" md="6">
+        <!-- Search filter -->
+        <v-text-field
+          v-model="filter.name"
+          label="Search by client name"
+          placeholder="Enter your client name..."
+          background-color="white"
+          prepend-inner-icon="mdi-magnify"
+          type="search"
+          clearable
+          solo
+          flat
+          rounded
+          hide-details
+        />
+      </v-col>
+
+      <v-col cols="12" md="6">
+        <v-select
+          v-model="filter.status"
+          :items="statusOptions"
+          :disabled="$fetchState.pending"
+          label="Filter by status connections"
+          item-text="text"
+          item-value="value"
+          hide-details
+          flat
+          solo
+          rounded
+          clearable
+          background-color="white"
         />
       </v-col>
     </v-row>
+
+    <v-row align="stretch">
+      <v-expand-transition>
+        <!-- If no have a pending or connected clients -->
+        <v-col v-if="clientConnections.length === 0" cols="12">
+          <v-card height="100%">
+            <v-card-text>
+              <BaseEmptyData
+                :is-on-filter="filter.name !== '' || filter.status !== ''"
+                page="Client Connections"
+                @refresh="refreshPage"
+              />
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-expand-transition>
+
+      <v-col
+        v-for="connections in clientConnections"
+        :key="connections.id"
+        else
+        cols="12"
+        md="3"
+      >
+        <v-expand-transition>
+          <v-card height="100%">
+            <v-card-text class="text-center">
+              <v-chip
+                :color="connections.status === 'pending' ? 'warning' : 'info'"
+                small
+              >
+                {{ connections.status }}
+              </v-chip>
+
+              <p class="text-h5 text--primary mt-2 mb-0 font-weight-medium">
+                {{ connections.client.name }}
+              </p>
+            </v-card-text>
+
+            <v-card-actions>
+              <v-spacer />
+
+              <v-btn
+                v-if="connections.status === 'pending'"
+                depressed
+                color="primary"
+                class="mx-2"
+                :loading="$fetchState.pending"
+                @click="doAcceptConnections(connections.id)"
+              >
+                Accept
+              </v-btn>
+
+              <v-spacer />
+            </v-card-actions>
+          </v-card>
+        </v-expand-transition>
+      </v-col>
+    </v-row>
+
+    <v-row align="center" justify="space-between" class="mt-8 rounded-xl">
+      <v-col cols="12" md="auto">
+        <v-select
+          v-model="pagination.itemsPerPage"
+          :items="itemsPerPageOptions"
+          :disabled="$fetchState.pending"
+          hide-details
+          solo
+          flat
+          dense
+          rounded
+          item-text="text"
+          item-value="value"
+          background-color="white"
+          :style="[{ width: $vuetify.breakpoint.mobile ? '100%' : '50%' }]"
+        />
+      </v-col>
+
+      <v-col cols="12" md="auto">
+        <v-pagination
+          v-model="pagination.page"
+          :length="meta.totalPage"
+          :disabled="$fetchState.pending"
+          circle
+        />
+      </v-col>
+    </v-row>
+
+    <v-snackbar
+      :value="alert.isShow"
+      :timeout="2000"
+      rounded="pill"
+      right
+      top
+      class="ma-6"
+      :color="alert.type"
+    >
+      {{ alert.message }}
+    </v-snackbar>
   </section>
 </template>
 
@@ -34,73 +155,160 @@ import {
   useStore,
   computed,
   ref,
+  Ref,
   useFetch,
-  reactive,
   watch,
+  nextTick,
 } from '@nuxtjs/composition-api'
 
 // Interfaces and types
-import { VuexModuleClientConnections } from '~/types/clientConnections'
-import { VuexModuleApplications } from '~/types/applications'
+import { VuexModuleClientConnections } from '~/types/partnerPortals/clientConnections'
+import { FilterDetails, VuexModuleApplications } from '~/types/applications'
 
 export default defineComponent({
   name: 'ClientConnectionsPages',
-  setup() {
+  setup(_props, { root }) {
     useMeta({ titleTemplate: '%s | Client Connections' })
 
     // store manage
     const storeClientConnections = useStore<VuexModuleClientConnections>()
     const storeApplications = useStore<VuexModuleApplications>()
-    const incomingOrders = computed(
-      () => storeClientConnections.state.clientConnections.clientConnections
+    const clientConnections = computed(
+      () =>
+        storeClientConnections.state.partnerPortals.clientConnections
+          .clientConnections
     )
+    const alert = computed(() => storeApplications.state.applications.alert)
     const meta = computed(
-      () => storeClientConnections.state.clientConnections.meta
+      () => storeClientConnections.state.partnerPortals.clientConnections.meta
     )
     const pagination = ref({
       ...storeApplications.state.applications.pagination,
     })
-
-    const headers = reactive([
-      {
-        text: 'Name',
-        value: 'name',
-      },
-      {
-        text: 'Contact Person',
-        value: 'contactPerson',
-        sortable: false,
-      },
-      {
-        text: 'Status',
-        value: 'status',
-        sortable: false,
-      },
-    ])
-    const fetchIncomingOrders = async () => {
-      await storeClientConnections.commit(
-        'clientConnections/SET_CLIENT_CONNECTIONS',
-        [
-          {
-            id: '1',
-            name: 'RayRay Global',
-            contactPerson: 'Ray',
-            status: 'Connected',
-          },
-          {
-            id: '2',
-            name: 'World Asia Logistic',
-            contactPerson: 'Asia',
-            status: 'Pending',
-          },
-        ]
-      )
-    }
-
-    useFetch(() => {
-      fetchIncomingOrders()
+    const filter = ref({
+      ...storeClientConnections.state.partnerPortals.clientConnections.filter,
     })
 
+    const itemsPerPageOptions = computed(() => {
+      const textDefault = 'Items per page'
+      const values = [5, 10, 15, 20]
+
+      return values.map((value) => ({
+        text: `${value} ${textDefault}`,
+        value,
+      }))
+    })
+    const statusOptions = computed(() => [
+      {
+        text: 'Pending',
+        value: 'pending',
+      },
+      {
+        text: 'Connected',
+        value: 'connected',
+      },
+    ])
+
+    const fetchClientConnections = async (params: FilterDetails) => {
+      const { page, itemsPerPage } = params
+      const perPage = itemsPerPage !== -1 ? itemsPerPage : meta.value.totalCount
+      const name = filter.value.name ?? null
+      const status = filter.value.status ?? null
+      const dataParams = {
+        page,
+        perPage,
+        name,
+        status,
+      }
+
+      try {
+        await storeClientConnections.dispatch(
+          'partnerPortals/clientConnections/getClientConnections',
+          dataParams
+        )
+      } catch (error) {
+        return error
+      }
+    }
+    const refreshPage = () => {
+      filter.value = {
+        name: '',
+        status: '',
+      }
+      pagination.value = {
+        ...pagination.value,
+        page: 1,
+      }
+
+      nextTick(() => {
+        root.$nuxt.refresh()
+      })
+    }
+    const doAcceptConnections = async (value: string) => {
+      try {
+        $fetchState.pending = true
+
+        const response = await storeClientConnections.dispatch(
+          'partnerPortals/clientConnections/acceptClientConnections',
+          value
+        )
+
+        if (response !== 'ok') throw response
+
+        storeApplications.commit('applications/SET_ALERT', {
+          isShow: true,
+          type: 'success',
+          message: 'Successfully connected to client!',
+        })
+        fetch()
+      } catch (error) {
+        storeApplications.commit('applications/SET_ALERT', {
+          isShow: true,
+          type: 'error',
+          message: 'Accepting client connection failed!',
+        })
+      } finally {
+        $fetchState.pending = false
+        setTimeout(() => {
+          storeApplications.commit('applications/RESET_ALERT')
+        }, 3000)
+      }
+    }
+
+    const { $fetchState, fetch } = useFetch(async () => {
+      await fetchClientConnections(pagination.value)
+    })
+    // Debounced fetch
+    const fetchTimer = ref(null) as unknown as Ref<any>
+    const fetchDebounced = () => {
+      clearTimeout(fetchTimer.value)
+
+      fetchTimer.value = setTimeout(() => {
+        fetch()
+      }, 500)
+    }
+
+    useMeta(() => ({ title: 'Partner Portal | Client Connections' }))
+
+    // manage filter on changed
+    watch(
+      filter,
+      (newFilter) => {
+        pagination.value = {
+          ...pagination.value,
+          page: 1,
+        }
+        storeApplications.commit(
+          'partnerPortals/clientConnections/SET_FILTER',
+          {
+            ...newFilter,
+          }
+        )
+
+        fetchDebounced()
+      },
+      { deep: true }
+    )
     // manage pagination on changed
     watch(
       pagination,
@@ -108,18 +316,23 @@ export default defineComponent({
         storeApplications.commit('applications/SET_PAGINATION', {
           ...newPagination,
         })
+
+        fetchDebounced()
       },
       { deep: true }
     )
 
-    useMeta(() => ({ title: 'Partner Portal | Client Connections' }))
-
     return {
-      incomingOrders,
+      alert,
+      clientConnections,
       meta,
       pagination,
-      headers,
-      fetchIncomingOrders,
+      filter,
+      itemsPerPageOptions,
+      statusOptions,
+      fetchClientConnections,
+      refreshPage,
+      doAcceptConnections,
     }
   },
   head: {},
