@@ -18,19 +18,16 @@
           <div
             class="headline font-weight-bold"
           >
-            Ninja Van
+            {{detailMarketplace.name}}
           </div>
           <v-chip-group
           >
             <v-chip
+              v-for="(mile, i) in detailMarketplace.partnerServiceTypes"
+              :key="i"
               small
             >
-              FIRST MILE
-            </v-chip>
-            <v-chip
-              small
-            >
-              FIRST MILE
+              {{mile.name}}
             </v-chip>
 
           </v-chip-group>
@@ -40,20 +37,29 @@
         <v-btn
           color="white darken-1 red--text"
           rounded
-          class="mr-3"
+          class="mr-3 custom-btn-red"
+          :disabled="detailMarketplace.status !== 'none'"
+          @click="addPartner(detailMarketplace)"
         >
-          Connect with Vendor
+          {{
+            detailMarketplace.status === 'none'
+            ?
+            'Connect with Vendor'
+            :
+            detailMarketplace.status
+          }}
         </v-btn>
         <v-btn
-          color="white darken-1 red--text"
+          color="white darken-1 red--text "
           rounded
+          class="custom-btn-red"
         >
           Add to Compare
         </v-btn>
       </div>
     </div>
     <v-row
-      class="middle-row d-flex align-start"
+      class="middle-row d-flex align-start mb-16"
     >
       <v-col
         class="rate d-flex flex-column align-center"
@@ -61,50 +67,47 @@
       >
         <div class="text-star-wrapper">
           <div
-            v-for="(u, n) in 4"
+            v-for="(u, n) in tempData.rateDetail"
             :key="n"
-            class="text-star d-flex align-center mb-5"
+            :class="`text-star d-flex align-center ${tempData.rateDetail.length - 1 !== n ? 'mb-3' : ''}`"
           >
-            <div
+            <v-col
               class="mr-3 blue--text"
+              cols="3"
             >
-              Overall
-            </div>
-            <div>
-              <v-icon
-                v-for="(x, i) in 5"
+              {{u.name}}
+            </v-col>
+            <v-col>
+              <NuxtImg
+                v-for="(x, i) in u.rate"
                 :key="i"
                 class="mr-2"
-              >
-                mdi-decagram
-                <!-- mdi-decagram-outline -->
-              </v-icon>
-            </div>
+                src="/images/star-detail.svg"
+                height="21.4"
+                preload
+              />
+            </v-col>
           </div>
         </div>
         <v-btn
           color="white darken-1 blue--text"
           rounded
+          class="my-13 btn-rate-sheet custom-btn-blue"
         >
           Download Rate Sheet
         </v-btn>
-        <v-img
-          height="100px"
-          width="200px"
-
-          src="https://cdn.vuetifyjs.com/images/cards/cooking.png"
-          class="mt-7 rounded-lg"
-        >
-        </v-img>
-        <!-- <div class="logo-image">
-
-        </div> -->
+        <NuxtImg
+          src="/images/logo-detail.svg"
+          width="290"
+          preload
+        />
       </v-col>
       <v-col
         class="detailed-info"
+        cols="5"
       >
         <v-row
-          v-for="(y, p) in 8"
+          v-for="(y, p) in tempData.infoDetail"
           :key="p"
           class="d-flex"
         >
@@ -112,14 +115,15 @@
             class="detailed-text font-weight-bold text-no-wrap"
             cols="4"
           >
-            Company Brief
+            {{y.name}}
           </v-col>
           <v-col class="detailed-description">
-            Lorem Ipsum is simply dummy text of the printing
+
+            {{y.desc}}
           </v-col>
         </v-row>
       </v-col>
-      <v-col class="gallery" cols="5">
+      <v-col class="gallery">
         <div
           class="mb-4 font-weight-bold"
         >
@@ -138,7 +142,10 @@
         class="btn-filter-map d-flex align-center"
       >
         <v-select
-          :items="[]"
+          v-model="selectedZone.value"
+          :items="zones"
+          item-text="country"
+          item-value="country"
           label="Select Country"
           outlined
           rounded
@@ -161,13 +168,14 @@
         <v-btn
           color="white darken-1 red--text"
           rounded
-          class="mr-3"
+          class="mr-3 custom-btn-red"
         >
           Download Coverage Area
         </v-btn>
         <v-btn
           color="white darken-1 red--text"
           rounded
+          class="custom-btn-red"
         >
           Download SLA
         </v-btn>
@@ -180,6 +188,12 @@
       @close="index = null"
     >
     </CoolLightBox>
+    <MarketplaceAddForm
+      :dialog="dialog"
+      :data="idPartner"
+      @toggle="toggle()"
+      @add="addConnection(idPartner.value)"
+    />
   </section>
 </template>
 
@@ -189,6 +203,7 @@ import {
   defineComponent,
   useFetch,
   useStore,
+  useRoute,
   reactive,
   watch,
   ref,
@@ -199,6 +214,10 @@ import {
 // Interfaces or types
 import { PhotoCollageWrapper, } from "vue-photo-collage";
 import CoolLightBox from 'vue-cool-lightbox'
+import { VuexModuleMarketplaces} from '~/types/marketplace/marketplace'
+import tempData from '~/static/tempData'
+import { VuexModuleFilters, Zone, ServiceType} from '~/types/filters'
+import { DetailMarketplace} from '~/types/marketplace/detail'
 import 'vue-cool-lightbox/dist/vue-cool-lightbox.min.css'
 
 
@@ -210,6 +229,27 @@ export default defineComponent({
   },
   layout: 'default',
   setup() {
+    const route = useRoute()
+    const id = computed(() => route.value.params.id)
+    // store manage
+    const storeDetailMarketplace = useStore<VuexModuleMarketplaces>()
+    const storeFilters= useStore<VuexModuleFilters>()
+    const detailMarketplace = computed(() => storeDetailMarketplace.state.marketplaces.marketplaces.detail)
+    const zones = ref([]) as Ref<Zone[]>
+
+    const selectedZone = reactive ({
+      value: ''
+    })
+    const method = reactive({
+      opt: 'add'
+    })
+    const dialog = reactive({
+      status: false
+    })
+    const idPartner = reactive ({
+      value: '' as String,
+      name: '' as String
+    })
 
     const collage = {
       gapSize: "1em",
@@ -217,36 +257,7 @@ export default defineComponent({
       width: "auto",
       height: ["calc(50vh - 2em)", "calc(50vh - 1em)"],
       layout: [1, 2, 1],
-      photos: [
-        {
-          source:
-            "https://images.unsplash.com/photo-1517088455889-bfa75135412c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=e5548929376f93d8b1b7a21097df03bd&auto=format&fit=crop&w=749&q=80",
-        },
-        {
-          source:
-            "https://images.unsplash.com/photo-1526656892012-7b336603ed46?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=31c8e58b58c25dfcc18452ed29b52951&auto=format&fit=crop&w=334&q=80",
-        },
-        {
-          source:
-            "https://images.unsplash.com/photo-1521024221340-efe7d7fa239b?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=9ad8a99d809d3fa3a9e8dff3ecc81878&auto=format&fit=crop&w=750&q=80",
-        },
-        {
-          source:
-            "https://images.unsplash.com/photo-1523038793606-2fd28f837a85?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=919b76f4229e41416653aeb10e84e94a&auto=format&fit=crop&w=334&q=80",
-        },
-        {
-          source:
-            "https://images.unsplash.com/photo-1516832970803-325be7a92aa5?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=93d7ac9abad6167aecb49ebd67fd5b6d&auto=format&fit=crop&w=751&q=80",
-        },
-        {
-          source:
-            "https://images.unsplash.com/photo-1526938972776-11558ad4de30?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=973795a277e861265b0fabbf4a96afe2&auto=format&fit=crop&w=750&q=80",
-        },
-        {
-          source:
-            "https://images.unsplash.com/photo-1464550838636-1a3496df938b?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=f22dbf6c13ea7c21e803aa721437b691&auto=format&fit=crop&w=888&q=80",
-        },
-      ],
+      photos: tempData.photos,
       showNumOfRemainingPhotos: true,
     }
     const index = ref(null)
@@ -264,13 +275,78 @@ export default defineComponent({
         return el.source
       })
     }
+
+    // action
+
+    const fetchDetail = async (id: string) => {
+
+      try {
+        $fetchState.pending = true
+
+        await storeDetailMarketplace.dispatch('marketplaces/marketplaces/getDetail', id)
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+    const fetchServiceZoneOnce = async () => {
+      try {
+        $fetchState.pending = true
+
+        await storeDetailMarketplace.dispatch('filters/getOnce')
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+    const toggle = () => {
+      if (method.opt === 'add' || method.opt === 'edit') {
+        dialog.status = !dialog.status
+      }
+    }
+    const addPartner = (partner: DetailMarketplace) => {
+      idPartner.value = partner.id
+      idPartner.name = partner.name
+      toggle()
+    }
+    const addConnection = async (id: String) => {
+      try {
+        $fetchState.pending = true
+
+        await storeDetailMarketplace.dispatch('marketplaces/marketplaces/addConnection', {id})
+        dialog.status = false
+        fetch()
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+    // fetch
+    const { $fetchState, fetch } = useFetch(async () => {
+      await fetchDetail(id.value)
+      await fetchServiceZoneOnce()
+      zones.value =  [ ...storeFilters.state.filters.zones]
+    })
+
     return {
       collage,
       itemClickHandler,
       index,
       showImg,
       silentbox,
-      imagesLightBox
+      imagesLightBox,
+      detailMarketplace,
+      addConnection,
+      addPartner,
+      idPartner,
+      dialog,
+      toggle,
+      zones,
+      selectedZone,
+      tempData
     }
   },
   head: {},
@@ -306,6 +382,31 @@ export default defineComponent({
     }
     .cool-lightbox-thumbs {
       display: none;
+    }
+  }
+  .text-star-wrapper {
+    width: 100%;
+  }
+  .btn-rate-sheet {
+    width: 100%;
+  }
+  .custom-btn-red {
+    transition: all .3s;
+    &:hover {
+      background: red !important;
+      color: white !important;
+    }
+  }
+  .custom-btn-blue {
+    transition: all .3s;
+    &:hover {
+      background: blue !important;
+      color: white !important;
+    }
+  }
+  .profile-text {
+    .headline {
+      max-width: 200px;
     }
   }
 </style>

@@ -40,7 +40,7 @@ import {
   useMeta,
   useRouter,
 } from '@nuxtjs/composition-api'
-import { VuexModuleMarketplaces} from '~/types/marketplace'
+import { VuexModuleMarketplaces} from '~/types/marketplace/marketplace'
 
 interface FeedbackMessage {
   alert: boolean
@@ -75,6 +75,14 @@ export default defineComponent({
     const addConnection = () => {
       emit('add')
     }
+
+    watch(
+      dialogComp,
+      (newDialogComp) => {
+        console.log({newDialogComp})
+      }
+    )
+    console.log({dialogComp})
     return {
       toggle,
       dialogComp,

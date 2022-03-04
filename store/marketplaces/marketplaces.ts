@@ -5,7 +5,10 @@ import {
   Marketplace,
   FilterDetails,
   PaginationMarketplaces
-} from '~/types/marketplace';
+} from '~/types/marketplace/marketplace';
+import {
+  DetailMarketplace,
+} from '~/types/marketplace/detail';
 
 interface GetMarketplaces {
   params: Meta;
@@ -26,7 +29,8 @@ export const state = () => ({
     totalPage: 1,
     totalCount: 8,
   } as Meta,
-  filter
+  filter,
+  detail: {} as DetailMarketplace | {},
 });
 
 export type RootStateMarketplaces = ReturnType<typeof state>;
@@ -36,6 +40,8 @@ export const mutations: MutationTree<RootStateMarketplaces> = {
   SET_META: (state, value: Meta) => (state.meta = value),
   SET_FILTER: (state, value: FilterDetails) => (state.filter = value),
   RESET_FILTER: (state) => (state.filter = filter),
+  SET_DETAIL_MARKETPLACE: (state, value: DetailMarketplace | {}) => (state.detail = value),
+  RESET_DETAIL_MARKETPLACE: (state) => (state.detail = {} as DetailMarketplace | {})
 };
 
 export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> = {
@@ -65,6 +71,18 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
   async addConnection({ commit }, { id }: { id: String; }) {
     try {
       const response = await this?.$axios?.$post(`/api/clients/connections/${ id }`);
+
+      return response;
+    } catch (error) {
+      return error;
+    }
+  },
+  async getDetail({ commit }, id: string) {
+    try {
+      const response = await this?.$axios?.$get(`/api/clients/partner-details/${ id ?? '' }`);
+
+      if (!response) throw response;
+      commit('SET_DETAIL_MARKETPLACE', response);
 
       return response;
     } catch (error) {

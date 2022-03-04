@@ -9,7 +9,8 @@ export default defineNuxtMiddleware(({ from, route, store }) => {
       store.commit('incomingOrders/RESET_FILTER');
     }
     else if (route.name?.includes('marketplace')) {
-      store.commit('marketplaces/RESET_FILTER');
+      store.commit('marketplaces/marketplaces/RESET_FILTER');
+      store.commit('marketplaces/marketplaces/RESET_DETAIL_MARKETPLACE');
     }
   }
 });
