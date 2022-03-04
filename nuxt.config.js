@@ -1,6 +1,7 @@
-import colors from 'vuetify/es5/util/colors';
+import minifyTheme from 'minify-css-string'
+import colors from 'vuetify/es5/util/colors'
 
-const development = process.env.NODE_ENV === 'development';
+const development = process.env.NODE_ENV === 'development'
 
 export default {
   // Rendering property : https://nuxtjs.org/docs/features/rendering-modes
@@ -57,7 +58,11 @@ export default {
   css: ['~/assets/scss/main.scss'],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: ['~/plugins/vee-validate.js', '~/plugins/customUtils.ts', { src: '~plugins/vue-carousel-3d', ssr: false }],
+  plugins: [
+    '~/plugins/vee-validate.js',
+    '~/plugins/customUtils.ts',
+    { src: '~plugins/vue-carousel-3d', ssr: false },
+  ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -111,6 +116,7 @@ export default {
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {
+    options: { minifyTheme },
     customVariables: ['~/assets/scss/variables.scss'],
     treeShake: true,
     breakpoint: {
@@ -120,13 +126,10 @@ export default {
       dark: false,
       themes: {
         light: {
-          primary: colors.blue.darken2,
-          secondary: colors.red.base,
-          base: colors.grey.lighten4,
+          primary: '#1961E4',
+          secondary: '#FF3D17',
+          base: '#F7F7F7',
           info: colors.teal.lighten1,
-          warning: colors.amber.base,
-          error: colors.deepOrange.accent4,
-          success: colors.green.accent3,
         },
       },
     },
@@ -167,4 +170,4 @@ export default {
     hardSourcePlugin: development,
     parallelPlugin: development,
   },
-};
+}

@@ -1,19 +1,22 @@
 // Ref: https://github.com/nuxt-community/vuetify-module#customvariables
-
+$primary: #2196f3;
+$secondary: #ff3d17;
+$error: #ff5252;
 // font
 $font-size-root: 16px;
 // text field
 $text-field-border-radius: 0px;
+// $text-field-outlined-fieldset-border: 2px solid #2196f3;
 // timeline
 $timeline-item-padding: 0px;
 $timeline-divider-width: 80px;
 // table
-$data-table-border-radius: 0px;
+$data-table-border-radius: 28px;
 // button
-$btn-border-radius: 16px;
+$btn-border-radius: 28px;
 // card
 $card-actions-padding: 16px;
 $card-elevation: 0;
-$card-border-radius: 24px;
+$card-border-radius: 28px;
 // menu
 $menu-content-border-radius: 16px;
