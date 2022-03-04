@@ -185,6 +185,7 @@
                 width="100%"
                 color="blue"
                 :disabled="$fetchState.pending"
+                @click="changePage(partner.id)"
               >
                 <v-img
                   height="250"
@@ -233,6 +234,7 @@
                   </div>
                 </div>
                 <v-btn
+                  v-if="partner.status !== 'connected'"
                   fab
                   small
                   plain
@@ -241,7 +243,7 @@
                   right
                   class="pt-12"
                   :disabled="partner.status === 'pending'"
-                  @click="addPartner(partner)"
+                  @click.stop="addPartner(partner)"
                 >
                   <v-icon
                     v-if="partner.status === 'none'"
@@ -265,6 +267,16 @@
                     mdi-account-multiple-check
                   </v-icon>
                 </v-btn>
+                <v-chip
+                  v-if="partner.status === 'connected'"
+                  color="green"
+                  text-color="white"
+                  x-small
+                  disabled
+                  class="custom-chip-connected"
+                >
+                  Connected
+                </v-chip>
               </v-card>
             </v-col>
           </v-row>
@@ -332,10 +344,11 @@ import {
   ref,
   useMeta,
   useRouter,
-  Ref
+  Ref,
+  useRoute
 } from '@nuxtjs/composition-api'
 // Interfaces or types
-import { Marketplace, VuexModuleMarketplaces,FilterDetails, PartnerServiceZone } from '~/types/marketplace'
+import { Marketplace, VuexModuleMarketplaces,FilterDetails, PartnerServiceZone } from '~/types/marketplace/marketplace'
 import { VuexModuleFilters, Zone, ServiceType} from '~/types/filters'
 import { VuexModuleApplications } from '~/types/applications'
 
@@ -344,17 +357,18 @@ export default defineComponent({
   name: 'MarketPlace',
   layout: 'default',
   setup() {
+    const router = useRouter()
     // store manage
     const storeMarketplaces = useStore<VuexModuleMarketplaces>()
     const storeFilters= useStore<VuexModuleFilters>()
     const storeApplications = useStore<VuexModuleApplications>()
-    const marketplaces = computed(() => storeMarketplaces.state.marketplaces.marketplaces)
-    const meta = computed(() => storeMarketplaces.state.marketplaces.meta)
+    const marketplaces = computed(() => storeMarketplaces.state.marketplaces.marketplaces.marketplaces)
+    const meta = computed(() => storeMarketplaces.state.marketplaces.marketplaces.meta)
     const pagination = ref({
       ...storeApplications.state.applications.pagination,
     })
     const filter = ref({
-      ...storeMarketplaces.state.marketplaces.filter
+      ...storeMarketplaces.state.marketplaces.marketplaces.filter
     })
     const zones = ref([]) as Ref<Zone[]>
     const serviceTypes = ref({ ...storeFilters.state.filters.serviceTypes })
@@ -403,7 +417,7 @@ export default defineComponent({
       try {
         $fetchState.pending = true
 
-        await storeMarketplaces.dispatch('marketplaces/addConnection', {id})
+        await storeMarketplaces.dispatch('marketplaces/marketplaces/addConnection', {id})
         dialog.status = false
         fetch()
       } catch (error) {
@@ -437,7 +451,7 @@ export default defineComponent({
       try {
         $fetchState.pending = true
 
-        await storeMarketplaces.dispatch('marketplaces/getMarketplaces', { params: dataParams })
+        await storeMarketplaces.dispatch('marketplaces/marketplaces/getMarketplaces', { params: dataParams })
       } catch (error) {
         return error
       } finally {
@@ -506,7 +520,7 @@ export default defineComponent({
           page: 1,
         }
 
-        storeFilters.commit('marketplaces/SET_FILTER', {
+        storeFilters.commit('marketplaces/marketplaces/SET_FILTER', {
           ...newFilter
         })
 
@@ -543,6 +557,10 @@ export default defineComponent({
       { deep: true }
     )
 
+    const changePage = (id: string) => {
+      router.push(`/marketplace/${id}`)
+    }
+
     return {
       marketplaces,
       filter,
@@ -564,7 +582,8 @@ export default defineComponent({
       selectedServiceTypes,
       addConnection,
       idPartner,
-      pagination
+      pagination,
+      changePage
     }
   },
   head: {},
@@ -632,5 +651,11 @@ export default defineComponent({
     .v-slide-group__prev--disabled, .v-slide-group__next--disabled {
       display: none;
     }
+  }
+  .custom-chip-connected {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    opacity: 1;
   }
 </style>

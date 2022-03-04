@@ -41,7 +41,7 @@ import {
   useRouter,
 } from '@nuxtjs/composition-api'
 // Interfaces or types
-import { Marketplace, VuexModuleMarketplaces,FilterDetails, PartnerServiceZone } from '~/types/marketplace'
+import { Marketplace, VuexModuleMarketplaces,FilterDetails, PartnerServiceZone } from '~/types/marketplace/marketplace'
 import { VuexModuleApplications } from '~/types/applications'
 
 

@@ -4,25 +4,7 @@
       <v-card
         class="rounded-xl pa-2"
       >
-        <v-card-title class="h-5 text-break">
-          Are you sure you want to connect with {{data.name}}?
-        </v-card-title>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="grey darken-1"
-            text
-            @click="toggle()"
-          >
-            Cancel
-          </v-btn>
-          <v-btn
-            color="blue darken-1 white--text"
-            @click="addConnection()"
-          >
-            Connect
-          </v-btn>
-        </v-card-actions>
+        ini image
       </v-card>
     </v-dialog>
   </div>
@@ -40,13 +22,6 @@ import {
   useMeta,
   useRouter,
 } from '@nuxtjs/composition-api'
-import { VuexModuleMarketplaces} from '~/types/marketplace/marketplace'
-
-interface FeedbackMessage {
-  alert: boolean
-  type: string
-  message: string | unknown
-}
 
 export default defineComponent({
   props: {
@@ -75,14 +50,6 @@ export default defineComponent({
     const addConnection = () => {
       emit('add')
     }
-
-    watch(
-      dialogComp,
-      (newDialogComp) => {
-        console.log({newDialogComp})
-      }
-    )
-    console.log({dialogComp})
     return {
       toggle,
       dialogComp,

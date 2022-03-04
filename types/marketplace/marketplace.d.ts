@@ -1,7 +1,9 @@
-import { RootStateMarketplaces } from '~/store/marketplaces';
+import { RootStateMarketplaces } from '~/store/marketplaces/marketplaces';
 
 export interface VuexModuleMarketplaces {
-  marketplaces: RootStateMarketplaces;
+  marketplaces: {
+    marketplaces: RootStateMarketplaces;
+  };
 }
 
 export interface PartnerServiceType {
