@@ -653,9 +653,9 @@ export default defineComponent({
     }
   }
   .custom-chip-connected {
-    position: absolute;
+    position: absolute !important;
     top: 20px;
     right: 20px;
-    opacity: 1;
+    opacity: 1 !important;
   }
 </style>
