@@ -1,3 +1,4 @@
+// scroll style
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -12,6 +13,7 @@
   background: transparent;
 }
 
+// page transition
 .page-enter-active,
 .page-leave-active {
   transition: opacity 0.1s;
@@ -21,9 +23,19 @@
   opacity: 0;
 }
 
+// line clamp
 .line-clamp-3 {
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+// input fields style
+.v-input fieldset {
+  color: $primary !important;
+}
+
+.error--text fieldset {
+  color: $error !important;
 }

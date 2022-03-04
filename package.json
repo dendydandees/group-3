@@ -20,6 +20,7 @@
     "@nuxtjs/proxy": "^2.1.0",
     "@nuxtjs/sentry": "^5.1.7",
     "core-js": "^3.19.3",
+    "minify-css-string": "^1.0.0",
     "nuxt": "^2.15.8",
     "nuxt-webpack-optimisations": "^2.2.0",
     "vee-validate": "^3.4.14",
