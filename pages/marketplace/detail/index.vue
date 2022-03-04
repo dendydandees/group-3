@@ -119,19 +119,14 @@
           </v-col>
         </v-row>
       </v-col>
-      <v-col class="gallery">
+      <v-col class="gallery" cols="5">
         <div
           class="mb-4 font-weight-bold"
         >
           Gallery
         </div>
         <div>
-          <v-card
-            color="blue"
-            width="100px"
-            height="100px"
-            class="rounded-circle mr-4"
-          />
+          <PhotoCollageWrapper v-bind="collage" @itemClick="itemClickHandler" />
         </div>
       </v-col>
     </v-row>
@@ -178,6 +173,13 @@
         </v-btn>
       </div>
     </div>
+    <CoolLightBox
+      :items="imagesLightBox(collage.photos)"
+      :index="index"
+      :slideshow="false"
+      @close="index = null"
+    >
+    </CoolLightBox>
   </section>
 </template>
 
@@ -195,14 +197,80 @@ import {
   Ref
 } from '@nuxtjs/composition-api'
 // Interfaces or types
+import { PhotoCollageWrapper, } from "vue-photo-collage";
+import CoolLightBox from 'vue-cool-lightbox'
+import 'vue-cool-lightbox/dist/vue-cool-lightbox.min.css'
 
 
 export default defineComponent({
   name: 'DetailMarketplace',
+  components: {
+    PhotoCollageWrapper,
+    CoolLightBox
+  },
   layout: 'default',
   setup() {
 
+    const collage = {
+      gapSize: "1em",
+      borderRadius: "1em",
+      width: "auto",
+      height: ["calc(50vh - 2em)", "calc(50vh - 1em)"],
+      layout: [1, 2, 1],
+      photos: [
+        {
+          source:
+            "https://images.unsplash.com/photo-1517088455889-bfa75135412c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=e5548929376f93d8b1b7a21097df03bd&auto=format&fit=crop&w=749&q=80",
+        },
+        {
+          source:
+            "https://images.unsplash.com/photo-1526656892012-7b336603ed46?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=31c8e58b58c25dfcc18452ed29b52951&auto=format&fit=crop&w=334&q=80",
+        },
+        {
+          source:
+            "https://images.unsplash.com/photo-1521024221340-efe7d7fa239b?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=9ad8a99d809d3fa3a9e8dff3ecc81878&auto=format&fit=crop&w=750&q=80",
+        },
+        {
+          source:
+            "https://images.unsplash.com/photo-1523038793606-2fd28f837a85?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=919b76f4229e41416653aeb10e84e94a&auto=format&fit=crop&w=334&q=80",
+        },
+        {
+          source:
+            "https://images.unsplash.com/photo-1516832970803-325be7a92aa5?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=93d7ac9abad6167aecb49ebd67fd5b6d&auto=format&fit=crop&w=751&q=80",
+        },
+        {
+          source:
+            "https://images.unsplash.com/photo-1526938972776-11558ad4de30?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=973795a277e861265b0fabbf4a96afe2&auto=format&fit=crop&w=750&q=80",
+        },
+        {
+          source:
+            "https://images.unsplash.com/photo-1464550838636-1a3496df938b?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=f22dbf6c13ea7c21e803aa721437b691&auto=format&fit=crop&w=888&q=80",
+        },
+      ],
+      showNumOfRemainingPhotos: true,
+    }
+    const index = ref(null)
+    const showImg = (indexInput: any) => {
+      index.value = indexInput
+    }
+    const silentbox = ref(null)
+    const itemClickHandler = (data: {id: number, source: string}, column: number) => {
+      const item = Object.assign({}, data);
+      showImg(item.id)
+    }
+
+    const imagesLightBox = (data: {source: string}[]) => {
+      return data.map((el, i) => {
+        return el.source
+      })
+    }
     return {
+      collage,
+      itemClickHandler,
+      index,
+      showImg,
+      silentbox,
+      imagesLightBox
     }
   },
   head: {},
@@ -219,6 +287,25 @@ export default defineComponent({
       .v-text-field__details {
         display: none;
       }
+    }
+    .cool-lightbox-toolbar {
+      button[title="Show thumbnails"] {
+        display: none;
+      }
+      button[title="Close"] {
+        display: none;
+      }
+    }
+    .cool-lightbox__slide__img {
+      img {
+        border-radius: 20px;
+      }
+    }
+    .cool-lightbox-button__icon {
+      border-radius: 20px;
+    }
+    .cool-lightbox-thumbs {
+      display: none;
     }
   }
 </style>
