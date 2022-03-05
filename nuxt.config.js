@@ -1,5 +1,4 @@
 import minifyTheme from 'minify-css-string'
-import colors from 'vuetify/es5/util/colors'
 
 const development = process.env.NODE_ENV === 'development'
 
@@ -77,6 +76,7 @@ export default {
     '@vueuse/nuxt',
     // https://github.com/harlan-zw/nuxt-webpack-optimisations
     'nuxt-webpack-optimisations',
+    '@nuxtjs/svg',
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -119,20 +119,7 @@ export default {
     options: { minifyTheme },
     customVariables: ['~/assets/scss/variables.scss'],
     treeShake: true,
-    breakpoint: {
-      mobileBreakpoint: 'sm',
-    },
-    theme: {
-      dark: false,
-      themes: {
-        light: {
-          primary: '#1961E4',
-          secondary: '#FF3D17',
-          base: '#F7F7F7',
-          info: colors.teal.lighten1,
-        },
-      },
-    },
+    optionsPath: './vuetify.config.ts',
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build

@@ -6,38 +6,14 @@
     :mini-variant-width="80"
     fixed
     app
+    dark
+    color="primary"
+    class="rounded-xl rounded-tl-0 rounded-bl-0"
   >
-    <v-list class="py-2 text--center">
-      <v-list-item class="justify-center">
-        <v-badge
-          v-if="!mini"
-          content="Client Portal"
-          value="Client Portal"
-          color="secondary"
-          overlap
-          class="mt-2 mr-10"
-        >
-          <NuxtImg
-            src="/images/Luwjistik Logo FA-01.png"
-            format="webp"
-            height="24"
-            preload
-          />
-        </v-badge>
-
-        <NuxtImg
-          v-else
-          src="/images/Luwjistik Logo FA-02.png"
-          format="webp"
-          height="24"
-          preload
-        />
-      </v-list-item>
-    </v-list>
-
-    <v-divider />
-
-    <BaseNavigationClientMenu @hideMiniSideNav="$emit('hideMiniSideNav')" />
+    <BaseNavigationClientMenu
+      :mini="mini"
+      @hideMiniSideNav="$emit('hideMiniSideNav')"
+    />
 
     <BaseNavigationPartnerMenu
       v-if="isPartners"
@@ -46,7 +22,26 @@
     />
 
     <template #append>
-      <v-divider />
+      <v-fade-transition hide-on-leave>
+        <NuxtImg
+          v-if="mini"
+          src="/images/luwjistik_logo_white_simple.png"
+          format="webp"
+          preload
+          class="mx-auto d-block my-8"
+        />
+      </v-fade-transition>
+
+      <v-fade-transition hide-on-leave>
+        <NuxtImg
+          v-if="!mini"
+          src="/images/luwjistik_logo_white_full.png"
+          format="webp"
+          preload
+          class="mx-auto d-block my-8"
+        />
+      </v-fade-transition>
+      <!-- <v-divider />
 
       <v-list class="py-4">
         <v-list-item
@@ -102,7 +97,7 @@
             Sign Out
           </v-btn>
         </div>
-      </v-expand-transition>
+      </v-expand-transition> -->
     </template>
   </v-navigation-drawer>
 </template>

@@ -23,7 +23,7 @@ export default defineComponent({
   setup() {
     const context = useContext()
     const drawer = ref(!context.$vuetify.breakpoint.smAndDown) as Ref<boolean>
-    const mini = ref(!context.$vuetify.breakpoint.smAndDown) as Ref<boolean>
+    const mini = ref(context.$vuetify.breakpoint.smAndDown) as Ref<boolean>
     const doShowSideNav = () => {
       const isMobile = context.$vuetify.breakpoint.smAndDown
 

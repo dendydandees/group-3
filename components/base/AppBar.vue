@@ -2,7 +2,7 @@
   <v-app-bar
     :elevate-on-scroll="true"
     app
-    color="white"
+    color="base"
     outlined
     tile
     style="border: 1px solid; border-color: rgba(0, 0, 0, 0.12)"

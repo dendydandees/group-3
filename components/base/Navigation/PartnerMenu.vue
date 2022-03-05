@@ -1,37 +1,29 @@
 <template>
-  <div>
-    <v-divider />
+  <v-list nav class="pt-0 px-0">
+    <v-list-group
+      :value="isGroupShown"
+      no-action
+      active-class="white--text"
+      @click="doShowGroup"
+    >
+      <template #activator>
+        <v-list-item-content>
+          <v-list-item-title
+            class="text-uppercase text-center"
+            :style="{ whiteSpace: mini ? 'unset' : '' }"
+          >
+            Partner Portal
+          </v-list-item-title>
+        </v-list-item-content>
+      </template>
 
-    <v-list nav dense class="py-4 px-4">
-      <v-slide-x-transition hide-on-leave>
-        <v-subheader v-if="!mini" class="text-uppercase">
-          Partner Portal
-        </v-subheader>
-      </v-slide-x-transition>
+      <BaseNavigationListItem :items="partnerMenus" />
+    </v-list-group>
 
-      <v-list-item
-        v-for="(partner, index) in partnerMenus"
-        :key="index"
-        :to="partner.to"
-        link
-        nuxt
-        :ripple="{ class: `red--text` }"
-        active-class="secondary white--text"
-        class="rounded-0 my-4"
-        @click="$emit('hideMiniSideNav')"
-      >
-        <v-list-item-icon>
-          <v-icon>
-            {{ partner.icon }}
-          </v-icon>
-        </v-list-item-icon>
-
-        <v-list-item-title>
-          {{ partner.title }}
-        </v-list-item-title>
-      </v-list-item>
-    </v-list>
-  </div>
+    <template v-if="mini">
+      <BaseNavigationListItem :items="partnerMenus" />
+    </template>
+  </v-list>
 </template>
 
 <script lang="ts">
@@ -55,8 +47,9 @@ export default defineComponent({
       required: true,
     },
   },
-  setup() {
+  setup(_props, { emit }) {
     const { $auth } = useContext()
+
     const user = computed(() =>
       $auth.$storage.getUniversal('user')
     ) as ComputedRef<User>
@@ -78,9 +71,17 @@ export default defineComponent({
         to: `/partner-portals/${partnerId.value}/profiles`,
       },
     ]) as Ref<NavigationLinks[]>
+    const isGroupShown = ref(true)
+
+    const doShowGroup = () => {
+      isGroupShown.value = !isGroupShown.value
+      emit('hideMiniSideNav')
+    }
 
     return {
       partnerMenus,
+      isGroupShown,
+      doShowGroup,
     }
   },
 })
