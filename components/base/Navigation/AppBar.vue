@@ -32,6 +32,62 @@
     </div>
 
     <v-spacer v-if="!$vuetify.breakpoint.mobile" />
+
+    <v-menu bottom right min-width="200px" rounded offset-y>
+      <template #activator="{ on }">
+        <v-btn
+          text
+          x-large
+          color="primary"
+          class="pa-0 text-capitalize"
+          v-on="on"
+        >
+          <div class="d-flex align-center justify-space-between">
+            <v-avatar color="primary" size="48" class="mr-2">
+              <span class="white--text text-h5">
+                {{ user.initial }}
+              </span>
+            </v-avatar>
+
+            <div class="d-flex flex-column text-start">
+              <p
+                class="ma-0 subtitle-2 font-weight-bold text-truncate"
+                style="max-width: 150px"
+              >
+                {{ user.role }}
+              </p>
+
+              <p
+                class="ma-0 subtitle-2 text-truncate text-lowercase"
+                style="max-width: 150px"
+              >
+                {{ user.email }}
+              </p>
+            </div>
+          </div>
+        </v-btn>
+      </template>
+
+      <v-card>
+        <v-list-item-content class="justify-center">
+          <div class="mx-auto text-center">
+            <v-btn
+              depressed
+              rounded
+              nuxt
+              to="/account-profiles"
+              color="primary"
+            >
+              Profile
+            </v-btn>
+
+            <v-divider class="my-3" />
+
+            <v-btn depressed rounded text @click="doLogout"> Log out </v-btn>
+          </div>
+        </v-list-item-content>
+      </v-card>
+    </v-menu>
   </v-app-bar>
 </template>
 
@@ -41,7 +97,12 @@ import {
   defineComponent,
   useContext,
   PropType,
+  ComputedRef,
+  useStore,
 } from '@nuxtjs/composition-api'
+// Interfaces and types
+import { User } from '~/types/login'
+import { VuexModuleApplications } from '~/types/applications'
 
 export default defineComponent({
   props: {
@@ -51,7 +112,12 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const { $vuetify } = useContext()
+    const { $vuetify, $auth } = useContext()
+    const storeOfApplications = useStore<VuexModuleApplications>()
+
+    const user = computed(() =>
+      $auth.$storage.getUniversal('user')
+    ) as ComputedRef<User>
     const setIcon = computed(() => {
       return !$vuetify.breakpoint.mobile && !props.mini
         ? 'mdi-backburger'
@@ -60,8 +126,18 @@ export default defineComponent({
         : 'mdi-menu'
     })
 
+    const doLogout = async () => {
+      try {
+        await storeOfApplications.dispatch('applications/logout')
+      } catch (error) {
+        return error
+      }
+    }
+
     return {
+      user,
       setIcon,
+      doLogout,
     }
   },
 })

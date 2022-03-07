@@ -41,63 +41,6 @@
           class="mx-auto d-block my-8"
         />
       </v-fade-transition>
-      <!-- <v-divider />
-
-      <v-list class="py-4">
-        <v-list-item
-          link
-          :ripple="{ class: `red--text` }"
-          @click="doShowUserActions"
-        >
-          <v-avatar
-            size="40"
-            tile
-            color="secondary"
-            :class="mini ? 'mr-0' : 'mr-4'"
-          >
-            <span class="text-uppercase white--text font-weight-bold title">
-              {{ user.initial }}
-            </span>
-          </v-avatar>
-
-          <v-list-item-content>
-            <v-list-item-title class="font-weight-bold text-capitalize">
-              {{ user.role }}
-            </v-list-item-title>
-            <v-list-item-subtitle>
-              {{ user.email }}
-            </v-list-item-subtitle>
-          </v-list-item-content>
-
-          <v-list-item-action>
-            <v-icon>
-              {{ isShowUserActions ? 'mdi-menu-up' : 'mdi-menu-down' }}
-            </v-icon>
-          </v-list-item-action>
-        </v-list-item>
-      </v-list>
-
-      <v-divider></v-divider>
-
-      <v-expand-transition>
-        <div v-if="isShowUserActions" class="pa-4 mb-4">
-          <v-btn
-            block
-            tile
-            color="primary"
-            depressed
-            nuxt
-            to="/account-profiles"
-            class="mb-4"
-          >
-            Profile
-          </v-btn>
-
-          <v-btn block tile outlined color="primary" @click="doLogout">
-            Sign Out
-          </v-btn>
-        </div>
-      </v-expand-transition> -->
     </template>
   </v-navigation-drawer>
 </template>
