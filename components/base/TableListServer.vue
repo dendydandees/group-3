@@ -140,7 +140,6 @@
       <div class="d-flex align-center">
         <v-btn
           v-if="isShowActions.detail"
-          tile
           small
           depressed
           :loading="loading"
@@ -154,7 +153,6 @@
 
         <v-btn
           v-if="isShowActions.download"
-          tile
           small
           depressed
           download

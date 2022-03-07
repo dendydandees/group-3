@@ -130,6 +130,7 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const { $auth } = useContext()
+
     const storeOfApplications = useStore<VuexModuleApplications>()
     const drawer = computed({
       get(): boolean {

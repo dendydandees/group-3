@@ -16,16 +16,17 @@
         <!-- Search filter -->
         <v-text-field
           v-model="filter.name"
+          clearable
+          outlined
+          single-line
+          dense
+          rounded
+          hide-details
           label="Search by client name"
           placeholder="Enter your client name..."
           background-color="white"
-          prepend-inner-icon="mdi-magnify"
           type="search"
-          clearable
-          solo
-          flat
-          rounded
-          hide-details
+          class="input-filter"
         />
       </v-col>
 
@@ -34,15 +35,17 @@
           v-model="filter.status"
           :items="statusOptions"
           :disabled="$fetchState.pending"
+          hide-details
+          outlined
+          single-line
+          dense
+          rounded
+          clearable
           label="Filter by status connections"
           item-text="text"
           item-value="value"
-          hide-details
-          flat
-          solo
-          rounded
-          clearable
           background-color="white"
+          class="input-select-filter"
         />
       </v-col>
     </v-row>

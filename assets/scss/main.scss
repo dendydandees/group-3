@@ -39,3 +39,27 @@
 .error--text fieldset {
   color: $error !important;
 }
+
+.input-filter {
+  fieldset {
+    border-color: #2196f3;
+  }
+  .v-text-field__slot {
+    label {
+      color: #2196f3;
+      font-size: large;
+    }
+  }
+}
+
+.input-select-filter {
+  fieldset {
+    border-color: #2196f3;
+  }
+  .v-select__slot {
+    label {
+      color: #2196f3;
+      font-size: large;
+    }
+  }
+}

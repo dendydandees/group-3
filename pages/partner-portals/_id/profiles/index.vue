@@ -18,7 +18,7 @@
       </v-col>
 
       <v-col cols="12" md="8">
-        <v-card tile color="white" elevation="0">
+        <v-card color="white" elevation="0">
           <ValidationObserver
             ref="editProfileFormObserver"
             v-slot="{ invalid }"
@@ -79,7 +79,6 @@
                 <v-expand-transition>
                   <v-btn
                     v-show="!profiles.logo"
-                    tile
                     depressed
                     :loading="$fetchState.pending"
                     color="primary"
@@ -94,7 +93,6 @@
                   <v-btn
                     v-show="form.logo"
                     outlined
-                    tile
                     depressed
                     :loading="$fetchState.pending"
                     color="error"
@@ -121,6 +119,7 @@
                     :error-messages="errors"
                     required
                     outlined
+                    rounded
                     autocomplete
                     label="Partner Name"
                     placeholder="Enter your partner name..."
@@ -141,9 +140,9 @@
                     :error-messages="errors"
                     clearable
                     outlined
+                    rounded
                     auto-grow
-                    rows="1"
-                    row-height="50"
+                    rows="5"
                     clear-icon="mdi-close-circle"
                     label="Company Brief"
                   />
@@ -156,7 +155,6 @@
               <v-spacer />
 
               <v-btn
-                tile
                 depressed
                 color="primary"
                 type="submit"
@@ -200,7 +198,7 @@ export default defineComponent({
   },
   middleware: 'partner',
   setup() {
-    useMeta({ titleTemplate: '%s | Edit Partner Profiles' })
+    useMeta({ titleTemplate: '%s | Partner Profiles' })
     const route = useRoute()
     const router = useRouter()
 
@@ -245,7 +243,7 @@ export default defineComponent({
 
         const data = {
           ...form.value,
-          logo: profiles.value.logo ? '' : form.value.logo,
+          logo: profiles.value.logo ? null : form.value.logo,
         }
         const response = await storeProfiles.dispatch(
           'partnerPortals/profiles/editProfile',

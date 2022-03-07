@@ -6,7 +6,7 @@
       @hideMiniSideNav="hideMiniSideNav"
     />
 
-    <BaseAppBar :mini="mini" @doShowSideNav="doShowSideNav" />
+    <BaseNavigationAppBar :mini="mini" @doShowSideNav="doShowSideNav" />
 
     <v-main class="base">
       <Nuxt />
@@ -22,8 +22,8 @@ export default defineComponent({
   middleware: 'auth',
   setup() {
     const context = useContext()
-    const drawer = ref(!context.$vuetify.breakpoint.smAndDown) as Ref<boolean>
-    const mini = ref(context.$vuetify.breakpoint.smAndDown) as Ref<boolean>
+    const drawer = ref(!context.$vuetify.breakpoint.mobile) as Ref<boolean>
+    const mini = ref(false) as Ref<boolean>
     const doShowSideNav = () => {
       const isMobile = context.$vuetify.breakpoint.smAndDown
 

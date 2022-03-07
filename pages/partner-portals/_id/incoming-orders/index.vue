@@ -11,10 +11,23 @@
       </template>
     </BaseHeadlinePage>
 
-    <v-row align="center" class="white my-8 mx-0">
-      <v-col cols="12" md="6">
+    <v-row align="center" class="my-8 mx-0">
+      <v-col cols="12" md="6" class="px-0">
         <!-- Search filter field -->
-        <BaseSearchField v-model="filter.search" />
+        <v-text-field
+          v-model="filter.search"
+          clearable
+          outlined
+          dense
+          rounded
+          single-line
+          hide-details
+          label="Search by order code"
+          placeholder="Enter your order code..."
+          background-color="white"
+          type="search"
+          class="input-filter"
+        />
       </v-col>
     </v-row>
 

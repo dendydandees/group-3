@@ -83,7 +83,7 @@
           :disabled="invalid"
           :loading="loading"
         >
-          Sign In
+          Login
         </v-btn>
 
         <v-alert

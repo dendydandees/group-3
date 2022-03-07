@@ -15,21 +15,23 @@
       <NuxtImg
         src="/images/Luwjistik Logo FA-02.png"
         format="webp"
-        height="24"
+        height="32"
         preload
       />
     </NuxtLink>
 
-    <v-spacer v-if="$vuetify.breakpoint.smAndDown" />
+    <v-spacer v-if="$vuetify.breakpoint.mobile" />
 
     <div class="d-flex align-center">
       <v-app-bar-nav-icon
-        :class="[!$vuetify.breakpoint.smAndDown ? 'mr-4' : '']"
+        :class="[!$vuetify.breakpoint.mobile ? 'mr-4' : '']"
         @click.stop="$emit('doShowSideNav')"
       >
         <v-icon> {{ setIcon }} </v-icon>
       </v-app-bar-nav-icon>
     </div>
+
+    <v-spacer v-if="!$vuetify.breakpoint.mobile" />
   </v-app-bar>
 </template>
 
