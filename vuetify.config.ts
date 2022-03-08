@@ -1,5 +1,9 @@
 import colors from 'vuetify/es5/util/colors'
+// Icons
 import OrderIcon from '@/components/base/Icon/Order.vue'
+import Marketplace from '@/components/base/Icon/Marketplace.vue'
+import ClientConnections from '@/components/base/Icon/ClientConnections.vue'
+import Profile from '@/components/base/Icon/Profile.vue'
 
 export default {
   breakpoint: {
@@ -24,6 +28,9 @@ export default {
     // iconfont: 'mdi',
     values: {
       order: { component: OrderIcon },
+      marketplace: { component: Marketplace },
+      clientConnections: { component: ClientConnections },
+      profile: { component: Profile },
     },
   },
 }

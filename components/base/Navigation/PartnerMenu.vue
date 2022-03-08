@@ -57,17 +57,17 @@ export default defineComponent({
     const partnerMenus = ref([
       {
         title: 'Incoming Orders',
-        icon: 'mdi-file-clock',
+        icon: '$order',
         to: `/partner-portals/${partnerId.value}/incoming-orders/`,
       },
       {
         title: 'Client Connections',
-        icon: 'mdi-power-plug',
+        icon: '$clientConnections',
         to: `/partner-portals/${partnerId.value}/client-connections`,
       },
       {
         title: 'Partner Profile',
-        icon: 'mdi-account-multiple',
+        icon: '$profile',
         to: `/partner-portals/${partnerId.value}/profiles`,
       },
     ]) as Ref<NavigationLinks[]>

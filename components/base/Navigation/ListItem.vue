@@ -10,7 +10,7 @@
       class="my-0 px-6 rounded-0 item-group-sidebar"
     >
       <v-list-item-icon>
-        <v-icon v-text="icon" />
+        <v-icon size="32" v-text="icon" />
       </v-list-item-icon>
 
       <v-list-item-title v-text="title" />

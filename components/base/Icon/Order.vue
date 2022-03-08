@@ -1,59 +1,81 @@
 <template>
   <svg
+    id="Group_236"
+    data-name="Group 236"
     xmlns="http://www.w3.org/2000/svg"
     xmlns:xlink="http://www.w3.org/1999/xlink"
-    width="25.397"
-    height="26.562"
-    viewBox="0 0 25.397 26.562"
+    width="47.261"
+    height="49.427"
+    viewBox="0 0 47.261 49.427"
   >
     <defs>
-      <style>
-        .a {
-          fill: currentColor;
-          stroke: #707070;
-          stroke-width: 10px;
-        }
-        .b {
-          clip-path: url(#a);
-        }
-        .c {
-          fill: #fff;
-        }
-      </style>
-      <clipPath id="a">
-        <rect class="a" width="25.398" height="26.562" />
+      <clipPath id="clip-path">
+        <rect
+          id="Rectangle_6"
+          data-name="Rectangle 6"
+          width="47.261"
+          height="49.427"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1"
+        />
       </clipPath>
     </defs>
-    <g transform="translate(0 0)">
-      <g class="b">
+    <g id="Group_12" data-name="Group 12" transform="translate(0 0)">
+      <g id="Group_11" data-name="Group 11" clip-path="url(#clip-path)">
         <path
-          class="c"
-          d="M23.2,24.657H.5a.25.25,0,0,1-.25-.25V.5A.25.25,0,0,1,.5.25H18.394a.25.25,0,0,1,.177.073l4.81,4.81a.25.25,0,0,1,.073.177v19.1A.25.25,0,0,1,23.2,24.657ZM.75,24.157h22.2V5.413L18.29.75H.75Z"
-          transform="translate(-0.218 -0.218)"
+          id="Path_9"
+          data-name="Path 9"
+          d="M42.749,44.987V9.451L33.8.5H.5V44.987Z"
+          transform="translate(0.024 0.024)"
+          fill="none"
+          stroke="currentColor"
+          stroke-linejoin="round"
+          stroke-width="2"
         />
       </g>
     </g>
-    <path
-      class="c"
-      d="M12.951.25H0v-.5H12.951Z"
-      transform="translate(5.158 8.639)"
+    <line
+      id="Line_3"
+      data-name="Line 3"
+      x2="24.1"
+      transform="translate(9.598 16.076)"
+      fill="none"
+      stroke="currentColor"
+      stroke-linejoin="round"
+      stroke-width="2"
     />
-    <path
-      class="c"
-      d="M12.951.25H0v-.5H12.951Z"
-      transform="translate(5.158 13.828)"
+    <line
+      id="Line_4"
+      data-name="Line 4"
+      x2="24.1"
+      transform="translate(9.598 25.732)"
+      fill="none"
+      stroke="currentColor"
+      stroke-linejoin="round"
+      stroke-width="2"
     />
-    <path
-      class="c"
-      d="M12.951.25H0v-.5H12.951Z"
-      transform="translate(5.158 19.018)"
+    <line
+      id="Line_5"
+      data-name="Line 5"
+      x2="24.1"
+      transform="translate(9.598 35.389)"
+      fill="none"
+      stroke="currentColor"
+      stroke-linejoin="round"
+      stroke-width="2"
     />
-    <g transform="translate(0 0)">
-      <g class="b">
+    <g id="Group_14" data-name="Group 14" transform="translate(0 0)">
+      <g id="Group_13" data-name="Group 13" clip-path="url(#clip-path)">
         <path
-          class="c"
-          d="M37.075,5.574H32.251a.25.25,0,0,1-.25-.25V.5h.5V5.074h4.574Z"
-          transform="translate(-14.089 -0.218)"
+          id="Path_10"
+          data-name="Path 10"
+          d="M41.228,9.477H32.251V.5"
+          transform="translate(1.545 0.024)"
+          fill="none"
+          stroke="currentColor"
+          stroke-linejoin="round"
+          stroke-width="2"
         />
       </g>
     </g>
