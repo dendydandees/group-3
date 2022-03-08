@@ -7,6 +7,15 @@
     tile
     style="border: 1px solid; border-color: rgba(0, 0, 0, 0.12)"
   >
+    <v-app-bar-nav-icon
+      :class="[!$vuetify.breakpoint.mobile ? 'mr-4' : '']"
+      @click.stop="$emit('doShowSideNav')"
+    >
+      <v-icon> {{ setIcon }} </v-icon>
+    </v-app-bar-nav-icon>
+
+    <v-spacer v-if="$vuetify.breakpoint.mobile" />
+
     <NuxtLink
       v-if="$vuetify.breakpoint.mobile"
       to="/"
@@ -20,50 +29,36 @@
       />
     </NuxtLink>
 
-    <v-spacer v-if="$vuetify.breakpoint.mobile" />
-
-    <div class="d-flex align-center">
-      <v-app-bar-nav-icon
-        :class="[!$vuetify.breakpoint.mobile ? 'mr-4' : '']"
-        @click.stop="$emit('doShowSideNav')"
-      >
-        <v-icon> {{ setIcon }} </v-icon>
-      </v-app-bar-nav-icon>
-    </div>
-
-    <v-spacer v-if="!$vuetify.breakpoint.mobile" />
+    <v-spacer />
 
     <v-menu bottom right min-width="200px" rounded offset-y>
       <template #activator="{ on }">
         <v-btn
           text
           x-large
+          :icon="$vuetify.breakpoint.mobile"
           color="primary"
-          class="pa-0 text-capitalize"
+          class="pa-0"
           v-on="on"
         >
-          <div class="d-flex align-center justify-space-between">
-            <v-avatar color="primary" size="48" class="mr-2">
-              <span class="white--text text-h5">
-                {{ user.initial }}
-              </span>
-            </v-avatar>
+          <v-icon size="48" class="mr-0 mr-md-2 mt-0 mt-md-1" color="primary">
+            {{ $vuetify.breakpoint.mobile ? 'mdi-account-circle' : '$profile' }}
+          </v-icon>
 
-            <div class="d-flex flex-column text-start">
-              <p
-                class="ma-0 subtitle-2 font-weight-bold text-truncate"
-                style="max-width: 150px"
-              >
-                {{ user.role }}
-              </p>
+          <div class="d-none d-md-flex flex-column text-start">
+            <p
+              class="ma-0 subtitle-2 font-weight-bold text-truncate"
+              style="max-width: 150px"
+            >
+              {{ user.role }}
+            </p>
 
-              <p
-                class="ma-0 subtitle-2 text-truncate text-lowercase"
-                style="max-width: 150px"
-              >
-                {{ user.email }}
-              </p>
-            </div>
+            <p
+              class="ma-0 subtitle-2 text-truncate text-lowercase"
+              style="max-width: 150px"
+            >
+              {{ user.email }}
+            </p>
           </div>
         </v-btn>
       </template>
