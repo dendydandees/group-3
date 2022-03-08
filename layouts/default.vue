@@ -4,6 +4,7 @@
       v-model="drawer"
       :mini="mini"
       @hideMiniSideNav="hideMiniSideNav"
+      @doShowSideNav="doShowSideNav"
     />
 
     <BaseNavigationAppBar :mini="mini" @doShowSideNav="doShowSideNav" />

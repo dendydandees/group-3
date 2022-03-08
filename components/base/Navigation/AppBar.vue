@@ -8,10 +8,10 @@
     style="border: 1px solid; border-color: rgba(0, 0, 0, 0.12)"
   >
     <v-app-bar-nav-icon
-      :class="[!$vuetify.breakpoint.mobile ? 'mr-4' : '']"
+      v-if="$vuetify.breakpoint.mobile"
       @click.stop="$emit('doShowSideNav')"
     >
-      <v-icon> {{ setIcon }} </v-icon>
+      <v-icon> mdi-menu </v-icon>
     </v-app-bar-nav-icon>
 
     <v-spacer v-if="$vuetify.breakpoint.mobile" />
@@ -106,20 +106,13 @@ export default defineComponent({
       required: true,
     },
   },
-  setup(props) {
-    const { $vuetify, $auth } = useContext()
+  setup(_props) {
+    const { $auth } = useContext()
     const storeOfApplications = useStore<VuexModuleApplications>()
 
     const user = computed(() =>
       $auth.$storage.getUniversal('user')
     ) as ComputedRef<User>
-    const setIcon = computed(() => {
-      return !$vuetify.breakpoint.mobile && !props.mini
-        ? 'mdi-backburger'
-        : !$vuetify.breakpoint.mobile && props.mini
-        ? 'mdi-forwardburger'
-        : 'mdi-menu'
-    })
 
     const doLogout = async () => {
       try {
@@ -131,7 +124,6 @@ export default defineComponent({
 
     return {
       user,
-      setIcon,
       doLogout,
     }
   },

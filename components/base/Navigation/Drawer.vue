@@ -9,6 +9,7 @@
     dark
     color="primary"
     class="rounded-xl rounded-tl-0 rounded-bl-0"
+    style="overflow: unset"
   >
     <BaseNavigationClientMenu
       :mini="mini"
@@ -42,6 +43,16 @@
         />
       </v-fade-transition>
     </template>
+
+    <div
+      v-if="!$vuetify.breakpoint.mobile"
+      class="side-button"
+      @click="$emit('doShowSideNav')"
+    >
+      <v-icon class="my-auto" style="height: 100%">
+        {{ mini ? 'mdi-chevron-right' : 'mdi-chevron-left' }}
+      </v-icon>
+    </div>
   </v-navigation-drawer>
 </template>
 
@@ -126,5 +137,23 @@ export default defineComponent({
 .v-list--nav .v-list-item,
 .v-list--nav .v-list-item:before {
   border-radius: 0 !important;
+}
+
+.side-button {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 0;
+  z-index: 999;
+  transform: translate(50%, -50%);
+  border-radius: 24px;
+  color: white;
+  background-color: $primary;
+  width: 1.5rem;
+  height: 10%;
+}
+
+.side-button :hover {
+  cursor: pointer;
 }
 </style>
