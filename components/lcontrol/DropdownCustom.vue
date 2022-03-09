@@ -8,12 +8,13 @@
     >
       {{label}}
     </div>
+    <!-- {{JSON.stringify(data)}} -->
     <v-select
-      v-model="selectedValue.value"
+      v-model="selectedComp"
       :label="title"
       :items="data"
-      item-text="name"
-      item-value="value"
+      :item-text="itemShow.text"
+      :item-value="itemShow.value"
       :placeholder="placeholder"
       outlined
       rounded
@@ -59,8 +60,16 @@ export default defineComponent({
       type: String,
       default: '',
     },
+    selectedValue: {
+      type: String as PropType<string>,
+      default: '',
+    },
+    itemShow: {
+      type: Object as PropType<{text: string, value: string}>,
+      default: () => ({}),
+    },
     data: {
-      type: Array,
+      type: Array ,
       default: () => ([]),
     },
     partner: {
@@ -79,7 +88,14 @@ export default defineComponent({
     const selectedValue = reactive ({
       value: ''
     })
-    const partnerComp = computed({
+    // const partnerComp = computed({
+    //   get: () => props.value,
+    //   set: (value: String) => {
+    //     // console.log(value)
+    //     emit('input', value)
+    //   }
+    // })
+    const selectedComp = computed({
       get: () => props.value,
       set: (value: String) => {
         // console.log(value)
@@ -87,17 +103,9 @@ export default defineComponent({
       }
     })
 
-    watch(
-      selectedValue,
-      (newData) => {
-        partnerComp.value = newData.value
-        // console.log('selected', newData.value, partnerComp.value)
-      },
-      { deep: true }
-    )
     return {
       toggle,
-      selectedValue
+      selectedComp
     }
   },
 })

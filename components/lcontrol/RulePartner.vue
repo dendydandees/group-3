@@ -117,7 +117,7 @@ import {
   PropType,
 } from '@nuxtjs/composition-api'
 // Interfaces or types
-import { RuleDefinitions,Rules,LControl } from '~/types/lcontrol'
+import { RuleDefinitions,Rules,LControl } from '~/types/lcontrolOld'
 
 export default defineComponent({
   props: {
