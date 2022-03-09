@@ -72,7 +72,6 @@
         <v-list-item-action>
           <v-btn
             v-if="!credential.revokedAt && $vuetify.breakpoint.smAndUp"
-            tile
             depressed
             text
             color="error"

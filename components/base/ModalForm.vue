@@ -10,7 +10,7 @@
           v-if="alert.isShow"
           :type="alert.type"
           dismissible
-          tile
+          rounded="xl"
           class="mx-6 mt-6"
         >
           {{ alert.message }}
@@ -29,7 +29,6 @@
           <v-spacer />
 
           <v-btn
-            tile
             depressed
             text
             :loading="dialogSettings.loading"
@@ -41,7 +40,6 @@
           </v-btn>
 
           <v-btn
-            tile
             depressed
             :loading="dialogSettings.loading"
             :disabled="invalid || dialogSettings.loading"

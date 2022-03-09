@@ -1,11 +1,11 @@
 <template>
   <v-row>
     <v-col cols="12">
-      <v-card dark tile color="primary" elevation="0">
+      <v-card dark color="primary" elevation="0">
         <v-card-text class="body-1 white--text pa-6">
           <v-row align="center">
             <v-col cols="12" md="auto">
-              <v-avatar size="48" tile color="secondary">
+              <v-avatar size="56" color="secondary">
                 <span class="text-uppercase font-weight-bold title">
                   {{ user.initial }}
                 </span>
