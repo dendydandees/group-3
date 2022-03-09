@@ -7,7 +7,11 @@
       style="min-height: 100vh"
       class="primary"
     >
-      <v-col cols="12" md="8" class="white rounded-xl pa-4 py-8 pa-md-15">
+      <v-col
+        cols="12"
+        md="8"
+        class="white rounded-xl pa-4 py-8 pa-md-15 elevation-2"
+      >
         <v-row align="center" justify="center">
           <v-col cols="12" md="5" class="text-center">
             <LoginLeftSide />

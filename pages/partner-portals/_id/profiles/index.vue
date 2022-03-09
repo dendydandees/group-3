@@ -26,17 +26,6 @@
             eager
             @submit.stop.prevent="doSubmitEdit"
           >
-            <v-expand-transition>
-              <v-alert
-                v-if="alert.isShow && alert.message.includes('Partner profile')"
-                :type="alert.type"
-                tile
-                class="mb-4"
-              >
-                {{ alert.message }}
-              </v-alert>
-            </v-expand-transition>
-
             <v-card-text class="pt-6 d-flex flex-column flex-md-row">
               <!-- Logo field -->
               <div
@@ -168,6 +157,17 @@
         </v-card>
       </v-col>
     </v-row>
+
+    <v-snackbar
+      :value="alert.isShow && alert.message.includes('Partner profile')"
+      :timeout="2000"
+      rounded="pill"
+      right
+      bottom
+      :color="alert.type"
+    >
+      {{ alert.message }}
+    </v-snackbar>
   </section>
 </template>
 

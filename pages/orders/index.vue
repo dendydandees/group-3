@@ -11,7 +11,7 @@
       </template>
     </BaseHeadlinePage>
 
-    <v-row align="center" class="my-8 mx-0">
+    <v-row align="center" justify="space-between" class="my-8 mx-0">
       <v-col cols="12" md="6" class="px-0">
         <!-- Search filter field -->
         <v-text-field
@@ -26,9 +26,20 @@
           placeholder="Enter your order code..."
           background-color="white"
           type="search"
-          class="input-filter"
+          class="input-filter elevation-1"
         />
       </v-col>
+
+      <!-- <v-col cols="12" md="auto" class="px-0">
+        <v-btn
+          color="primary"
+          :loading="$fetchState.pending"
+          nuxt
+          to="/orders/upload"
+        >
+          Upload Orders
+        </v-btn>
+      </v-col> -->
     </v-row>
 
     <v-row align="center">
@@ -70,6 +81,7 @@ export default defineComponent({
   layout: 'default',
   setup() {
     useMeta({ titleTemplate: '%s | Orders' })
+
     const router = useRouter()
     // store manage
     const storeOrders = useStore<VuexModuleOrders>()
@@ -83,6 +95,7 @@ export default defineComponent({
       ...storeOrders.state.orders.filter,
     })
 
+    // manage table
     const headers = reactive([
       {
         text: 'Order Code (#Ref)',
@@ -111,6 +124,7 @@ export default defineComponent({
     const doGetDetails = (data: Order) => {
       router.push(`/orders/${data.id}`)
     }
+
     const fetchOrders = async (params: FilterDetails) => {
       const { page, itemsPerPage, sortBy, sortDesc } = params
       const perPage = itemsPerPage !== -1 ? itemsPerPage : meta.value.totalCount
@@ -172,9 +186,9 @@ export default defineComponent({
       pagination,
       filter,
       headers,
-      fetchOrders,
       doGetDetails,
       isShowActions,
+      fetchOrders,
     }
   },
   head: {},
