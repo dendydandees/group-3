@@ -26,7 +26,7 @@
           placeholder="Enter your client name..."
           background-color="white"
           type="search"
-          class="input-filter"
+          class="input-filter elevation-1"
         />
       </v-col>
 
@@ -45,7 +45,7 @@
           item-text="text"
           item-value="value"
           background-color="white"
-          class="input-select-filter"
+          class="input-select-filter elevation-1"
         />
       </v-col>
     </v-row>
@@ -82,7 +82,7 @@
           md="3"
         >
           <v-expand-transition>
-            <v-card height="100%">
+            <v-card height="100%" elevation="2">
               <v-card-text class="text-center">
                 <v-chip
                   :color="connections.status === 'pending' ? 'warning' : 'info'"
@@ -125,13 +125,14 @@
           :items="itemsPerPageOptions"
           :disabled="$fetchState.pending"
           hide-details
-          solo
-          flat
+          outlined
+          single-line
           dense
           rounded
           item-text="text"
           item-value="value"
           background-color="white"
+          class="input-select-filter elevation-1"
           :style="[{ width: $vuetify.breakpoint.mobile ? '100%' : '50%' }]"
         />
       </v-col>
@@ -202,7 +203,7 @@ export default defineComponent({
     })
 
     const itemsPerPageOptions = computed(() => {
-      const textDefault = 'Items per page'
+      const textDefault = 'Items/Page'
       const values = [5, 10, 15, 20]
 
       return values.map((value) => ({

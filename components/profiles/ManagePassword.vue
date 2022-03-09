@@ -9,7 +9,7 @@
       </v-col>
 
       <v-col cols="12" md="8">
-        <v-card color="white" elevation="0">
+        <v-card color="white" elevation="2">
           <!-- Form -->
           <ValidationObserver
             ref="updatePasswordFormObserver"

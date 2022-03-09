@@ -1,16 +1,17 @@
 // scroll style
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 0.75rem;
+  height: 0.75rem;
 }
 
 ::-webkit-scrollbar-thumb {
   background: #1976d2;
+  border-radius: 0.75rem;
   opacity: 75%;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: $base;
 }
 
 // page transition
@@ -61,5 +62,8 @@
       color: $primary;
       font-size: large;
     }
+  }
+  .v-select__selection {
+    color: $primary;
   }
 }

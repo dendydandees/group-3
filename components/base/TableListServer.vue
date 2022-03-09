@@ -7,7 +7,7 @@
     :server-items-length="meta.totalCount"
     :options.sync="pagination"
     :loading="loading"
-    class="elevation-0"
+    class="elevation-2"
     @update:options="fetch"
   >
     <!-- Order List Page -->
