@@ -10,10 +10,9 @@
       </v-card-text>
 
       <v-card-actions class="px-6 pb-6">
-        <v-spacer></v-spacer>
+        <v-spacer />
 
         <v-btn
-          tile
           depressed
           text
           :loading="dialogSettings.loading"
@@ -25,7 +24,6 @@
         </v-btn>
 
         <v-btn
-          tile
           depressed
           :loading="dialogSettings.loading"
           :disabled="dialogSettings.loading"

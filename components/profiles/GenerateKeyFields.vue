@@ -15,6 +15,7 @@
         type="text"
         required
         outlined
+        rounded
       />
     </ValidationProvider>
   </v-card-text>

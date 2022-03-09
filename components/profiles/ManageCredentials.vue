@@ -9,9 +9,9 @@
       </v-col>
 
       <v-col cols="12" md="8">
-        <v-card tile color="white" elevation="0">
+        <v-card color="white" elevation="0">
           <v-card-text>
-            <v-alert tile type="warning">
+            <v-alert rounded="xl" type="warning">
               Your secret key grants you access to our API. Treat your API key
               like a passwords, don't expose them in your application code and
               don't share it on Github or anywhere else online.
@@ -23,8 +23,8 @@
               <v-expand-transition>
                 <v-alert
                   v-if="alert.isShow && alert.message.includes('Key')"
-                  tile
                   dismissible
+                  rounded="xl"
                   :type="alert.type"
                 >
                   {{ alert.message }}
@@ -33,32 +33,31 @@
 
               <BaseLoading v-if="$fetchState.pending" color="primary" />
 
+              <!-- if credentials key is empty -->
+              <template v-if="credentials.length === 0">
+                <h2 class="text-center mt-6 subtitle-1">No keys available</h2>
+              </template>
+
               <template v-else>
-                <!-- if credentials key is empty -->
-                <template v-if="credentials.length === 0">
-                  <h2 class="text-center mt-6 subtitle-1">No keys available</h2>
-                </template>
-
-                <template v-else>
-                  <v-scroll-x-transition>
-                    <ProfilesCredentialList
-                      v-if="!$fetchState.pending"
-                      :credentials="credentials"
-                      :status="status"
-                      @doCopy="doCopy"
-                      @toggleConfirmRevoke="toggleConfirmRevoke"
-                    />
-                  </v-scroll-x-transition>
-
-                  <v-pagination
-                    :value="pagination.page"
-                    :disabled="status.copied"
-                    :length="metaCredentials.totalPage"
-                    :total-visible="7"
-                    class="my-6"
-                    @input="changePagination"
+                <v-scroll-x-transition>
+                  <ProfilesCredentialList
+                    v-if="!$fetchState.pending"
+                    :credentials="credentials"
+                    :status="status"
+                    @doCopy="doCopy"
+                    @toggleConfirmRevoke="toggleConfirmRevoke"
                   />
-                </template>
+                </v-scroll-x-transition>
+
+                <v-pagination
+                  :value="pagination.page"
+                  :disabled="status.copied"
+                  :length="metaCredentials.totalPage"
+                  :total-visible="7"
+                  circle
+                  class="my-6"
+                  @input="changePagination"
+                />
               </template>
             </div>
           </v-card-text>
@@ -67,7 +66,6 @@
             <v-spacer />
 
             <v-btn
-              tile
               depressed
               outlined
               color="primary"
@@ -224,7 +222,7 @@ export default defineComponent({
         loading: false,
         title: 'Are you sure ?',
         content:
-          'You are going to revoke the credential key, revoked credential keys will not be able to use our API',
+          'You are going to revoke the credential key, revoked credential keys will not be able to use our API.',
         cancelText: 'Cancel',
         submitText: 'Revoke',
         submitColor: 'error',

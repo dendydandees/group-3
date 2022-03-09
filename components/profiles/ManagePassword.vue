@@ -9,7 +9,7 @@
       </v-col>
 
       <v-col cols="12" md="8">
-        <v-card tile color="white" elevation="0">
+        <v-card color="white" elevation="0">
           <!-- Form -->
           <ValidationObserver
             ref="updatePasswordFormObserver"
@@ -34,7 +34,7 @@
               <ValidationProvider
                 v-slot="{ errors }"
                 slim
-                name="Old Password"
+                name="Current Password"
                 rules="required|min:8|max:16"
                 tag="div"
                 class="mb-4"
@@ -46,10 +46,11 @@
                     formSettings.isShowOldPassword ? 'mdi-eye-off' : 'mdi-eye'
                   "
                   :type="formSettings.isShowOldPassword ? 'text' : 'password'"
-                  label="Old Password"
-                  placeholder="Enter your old password..."
+                  label="Current Password"
+                  placeholder="Enter your current password..."
                   required
                   outlined
+                  rounded
                   @click:append="
                     formSettings.isShowOldPassword =
                       !formSettings.isShowOldPassword
@@ -78,6 +79,7 @@
                   placeholder="Enter your new password..."
                   required
                   outlined
+                  rounded
                   @click:append="
                     formSettings.isShowNewPassword =
                       !formSettings.isShowNewPassword
@@ -111,6 +113,7 @@
                   placeholder="Enter your confirmation password..."
                   required
                   outlined
+                  rounded
                   @click:append="
                     formSettings.isShowConfirmationPassword =
                       !formSettings.isShowConfirmationPassword
@@ -124,7 +127,6 @@
               <v-spacer />
 
               <v-btn
-                tile
                 depressed
                 text
                 :disabled="formSettings.loading"
@@ -136,7 +138,6 @@
               </v-btn>
 
               <v-btn
-                tile
                 depressed
                 color="primary"
                 type="submit"

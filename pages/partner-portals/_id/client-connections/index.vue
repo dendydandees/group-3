@@ -51,62 +51,71 @@
     </v-row>
 
     <v-row align="stretch">
+      <!-- If no have a pending or connected clients -->
       <v-expand-transition>
-        <!-- If no have a pending or connected clients -->
-        <v-col v-if="clientConnections.length === 0" cols="12">
+        <v-col
+          v-if="clientConnections.length === 0 || $fetchState.pending"
+          cols="12"
+        >
           <v-card height="100%">
             <v-card-text>
-              <BaseEmptyData
-                :is-on-filter="filter.name !== '' || filter.status !== ''"
-                page="Client Connections"
-                @refresh="refreshPage"
-              />
+              <v-expand-transition>
+                <BaseLoading v-if="$fetchState.pending" />
+
+                <BaseEmptyData
+                  v-else
+                  :is-on-filter="filter.name !== '' || filter.status !== ''"
+                  page="Client Connections"
+                  @refresh="refreshPage"
+                />
+              </v-expand-transition>
             </v-card-text>
           </v-card>
         </v-col>
       </v-expand-transition>
 
-      <v-col
-        v-for="connections in clientConnections"
-        :key="connections.id"
-        else
-        cols="12"
-        md="3"
-      >
-        <v-expand-transition>
-          <v-card height="100%">
-            <v-card-text class="text-center">
-              <v-chip
-                :color="connections.status === 'pending' ? 'warning' : 'info'"
-                small
-              >
-                {{ connections.status }}
-              </v-chip>
+      <template v-if="clientConnections.length !== 0 && !$fetchState.pending">
+        <v-col
+          v-for="connections in clientConnections"
+          :key="connections.id"
+          cols="12"
+          md="3"
+        >
+          <v-expand-transition>
+            <v-card height="100%">
+              <v-card-text class="text-center">
+                <v-chip
+                  :color="connections.status === 'pending' ? 'warning' : 'info'"
+                  small
+                >
+                  {{ connections.status }}
+                </v-chip>
 
-              <p class="text-h5 text--primary mt-2 mb-0 font-weight-medium">
-                {{ connections.client.name }}
-              </p>
-            </v-card-text>
+                <p class="text-h5 text--primary mt-2 mb-0 font-weight-medium">
+                  {{ connections.client.name }}
+                </p>
+              </v-card-text>
 
-            <v-card-actions>
-              <v-spacer />
+              <v-card-actions>
+                <v-spacer />
 
-              <v-btn
-                v-if="connections.status === 'pending'"
-                depressed
-                color="primary"
-                class="mx-2"
-                :loading="$fetchState.pending"
-                @click="doAcceptConnections(connections.id)"
-              >
-                Accept
-              </v-btn>
+                <v-btn
+                  v-if="connections.status === 'pending'"
+                  depressed
+                  color="primary"
+                  class="mx-2"
+                  :loading="$fetchState.pending"
+                  @click="doAcceptConnections(connections.id)"
+                >
+                  Accept
+                </v-btn>
 
-              <v-spacer />
-            </v-card-actions>
-          </v-card>
-        </v-expand-transition>
-      </v-col>
+                <v-spacer />
+              </v-card-actions>
+            </v-card>
+          </v-expand-transition>
+        </v-col>
+      </template>
     </v-row>
 
     <v-row align="center" justify="space-between" class="mt-8 rounded-xl">
