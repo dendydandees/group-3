@@ -89,6 +89,7 @@
         <v-alert
           v-if="alert.isShow && invalid"
           :type="alert.type"
+          rounded="xl"
           class="text-capitalize"
         >
           {{ alert.message }}

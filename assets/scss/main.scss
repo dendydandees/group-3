@@ -42,11 +42,11 @@
 
 .input-filter {
   fieldset {
-    border-color: #2196f3;
+    border-color: $primary;
   }
   .v-text-field__slot {
     label {
-      color: #2196f3;
+      color: $primary;
       font-size: large;
     }
   }
@@ -54,11 +54,11 @@
 
 .input-select-filter {
   fieldset {
-    border-color: #2196f3;
+    border-color: $primary;
   }
   .v-select__slot {
     label {
-      color: #2196f3;
+      color: $primary;
       font-size: large;
     }
   }
