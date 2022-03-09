@@ -26,7 +26,7 @@
           placeholder="Enter your order code..."
           background-color="white"
           type="search"
-          class="input-filter"
+          class="input-filter elevation-1"
         />
       </v-col>
     </v-row>

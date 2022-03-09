@@ -1,7 +1,7 @@
 <template>
   <v-row>
     <v-col cols="12">
-      <v-card dark color="primary" elevation="0">
+      <v-card dark color="primary" elevation="2">
         <v-card-text class="body-1 white--text pa-6">
           <v-row align="center">
             <v-col cols="12" md="auto">
