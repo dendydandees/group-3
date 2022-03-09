@@ -17,11 +17,17 @@
         </v-list-item-content>
       </template>
 
-      <BaseNavigationListItem :items="partnerMenus" />
+      <template v-if="!mini">
+        <template v-for="(menu, index) in partnerMenus">
+          <BaseNavigationListItem :key="index" :items="menu" class="px-6" />
+        </template>
+      </template>
     </v-list-group>
 
     <template v-if="mini">
-      <BaseNavigationListItem :items="partnerMenus" />
+      <template v-for="(menu, index) in partnerMenus">
+        <BaseNavigationListItem :key="index" :items="menu" />
+      </template>
     </template>
   </v-list>
 </template>
