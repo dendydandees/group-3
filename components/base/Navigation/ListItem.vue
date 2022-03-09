@@ -1,21 +1,20 @@
 <template>
-  <div>
-    <v-list-item
-      v-for="({ title, icon, to }, index) in items"
-      :key="index"
-      :to="to"
-      nuxt
-      :ripple="{ class: `white--text` }"
-      active-class="item-group-sidebar-active"
-      class="my-0 px-6 rounded-0 item-group-sidebar"
-    >
-      <v-list-item-icon>
-        <v-icon size="32" v-text="icon" />
-      </v-list-item-icon>
+  <v-list-item
+    :to="items.to"
+    nuxt
+    link
+    :ripple="{ class: `white--text` }"
+    active-class="item-group-sidebar-active"
+    class="my-0 rounded-0 item-group-sidebar"
+  >
+    <v-list-item-icon>
+      <v-icon large v-text="items.icon" />
+    </v-list-item-icon>
 
-      <v-list-item-title v-text="title" />
-    </v-list-item>
-  </div>
+    <v-list-item-content>
+      <v-list-item-title v-text="items.title" />
+    </v-list-item-content>
+  </v-list-item>
 </template>
 
 <script lang="ts">
@@ -25,7 +24,7 @@ export default defineComponent({
   name: 'NavigationListItem',
   props: {
     items: {
-      type: Array,
+      type: Object,
       required: true,
     },
   },
