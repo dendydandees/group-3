@@ -13,7 +13,6 @@
         <v-spacer />
 
         <v-btn
-          depressed
           text
           :loading="dialogSettings.loading"
           :disabled="dialogSettings.loading"
@@ -24,7 +23,6 @@
         </v-btn>
 
         <v-btn
-          depressed
           :loading="dialogSettings.loading"
           :disabled="dialogSettings.loading"
           :color="dialogSettings.submitColor"

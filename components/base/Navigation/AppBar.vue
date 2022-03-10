@@ -41,7 +41,12 @@
           class="pa-0"
           v-on="on"
         >
-          <v-icon size="48" class="mr-0 mr-md-2 mt-0 mt-md-1" color="primary">
+          <v-icon
+            left
+            size="48"
+            class="mr-0 mr-md-2 mt-0 mt-md-1"
+            color="primary"
+          >
             {{ $vuetify.breakpoint.mobile ? 'mdi-account-circle' : '$profile' }}
           </v-icon>
 
@@ -66,19 +71,13 @@
       <v-card>
         <v-list-item-content class="justify-center">
           <div class="mx-auto text-center">
-            <v-btn
-              depressed
-              rounded
-              nuxt
-              to="/account-profiles"
-              color="primary"
-            >
+            <v-btn rounded nuxt to="/account-profiles" color="primary">
               Profile
             </v-btn>
 
             <v-divider class="my-3" />
 
-            <v-btn depressed rounded text @click="doLogout"> Log out </v-btn>
+            <v-btn rounded text @click="doLogout"> Log out </v-btn>
           </div>
         </v-list-item-content>
       </v-card>

@@ -127,7 +127,6 @@
               <v-spacer />
 
               <v-btn
-                depressed
                 text
                 :disabled="formSettings.loading"
                 :loading="formSettings.loading"
@@ -138,7 +137,6 @@
               </v-btn>
 
               <v-btn
-                depressed
                 color="primary"
                 type="submit"
                 :disabled="invalid || formSettings.loading"

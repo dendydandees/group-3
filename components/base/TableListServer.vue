@@ -279,10 +279,8 @@
         <v-btn
           v-if="isShowActions.detail"
           small
-          depressed
           :loading="loading"
           color="primary"
-          elevation="0"
           class="ma-2"
           @click="getDetailItem(item)"
         >
@@ -292,13 +290,11 @@
         <v-btn
           v-if="isShowActions.download"
           small
-          depressed
           download
           :href="item.labelPath || ''"
           :loading="loading"
           :disabled="!item.labelPath"
           color="info"
-          elevation="0"
           class="ma-2"
         >
           Download

@@ -66,7 +66,6 @@
             <v-spacer />
 
             <v-btn
-              depressed
               outlined
               color="primary"
               :disabled="$fetchState.pending || status.copied"

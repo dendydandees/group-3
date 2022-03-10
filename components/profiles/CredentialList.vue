@@ -35,7 +35,6 @@
             <v-btn
               v-if="!credential.revokedAt"
               icon
-              depressed
               :disabled="status.copied"
               @click="$emit('doCopy', credential.appId, 'key')"
             >
@@ -60,7 +59,6 @@
             <v-btn
               v-if="!credential.revokedAt"
               icon
-              depressed
               :disabled="status.copied"
               @click="$emit('doCopy', credential.appSecret, 'key')"
             >
@@ -72,7 +70,6 @@
         <v-list-item-action>
           <v-btn
             v-if="!credential.revokedAt && $vuetify.breakpoint.smAndUp"
-            depressed
             text
             color="error"
             :disabled="status.copied"
@@ -85,7 +82,6 @@
           <v-btn
             v-if="!credential.revokedAt && $vuetify.breakpoint.xsOnly"
             icon
-            depressed
             color="error"
             :disabled="status.copied"
             class="mx-2"
