@@ -14,7 +14,7 @@ interface GetRuleGroups {
 interface inputAddRules {
   data: Rule,
   id: string,
-  ruleId: string;
+  ruleID: string;
 }
 
 export const state = () => ({
@@ -67,9 +67,17 @@ export const actions: ActionTree<RootStateLControls, RootStateLControls> = {
       return error;
     }
   },
-  async deleteRules({ commit }, { id, ruleId }: inputAddRules) {
+  async deleteRules({ commit }, { id, ruleID }: inputAddRules) {
     try {
-      const response = await this?.$axios?.$delete(`/api/clients/rule-groups/${ id ?? '' }/rules/${ ruleId ?? '' }`);
+      const response = await this?.$axios?.$delete(`/api/clients/rules/${ ruleID ?? '' }`);
+      return response;
+    } catch (error) {
+      return error;
+    }
+  },
+  async deleteRuleGroups({ commit }, ruleGroupID: string) {
+    try {
+      const response = await this?.$axios?.$delete(`/api/clients/rule-groups/${ ruleGroupID ?? '' }`);
       return response;
     } catch (error) {
       return error;

@@ -2,18 +2,19 @@
   <div>
     <v-dialog v-model="dialogComp" persistent max-width="600">
       <v-card
+        v-if="!isRule"
         class="rounded-xl pa-6"
       >
         <LcontrolDropdownCustom
-          v-model="selectedCountry.value"
-          :label="'Country'"
-          :placeholder="'Country'"
+          v-model="selectedRuleGroup.country"
+          :label="'Zone'"
+          :placeholder="'Zone'"
           :data="zones"
           :item-show="{text: 'country', value: 'country'}"
           class="pb-3"
         />
         <LcontrolDropdownCustom
-          v-model="selectedService.value"
+          v-model="selectedRuleGroup.service"
           :label="'Service Type'"
           :placeholder="'Service Type'"
           :data="serviceTypes"
@@ -21,55 +22,13 @@
           class="pb-3"
         />
         <LcontrolDropdownCustom
-          v-model="selectedDefaultPartner.value"
+          v-model="selectedRuleGroup.defaultPartner"
           :label="'Default Partner'"
           :placeholder="'Default Partner'"
           :data="marketplaces"
           :item-show="{text: 'name', value: 'id'}"
           class="pb-3"
         />
-        <!-- <LcontrolBorderHorizontal
-          class="my-6"
-        /> -->
-        <!-- <div
-          v-if="!isAddRule.status"
-        >
-          <div
-            class="subtitle-2"
-          >
-            Optional*
-          </div>
-          <v-btn
-            color="blue darken-1 white--text"
-            @click="actionAddRule()"
-          >
-            + Add Rule
-          </v-btn>
-        </div>
-        <div
-          v-else
-        >
-          <div
-            class="h-5 font-weight-medium"
-          >
-            Rule
-          </div>
-          <div>
-            <LcontrolRulePartner
-              v-for="(x, i) in arrPartner.data"
-              :key="i"
-              v-model="x.ruleDefinitions"
-              :index="i"
-            />
-          </div>
-          <v-btn
-            v-if="arrPartner.data.length < 3"
-            color="blue darken-1 white--text"
-            @click="addDeleteRule('+')"
-          >
-            + add network partner
-          </v-btn>
-        </div> -->
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
@@ -81,8 +40,87 @@
           </v-btn>
           <v-btn
             color="blue darken-1 white--text"
-            :disabled="disabledBtn()"
+            :disabled="disabledBtn('ruleGroup')"
             @click="addRuleGroup()"
+          >
+            Save
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+      <v-card
+        v-else
+        class="rounded-xl pa-6"
+      >
+        <LcontrolDropdownCustom
+          v-model="selectedRule.partnerID"
+          :label="'Partner'"
+          :placeholder="'Partner'"
+          :data="marketplaces"
+          :item-show="{text: 'name', value: 'id'}"
+          class="pb-3"
+        />
+        <LcontrolDropdownCustom
+          v-model="selectedRule.priority"
+          :label="'Priority'"
+          :placeholder="'Priority'"
+          :data="priorities"
+          :item-show="{text: 'name', value: 'value'}"
+          class="pb-3"
+        />
+        <v-row
+          class="justify-end"
+        >
+          <v-btn
+            color="blue darken-1 white--text"
+            class="mt-5 mr-4"
+            :disabled="disabledBtn('rule') || (ruleAdd.length >= 1)"
+            @click="addRuleBtn(ruleAdd.length + 1)"
+          >
+            + Add Rule
+          </v-btn>
+        </v-row>
+        <v-row
+          v-for="(x, i) in ruleAdd"
+          :key="i"
+          class="mt-0"
+        >
+          <v-col v-if="x.id === i + 1" cols="4">
+            <LcontrolDropdownCustom
+              v-model="x[`type`]"
+              :label="'Type'"
+              :placeholder="'Type'"
+              :data="ruleType"
+              :item-show="{text: 'name', value: 'value'}"
+            />
+          </v-col>
+          <v-col
+            v-if="(x.id === i + 1 )&& x[`type`]"
+          >
+            <LcontrolDropdownCustom
+              v-model="x[`value`]"
+              :label="'Value'"
+              :placeholder="'Value'"
+              :data="dataOptByType(x[`type`])"
+              :item-show="itemShowByType(x[`type`])"
+            />
+          </v-col>
+        </v-row>
+        <v-card-actions
+          class="mt-4"
+        >
+
+          <v-spacer></v-spacer>
+          <v-btn
+            color="grey darken-1"
+            text
+            @click="toggle()"
+          >
+            Cancel
+          </v-btn>
+          <v-btn
+            color="blue darken-1 white--text"
+            :disabled="disabledBtn('rule')  || disabledBtn('plusRule')"
+            @click="addRules()"
           >
             Save
           </v-btn>
@@ -117,6 +155,10 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    isRule: {
+      type: Boolean,
+      default: false,
+    },
     item: {
       type: Object,
       default: () => ({}),
@@ -129,15 +171,39 @@ export default defineComponent({
     const serviceTypes = ref([ ...storeFilters.state.filters.serviceTypes ])
     const zones = ref([...storeFilters.state.filters.zones ])
     const marketplaces = computed(() => storeMarketplaces.state.marketplaces.marketplaces.marketplaces)
+    const ruleAdd = ref([])
 
-    const selectedCountry = reactive ({
-      value: ''
+    const ruleType = computed(() => ([
+      {
+        name: 'Zone',
+        value: 'RULE_TYPE_ZONE'
+      }
+    ]))
+
+    const priorities = computed(() => ([
+      {
+        name: 'Primary',
+        value: 1
+      },
+      {
+        name: 'Secondary',
+        value: 2
+      },
+      {
+        name: 'Tertiary',
+        value: 3
+      }
+    ]))
+
+    const selectedRuleGroup = reactive ({
+      country: '',
+      service: '',
+      defaultPartner: ''
     })
-    const selectedService = reactive ({
-      value: ''
-    })
-    const selectedDefaultPartner = reactive ({
-      value: ''
+    const selectedRule = reactive ({
+      priority: '',
+      partnerID: '',
+      definitions: ''
     })
 
     const arrPartner = reactive({
@@ -160,15 +226,60 @@ export default defineComponent({
     const toggle = () => {
       emit('toggle')
     }
+    const addRuleBtn = (id: number) => {
+      const data = {
+        [`type`]: '',
+        [`value`]: '',
+        id
+      }
+      ruleAdd.value = [...ruleAdd.value, data ]
+    }
+
+    watch(
+      ruleAdd,
+      (newRuleAdd) => {
+        if(newRuleAdd) {
+          // alert(JSON.stringify(newRuleAdd))
+        }
+      },
+      { deep: true }
+    )
     const addRuleGroup = () => {
       emit('addRuleGroup', {
-        defaultPartnerID: selectedDefaultPartner.value,
-        serviceType: selectedService.value,
-        countryCode: selectedCountry.value
+        defaultPartnerID: selectedRuleGroup.defaultPartner,
+        serviceType: selectedRuleGroup.service,
+        countryCode: selectedRuleGroup.country
+      })
+    }
+    const addRules = () => {
+      emit('addRules', {
+        partnerID: selectedRule.partnerID,
+        priority: selectedRule.priority,
+        definitions: ruleAdd.value && ruleAdd.value.length > 0 ? ruleAdd.value : null
       })
     }
     const actionAddRule = () => {
       isAddRule.status = !isAddRule.status
+    }
+
+    const dataOptByType = (name: string) => {
+      switch (name) {
+        case 'RULE_TYPE_ZONE':
+          return zones.value
+
+        default:
+          return zones.value
+      }
+    }
+
+    const itemShowByType = (name: string) => {
+      switch (name) {
+        case 'RULE_TYPE_ZONE':
+          return {text: 'zoneName', value: 'zoneName'}
+
+        default:
+          return {text: 'zoneName', value: 'zoneName'}
+      }
     }
 
     const addDeleteRule = (status: String, index: number)=> {
@@ -233,22 +344,48 @@ export default defineComponent({
       await fetchZones()
       await fetchServices()
       await fetchMarketplace(
-        selectedCountry.value,
-        selectedService.value
+        selectedRuleGroup.country,
+        selectedRuleGroup.service
       )
       zones.value =  [ ...storeFilters.state.filters.zones]
       serviceTypes.value =  [ ...storeFilters.state.filters.serviceTypes]
     })
 
-    const disabledBtn = () => {
-      if(
-        !selectedCountry.value ||
-        !selectedService.value ||
-        !selectedDefaultPartner.value
-      ) {
-        return true
-      } else {
+    const disabledBtn = (name: string) => {
+      if(name === 'rule') {
+        if(
+          !selectedRule.partnerID ||
+          !selectedRule.priority
+        ) {
+          return true
+        } else {
+          return false
+        }
+
+      } else if(name === 'plusRule') {
         return false
+        // if(
+        //   !selectedRule.partnerID ||
+        //   !selectedRule.priority ||
+        //   (ruleAdd.value.filter(x => (Object.values(x)).filter(o => !o)).length > 0)
+        // ) {
+        //   console.log(ruleAdd.value.filter(x => (Object.values(x)).filter(o => !o)))
+        //   return true
+        // } else {
+        //   return false
+        // }
+
+      } else if(name === 'ruleGroup') {
+        if(
+          !selectedRuleGroup.country ||
+          !selectedRuleGroup.service ||
+          !selectedRuleGroup.defaultPartner
+        ) {
+          return true
+        } else {
+          return false
+        }
+
       }
     }
 
@@ -257,18 +394,32 @@ export default defineComponent({
       (newDialogComp) => {
         if(newDialogComp) {
           fetch()
-          selectedCountry.value = ''
-          selectedService.value = ''
-          selectedDefaultPartner.value = ''
+          selectedRuleGroup.country = ''
+          selectedRuleGroup.service = ''
+          selectedRuleGroup.defaultPartner = ''
+
+          if(props.isRule) {
+            selectedRule.partnerID = ''
+            selectedRule.priority = ''
+            ruleAdd.value = []
+
+          }
+        } else if(!newDialogComp) {
+          if(!props.isRule) {
+            fetchMarketplace(
+              selectedRuleGroup.country,
+              selectedRuleGroup.service
+            )
+          }
         }
       },
       { deep: true }
     )
     watch(
-      [selectedService, selectedCountry],
+      [() => (selectedRuleGroup.service), () => (selectedRuleGroup.country)],
       ([newSelectedService, newSelectedCountry]) => {
-        fetchMarketplace(newSelectedCountry.value, newSelectedService.value)
-        selectedDefaultPartner.value = ''
+        fetchMarketplace(newSelectedCountry, newSelectedService)
+        selectedRuleGroup.defaultPartner = ''
       },
       { deep: true }
     )
@@ -283,10 +434,16 @@ export default defineComponent({
       serviceTypes,
       zones,
       marketplaces,
-      selectedCountry,
-      selectedService,
-      selectedDefaultPartner,
-      disabledBtn
+      selectedRuleGroup,
+      disabledBtn,
+      selectedRule,
+      priorities,
+      addRuleBtn,
+      ruleAdd,
+      ruleType,
+      dataOptByType,
+      itemShowByType,
+      addRules
     }
   },
 })

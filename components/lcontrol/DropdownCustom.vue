@@ -98,7 +98,6 @@ export default defineComponent({
     const selectedComp = computed({
       get: () => props.value,
       set: (value: String) => {
-        // console.log(value)
         emit('input', value)
       }
     })

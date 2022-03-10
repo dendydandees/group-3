@@ -2,11 +2,14 @@
   <v-data-table
     :item-key="itemKey"
     :items="items"
+    :loading="loading"
     :headers="headers"
     :footer-props="footerProps"
     :server-items-length="meta.totalCount"
+    :hide-default-footer="hideDefaultFooter"
     :options.sync="pagination"
-    :loading="loading"
+    :single-expand="expandedOption.singleExpand"
+    :show-expand="expandedOption.showExpand"
     class="elevation-2"
     @update:options="fetch"
   >
@@ -133,7 +136,108 @@
         {{ $customUtils.setServiceType(item.serviceType) }}
       </v-chip>
     </template>
+    <template #expanded-item="{ headers, item }">
+      <td
+        :colspan="headers.length"
+        class="expandable-custom"
+      >
+        <div
+          class="d-flex align-center justify-space-between py-3 border-bottom"
+        >
+          <div
+            class="font-weight-bold"
+          >
+            RULE LIST
+          </div>
+          <v-btn
+            @click="addRuleModal(item.id)"
+          >
+            New rules
+          </v-btn>
+        </div>
+        <v-card
+          v-for="(x,i) in item.Rules"
+          :key="i"
+        >
+          <div
+            class="d-flex align-center border-bottom"
+          >
+            <v-col
+              cols="1"
+            >
+              {{ x.priority }}
+            </v-col>
+            <v-col
+              class="ml-16"
+              cols="4"
+            >
+              {{ findNamePartner(x.partnerID) }}
+            </v-col>
+            <v-col
+              class="d-flex justify-end"
+            >
+              <v-btn
+                @click="dialogDeleteModal(x.id, 'rule')"
+              >
+                Delete Rules
+              </v-btn>
+            </v-col>
+          </div>
+          <div
+            v-for="(o, n) in x.definitions"
+            :key="n"
+            class="d-flex  border-bottom"
+          >
+            <v-col
+              cols="2"
+            >
+
+            </v-col>
+            <v-col
+              cols="4"
+            >
+              {{o.type}}
+            </v-col>
+            <v-col
+            >
+              {{o.value}}
+            </v-col>
+          </div>
+        </v-card>
+      </td>
+    </template>
+    <template #[`item.actionsLControl`]="{ item }">
+      <div class="d-flex align-center justify-end">
+        <v-btn
+          @click="dialogDeleteModal(item.id)"
+        >
+          Delete
+        </v-btn>
+      </div>
+    </template>
     <!-- End Incoming Order List Page -->
+
+    <!-- Start Incoming L-Control Page -->
+    <template #[`item.defaultPartner`]="{ item }">
+      <v-row class="text--secondary my-2">
+        <v-col
+          class="mb-2 font-weight-bold subtitle-2 text-no-wrap"
+          cols="5"
+        >
+          {{ findNamePartner(item.defaultPartnerID)}}
+        </v-col>
+        <v-col cols="3">
+          <v-chip small color="info" class="text-uppercase mb-2 white--text">
+            {{ $customUtils.setServiceType(item.serviceType) }}
+          </v-chip>
+
+        </v-col>
+        <!-- <p class="mb-1">
+          {{ item.serviceType }}
+        </p> -->
+      </v-row>
+    </template>
+    <!-- End Incoming L-Control Page -->
 
     <!-- Actions button list -->
     <template #[`item.actions`]="{ item }">
@@ -172,14 +276,22 @@
 
 <script lang="ts">
 import {
-  defineComponent,
-  reactive,
   computed,
+  defineComponent,
+  useFetch,
+  useStore,
+  reactive,
+  watch,
+  ref,
+  Ref,
+  useMeta,
+  useRouter,
   PropType,
 } from '@nuxtjs/composition-api'
 // Interfaces and types
 import { DataOptions, DataTableHeader, ItemGroup } from 'vuetify'
 import { ActionsTable, FilterDetails, Meta } from '~/types/applications'
+import { Marketplace, VuexModuleMarketplaces, PartnerServiceZone } from '~/types/marketplace/marketplace'
 
 export default defineComponent({
   props: {
@@ -191,9 +303,18 @@ export default defineComponent({
       type: Boolean as PropType<Boolean>,
       default: false,
     },
+    expandedOption: {
+      type: Object as PropType<{singleExpand: Boolean, showExpand: Boolean}>,
+      default: () => ({singleExpand: true,
+      showExpand: false}),
+    },
     itemKey: {
       type: String as PropType<String>,
       required: true,
+    },
+    hideDefaultFooter: {
+      type: Boolean as PropType<Boolean>,
+      default: false
     },
     items: {
       type: Array as () => PropType<ItemGroup<[]>>,
@@ -218,6 +339,9 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
+    const storeMarketplaces = useStore<VuexModuleMarketplaces>()
+    const marketplaces = computed(() => storeMarketplaces.state.marketplaces.marketplaces.marketplaces)
+
     const pagination = computed({
       get: () => props.value,
       set: (value: DataOptions) => emit('input', value),
@@ -233,13 +357,37 @@ export default defineComponent({
     const getDetailItem = (data: {}) => {
       emit('doGetDetails', data)
     }
+    const addRuleModal = (ruleGroupID: string) => {
+      emit('addRuleModal', ruleGroupID)
+    }
+    const dialogDeleteModal = (ruleID: string, name: string) => {
+      emit('dialogDeleteModal', {id: ruleID, name})
+    }
+
+    const findNamePartner = (id: string) => {
+      return marketplaces.value.filter(x => x.id === id)[0]?.name
+    }
 
     return {
       pagination,
       footerProps,
       fetch,
       getDetailItem,
+      addRuleModal,
+      dialogDeleteModal,
+      marketplaces,
+      findNamePartner
     }
   },
 })
 </script>
+<style lang="scss">
+  .expandable-custom {
+    .border-bottom {
+      border-bottom: 1px solid rgba(128, 128, 128, 0.322);
+    }
+    .v-card {
+      border-radius: unset !important;
+    }
+  }
+</style>
