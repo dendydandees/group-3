@@ -14,7 +14,7 @@
         </v-btn>
       </v-col>
     </v-row>
-    <v-row>
+    <!-- <v-row>
       {{JSON.stringify(lControls)}}
       <v-col>
         <v-btn
@@ -23,7 +23,7 @@
           Add rules
         </v-btn>
       </v-col>
-    </v-row>
+    </v-row> -->
     <LcontrolCreateForm
       :dialog="dialog.status"
       @toggle="toggle()"
