@@ -152,8 +152,7 @@
       :timeout="2000"
       rounded="pill"
       right
-      top
-      class="ma-6"
+      bottom
       :color="alert.type"
     >
       {{ alert.message }}

@@ -32,6 +32,13 @@
   overflow: hidden;
 }
 
+.v-footer {
+  border-radius: 24px !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
 // input fields style
 .v-input fieldset {
   color: $primary !important;

@@ -10,7 +10,9 @@
     <BaseNavigationAppBar :mini="mini" @doShowSideNav="doShowSideNav" />
 
     <v-main class="base">
-      <Nuxt />
+      <Nuxt style="margin-bottom: 20rem" />
+
+      <BaseNavigationFooter />
     </v-main>
   </v-app>
 </template>

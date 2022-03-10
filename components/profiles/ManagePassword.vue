@@ -23,7 +23,7 @@
                 <v-alert
                   v-if="alert.isShow && alert.message.includes('Password')"
                   :type="alert.type"
-                  tile
+                  rounded="xl"
                   class="mb-10"
                 >
                   {{ alert.message }}
