@@ -2,7 +2,7 @@
   <section class="pa-4 pa-md-10 py-8 marketplace">
     <BaseHeadlinePageCustom
       title="L-Control"
-      subtitle="Find and connect with our best vendors"
+      subtitle="Automate your process"
     >
     </BaseHeadlinePageCustom>
     <v-row align="center">
@@ -24,10 +24,42 @@
         </v-btn>
       </v-col>
     </v-row> -->
+    <v-row align="center">
+      <v-col cols="12">
+        <BaseTableListServer
+          v-model="pagination"
+          item-key="id"
+          :loading="$fetchState.pending"
+          :items="lControls"
+          :headers="headers"
+          :hide-default-footer="true"
+          :meta="meta"
+          :expanded-option="expandedOption"
+          @addRuleModal="addRuleModal"
+          @dialogDeleteModal="dialogDeleteModal"
+        />
+      </v-col>
+    </v-row>
     <LcontrolCreateForm
-      :dialog="dialog.status"
-      @toggle="toggle()"
+      :dialog="dialog.ruleGroup"
+      @toggle="toggle('ruleGroup')"
       @addRuleGroup="addRuleGroup"
+    />
+    <LcontrolCreateForm
+      :is-rule="true"
+      :dialog="dialog.rule"
+      @toggle="toggle('rule')"
+      @addRules="addRules"
+    />
+    <BaseModalConfirm
+      v-model="dialog.deleteRule"
+      :dialog-settings="dialogSettings"
+      @doSubmit="deleteRules"
+    />
+    <BaseModalConfirm
+      v-model="dialog.deleteRuleGroup"
+      :dialog-settings="dialogSettings"
+      @doSubmit="deleteRuleGroups"
     />
   </section>
 </template>
@@ -41,12 +73,15 @@ import {
   reactive,
   watch,
   ref,
+  Ref,
   useMeta,
   useRouter,
+  PropType,
 } from '@nuxtjs/composition-api'
 // Interfaces or types
 import { VuexModuleLControls,Definition,Rule,RuleGroup } from '~/types/lControl/lControl'
-import { VuexModuleApplications } from '~/types/applications'
+import { VuexModuleApplications, ModalConfirm } from '~/types/applications'
+import { Marketplace, VuexModuleMarketplaces, PartnerServiceZone } from '~/types/marketplace/marketplace'
 
 
 export default defineComponent({
@@ -54,25 +89,101 @@ export default defineComponent({
   layout: 'default',
   setup() {
     // store manage
+    const storeMarketplaces = useStore<VuexModuleMarketplaces>()
     const storeLControls = useStore<VuexModuleLControls>()
     const storeApplications = useStore<VuexModuleApplications>()
+    const marketplaces = computed(() => storeMarketplaces.state.marketplaces.marketplaces.marketplaces)
     const lControls = computed(() => storeLControls.state.lControls.lControls.lControls)
     const meta = computed(() => storeLControls.state.lControls.lControls.meta)
+    const pagination = ref({
+      ...storeApplications.state.applications.pagination,
+    })
+    const expandedOption = ref({
+      singleExpand: true,
+      showExpand: true
+    })
+    const ruleGroupID = ref('')
+    const ruleID = ref('')
+
+    const headers = reactive([
+      {
+        text: 'Country',
+        value: 'countryCode',
+        sortable: false,
+      },
+      {
+        text: 'Default Partner',
+        value: 'defaultPartner',
+        sortable: false,
+      },
+      {
+        text: '',
+        value: 'actionsLControl',
+        sortable: false,
+      },
+      {
+        text: '',
+        value: 'data-table-expand' ,
+        sortable: false,
+      },
+    ])
 
     const method = reactive({
       opt: 'add'
     })
     const dialog = reactive({
-      status: false
+      ruleGroup: false,
+      rule: false,
+      deleteRule: false,
+      deleteRuleGroup: false,
     })
-    const toggle = () => {
+    const dialogSettings = ref({
+      loading: false,
+      title: 'Are you sure you want to delete this rule?',
+      content: '',
+      cancelText: 'No',
+      submitText: 'Yes',
+      submitColor: '',
+    }) as Ref<ModalConfirm>
+
+    const toggle = (key: string) => {
       if (method.opt === 'add' || method.opt === 'edit') {
-        dialog.status = !dialog.status
+        switch (key) {
+          case 'rule':
+            dialog.rule = !dialog.rule
+            break;
+          default:
+            dialog.ruleGroup = !dialog.ruleGroup
+            break;
+        }
+
       }
     }
     const addPartner = () => {
-      toggle()
+      toggle('ruleGroup')
     }
+
+    const addRuleModal = (id: string) => {
+      ruleGroupID.value = id
+      toggle('rule')
+    }
+
+
+    const dialogDeleteModal = (data: {id: string, name: string}) => {
+      switch (data.name) {
+        case 'rule':
+          dialog.deleteRule = true
+          ruleID.value = data.id
+          break;
+
+        default:
+          dialog.deleteRuleGroup = true
+          ruleGroupID.value = data.id
+          dialogSettings.value.title = 'Are you sure you want to delete this rule group?'
+          break;
+      }
+    }
+
 
 
     const fetchRuleGroups = async () => {
@@ -86,48 +197,63 @@ export default defineComponent({
         $fetchState.pending = false
       }
     }
-    const addRules = async () => {
+    const addRules = async (data: Rule) => {
       try {
+
+        const id = ruleGroupID.value
+        if(data.definitions) {
+          data.definitions = data.definitions.map((el, i) => {
+            delete el.id
+            return el
+          })
+        }
         const payload = {
-          id: "b4a95b88-77c8-4c32-a4a4-e2009ef55d07",
-          data: {
-            "partnerID": "6abf8aa4-f1ed-4bc1-8990-2707f287d778",
-            "priority": 1,
-            "definitions": [
-                {
-                    "type": "RULE_TYPE_ZONE",
-                    "value": "KL"
-                }
-            ]
-          }
+          id,
+          data
         }
 
         $fetchState.pending = true
 
         await storeLControls.dispatch('lControls/lControls/addRules', payload)
-        dialog.status = false
+        dialog.ruleGroup = false
         fetch()
       } catch (error) {
         return error
       } finally {
+        toggle('rule')
         $fetchState.pending = false
       }
     }
     const deleteRules  = async () => {
       try {
-        const payload = {
-          id: "b4a95b88-77c8-4c32-a4a4-e2009ef55d07",
-          ruleId: "bd8e67aa-3f02-4c08-8ceb-716a9b38aafe"
-        }
+        dialogSettings.value.loading = true
 
         $fetchState.pending = true
 
-        await storeLControls.dispatch('lControls/lControls/deleteRules', payload)
-        dialog.status = false
+        await storeLControls.dispatch('lControls/lControls/deleteRules', {ruleID: ruleID.value})
         fetch()
       } catch (error) {
         return error
       } finally {
+        dialogSettings.value.loading = false
+        dialog.deleteRule = false
+        $fetchState.pending = false
+      }
+    }
+
+    const deleteRuleGroups  = async () => {
+      try {
+        dialogSettings.value.loading = true
+
+        $fetchState.pending = true
+
+        await storeLControls.dispatch('lControls/lControls/deleteRuleGroups', ruleGroupID.value)
+        fetch()
+      } catch (error) {
+        return error
+      } finally {
+        dialogSettings.value.loading = false
+        dialog.deleteRuleGroup = false
         $fetchState.pending = false
       }
     }
@@ -149,7 +275,7 @@ export default defineComponent({
         $fetchState.pending = true
 
         await storeLControls.dispatch('lControls/lControls/addRuleGroup', data)
-        dialog.status = false
+        dialog.ruleGroup = false
         fetch()
       } catch (error) {
         return error
@@ -157,6 +283,7 @@ export default defineComponent({
         $fetchState.pending = false
       }
     }
+
 
 
     const { $fetchState, fetch } = useFetch(async () => {
@@ -171,13 +298,21 @@ export default defineComponent({
 
     return {
       dialog,
+      dialogSettings,
       method,
       toggle,
       addPartner,
       addRuleGroup,
       lControls,
       addRules,
-      deleteRules
+      addRuleModal,
+      deleteRules,
+      headers,
+      meta,
+      pagination,
+      expandedOption,
+      dialogDeleteModal,
+      deleteRuleGroups
     }
   },
   head: {},
