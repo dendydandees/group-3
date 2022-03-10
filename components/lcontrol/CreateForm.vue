@@ -1,24 +1,37 @@
 <template>
   <div>
-    <v-dialog v-model="dialogComp.status" persistent max-width="600">
+    <v-dialog v-model="dialogComp" persistent max-width="600">
       <v-card
         class="rounded-xl pa-6"
       >
         <LcontrolDropdownCustom
+          v-model="selectedCountry.value"
           :label="'Country'"
           :placeholder="'Country'"
-          :data="[]"
+          :data="zones"
+          :item-show="{text: 'country', value: 'country'}"
           class="pb-3"
         />
         <LcontrolDropdownCustom
+          v-model="selectedService.value"
+          :label="'Service Type'"
+          :placeholder="'Service Type'"
+          :data="serviceTypes"
+          :item-show="{text: 'name', value: 'name'}"
+          class="pb-3"
+        />
+        <LcontrolDropdownCustom
+          v-model="selectedDefaultPartner.value"
           :label="'Default Partner'"
           :placeholder="'Default Partner'"
-          :data="[]"
+          :data="marketplaces"
+          :item-show="{text: 'name', value: 'id'}"
+          class="pb-3"
         />
-        <LcontrolBorderHorizontal
+        <!-- <LcontrolBorderHorizontal
           class="my-6"
-        />
-        <div
+        /> -->
+        <!-- <div
           v-if="!isAddRule.status"
         >
           <div
@@ -42,12 +55,6 @@
             Rule
           </div>
           <div>
-            <!-- <LcontrolRulePartner
-              v-for="(x, i) in arrPartner.data"
-              :key="i"
-              v-model="arrPartner.data[i]"
-              :index="i"
-            /> -->
             <LcontrolRulePartner
               v-for="(x, i) in arrPartner.data"
               :key="i"
@@ -62,7 +69,7 @@
           >
             + add network partner
           </v-btn>
-        </div>
+        </div> -->
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
@@ -74,6 +81,8 @@
           </v-btn>
           <v-btn
             color="blue darken-1 white--text"
+            :disabled="disabledBtn()"
+            @click="addRuleGroup()"
           >
             Save
           </v-btn>
@@ -96,7 +105,11 @@ import {
   useRouter,
 } from '@nuxtjs/composition-api'
 // Interfaces or types
-import { RuleDefinitions,Rules,LControl } from '~/types/lcontrol'
+import { PropType } from 'vue'
+import { VuexModuleFilters, Zone, ServiceType} from '~/types/filters'
+import { Marketplace, VuexModuleMarketplaces,FilterDetails, PartnerServiceZone } from '~/types/marketplace/marketplace'
+import { RuleDefinitions,Rules,LControl } from '~/types/lcontrolOld'
+
 
 export default defineComponent({
   props: {
@@ -110,6 +123,23 @@ export default defineComponent({
     }
   },
   setup(props, {emit}) {
+    // store manage
+    const storeMarketplaces = useStore<VuexModuleMarketplaces>()
+    const storeFilters= useStore<VuexModuleFilters>()
+    const serviceTypes = ref([ ...storeFilters.state.filters.serviceTypes ])
+    const zones = ref([...storeFilters.state.filters.zones ])
+    const marketplaces = computed(() => storeMarketplaces.state.marketplaces.marketplaces.marketplaces)
+
+    const selectedCountry = reactive ({
+      value: ''
+    })
+    const selectedService = reactive ({
+      value: ''
+    })
+    const selectedDefaultPartner = reactive ({
+      value: ''
+    })
+
     const arrPartner = reactive({
       data: [
         {
@@ -129,6 +159,13 @@ export default defineComponent({
     })
     const toggle = () => {
       emit('toggle')
+    }
+    const addRuleGroup = () => {
+      emit('addRuleGroup', {
+        defaultPartnerID: selectedDefaultPartner.value,
+        serviceType: selectedService.value,
+        countryCode: selectedCountry.value
+      })
     }
     const actionAddRule = () => {
       isAddRule.status = !isAddRule.status
@@ -150,11 +187,90 @@ export default defineComponent({
           break;
       }
     }
-    watch(
-      arrPartner,
-      (newData) => {
-        console.log('Parent', newData.data)
+    const fetchZones= async () => {
+      try {
+        $fetchState.pending = true
+
+        await storeFilters.dispatch('filters/getZones')
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
       }
+    }
+    const fetchServices = async () => {
+      try {
+        $fetchState.pending = true
+
+        await storeFilters.dispatch('filters/getServiceTypes')
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+
+    const fetchMarketplace = async (country: string, service: string) => {
+      const dataParams = {
+        page:1,
+        perPage: 100,
+        country,
+        service
+      }
+
+      try {
+        $fetchState.pending = true
+
+        await storeFilters.dispatch('marketplaces/marketplaces/getMarketplaces', { params: dataParams })
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+
+    const { $fetchState, fetch } = useFetch(async () => {
+      await fetchZones()
+      await fetchServices()
+      await fetchMarketplace(
+        selectedCountry.value,
+        selectedService.value
+      )
+      zones.value =  [ ...storeFilters.state.filters.zones]
+      serviceTypes.value =  [ ...storeFilters.state.filters.serviceTypes]
+    })
+
+    const disabledBtn = () => {
+      if(
+        !selectedCountry.value ||
+        !selectedService.value ||
+        !selectedDefaultPartner.value
+      ) {
+        return true
+      } else {
+        return false
+      }
+    }
+
+    watch(
+      dialogComp,
+      (newDialogComp) => {
+        if(newDialogComp) {
+          fetch()
+          selectedCountry.value = ''
+          selectedService.value = ''
+          selectedDefaultPartner.value = ''
+        }
+      },
+      { deep: true }
+    )
+    watch(
+      [selectedService, selectedCountry],
+      ([newSelectedService, newSelectedCountry]) => {
+        fetchMarketplace(newSelectedCountry.value, newSelectedService.value)
+        selectedDefaultPartner.value = ''
+      },
+      { deep: true }
     )
     return {
       toggle,
@@ -163,6 +279,14 @@ export default defineComponent({
       actionAddRule,
       arrPartner,
       addDeleteRule,
+      addRuleGroup,
+      serviceTypes,
+      zones,
+      marketplaces,
+      selectedCountry,
+      selectedService,
+      selectedDefaultPartner,
+      disabledBtn
     }
   },
 })

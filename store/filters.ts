@@ -30,7 +30,7 @@ export const actions: ActionTree<RootStateFilter, RootStateFilter> = {
       commit('SET_LOADED', true);
     }
   },
-  async getZones({ commit, }) {
+  async getZones({ commit }) {
     try {
       const response = await this?.$axios?.$get('/api/clients/zones');
       const { zones } = response;

@@ -6,24 +6,28 @@
     >
     </BaseHeadlinePageCustom>
     <v-row align="center">
-      <v-col cols="12" md="7">
-        <!-- Search filter field -->
-        <BaseSearchFieldCustom
-          v-model="filter.search"
-          :filter="showFilter"
-        />
-      </v-col>
       <v-col>
         <v-btn
           @click="toggle()"
         >
-          tes
+          Add Country
         </v-btn>
       </v-col>
     </v-row>
+    <!-- <v-row>
+      {{JSON.stringify(lControls)}}
+      <v-col>
+        <v-btn
+          @click="addRules()"
+        >
+          Add rules
+        </v-btn>
+      </v-col>
+    </v-row> -->
     <LcontrolCreateForm
-      :dialog="dialog"
+      :dialog="dialog.status"
       @toggle="toggle()"
+      @addRuleGroup="addRuleGroup"
     />
   </section>
 </template>
@@ -41,7 +45,7 @@ import {
   useRouter,
 } from '@nuxtjs/composition-api'
 // Interfaces or types
-import { Marketplace, VuexModuleMarketplaces,FilterDetails, PartnerServiceZone } from '~/types/marketplace/marketplace'
+import { VuexModuleLControls,Definition,Rule,RuleGroup } from '~/types/lControl/lControl'
 import { VuexModuleApplications } from '~/types/applications'
 
 
@@ -50,16 +54,11 @@ export default defineComponent({
   layout: 'default',
   setup() {
     // store manage
-    const filter = reactive({
-      search: ''
-    })
-    const showFilter = reactive({
-      status: false
-    })
-    const filterIcon = reactive({
-      active: 'mdi-view-stream',
-      passive: 'mdi-view-stream-outline'
-    })
+    const storeLControls = useStore<VuexModuleLControls>()
+    const storeApplications = useStore<VuexModuleApplications>()
+    const lControls = computed(() => storeLControls.state.lControls.lControls.lControls)
+    const meta = computed(() => storeLControls.state.lControls.lControls.meta)
+
     const method = reactive({
       opt: 'add'
     })
@@ -75,14 +74,110 @@ export default defineComponent({
       toggle()
     }
 
+
+    const fetchRuleGroups = async () => {
+      try {
+        $fetchState.pending = true
+
+        await storeLControls.dispatch('lControls/lControls/getLControls', {params: {} })
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+    const addRules = async () => {
+      try {
+        const payload = {
+          id: "b4a95b88-77c8-4c32-a4a4-e2009ef55d07",
+          data: {
+            "partnerID": "6abf8aa4-f1ed-4bc1-8990-2707f287d778",
+            "priority": 1,
+            "definitions": [
+                {
+                    "type": "RULE_TYPE_ZONE",
+                    "value": "KL"
+                }
+            ]
+          }
+        }
+
+        $fetchState.pending = true
+
+        await storeLControls.dispatch('lControls/lControls/addRules', payload)
+        dialog.status = false
+        fetch()
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+    const deleteRules  = async () => {
+      try {
+        const payload = {
+          id: "b4a95b88-77c8-4c32-a4a4-e2009ef55d07",
+          ruleId: "bd8e67aa-3f02-4c08-8ceb-716a9b38aafe"
+        }
+
+        $fetchState.pending = true
+
+        await storeLControls.dispatch('lControls/lControls/deleteRules', payload)
+        dialog.status = false
+        fetch()
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+
+    const addRuleGroup = async (
+      payload: {
+        defaultPartnerID: string,
+        serviceType: string,
+        countryCode: string,
+    }) => {
+      try {
+        const {defaultPartnerID, serviceType, countryCode} = payload
+        const data = {
+          defaultPartnerID,
+          serviceType,
+          countryCode
+        }
+
+        $fetchState.pending = true
+
+        await storeLControls.dispatch('lControls/lControls/addRuleGroup', data)
+        dialog.status = false
+        fetch()
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+
+
+    const { $fetchState, fetch } = useFetch(async () => {
+      await fetchRuleGroups()
+    })
+    watch(
+      dialog,
+      (newDialog) => {
+      },
+      { deep: true }
+    )
+
     return {
-      filter,
       dialog,
       method,
       toggle,
       addPartner,
-      showFilter,
-      filterIcon,
+      addRuleGroup,
+      lControls,
+      addRules,
+      deleteRules
     }
   },
   head: {},
