@@ -142,7 +142,7 @@
         :class="`expandable-custom `"
       >
         <div
-          :class="`d-flex align-center justify-space-between py-3 border-bottom `"
+          :class="`d-flex align-center justify-space-between py-3 ${item.Rules ? 'border-bottom' : ''} `"
         >
           <div
             class="font-weight-bold"
@@ -241,7 +241,7 @@
 
     <!-- Start Incoming L-Control Page -->
     <template #[`item.countryCode`]="{ item }">
-      <div class="d-flex align-center">
+      <div class="d-flex align-center my-2">
           <country-flag
             :country="(item.countryCode)"
             size='normal'
@@ -257,22 +257,18 @@
       </div>
     </template>
     <template #[`item.defaultPartner`]="{ item }">
-      <v-row class="text--secondary my-2">
-        <v-col
-          class="font-weight-bold subtitle-2 text-no-wrap align-center"
-          cols="5"
-        >
-          {{ findNamePartner(item.defaultPartnerID)}}
-        </v-col>
-        <v-col cols="3">
-          <v-chip small color="info" class="text-uppercase white--text">
+      <v-row class="text--secondary my-2 px-4">
+        <div>
+          <v-chip small color="info" class="text-uppercase white--text mr-3">
             {{ $customUtils.setServiceType(item.serviceType) }}
           </v-chip>
 
-        </v-col>
-        <!-- <p class="mb-1">
-          {{ item.serviceType }}
-        </p> -->
+        </div>
+        <div
+          class="font-weight-bold subtitle-2 text-no-wrap align-center"
+        >
+          {{ findNamePartner(item.defaultPartnerID)}}
+        </div>
       </v-row>
     </template>
     <!-- End Incoming L-Control Page -->
