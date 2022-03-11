@@ -240,16 +240,32 @@
     <!-- End Incoming Order List Page -->
 
     <!-- Start Incoming L-Control Page -->
+    <template #[`item.countryCode`]="{ item }">
+      <div class="d-flex align-center">
+          <country-flag
+            :country="(item.countryCode)"
+            size='normal'
+            :shadow="true"
+            :rounded="true"
+            :style="'margin: unset'"
+          />
+          <div
+            class="font-weight-bold"
+          >
+            {{item.countryCode}}
+          </div>
+      </div>
+    </template>
     <template #[`item.defaultPartner`]="{ item }">
       <v-row class="text--secondary my-2">
         <v-col
-          class="mb-2 font-weight-bold subtitle-2 text-no-wrap"
+          class="font-weight-bold subtitle-2 text-no-wrap align-center"
           cols="5"
         >
           {{ findNamePartner(item.defaultPartnerID)}}
         </v-col>
         <v-col cols="3">
-          <v-chip small color="info" class="text-uppercase mb-2 white--text">
+          <v-chip small color="info" class="text-uppercase white--text">
             {{ $customUtils.setServiceType(item.serviceType) }}
           </v-chip>
 
@@ -310,6 +326,7 @@ import {
   useRouter,
   PropType,
 } from '@nuxtjs/composition-api'
+import CountryFlag from 'vue-country-flag'
 // Interfaces and types
 import { DataOptions, DataTableHeader, ItemGroup } from 'vuetify'
 import { ActionsTable, FilterDetails, Meta } from '~/types/applications'
@@ -317,6 +334,9 @@ import { Marketplace, VuexModuleMarketplaces, PartnerServiceZone } from '~/types
 import { Definition, Rule, RuleGroup } from '~/types/lControl/lControl'
 
 export default defineComponent({
+  components: {
+    CountryFlag
+  },
   props: {
     value: {
       type: Object as PropType<DataOptions>,
