@@ -143,7 +143,7 @@ export default defineComponent({
       content: '',
       cancelText: 'No',
       submitText: 'Yes',
-      submitColor: '',
+      submitColor: 'red white--text',
     }) as Ref<ModalConfirm>
 
     const toggle = (key: string) => {

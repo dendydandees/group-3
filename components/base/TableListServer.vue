@@ -139,10 +139,10 @@
     <template #expanded-item="{ headers, item }">
       <td
         :colspan="headers.length"
-        class="expandable-custom"
+        :class="`expandable-custom `"
       >
         <div
-          class="d-flex align-center justify-space-between py-3 border-bottom"
+          :class="`d-flex align-center justify-space-between py-3 border-bottom `"
         >
           <div
             class="font-weight-bold"
@@ -150,14 +150,21 @@
             RULE LIST
           </div>
           <v-btn
+            small
             @click="addRuleModal(item)"
           >
-            New rules
+            <v-icon
+              small
+            >
+              mdi-plus
+            </v-icon>
+            Rules
           </v-btn>
         </div>
         <v-card
           v-for="(x,i) in item.Rules"
           :key="i"
+          class="custom-card-expand"
         >
           <div
             class="d-flex align-center border-bottom"
@@ -177,16 +184,23 @@
               class="d-flex justify-end"
             >
               <v-btn
+                icon
+                color="red"
                 @click="dialogDeleteModal(x.id, 'rule')"
               >
-                Delete Rules
+                <v-icon
+                  small
+                >
+                  mdi-trash-can
+                </v-icon>
               </v-btn>
+              <!-- Delete -->
             </v-col>
           </div>
           <div
             v-for="(o, n) in x.definitions"
             :key="n"
-            class="d-flex  border-bottom"
+            class="d-flex  border-bottom custom-rule-card"
           >
             <v-col
               cols="2"
@@ -196,7 +210,7 @@
             <v-col
               cols="4"
             >
-              {{o.type}}
+              {{ $customUtils.setRuleType(o.type) }}
             </v-col>
             <v-col
             >
@@ -209,9 +223,17 @@
     <template #[`item.actionsLControl`]="{ item }">
       <div class="d-flex align-center justify-end">
         <v-btn
+          icon
+          outlined
+          color="red"
           @click="dialogDeleteModal(item.id)"
         >
-          Delete
+          <v-icon
+            small
+          >
+            mdi-trash-can
+          </v-icon>
+          <!-- Delete -->
         </v-btn>
       </div>
     </template>
@@ -411,6 +433,20 @@ export default defineComponent({
     }
     .v-card {
       border-radius: unset !important;
+    }
+    .custom-card-expand {
+      background: transparent;
+
+      .custom-rule-card {
+        background: rgba(128, 128, 128, 0.082);
+        /* color: white; */
+      }
+    }
+  }
+  .v-data-table__expanded {
+    &:last-of-type {
+      border-bottom-left-radius: 25px;
+      border-bottom-right-radius: 25px;
     }
   }
 </style>
