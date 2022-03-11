@@ -150,7 +150,7 @@
             RULE LIST
           </div>
           <v-btn
-            @click="addRuleModal(item.id)"
+            @click="addRuleModal(item)"
           >
             New rules
           </v-btn>
@@ -292,6 +292,7 @@ import {
 import { DataOptions, DataTableHeader, ItemGroup } from 'vuetify'
 import { ActionsTable, FilterDetails, Meta } from '~/types/applications'
 import { Marketplace, VuexModuleMarketplaces, PartnerServiceZone } from '~/types/marketplace/marketplace'
+import { Definition, Rule, RuleGroup } from '~/types/lControl/lControl'
 
 export default defineComponent({
   props: {
@@ -341,6 +342,7 @@ export default defineComponent({
   setup(props, { emit }) {
     const storeMarketplaces = useStore<VuexModuleMarketplaces>()
     const marketplaces = computed(() => storeMarketplaces.state.marketplaces.marketplaces.marketplaces)
+    const marketplacesLControl = computed(() => storeMarketplaces.state.marketplaces.marketplaces.marketplacesLControl)
 
     const pagination = computed({
       get: () => props.value,
@@ -357,15 +359,35 @@ export default defineComponent({
     const getDetailItem = (data: {}) => {
       emit('doGetDetails', data)
     }
-    const addRuleModal = (ruleGroupID: string) => {
-      emit('addRuleModal', ruleGroupID)
+    const addRuleModal = (data: RuleGroup) => {
+      emit('addRuleModal', data.id)
+      // console.log('addRuleModal', data)
+      fetchMarketplace(data.countryCode, data.serviceType)
     }
     const dialogDeleteModal = (ruleID: string, name: string) => {
       emit('dialogDeleteModal', {id: ruleID, name})
     }
 
     const findNamePartner = (id: string) => {
-      return marketplaces.value.filter(x => x.id === id)[0]?.name
+      return marketplacesLControl.value.filter(x => x.id === id)[0]?.name
+    }
+    const fetchMarketplace = async (country: string, service: string) => {
+      const dataParams = {
+        page:1,
+        perPage: 100,
+        country,
+        service
+      }
+
+      try {
+        // $fetchState.pending = true
+
+        await storeMarketplaces.dispatch('marketplaces/marketplaces/getMarketplaces', { params: dataParams})
+      } catch (error) {
+        return error
+      } finally {
+        // $fetchState.pending = false
+      }
     }
 
     return {
@@ -376,6 +398,7 @@ export default defineComponent({
       addRuleModal,
       dialogDeleteModal,
       marketplaces,
+      marketplacesLControl,
       findNamePartner
     }
   },
