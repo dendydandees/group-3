@@ -7,8 +7,8 @@
       >
         <LcontrolDropdownCustom
           v-model="selectedRuleGroup.country"
-          :label="'Zone'"
-          :placeholder="'Zone'"
+          :label="'Country'"
+          :placeholder="'Country'"
           :data="zones"
           :item-show="{text: 'country', value: 'country'}"
           class="pb-3"
@@ -52,6 +52,14 @@
         class="rounded-xl pa-6"
       >
         <LcontrolDropdownCustom
+          v-model="selectedRule.zone"
+          :label="'Zone'"
+          :placeholder="'Zone'"
+          :data="zones"
+          :item-show="{text: 'zoneName', value: 'zoneName'}"
+          class="pb-3"
+        />
+        <LcontrolDropdownCustom
           v-model="selectedRule.partnerID"
           :label="'Partner'"
           :placeholder="'Partner'"
@@ -73,7 +81,7 @@
           <v-btn
             color="blue darken-1 white--text"
             class="mt-5 mr-4"
-            :disabled="disabledBtn('rule') || (ruleAdd.length >= 1)"
+            :disabled="true"
             @click="addRuleBtn(ruleAdd.length + 1)"
           >
             + Add Rule
@@ -204,18 +212,9 @@ export default defineComponent({
     const selectedRule = reactive ({
       priority: '',
       partnerID: '',
-      definitions: ''
+      definitions: '',
+      zone: '',
     })
-
-    // const arrPartner = reactive({
-    //   data: [
-    //     {
-    //       "priority": 1,
-    //       "partnerID": "partner1",
-    //       "definitions": []
-    //     }
-    //   ] as Rule[]
-    // })
 
     const dialogComp = computed({
       get: () => props.dialog,
@@ -253,10 +252,15 @@ export default defineComponent({
       })
     }
     const addRules = () => {
+      const data = {
+        type: 'RULE_TYPE_ZONE',
+        value: selectedRule.zone,
+      }
       emit('addRules', {
         partnerID: selectedRule.partnerID,
         priority: selectedRule.priority,
-        definitions: ruleAdd.value && ruleAdd.value.length > 0 ? ruleAdd.value : null
+        definitions: [data, ...ruleAdd.value]
+        // definitions: ruleAdd.value && ruleAdd.value.length > 0 ? ruleAdd.value : null
       })
     }
     const actionAddRule = () => {
@@ -282,23 +286,6 @@ export default defineComponent({
           return {text: 'zoneName', value: 'zoneName'}
       }
     }
-
-    // const addDeleteRule = (status: String, index: number)=> {
-    //   switch (status) {
-    //     case '+':
-    //       arrPartner.data.push({
-    //         "priority": arrPartner.data.length + 1,
-    //         "partnerID": ``,
-    //         "ruleDefinitions": []
-    //       })
-    //       break;
-    //     case '-':
-    //       arrPartner.data.splice(index,1);
-    //       break;
-    //     default:
-    //       break;
-    //   }
-    // }
     const fetchZones= async () => {
       try {
         $fetchState.pending = true
@@ -322,7 +309,7 @@ export default defineComponent({
       }
     }
 
-    const fetchMarketplace = async (country: string, service: string) => {
+    const fetchMarketplace = async (country: string, service: string, isLControl?: Boolean) => {
       const dataParams = {
         page:1,
         perPage: 100,
@@ -333,7 +320,7 @@ export default defineComponent({
       try {
         $fetchState.pending = true
 
-        await storeFilters.dispatch('marketplaces/marketplaces/getMarketplaces', { params: dataParams })
+        await storeFilters.dispatch('marketplaces/marketplaces/getMarketplaces', { params: dataParams, isLControl })
       } catch (error) {
         return error
       } finally {
@@ -350,11 +337,13 @@ export default defineComponent({
       )
       zones.value =  [ ...storeFilters.state.filters.zones]
       serviceTypes.value =  [ ...storeFilters.state.filters.serviceTypes]
+
     })
 
     const disabledBtn = (name: string) => {
       if(name === 'rule') {
         if(
+          !selectedRule.zone ||
           !selectedRule.partnerID ||
           !selectedRule.priority
         ) {
@@ -394,22 +383,26 @@ export default defineComponent({
       dialogComp,
       (newDialogComp) => {
         if(newDialogComp) {
-          fetch()
-          selectedRuleGroup.country = ''
-          selectedRuleGroup.service = ''
-          selectedRuleGroup.defaultPartner = ''
+          if(!props.isRule) {
+            fetch()
+            selectedRuleGroup.country = ''
+            selectedRuleGroup.service = ''
+            selectedRuleGroup.defaultPartner = ''
+
+          }
 
           if(props.isRule) {
             selectedRule.partnerID = ''
             selectedRule.priority = ''
+            selectedRule.zone = ''
             ruleAdd.value = []
-
           }
         } else if(!newDialogComp) {
           if(!props.isRule) {
             fetchMarketplace(
-              selectedRuleGroup.country,
-              selectedRuleGroup.service
+              '',
+              '',
+              true
             )
           }
         }
@@ -429,8 +422,6 @@ export default defineComponent({
       dialogComp,
       isAddRule,
       actionAddRule,
-      // arrPartner,
-      // addDeleteRule,
       addRuleGroup,
       serviceTypes,
       zones,

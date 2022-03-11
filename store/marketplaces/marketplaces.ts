@@ -11,7 +11,8 @@ import {
 } from '~/types/marketplace/detail';
 
 interface GetMarketplaces {
-  params: Meta;
+  params: Meta,
+  isLControl: Boolean;
 }
 
 const filter = {
@@ -24,6 +25,8 @@ const filter = {
 
 export const state = () => ({
   marketplaces: [] as Marketplace[] | [],
+  marketplacesLControl: [] as Marketplace[] | [],
+  loadedLControl: false as Boolean,
   meta: {
     page: 1,
     totalPage: 1,
@@ -37,6 +40,8 @@ export type RootStateMarketplaces = ReturnType<typeof state>;
 
 export const mutations: MutationTree<RootStateMarketplaces> = {
   SET_MARKETPLACES: (state, value: Marketplace[] | []) => (state.marketplaces = value),
+  SET_MARKETPLACES_LCONTROL: (state, value: Marketplace[] | []) => (state.marketplacesLControl = value),
+  SET_LOADED_LCONTROL: (state, value: Boolean) => (state.loadedLControl = value),
   SET_META: (state, value: Meta) => (state.meta = value),
   SET_FILTER: (state, value: FilterDetails) => (state.filter = value),
   RESET_FILTER: (state) => (state.filter = filter),
@@ -45,7 +50,7 @@ export const mutations: MutationTree<RootStateMarketplaces> = {
 };
 
 export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> = {
-  async getMarketplaces({ commit }, { params }: GetMarketplaces) {
+  async getMarketplaces({ commit, state }, { params, isLControl }: GetMarketplaces) {
     try {
       const response = await this?.$axios?.$get('/api/clients/partners', {
         params,
@@ -62,6 +67,10 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
 
       commit('SET_MARKETPLACES', data);
       commit('SET_META', meta);
+      if (!state.loadedLControl || isLControl) {
+        commit('SET_MARKETPLACES_LCONTROL', data);
+        commit('SET_LOADED_LCONTROL', true);
+      }
 
       return response;
     } catch (error) {
