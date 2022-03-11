@@ -139,6 +139,7 @@ import {
   reactive,
   watch,
   ref,
+  Ref,
   useMeta,
   useRouter,
 } from '@nuxtjs/composition-api'
@@ -146,7 +147,7 @@ import {
 import { PropType } from 'vue'
 import { VuexModuleFilters, Zone, ServiceType} from '~/types/filters'
 import { Marketplace, VuexModuleMarketplaces,FilterDetails, PartnerServiceZone } from '~/types/marketplace/marketplace'
-import { RuleDefinitions,Rules,LControl } from '~/types/lcontrolOld'
+import { Definition, Rule } from '~/types/lControl/lControl'
 
 
 export default defineComponent({
@@ -171,7 +172,7 @@ export default defineComponent({
     const serviceTypes = ref([ ...storeFilters.state.filters.serviceTypes ])
     const zones = ref([...storeFilters.state.filters.zones ])
     const marketplaces = computed(() => storeMarketplaces.state.marketplaces.marketplaces.marketplaces)
-    const ruleAdd = ref([])
+    const ruleAdd = ref([]) as Ref<Definition[]>
 
     const ruleType = computed(() => ([
       {
@@ -206,15 +207,15 @@ export default defineComponent({
       definitions: ''
     })
 
-    const arrPartner = reactive({
-      data: [
-        {
-          "priority": 1,
-          "partnerID": "partner1",
-          "ruleDefinitions": []
-        }
-      ] as Rules[]
-    })
+    // const arrPartner = reactive({
+    //   data: [
+    //     {
+    //       "priority": 1,
+    //       "partnerID": "partner1",
+    //       "definitions": []
+    //     }
+    //   ] as Rule[]
+    // })
 
     const dialogComp = computed({
       get: () => props.dialog,
@@ -227,7 +228,7 @@ export default defineComponent({
       emit('toggle')
     }
     const addRuleBtn = (id: number) => {
-      const data = {
+      const data: Definition = {
         [`type`]: '',
         [`value`]: '',
         id
@@ -282,22 +283,22 @@ export default defineComponent({
       }
     }
 
-    const addDeleteRule = (status: String, index: number)=> {
-      switch (status) {
-        case '+':
-          arrPartner.data.push({
-            "priority": arrPartner.data.length + 1,
-            "partnerID": ``,
-            "ruleDefinitions": []
-          })
-          break;
-        case '-':
-          arrPartner.data.splice(index,1);
-          break;
-        default:
-          break;
-      }
-    }
+    // const addDeleteRule = (status: String, index: number)=> {
+    //   switch (status) {
+    //     case '+':
+    //       arrPartner.data.push({
+    //         "priority": arrPartner.data.length + 1,
+    //         "partnerID": ``,
+    //         "ruleDefinitions": []
+    //       })
+    //       break;
+    //     case '-':
+    //       arrPartner.data.splice(index,1);
+    //       break;
+    //     default:
+    //       break;
+    //   }
+    // }
     const fetchZones= async () => {
       try {
         $fetchState.pending = true
@@ -428,8 +429,8 @@ export default defineComponent({
       dialogComp,
       isAddRule,
       actionAddRule,
-      arrPartner,
-      addDeleteRule,
+      // arrPartner,
+      // addDeleteRule,
       addRuleGroup,
       serviceTypes,
       zones,
