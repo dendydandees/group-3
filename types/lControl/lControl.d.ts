@@ -8,8 +8,8 @@ export interface VuexModuleLControls {
 
 
 export interface Definition {
-  id: string,
-  ruleID: string,
+  id?: string | number,
+  ruleID?: string,
   type: string,
   value: string;
 }

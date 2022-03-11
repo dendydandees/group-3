@@ -202,7 +202,7 @@ export default defineComponent({
 
         const id = ruleGroupID.value
         if(data.definitions) {
-          data.definitions = data.definitions.map((el, i) => {
+          data.definitions = data.definitions.map((el: Definition, i) => {
             delete el.id
             return el
           })
