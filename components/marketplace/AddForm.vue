@@ -1,8 +1,9 @@
 <template>
-  <div>
+  <div
+  >
     <v-dialog v-model="dialogComp" persistent max-width="450">
       <v-card
-        class="rounded-xl pa-2"
+        class="rounded-xl pa-2 add-form-marketplace"
       >
         <v-card-title class="h-5 text-break">
           Are you sure you want to connect with {{data.name}}?
@@ -91,3 +92,11 @@ export default defineComponent({
   },
 })
 </script>
+<style lang="scss">
+  .add-form-marketplace {
+    &.v-card {
+      background-color: unset !important;
+      backdrop-filter: blur(21px) brightness(1.4) !important;
+    }
+  }
+</style>
