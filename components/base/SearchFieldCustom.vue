@@ -13,7 +13,6 @@
     rounded
     outlined
     class="input-custom"
-    :suffix="!search ? 'Filter' : null"
     :append-icon="customAppendIcon(showFilterComp.status, search, icon)"
     @click:append="showFilterComp.status = !showFilterComp.status"
   />

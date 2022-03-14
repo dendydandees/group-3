@@ -5,152 +5,208 @@
       subtitle="Find and connect with our best vendors"
     >
     </BaseHeadlinePageCustom>
-    <v-row align="center">
-      <v-col cols="12" md="7">
-        <!-- Search filter field -->
-        <BaseSearchFieldCustom
-          v-model="filter.search"
-          :filter="showFilter"
-          :icon="filterIcon"
-        />
-      </v-col>
-    </v-row>
-    <v-row
-      v-if="filter.search || showFilter.status"
-    >
-      <v-col cols="4" md="3">
-        <v-select
-          v-model="selectedZone.value"
-          :items="zones"
-          item-text="country"
-          item-value="country"
-          label="Country"
-          outlined
-          rounded
-          dense
-          color="blue"
-          class="custom-select pb-3"
-          clearable
-        >
-        </v-select>
-        <v-select
-          :items="[]"
-          label="Ports"
-          outlined
-          rounded
-          dense
-          color="blue"
-          class="custom-select"
-          clearable
-        >
-        </v-select>
-      </v-col>
-      <v-col
-        v-if="serviceTypes && serviceTypes.length > 0"
-        align-self="center"
-        cols="4"
-        md="4"
-      >
-        <div
-          class="red--text font-weight-bold subtitle-2"
-        >
-          Types
-        </div>
-        <div
-        >
-          <v-chip-group
-            v-model="selectedServiceTypes.arrValue"
-            multiple
-            active-class="blue accent-4 white--text"
-
-            column
-          >
-            <v-chip
-              v-for="(chip, i) in serviceTypes"
-              :key="i"
-              :value="chip.name"
-              small
-              class="custom-chips"
-            >
-              {{chip.name}}
-            </v-chip>
-
-          </v-chip-group>
-        </div>
-      </v-col>
-    </v-row>
     <v-row
       class="mt-6"
     >
-      <v-col v-if="!filter.search && !filter.country && !filter.service" cols="12" md="12">
-        <h1 class="headline font-weight-bold mb-2 text-capitalize">
-          Featured Network <br>
-          Partners
-        </h1>
-        <carousel-3d
-          :perspective="0"
-          :space="330"
-          :display="5"
-          :height="350"
-          :width="500"
-          :autoplay="true"
+      <v-col
+        cols="7"
+        class="pa-0"
+      >
+        <BaseSearchFieldCustom
+          v-model="filter.search"
+          class="mb-14"
+        />
+        <div
+          v-if="!filter.search && !filter.country && !filter.service"
         >
-          <slide
-            v-for="(slide, i) in slides"
-            :key="i"
-            :index="i"
+          <h1 class="headline font-weight-bold mb-2 text-capitalize">
+            Featured Network <br>
+            Partners
+          </h1>
+          <carousel-3d
+            :perspective="0"
+            :space="200"
+            :display="3"
+            :height="475"
+            :width="586"
+            :autoplay="true"
+            :on-main-slide-click="changePage"
           >
-            <!-- <span class="title">Featured Partners #{{i + 1}}</span>
-            <p>Ninja Van</p> -->
-            <v-img
-              height="100%"
-              class="align-end opacity opacity-custom"
-
-              src="https://cdn.vuetifyjs.com/images/cards/cooking.png"
+            <slide
+              v-for="(slide, i) in marketplaces.slice(0, 5)"
+              :key="i"
+              :index="i"
+              style="cursor:pointer"
             >
-              <div
-                class="pa-4 "
+              <v-img
+                height="100%"
+                class="align-end opacity opacity-custom custom-slide"
+
+                src="https://cdn.vuetifyjs.com/images/cards/cooking.png"
+              >
+                <div class="gradation-custom">
+                  <!-- this is for gradation -->
+                </div>
+                <div
+                  class="py-7 px-10 text-custom d-flex align-center justify-space-between"
+                >
+                  <v-col
+                    class="text-h4 white--text pa-0"
+                  >
+                    {{slide.name}}
+                  </v-col>
+                  <v-col
+                    v-if="slide.partnerServiceTypes.length > 0"
+                    cols="6"
+                    class="pa-0"
+                  >
+                    <div>
+                      <v-chip
+                        v-for="(mile, i) in slide.partnerServiceTypes"
+                        :key="i"
+                        class="mr-1 my-1"
+                        color="pink"
+                        text-color="white"
+                        small
+                        disabled
+                        style="opacity: 1"
+                      >
+                        {{$customUtils.setServiceType(mile.name)}}
+                      </v-chip>
+
+                    </div>
+                  </v-col>
+                </div>
+              </v-img>
+            </slide>
+          </carousel-3d>
+
+        </div>
+      </v-col>
+      <v-col
+        class="pa-0 ml-15"
+      >
+        <v-card
+          class="pa-6 d-flex"
+          elevation="3"
+        >
+          <v-col
+            class="pa-0 mr-6"
+            cols="1"
+          >
+            <div
+              class="d-flex align-center blue--text"
+              style="height: 40px"
+            >
+              Filter
+            </div>
+          </v-col>
+          <v-col
+            class="pa-0"
+          >
+            <div
+              class="d-flex align-center justify-space-between mb-4"
+            >
+              <v-select
+                v-model="selectedZone.value"
+                :items="zones"
+                item-text="country"
+                item-value="country"
+                label="Country"
+                outlined
+                rounded
+                dense
+                color="blue"
+                class="custom-select mr-4"
+                clearable
+              >
+              </v-select>
+              <v-select
+                :items="[]"
+                label="Ports"
+                outlined
+                rounded
+                dense
+                color="blue"
+                class="custom-select"
+                clearable
+              >
+              </v-select>
+            </div>
+            <div>
+              <v-col
+                v-if="serviceTypes && serviceTypes.length > 0"
+                align-self="center"
+                class="pa-0"
               >
                 <div
-                  class="title white--text"
+                  class="red--text font-weight-bold subtitle-2 mb-3"
                 >
-                  Ninja Van
+                  Types
                 </div>
                 <div
-                  class="pb-1 body-2 white--text aling-center d-flex"
-                >
-                  <v-icon
-                    small
-                    color="white"
-                    class="mr-1"
-                  >
-                    mdi-pin
-                  </v-icon>
-                  Malaysia - Kuala Lumpur
-                </div>
-                <div
-                  class="d-flex"
+                  class="chip-group-custom"
                 >
                   <v-chip-group
-                    class="card-chip-group"
+                    v-model="selectedServiceTypes.arrValue"
+                    multiple
+                    active-class="blue accent-4 white--text"
+
+                    column
                   >
                     <v-chip
-                      v-for="(mile, i) in 4"
+                      v-for="(chip, i) in serviceTypes"
                       :key="i"
-                      class="mr-1 my-0"
-                      color="pink"
-                      text-color="white"
-                      x-small
-                      disabled
+                      :value="chip.name"
+                      small
+                      class="custom-chips"
                     >
-                      First Mile
+                      {{$customUtils.setServiceType(chip.name)}}
                     </v-chip>
+
                   </v-chip-group>
                 </div>
-              </div>
-            </v-img>
-          </slide>
-        </carousel-3d>
+              </v-col>
+            </div>
+          </v-col>
+        </v-card>
+        <div
+          v-if="!filter.search && !filter.country && !filter.service"
+        >
+          <h1 class="headline font-weight-bold mb-6  mt-16 text-capitalize">
+            Your Network <br>
+            Partners
+          </h1>
+          <div class="container-your-partner">
+            <div
+              class="wrapper-your-partner"
+            >
+              <v-row>
+                <v-col
+                  v-for="(x, i) in 6"
+                  :key="i"
+                  cols="4"
+                >
+                  <v-img
+                    :aspect-ratio="156/156"
+                    class="rounded-circle"
+                    src="https://cdn.vuetifyjs.com/images/cards/cooking.png"
+                  >
+                  </v-img>
+                </v-col>
+              </v-row>
+            </div>
+            <div class="button-your-partner d-flex justify-center mt-6">
+              <v-btn
+                plain
+                color="red"
+              >
+                View your connected vendors
+              </v-btn>
+            </div>
+          </div>
+
+        </div>
       </v-col>
     </v-row>
     <v-row>
@@ -181,102 +237,128 @@
                 elevation="1"
                 shaped
                 tile
-                class="rounded-xl d-flex flex-column justify-space-between"
+                class="rounded-xl d-flex flex-column justify-space-between  card-partner-custom"
                 width="100%"
+                height="245px"
                 color="blue"
                 :disabled="$fetchState.pending"
                 @click="changePage(partner.id)"
               >
                 <v-img
-                  height="250"
+                  height="100%"
+                  width="100%"
+                  class="align-end "
+
                   src="https://cdn.vuetifyjs.com/images/cards/cooking.png"
-                ></v-img>
-                <div
-                  class="pa-4 "
                 >
-                  <div
-                    class="title white--text  text-truncate"
+                  <v-col
+                    class="pa-0 wrapper-service"
+                    cols="7"
                   >
-                    {{partner.name}}
+                      <div>
+                        <v-chip
+                          v-for="(mile, i) in partner.partnerServiceTypes"
+                          :key="i"
+                          class="mr-1 my-0 custom-chip"
+                          text-color="white"
+                          x-small
+                          disabled
+                        >
+                          {{$customUtils.setServiceType(mile.name)}}
+                        </v-chip>
+
+                      </div>
+                  </v-col>
+                  <div>
+                    <div class="gradation-custom">
+                      <!-- this is for gradation -->
+                    </div>
+                    <div
+                      class="pa-4 d-flex align-center justify-space-between blue"
+                    >
+                      <v-col
+                        class="white--text pa-0"
+                        style="font-size: 33px"
+                        :cols="!partner.partnerServiceZones ? 12 : 0"
+                      >
+                        {{partner.name}}
+                      </v-col>
+                      <v-col
+                        v-if="partner.partnerServiceZones"
+                        class="body-2 white--text aling-center d-flex pa-0 ml-3"
+                        cols="4"
+                      >
+                        <!-- <v-icon
+                          v-if="partner.partnerServiceTypes.length > 0"
+                          small
+                          color="white"
+                          class="mr-1"
+                        >
+                          mdi-pin
+                        </v-icon> -->
+                        <NuxtImg
+                          v-if="partner.partnerServiceTypes.length > 0"
+                          src="/images/mapLocation.svg"
+                          preload
+                          height="22.69"
+                          class="mr-2"
+                        />
+                        <div
+                          style="word-break: break-word;font-size: 10px"
+                        >
+                          {{locationMapping(partner.partnerServiceZones)}}
+                        </div>
+                      </v-col>
+
+                    </div>
+
                   </div>
-                  <div
-                    class="pb-1 body-2 white--text aling-center d-flex"
+                  <v-btn
+                    v-if="partner.status !== 'connected'"
+                    fab
+                    small
+                    plain
+                    absolute
+                    top
+                    right
+                    class="pt-12"
+                    :disabled="partner.status === 'pending'"
+                    @click.stop="addPartner(partner)"
                   >
                     <v-icon
-                      v-if="partner.partnerServiceTypes.length > 0"
-                      small
+                      v-if="partner.status === 'none'"
+                      dense
                       color="white"
-                      class="mr-1"
                     >
-                      mdi-pin
+                      mdi-account-plus
                     </v-icon>
-                    {{locationMapping(partner.partnerServiceZones)}}
-                  </div>
-                  <div
-                    class="d-flex"
-                  >
-                    <v-chip-group
-                      class="card-chip-group"
-
+                    <v-icon
+                      v-else-if="partner.status === 'pending'"
+                      dense
+                      color="white"
                     >
-                      <v-chip
-                        v-for="(mile, i) in partner.partnerServiceTypes"
-                        :key="i"
-                        class="mr-1 my-0"
-                        color="pink"
-                        text-color="white"
-                        x-small
-                        disabled
-                      >
-                        {{mile.name}}
-                      </v-chip>
-                    </v-chip-group>
-                  </div>
-                </div>
-                <v-btn
-                  v-if="partner.status !== 'connected'"
-                  fab
-                  small
-                  plain
-                  absolute
-                  top
-                  right
-                  class="pt-12"
-                  :disabled="partner.status === 'pending'"
-                  @click.stop="addPartner(partner)"
-                >
-                  <v-icon
-                    v-if="partner.status === 'none'"
-                    dense
-                    color="white"
+                      mdi-account-minus
+                    </v-icon>
+                    <v-icon
+                      v-else
+                      dense
+                      color="white"
+                    >
+                      mdi-account-multiple-check
+                    </v-icon>
+                  </v-btn>
+                  <v-chip
+                    v-if="partner.status === 'connected'"
+                    color="green"
+                    text-color="white"
+                    x-small
+                    disabled
+
+                    class="custom-chip-connected"
                   >
-                    mdi-account-plus
-                  </v-icon>
-                  <v-icon
-                    v-else-if="partner.status === 'pending'"
-                    dense
-                    color="white"
-                  >
-                    mdi-account-minus
-                  </v-icon>
-                  <v-icon
-                    v-else
-                    dense
-                    color="white"
-                  >
-                    mdi-account-multiple-check
-                  </v-icon>
-                </v-btn>
-                <v-chip
-                  v-if="partner.status === 'connected'"
-                  color="green"
-                  text-color="white"
-                  x-small
-                  disabled
-                  class="custom-chip-connected"
-                >
-                  Connected
-                </v-chip>
+                    <!-- Connected -->
+                  </v-chip>
+                </v-img>
               </v-card>
             </v-col>
           </v-row>
@@ -390,13 +472,6 @@ export default defineComponent({
 
     const slides = 7
     const chips = 6
-    const showFilter = reactive({
-      status: false
-    })
-    const filterIcon = reactive({
-      active: 'mdi-view-stream',
-      passive: 'mdi-view-stream-outline'
-    })
     const method = reactive({
       opt: 'add'
     })
@@ -479,6 +554,7 @@ export default defineComponent({
       )
       await fetchServiceZoneOnce()
       zones.value =  [ ...storeFilters.state.filters.zones]
+      serviceTypes.value =  [ ...storeFilters.state.filters.serviceTypes]
     })
 
     const locationMapping = (partnerServiceZones: PartnerServiceZone[]) => {
@@ -557,8 +633,12 @@ export default defineComponent({
       { deep: true }
     )
 
-    const changePage = (id: string) => {
-      router.push(`/marketplace/${id}`)
+    const changePage = (id: string | {index: number}) => {
+      let tempId = id
+      if(typeof id === 'object') {
+        tempId = marketplaces.value[id.index].id
+      }
+      router.push(`/marketplace/${tempId}`)
     }
 
     return {
@@ -570,8 +650,6 @@ export default defineComponent({
       addPartner,
       slides,
       chips,
-      showFilter,
-      filterIcon,
       locationMapping,
       meta,
       nextOrPrev,
@@ -629,33 +707,77 @@ export default defineComponent({
       }
     }
 
-    .custom-chips {
-      color: #2196F3;
-      background: transparent !important;
-      border: 1px solid #2196F3;
-    }
-  }
-  .card-chip-group {
-    .v-slide-group__next, .v-slide-group__prev {
-      min-width: unset;
-      flex: unset;
-      i {
-        color: rgba(255, 255, 255, 0.534);
-        font-size: 18px;
+    .custom-slide {
+      .gradation-custom {
+        background: linear-gradient(0deg, #2196F3, transparent);
+        height: 90px;
+      }
+      .text-custom {
+        background: #2196F3;
       }
     }
 
-    .v-chip--disabled {
-      opacity: 1;
+    .card-partner-custom {
+      .gradation-custom {
+        background: linear-gradient(0deg, #2196F3, transparent);
+        height: 90px;
+      }
+
+      .custom-chip-connected {
+        position: absolute !important;
+        top: 20px;
+        right: 20px;
+        opacity: 1 !important;
+      }
+
+      .wrapper-service {
+        position: absolute;
+        left: 20px;
+        top: 18px;
+      }
+
+      .custom-chip {
+        background-color: unset !important;
+        backdrop-filter: blur(100px);
+        opacity: 1;
+      }
     }
-    .v-slide-group__prev--disabled, .v-slide-group__next--disabled {
-      display: none;
+
+
+    .chip-group-custom {
+      .card-chip-group {
+        .v-slide-group__next, .v-slide-group__prev {
+          min-width: unset;
+          flex: unset;
+          i {
+            color: rgba(255, 255, 255, 0.534);
+            font-size: 18px;
+          }
+        }
+
+        .v-chip--disabled {
+          opacity: 1;
+        }
+        .v-slide-group__prev--disabled, .v-slide-group__next--disabled {
+          display: none;
+        }
+      }
+      .custom-chip-connected {
+        position: absolute !important;
+        top: 20px;
+        right: 20px;
+        opacity: 1 !important;
+      }
+      .v-slide-group__content {
+        padding: unset;
+        .custom-chips {
+          color: #2196F3;
+          background: transparent !important;
+          border: 1px solid #2196F3;
+          margin: 0px 8px 0px 0;
+        }
+      }
+
     }
-  }
-  .custom-chip-connected {
-    position: absolute !important;
-    top: 20px;
-    right: 20px;
-    opacity: 1 !important;
   }
 </style>
