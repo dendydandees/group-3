@@ -37,6 +37,7 @@ export interface Order {
 export interface OrderItem {
   id: string
   orderId: string
+  orderCode?: string
   description: string
   quantity: number
   productCode: string
@@ -67,5 +68,6 @@ export interface OrderDetails {
 }
 
 export interface FilterOrders {
-  search: ''
+  orderCode: string
+  batchId: string
 }

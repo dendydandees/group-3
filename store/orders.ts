@@ -14,7 +14,8 @@ interface GetOrders {
 }
 
 const filter = {
-  search: '',
+  orderCode: '',
+  batchId: '',
 } as FilterOrders
 
 export const state = () => ({
@@ -89,6 +90,18 @@ export const actions: ActionTree<RootStateOrders, RootStateOrders> = {
       commit('SET_ORDER_DETAILS', data)
 
       return data
+    } catch (error) {
+      return error
+    }
+  },
+  async uploadCrossBorder(_store, { data }) {
+    try {
+      const response = await this.$axios.$post(
+        `/api/clients/orders/batch`,
+        data
+      )
+
+      return response
     } catch (error) {
       return error
     }

@@ -4,6 +4,7 @@ import OrderIcon from '@/components/base/Icon/Order.vue'
 import Marketplace from '@/components/base/Icon/Marketplace.vue'
 import ClientConnections from '@/components/base/Icon/ClientConnections.vue'
 import Profile from '@/components/base/Icon/Profile.vue'
+import Freight from '@/components/base/Icon/Freight.vue'
 
 export default {
   breakpoint: {
@@ -31,6 +32,7 @@ export default {
       marketplace: { component: Marketplace },
       clientConnections: { component: ClientConnections },
       profile: { component: Profile },
+      freight: { component: Freight },
     },
   },
 }

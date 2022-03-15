@@ -1,0 +1,30 @@
+// file pond
+.filepond--root {
+  cursor: pointer;
+}
+
+.filepond--credits {
+  display: none !important;
+}
+
+.ordersPondCSV {
+  .filepond--root {
+    height: 15rem;
+  }
+
+  /* the border radius of the file item */
+  .filepond--item-panel {
+    height: 100%;
+    border-radius: 1rem;
+  }
+
+  /* bordered drop area */
+  .filepond--panel-root {
+    border-radius: 1.5rem;
+  }
+
+  /* the text color of the drop label*/
+  .filepond--drop-label {
+    height: 100%;
+  }
+}
