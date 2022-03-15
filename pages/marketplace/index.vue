@@ -410,7 +410,7 @@
       :dialog="dialog"
       :data="idPartner"
       @toggle="toggle()"
-      @add="addConnection(idPartner.value)"
+      @add="addConnection(idPartner.id)"
     />
   </section>
 </template>
@@ -454,10 +454,7 @@ export default defineComponent({
     })
     const zones = ref([]) as Ref<Zone[]>
     const serviceTypes = ref({ ...storeFilters.state.filters.serviceTypes })
-    const idPartner = reactive ({
-      value: '' as String,
-      name: '' as String
-    })
+    const idPartner = ref ({}) as Ref<Marketplace | {}>
     // status connect - none - pending - connected
     const statusConnect = reactive ({
       status: 'none'
@@ -484,8 +481,9 @@ export default defineComponent({
       }
     }
     const addPartner = (partner: Marketplace) => {
-      idPartner.value = partner.id
-      idPartner.name = partner.name
+      // idPartner.value = partner.id
+      // idPartner.name = partner.name
+      idPartner.value = partner
       toggle()
     }
     const addConnection = async (id: String) => {
@@ -506,7 +504,7 @@ export default defineComponent({
       [dialog],
       ([newDialog]) => {
         if(!newDialog.status) {
-          idPartner.value = ''
+          idPartner.value = {}
         }
       },
       { deep: true }
@@ -620,7 +618,8 @@ export default defineComponent({
     watch(
       selectedServiceTypes,
       (newService) => {
-        filter.value.service = newService.arrValue.join(',')
+        // filter.value.service = newService.arrValue.join(',')
+        filter.value.service = newService.arrValue
       },
       { deep: true }
     )
@@ -771,10 +770,15 @@ export default defineComponent({
       .v-slide-group__content {
         padding: unset;
         .custom-chips {
-          color: #2196F3;
+          color: #2196F3 ;
           background: transparent !important;
           border: 1px solid #2196F3;
           margin: 0px 8px 0px 0;
+
+          &.blue {
+            background: #2196F3 !important;
+            border: 1px solid #2196F3 !important;
+          }
         }
       }
 
