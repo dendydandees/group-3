@@ -235,6 +235,7 @@ export default defineComponent({
     const storeDetailMarketplace = useStore<VuexModuleMarketplaces>()
     const storeFilters= useStore<VuexModuleFilters>()
     const detailMarketplace = computed(() => storeDetailMarketplace.state.marketplaces.marketplaces.detail)
+    const detailGalleries = computed(() => storeDetailMarketplace.state.marketplaces.marketplaces.galleries)
     const zones = ref([]) as Ref<Zone[]>
 
     const selectedZone = reactive ({
@@ -257,7 +258,8 @@ export default defineComponent({
       width: "auto",
       height: ["calc(50vh - 2em)", "calc(50vh - 1em)"],
       layout: [1, 2, 1],
-      photos: tempData.photos,
+      // photos: tempData.photos,
+      photos: detailGalleries.value,
       showNumOfRemainingPhotos: true,
     }
     const index = ref(null)
@@ -271,9 +273,14 @@ export default defineComponent({
     }
 
     const imagesLightBox = (data: {source: string}[]) => {
-      return data.map((el, i) => {
-        return el.source
-      })
+      if(data && data.length > 0) {
+        return data.map((el, i) => {
+          return el.source
+        })
+
+      } else {
+        return []
+      }
     }
 
     // action
@@ -284,6 +291,18 @@ export default defineComponent({
         $fetchState.pending = true
 
         await storeDetailMarketplace.dispatch('marketplaces/marketplaces/getDetail', id)
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+    const fetchGalleries = async (id: string) => {
+
+      try {
+        $fetchState.pending = true
+
+        await storeDetailMarketplace.dispatch('marketplaces/marketplaces/getGalleries', id)
       } catch (error) {
         return error
       } finally {
@@ -327,6 +346,7 @@ export default defineComponent({
     // fetch
     const { $fetchState, fetch } = useFetch(async () => {
       await fetchDetail(id.value)
+      await fetchGalleries(id.value)
       await fetchServiceZoneOnce()
       zones.value =  [ ...storeFilters.state.filters.zones]
     })
@@ -346,7 +366,8 @@ export default defineComponent({
       toggle,
       zones,
       selectedZone,
-      tempData
+      tempData,
+      detailGalleries
     }
   },
   head: {},
