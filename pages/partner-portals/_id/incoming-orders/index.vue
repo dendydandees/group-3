@@ -61,7 +61,7 @@ import {
 } from '@nuxtjs/composition-api'
 import { FilterDetails, VuexModuleApplications } from '~/types/applications'
 // Interface and types
-import { VuexModuleIncomingOrders } from '~/types/incomingOrders'
+import { VuexModuleIncomingOrders } from '~/types/partnerPortals/incomingOrders'
 
 export default defineComponent({
   name: 'OrdersIncomingPages',
@@ -72,14 +72,17 @@ export default defineComponent({
     const storeIncomingOrders = useStore<VuexModuleIncomingOrders>()
     const storeApplications = useStore<VuexModuleApplications>()
     const incomingOrders = computed(
-      () => storeIncomingOrders.state.incomingOrders.incomingOrders
+      () =>
+        storeIncomingOrders.state.partnerPortals.incomingOrders.incomingOrders
     )
-    const meta = computed(() => storeIncomingOrders.state.incomingOrders.meta)
+    const meta = computed(
+      () => storeIncomingOrders.state.partnerPortals.incomingOrders.meta
+    )
     const pagination = ref({
       ...storeApplications.state.applications.pagination,
     })
     const filter = ref({
-      ...storeIncomingOrders.state.incomingOrders.filter,
+      ...storeIncomingOrders.state.partnerPortals.incomingOrders.filter,
     })
 
     const headers = reactive([
@@ -117,10 +120,13 @@ export default defineComponent({
       try {
         $fetchState.pending = true
 
-        await storeIncomingOrders.dispatch('incomingOrders/getIncomingOrders', {
-          id,
-          params: dataParams,
-        })
+        await storeIncomingOrders.dispatch(
+          'partnerPortals/incomingOrders/getIncomingOrders',
+          {
+            id,
+            params: dataParams,
+          }
+        )
       } catch (error) {
         return error
       } finally {
@@ -136,7 +142,7 @@ export default defineComponent({
           ...pagination.value,
           page: 1,
         }
-        storeApplications.commit('incomingOrders/SET_FILTER', {
+        storeApplications.commit('partnerPortals/incomingOrders/SET_FILTER', {
           ...newFilter,
         })
 

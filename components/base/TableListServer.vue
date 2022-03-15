@@ -13,65 +13,6 @@
     class="elevation-2"
     @update:options="fetch"
   >
-    <!-- Order List Page -->
-    <!-- Order code -->
-    <template #[`item.orderCode`]="{ item }">
-      {{ item.orderCode }}
-
-      <span v-if="item.refID" class="ml-1 text--secondary">
-        (#{{ item.refID }})
-      </span>
-    </template>
-
-    <!-- Consignee data -->
-    <template #[`item.consignee`]="{ item }">
-      <div class="text--secondary my-2">
-        <p class="mb-2 font-weight-bold subtitle-2">
-          {{ item.consigneeName }}
-        </p>
-
-        <p class="mb-1">
-          {{ item.consigneeAddress }}
-        </p>
-
-        <p class="ma-0">
-          {{
-            $customUtils.setAddress([
-              item.consigneeCity,
-              item.consigneeProvince,
-              item.consigneeCountry,
-              item.consigneePostal,
-            ])
-          }}
-        </p>
-      </div>
-    </template>
-
-    <!-- Pickup data -->
-    <template #[`item.pickup`]="{ item }">
-      <div class="text--secondary my-2">
-        <p class="mb-2 font-weight-bold subtitle-2">
-          {{ item.pickupContactName }}
-        </p>
-
-        <p class="mb-1">
-          {{ item.pickupAddress }}
-        </p>
-
-        <p class="ma-0">
-          {{
-            $customUtils.setAddress([
-              item.pickupCity,
-              item.pickupProvince,
-              item.pickupCountry,
-              item.pickupPostal,
-            ])
-          }}
-        </p>
-      </div>
-    </template>
-    <!-- End Order List Page -->
-
     <!-- Incoming Order List Page -->
     <!-- Order code -->
     <template #[`item.incomingOrderCode`]="{ item }">
@@ -279,10 +220,8 @@
         <v-btn
           v-if="isShowActions.detail"
           small
-          depressed
           :loading="loading"
           color="primary"
-          elevation="0"
           class="ma-2"
           @click="getDetailItem(item)"
         >
@@ -292,13 +231,11 @@
         <v-btn
           v-if="isShowActions.download"
           small
-          depressed
           download
           :href="item.labelPath || ''"
           :loading="loading"
           :disabled="!item.labelPath"
           color="info"
-          elevation="0"
           class="ma-2"
         >
           Download

@@ -29,10 +29,10 @@
           <v-spacer />
 
           <v-btn
-            depressed
-            text
+            outlined
             :loading="dialogSettings.loading"
             :disabled="dialogSettings.loading"
+            color="primary"
             class="mx-2"
             @click="doClose"
           >
@@ -40,7 +40,6 @@
           </v-btn>
 
           <v-btn
-            depressed
             :loading="dialogSettings.loading"
             :disabled="invalid || dialogSettings.loading"
             :color="dialogSettings.submitColor"

@@ -127,10 +127,10 @@
               <v-spacer />
 
               <v-btn
-                depressed
-                text
+                outlined
                 :disabled="formSettings.loading"
                 :loading="formSettings.loading"
+                color="primary"
                 class="mx-2"
                 @click="doReset"
               >
@@ -138,7 +138,6 @@
               </v-btn>
 
               <v-btn
-                depressed
                 color="primary"
                 type="submit"
                 :disabled="invalid || formSettings.loading"

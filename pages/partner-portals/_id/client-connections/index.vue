@@ -101,7 +101,6 @@
 
                 <v-btn
                   v-if="connections.status === 'pending'"
-                  depressed
                   color="primary"
                   class="mx-2"
                   :loading="$fetchState.pending"

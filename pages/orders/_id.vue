@@ -30,8 +30,7 @@
 
     <!-- Order items -->
     <v-row no-gutters align="center" class="mt-6">
-      <v-col cols="12" class="white pa-3"
-        >'
+      <v-col cols="12" class="white pa-3 elevation-2 rounded-xl">
         <OrderItems :fetch-state="$fetchState" />
       </v-col>
     </v-row>

@@ -68,7 +68,6 @@
                 <v-expand-transition>
                   <v-btn
                     v-show="!profiles.logo"
-                    depressed
                     :loading="$fetchState.pending"
                     color="primary"
                     class="my-2"
@@ -82,7 +81,6 @@
                   <v-btn
                     v-show="form.logo"
                     outlined
-                    depressed
                     :loading="$fetchState.pending"
                     color="error"
                     class="my-2"
@@ -144,7 +142,6 @@
               <v-spacer />
 
               <v-btn
-                depressed
                 color="primary"
                 type="submit"
                 :disabled="invalid"

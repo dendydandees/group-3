@@ -10,7 +10,7 @@
     <BaseNavigationAppBar :mini="mini" @doShowSideNav="doShowSideNav" />
 
     <v-main class="base">
-      <Nuxt style="margin-bottom: 20rem" />
+      <Nuxt class="main-content" />
 
       <BaseNavigationFooter />
     </v-main>
@@ -47,3 +47,15 @@ export default defineComponent({
   },
 })
 </script>
+
+<style>
+.main-content {
+  margin-bottom: 35rem;
+}
+
+@media only screen and (min-width: 1024px) {
+  .main-content {
+    margin-bottom: 20rem;
+  }
+}
+</style>
