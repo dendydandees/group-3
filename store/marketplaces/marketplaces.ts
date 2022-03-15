@@ -11,7 +11,13 @@ import {
 } from '~/types/marketplace/detail';
 
 interface GetMarketplaces {
-  params: Meta,
+  params: {
+    page: string,
+    perPage: string,
+    search: string,
+    country: string,
+    service: string[];
+  },
   isLControl: Boolean;
 }
 
@@ -51,10 +57,17 @@ export const mutations: MutationTree<RootStateMarketplaces> = {
 
 export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> = {
   async getMarketplaces({ commit, state }, { params, isLControl }: GetMarketplaces) {
+    let serviceParams = 'service=';
+    if (params && params?.service.length > 0) {
+      serviceParams = params.service.map((el, i) => {
+        return `service=${ el }`;
+      }).join('&');
+    }
+    const uri = params
+      ? `?page=${ params.page ?? '' }&perPage=${ params.perPage ?? '' }&search=${ params.search ?? '' }&country=${ params.country ?? '' }&${ serviceParams ?? '' }`
+      : '';
     try {
-      const response = await this?.$axios?.$get('/api/clients/partners', {
-        params,
-      });
+      const response = await this?.$axios?.$get(`/api/clients/partners${ uri }`);
       const { data, page, totalPage, totalCount } = response;
 
       if (!data) throw response;
