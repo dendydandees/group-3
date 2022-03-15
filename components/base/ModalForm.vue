@@ -29,9 +29,10 @@
           <v-spacer />
 
           <v-btn
-            text
+            outlined
             :loading="dialogSettings.loading"
             :disabled="dialogSettings.loading"
+            color="primary"
             class="mx-2"
             @click="doClose"
           >

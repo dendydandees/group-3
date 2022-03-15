@@ -1,5 +1,5 @@
 <template>
-  <v-card dark tile color="primary" elevation="0" :loading="fetchState.pending">
+  <v-card dark color="primary" elevation="2" :loading="fetchState.pending">
     <template slot="progress">
       <v-progress-linear color="info" height="8" indeterminate />
     </template>

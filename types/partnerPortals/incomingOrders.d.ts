@@ -1,7 +1,9 @@
-import { RootStateIncomingOrders } from '~/store/incomingOrders'
+import { RootStateIncomingOrders } from '~/store/partnerPortals/incomingOrders'
 
 export interface VuexModuleIncomingOrders {
-  incomingOrders: RootStateIncomingOrders
+  partnerPortals: {
+    incomingOrders: RootStateIncomingOrders
+  }
 }
 
 export interface ExternalTracking {
@@ -49,4 +51,8 @@ export interface IncomingOrder {
   externalTrackingNumber: null
   order: Order
   externalTracking: ExternalTracking
+}
+
+export interface FilterOrders {
+  search: string
 }

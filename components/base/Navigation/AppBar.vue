@@ -1,11 +1,11 @@
 <template>
   <v-app-bar
+    id="app-bar-custom"
     :elevate-on-scroll="true"
     app
     color="base"
     outlined
     tile
-    style="border: 1px solid; border-color: rgba(0, 0, 0, 0.12)"
   >
     <v-app-bar-nav-icon
       v-if="$vuetify.breakpoint.mobile"

@@ -127,9 +127,10 @@
               <v-spacer />
 
               <v-btn
-                text
+                outlined
                 :disabled="formSettings.loading"
                 :loading="formSettings.loading"
+                color="primary"
                 class="mx-2"
                 @click="doReset"
               >

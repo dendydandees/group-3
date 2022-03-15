@@ -1,8 +1,10 @@
 // Interfaces
 import { MutationTree, ActionTree } from 'vuex'
 import { Meta } from '~/types/applications'
-import { IncomingOrder } from '~/types/incomingOrders'
-import { FilterOrders } from '~/types/orders'
+import {
+  IncomingOrder,
+  FilterOrders,
+} from '~/types/partnerPortals/incomingOrders'
 
 const filter = {
   search: '',
