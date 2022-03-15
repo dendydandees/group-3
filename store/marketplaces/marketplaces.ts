@@ -8,6 +8,8 @@ import {
 } from '~/types/marketplace/marketplace';
 import {
   DetailMarketplace,
+  Gallery,
+  DataGallery
 } from '~/types/marketplace/detail';
 
 interface GetMarketplaces {
@@ -40,6 +42,7 @@ export const state = () => ({
   } as Meta,
   filter,
   detail: {} as DetailMarketplace | {},
+  galleries: [] as Gallery[] | [],
 });
 
 export type RootStateMarketplaces = ReturnType<typeof state>;
@@ -52,6 +55,7 @@ export const mutations: MutationTree<RootStateMarketplaces> = {
   SET_FILTER: (state, value: FilterDetails) => (state.filter = value),
   RESET_FILTER: (state) => (state.filter = filter),
   SET_DETAIL_MARKETPLACE: (state, value: DetailMarketplace | {}) => (state.detail = value),
+  SET_GALLERY: (state, value: Gallery[] | []) => (state.galleries = value),
   RESET_DETAIL_MARKETPLACE: (state) => (state.detail = {} as DetailMarketplace | {})
 };
 
@@ -110,5 +114,24 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
     } catch (error) {
       return error;
     }
-  }
+  },
+  async getGalleries({ commit }, id: string) {
+    try {
+      const response = await this?.$axios?.$get(`api/clients/partners/${ id ?? '' }/profile`);
+
+      if (!response) throw response;
+      let temp = response?.gallery;
+      if (response?.gallery?.length > 0) {
+        temp = temp.map((el: Gallery) => {
+          return { source: el.path };
+        });
+      }
+
+      commit('SET_GALLERY', temp);
+
+      return response;
+    } catch (error) {
+      return error;
+    }
+  },
 };

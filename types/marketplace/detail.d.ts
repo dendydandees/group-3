@@ -25,3 +25,16 @@ export interface DetailMarketplace {
   partnerServiceTypes: PartnerServiceType[],
   partnerServiceZones: PartnerServiceZone[],
 }
+export interface Gallery {
+  id: string,
+  path: string,
+  partnerId: string,
+  logo: string,
+}
+export interface DataGallery {
+  description: string,
+  gallery: Gallery[],
+  logo: string,
+  name: string,
+  slug: string,
+}
