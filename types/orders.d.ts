@@ -71,3 +71,15 @@ export interface FilterOrders {
   orderCode: string
   batchId: string
 }
+
+export interface BatchOrders {
+  id: string
+  createdAt: Date
+  updatedAt: Date
+  clientId: string
+  totalOrder: number
+}
+
+export interface FilterBatch {
+  batchId: string
+}

@@ -98,6 +98,7 @@ export default {
     '@nuxtjs/auth-next',
     '@nuxt/image',
     '@nuxtjs/sentry',
+    '@nuxtjs/dayjs',
   ],
 
   // Auth modules configuration: https://auth.nuxtjs.org
@@ -162,6 +163,12 @@ export default {
     config: {
       release: process.env.RELEASE || '',
     },
+  },
+
+  dayjs: {
+    locales: ['en'],
+    defaultLocale: 'en',
+    plugins: ['utc', 'timezone'],
   },
 
   webpackOptimisations: {

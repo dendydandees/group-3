@@ -77,63 +77,35 @@
         {{ $customUtils.setServiceType(item.serviceType) }}
       </v-chip>
     </template>
-    <template #expanded-item="{ headers, item }">
-      <td
-        :colspan="headers.length"
-        :class="`expandable-custom `"
-      >
+
+    <template #expanded-item="{ headers: expandHeaders, item }">
+      <td :colspan="expandHeaders.length" :class="`expandable-custom `">
         <div
-          :class="`d-flex align-center justify-space-between py-3 ${item.Rules ? 'border-bottom' : ''} `"
+          :class="`d-flex align-center justify-space-between py-3 ${
+            item.Rules ? 'border-bottom' : ''
+          } `"
         >
-          <div
-            class="font-weight-bold"
-          >
-            RULE LIST
-          </div>
-          <v-btn
-            small
-            @click="addRuleModal(item)"
-          >
-            <v-icon
-              small
-            >
-              mdi-plus
-            </v-icon>
+          <div class="font-weight-bold">RULE LIST</div>
+          <v-btn small @click="addRuleModal(item)">
+            <v-icon small> mdi-plus </v-icon>
             Rules
           </v-btn>
         </div>
         <v-card
-          v-for="(x,i) in item.Rules"
+          v-for="(x, i) in item.Rules"
           :key="i"
           class="custom-card-expand"
         >
-          <div
-            class="d-flex align-center border-bottom"
-          >
-            <v-col
-              cols="1"
-            >
+          <div class="d-flex align-center border-bottom">
+            <v-col cols="1">
               {{ x.priority }}
             </v-col>
-            <v-col
-              class="ml-16"
-              cols="4"
-            >
+            <v-col class="ml-16" cols="4">
               {{ findNamePartner(x.partnerID) }}
             </v-col>
-            <v-col
-              class="d-flex justify-end"
-            >
-              <v-btn
-                icon
-                color="red"
-                @click="dialogDeleteModal(x.id, 'rule')"
-              >
-                <v-icon
-                  small
-                >
-                  mdi-trash-can
-                </v-icon>
+            <v-col class="d-flex justify-end">
+              <v-btn icon color="red" @click="dialogDeleteModal(x.id, 'rule')">
+                <v-icon small> mdi-trash-can </v-icon>
               </v-btn>
               <!-- Delete -->
             </v-col>
@@ -141,21 +113,14 @@
           <div
             v-for="(o, n) in x.definitions"
             :key="n"
-            class="d-flex  border-bottom custom-rule-card"
+            class="d-flex border-bottom custom-rule-card"
           >
-            <v-col
-              cols="2"
-            >
-
-            </v-col>
-            <v-col
-              cols="4"
-            >
+            <v-col cols="2"> </v-col>
+            <v-col cols="4">
               {{ $customUtils.setRuleType(o.type) }}
             </v-col>
-            <v-col
-            >
-              {{o.value}}
+            <v-col>
+              {{ o.value }}
             </v-col>
           </div>
         </v-card>
@@ -163,17 +128,8 @@
     </template>
     <template #[`item.actionsLControl`]="{ item }">
       <div class="d-flex align-center justify-end">
-        <v-btn
-          icon
-          outlined
-          color="red"
-          @click="dialogDeleteModal(item.id)"
-        >
-          <v-icon
-            small
-          >
-            mdi-trash-can
-          </v-icon>
+        <v-btn icon outlined color="red" @click="dialogDeleteModal(item.id)">
+          <v-icon small> mdi-trash-can </v-icon>
           <!-- Delete -->
         </v-btn>
       </div>
@@ -183,18 +139,16 @@
     <!-- Start Incoming L-Control Page -->
     <template #[`item.countryCode`]="{ item }">
       <div class="d-flex align-center my-2">
-          <country-flag
-            :country="(item.countryCode)"
-            size='normal'
-            :shadow="true"
-            :rounded="true"
-            :style="'margin: unset'"
-          />
-          <div
-            class="font-weight-bold"
-          >
-            {{item.countryCode}}
-          </div>
+        <country-flag
+          :country="item.countryCode"
+          size="normal"
+          :shadow="true"
+          :rounded="true"
+          :style="'margin: unset'"
+        />
+        <div class="font-weight-bold">
+          {{ item.countryCode }}
+        </div>
       </div>
     </template>
     <template #[`item.defaultPartner`]="{ item }">
@@ -203,12 +157,9 @@
           <v-chip small color="info" class="text-uppercase white--text mr-3">
             {{ $customUtils.setServiceType(item.serviceType) }}
           </v-chip>
-
         </div>
-        <div
-          class="font-weight-bold subtitle-2 text-no-wrap align-center"
-        >
-          {{ findNamePartner(item.defaultPartnerID)}}
+        <div class="font-weight-bold subtitle-2 text-no-wrap align-center">
+          {{ findNamePartner(item.defaultPartnerID) }}
         </div>
       </v-row>
     </template>
@@ -249,26 +200,20 @@
 import {
   computed,
   defineComponent,
-  useFetch,
   useStore,
   reactive,
-  watch,
-  ref,
-  Ref,
-  useMeta,
-  useRouter,
   PropType,
 } from '@nuxtjs/composition-api'
 import CountryFlag from 'vue-country-flag'
 // Interfaces and types
 import { DataOptions, DataTableHeader, ItemGroup } from 'vuetify'
 import { ActionsTable, FilterDetails, Meta } from '~/types/applications'
-import { Marketplace, VuexModuleMarketplaces, PartnerServiceZone } from '~/types/marketplace/marketplace'
-import { Definition, Rule, RuleGroup } from '~/types/lControl/lControl'
+import { VuexModuleMarketplaces } from '~/types/marketplace/marketplace'
+import { RuleGroup } from '~/types/lControl/lControl'
 
 export default defineComponent({
   components: {
-    CountryFlag
+    CountryFlag,
   },
   props: {
     value: {
@@ -280,9 +225,8 @@ export default defineComponent({
       default: false,
     },
     expandedOption: {
-      type: Object as PropType<{singleExpand: Boolean, showExpand: Boolean}>,
-      default: () => ({singleExpand: true,
-      showExpand: false}),
+      type: Object as PropType<{ singleExpand: Boolean; showExpand: Boolean }>,
+      default: () => ({ singleExpand: true, showExpand: false }),
     },
     itemKey: {
       type: String as PropType<String>,
@@ -290,7 +234,7 @@ export default defineComponent({
     },
     hideDefaultFooter: {
       type: Boolean as PropType<Boolean>,
-      default: false
+      default: false,
     },
     items: {
       type: Array as () => PropType<ItemGroup<[]>>,
@@ -316,8 +260,13 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const storeMarketplaces = useStore<VuexModuleMarketplaces>()
-    const marketplaces = computed(() => storeMarketplaces.state.marketplaces.marketplaces.marketplaces)
-    const marketplacesLControl = computed(() => storeMarketplaces.state.marketplaces.marketplaces.marketplacesLControl)
+    const marketplaces = computed(
+      () => storeMarketplaces.state.marketplaces.marketplaces.marketplaces
+    )
+    const marketplacesLControl = computed(
+      () =>
+        storeMarketplaces.state.marketplaces.marketplaces.marketplacesLControl
+    )
 
     const pagination = computed({
       get: () => props.value,
@@ -340,24 +289,27 @@ export default defineComponent({
       fetchMarketplace(data.countryCode, data.serviceType)
     }
     const dialogDeleteModal = (ruleID: string, name: string) => {
-      emit('dialogDeleteModal', {id: ruleID, name})
+      emit('dialogDeleteModal', { id: ruleID, name })
     }
 
     const findNamePartner = (id: string) => {
-      return marketplacesLControl.value.filter(x => x.id === id)[0]?.name
+      return marketplacesLControl.value.filter((x) => x.id === id)[0]?.name
     }
     const fetchMarketplace = async (country: string, service: string) => {
       const dataParams = {
-        page:1,
+        page: 1,
         perPage: 100,
         country,
-        service
+        service,
       }
 
       try {
         // $fetchState.pending = true
 
-        await storeMarketplaces.dispatch('marketplaces/marketplaces/getMarketplaces', { params: dataParams})
+        await storeMarketplaces.dispatch(
+          'marketplaces/marketplaces/getMarketplaces',
+          { params: dataParams }
+        )
       } catch (error) {
         return error
       } finally {
@@ -374,32 +326,32 @@ export default defineComponent({
       dialogDeleteModal,
       marketplaces,
       marketplacesLControl,
-      findNamePartner
+      findNamePartner,
     }
   },
 })
 </script>
 <style lang="scss">
-  .expandable-custom {
-    .border-bottom {
-      border-bottom: 1px solid rgba(128, 128, 128, 0.322);
-    }
-    .v-card {
-      border-radius: unset !important;
-    }
-    .custom-card-expand {
-      background: transparent;
+.expandable-custom {
+  .border-bottom {
+    border-bottom: 1px solid rgba(128, 128, 128, 0.322);
+  }
+  .v-card {
+    border-radius: unset !important;
+  }
+  .custom-card-expand {
+    background: transparent;
 
-      .custom-rule-card {
-        background: rgba(128, 128, 128, 0.082);
-        /* color: white; */
-      }
+    .custom-rule-card {
+      background: rgba(128, 128, 128, 0.082);
+      /* color: white; */
     }
   }
-  .v-data-table__expanded {
-    &:last-of-type {
-      border-bottom-left-radius: 25px;
-      border-bottom-right-radius: 25px;
-    }
+}
+.v-data-table__expanded {
+  &:last-of-type {
+    border-bottom-left-radius: 25px;
+    border-bottom-right-radius: 25px;
   }
+}
 </style>

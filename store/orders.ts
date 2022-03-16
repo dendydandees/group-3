@@ -7,16 +7,20 @@ import {
   OrderItem,
   OrderAllocationUpdate,
   FilterOrders,
+  BatchOrders,
+  FilterBatch,
 } from '~/types/orders'
 
-interface GetOrders {
-  params: Meta
-}
+interface ParamsGetOrder extends Meta, FilterOrders {}
 
-const filter = {
+const filterOrder = {
   orderCode: '',
   batchId: '',
 } as FilterOrders
+
+const filterBatch = {
+  batchId: '',
+} as FilterBatch
 
 export const state = () => ({
   orders: [] as Order[] | [],
@@ -25,12 +29,14 @@ export const state = () => ({
     orderItems: [] as OrderItem | [],
     orderAllocationUpdates: [] as OrderAllocationUpdate | [],
   } as OrderDetails,
+  batchOrders: [] as BatchOrders[],
   meta: {
     page: 1,
     totalPage: 1,
     totalCount: 10,
   } as Meta,
-  filter: filter as FilterOrders,
+  filterOrder: filterOrder as FilterOrders,
+  filterBatch: filterBatch as FilterBatch,
 })
 
 export type RootStateOrders = ReturnType<typeof state>
@@ -39,13 +45,18 @@ export const mutations: MutationTree<RootStateOrders> = {
   SET_ORDERS: (state, value: Order[] | []) => (state.orders = value),
   SET_ORDER_DETAILS: (state, value: OrderDetails) =>
     (state.orderDetails = value),
+  SET_BATCH_ORDERS: (state, value: BatchOrders[]) =>
+    (state.batchOrders = value),
   SET_META: (state, value: Meta) => (state.meta = value),
-  SET_FILTER: (state, value: FilterOrders) => (state.filter = value),
-  RESET_FILTER: (state) => (state.filter = filter),
+  SET_FILTER_ORDERS: (state, value: FilterOrders) =>
+    (state.filterOrder = value),
+  RESET_FILTER_ORDERS: (state) => (state.filterOrder = filterOrder),
+  SET_FILTER_BATCH: (state, value: FilterOrders) => (state.filterBatch = value),
+  RESET_FILTER_BATCH: (state) => (state.filterBatch = filterBatch),
 }
 
 export const actions: ActionTree<RootStateOrders, RootStateOrders> = {
-  async getOrders({ commit }, { params }: GetOrders) {
+  async getOrders({ commit }, { params }: { params: ParamsGetOrder }) {
     try {
       const response = await this?.$axios?.$get('/api/clients/orders', {
         params,
@@ -64,6 +75,27 @@ export const actions: ActionTree<RootStateOrders, RootStateOrders> = {
       commit('SET_META', meta)
 
       return response
+    } catch (error) {
+      return error
+    }
+  },
+  async getBatchOrders({ commit }, { params }) {
+    try {
+      const response = await this.$axios.$get('/api/clients/orders/batch', {
+        params,
+      })
+      const { data, page, totalPage, totalCount } = response
+
+      if (!data) throw response
+
+      const meta = {
+        page,
+        totalPage,
+        totalCount,
+      }
+
+      commit('SET_BATCH_ORDERS', data)
+      commit('SET_META', meta)
     } catch (error) {
       return error
     }

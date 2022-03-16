@@ -25,7 +25,9 @@
       "@nuxtjs/auth-next",
       "@nuxt/image",
       "@nuxtjs/sentry",
-      "nuxt-webpack-optimisations"
+      "nuxt-webpack-optimisations",
+      "@nuxtjs/dayjs",
+      "dayjs/plugin/relativeTime"
     ],
     "typeRoots": ["./types"]
   },

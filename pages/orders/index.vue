@@ -2,16 +2,24 @@
   <section class="pa-4 pa-md-10 py-8">
     <BaseHeadlinePage
       title="Manage Orders"
-      subtitle="View the details of each order or make changes to a order."
+      subtitle="View the details of each order and batch order, or make changes to a order."
     >
       <template slot="addition">
-        <span class="text--secondary font-weight-medium title">
+        <span
+          v-if="isOnListView"
+          class="text--secondary font-weight-medium title"
+        >
           &bull; {{ meta.totalCount }} Total Orders
+        </span>
+
+        <span v-else class="text--secondary font-weight-medium title">
+          &bull; {{ meta.totalCount }} Total Batch
         </span>
       </template>
     </BaseHeadlinePage>
 
     <v-row align="center" justify="end">
+      <!-- Left options -->
       <v-col>
         <v-btn
           v-if="isOnListView"
@@ -27,7 +35,7 @@
           :outlined="isShowFilter"
           :disabled="$fetchState.pending"
           color="primary"
-          class="mx-2"
+          :class="[isOnListView ? 'mx-2' : '']"
           @click="isShowFilter = !isShowFilter"
         >
           Filter
@@ -38,6 +46,7 @@
         </span>
       </v-col>
 
+      <!-- Right options -->
       <v-col cols="12" md="auto" class="d-flex align-center">
         <v-btn-toggle v-model="orderView" mandatory rounded dark class="mx-2">
           <template v-for="({ icon, text }, index) in listView">
@@ -46,7 +55,7 @@
                 <v-btn
                   v-bind="attrs"
                   color="primary"
-                  :disabled="$fetchState.pending || text === 'Batch view'"
+                  :disabled="$fetchState.pending"
                   v-on="on"
                 >
                   <v-icon>{{ icon }}</v-icon>
@@ -77,10 +86,11 @@
               Filter
             </span>
 
-            <v-row align="center" class="ma-0">
-              <v-col v-if="isOnListView" cols="12" md="6">
+            <!-- Filter for order list -->
+            <v-row v-if="isOnListView" align="center" class="ma-0">
+              <v-col cols="12" md="6">
                 <v-text-field
-                  v-model="filter.orderCode"
+                  v-model="filterOrder.orderCode"
                   clearable
                   outlined
                   dense
@@ -98,7 +108,28 @@
 
               <v-col cols="12" md="6">
                 <v-text-field
-                  v-model="filter.batchId"
+                  v-model="filterOrder.batchId"
+                  clearable
+                  outlined
+                  dense
+                  rounded
+                  single-line
+                  hide-details
+                  label="Search by batch code"
+                  placeholder="Enter your batch code..."
+                  background-color="white"
+                  type="search"
+                  class="input-filter elevation-1"
+                  @change="fetchDebounced"
+                />
+              </v-col>
+            </v-row>
+
+            <!-- Filter for batch list -->
+            <v-row v-else align="center" class="ma-0">
+              <v-col cols="12" md="6">
+                <v-text-field
+                  v-model="filterBatch.batchId"
                   clearable
                   outlined
                   dense
@@ -128,7 +159,8 @@
     </v-expand-transition>
 
     <v-fade-transition hide-on-leave>
-      <v-row v-show="isOnListView" align="center" class="my-4">
+      <!-- List data for order -->
+      <v-row v-if="isOnListView" align="center" class="my-4">
         <v-col cols="12">
           <v-data-table
             v-model="selectedOrders"
@@ -198,8 +230,54 @@
           </v-data-table>
         </v-col>
       </v-row>
+
+      <!-- List data for batch -->
+      <v-row v-else align="center" class="my-4">
+        <v-col cols="12">
+          <v-card
+            v-for="{ id, totalOrder, updatedAt, createdAt } in batchOrders"
+            :key="id"
+            :loading="$fetchState.pending"
+            elevation="2"
+            class="my-4"
+          >
+            <v-card-text>
+              <v-col cols="12">
+                <h2 class="title font-weight-bold primary--text">{{ id }}</h2>
+              </v-col>
+
+              <v-col cols="12">
+                <v-row>
+                  <v-col cols="12" md="4">
+                    <span class="d-block"> Last Updated </span>
+
+                    <span class="d-block">
+                      {{ $dayjs(updatedAt).format('MMM DD, YYYY HH:mm') }}
+                    </span>
+                  </v-col>
+
+                  <v-col cols="12" md="4">
+                    <span class="d-block"> Created </span>
+
+                    <span class="d-block">
+                      {{ $dayjs(createdAt).format('MMM DD, YYYY HH:mm') }}
+                    </span>
+                  </v-col>
+
+                  <v-col cols="12" md="4">
+                    <span class="d-block"> Number of Orders </span>
+
+                    <span class="d-block"> {{ totalOrder }} </span>
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
     </v-fade-transition>
 
+    <!-- Pagination universal (order and batch view) -->
     <v-row align="center" justify="space-between">
       <v-col cols="12" md="auto">
         <v-select
@@ -225,7 +303,6 @@
           v-model="pagination.page"
           :length="meta.totalPage"
           :disabled="$fetchState.pending"
-          :total-visible="7"
           circle
         />
       </v-col>
@@ -272,12 +349,16 @@ export default defineComponent({
     const storeOrders = useStore<VuexModuleOrders>()
     const storeApplications = useStore<VuexModuleApplications>()
     const orders = computed(() => storeOrders.state.orders.orders)
+    const batchOrders = computed(() => storeOrders.state.orders.batchOrders)
     const meta = computed(() => storeOrders.state.orders.meta)
     const pagination = ref({
       ...storeApplications.state.applications.pagination,
     })
-    const filter = ref({
-      ...storeOrders.state.orders.filter,
+    const filterOrder = ref({
+      ...storeOrders.state.orders.filterOrder,
+    })
+    const filterBatch = ref({
+      ...storeOrders.state.orders.filterBatch,
     })
     const alert = computed(() => storeApplications.state.applications.alert)
 
@@ -349,11 +430,14 @@ export default defineComponent({
       router.push(`/orders/${data.id}`)
     }
 
-    // manage filter
+    // manage filter order
     const isShowFilter = ref(false)
     const doResetFilter = () => {
-      filter.value = {
+      filterOrder.value = {
         orderCode: '',
+        batchId: '',
+      }
+      filterBatch.value = {
         batchId: '',
       }
     }
@@ -365,27 +449,47 @@ export default defineComponent({
 
       fetchTimer.value = setTimeout(() => {
         fetch()
-      }, 500)
+      }, 300)
     }
     const fetchOrders = async (params: FilterDetails) => {
       const { page, itemsPerPage } = pagination.value
-      const { sortBy, sortDesc } = params
       const perPage = itemsPerPage !== -1 ? itemsPerPage : meta.value.totalCount
-      const orderCode = filter?.value.orderCode ?? null
-      const batchId = filter?.value.batchId ?? null
-      const dataParams = {
+      let dataParams = {
         page,
         perPage,
-        orderCode,
-        batchId,
-        sortBy: sortBy && sortBy[0] === 'orderCode' ? 'order_code' : null,
-        sortDesc: sortDesc ? sortDesc[0] : null,
+      } as Object
+
+      if (isOnListView.value) {
+        const { sortBy, sortDesc } = params
+        const orderCode = filterOrder?.value.orderCode ?? null
+        const batchId = filterOrder?.value.batchId ?? null
+
+        dataParams = {
+          ...dataParams,
+          orderCode,
+          batchId,
+          sortBy: sortBy && sortBy[0] === 'orderCode' ? 'order_code' : null,
+          sortDesc: sortDesc ? sortDesc[0] : null,
+        }
+      } else {
+        const batchId = filterBatch?.value.batchId ?? null
+
+        dataParams = {
+          ...dataParams,
+          batchId,
+        }
       }
 
       try {
         $fetchState.pending = true
 
-        await storeOrders.dispatch('orders/getOrders', { params: dataParams })
+        if (isOnListView.value) {
+          await storeOrders.dispatch('orders/getOrders', { params: dataParams })
+        } else {
+          await storeOrders.dispatch('orders/getBatchOrders', {
+            params: dataParams,
+          })
+        }
       } catch (error) {
         return error
       } finally {
@@ -393,21 +497,28 @@ export default defineComponent({
       }
     }
     const { $fetchState, fetch } = useFetch(async () => {
-      switch (isOnListView.value) {
-        case true:
-          await fetchOrders(pagination.value)
-          break
-        default:
-          break
-      }
+      setTimeout(() => {
+        storeApplications.commit('applications/RESET_ALERT')
+      }, 3000)
+      await fetchOrders(pagination.value)
     })
 
     // manage filter on changed
     watch(
-      filter,
+      filterOrder,
       (newFilter) => {
         doResetPagination()
-        storeApplications.commit('orders/SET_FILTER', {
+        storeApplications.commit('orders/SET_FILTER_ORDERS', {
+          ...newFilter,
+        })
+      },
+      { deep: true }
+    )
+    watch(
+      filterBatch,
+      (newFilter) => {
+        doResetPagination()
+        storeApplications.commit('orders/SET_FILTER_BATCH', {
           ...newFilter,
         })
       },
@@ -433,9 +544,11 @@ export default defineComponent({
 
     return {
       orders,
+      batchOrders,
       meta,
       pagination,
-      filter,
+      filterOrder,
+      filterBatch,
       alert,
       listView,
       orderView,
