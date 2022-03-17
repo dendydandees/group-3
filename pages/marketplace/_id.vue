@@ -123,14 +123,37 @@
           </v-col>
         </v-row>
       </v-col>
-      <v-col class="gallery">
+      <v-col
+        cols="4"
+       class="gallery">
         <div
           class="mb-4 font-weight-bold"
         >
           Gallery
         </div>
-        <div>
-          <PhotoCollageWrapper v-bind="collage" @itemClick="itemClickHandler" />
+        <div
+          style="width: 100%"
+        >
+          <!-- <PhotoCollageWrapper
+            v-bind="collage"
+            @itemClick="itemClickHandler"
+          /> -->
+          <MasonryWall :items="detailGalleries" :ssr-columns="2" :column-width="160" :gap="8">
+            <template
+              #default="{ item, index}">
+              <div
+              >
+                <NuxtImg
+                  :src="item.src"
+                  preload
+                  width="170px"
+                  :style="`borderRadius: 20px;cursor: pointer; marginBottom: 8px`"
+                  @click="itemClickHandler(index)"
+                />
+              </div>
+
+            </template>
+          </MasonryWall>
         </div>
       </v-col>
     </v-row>
@@ -182,7 +205,7 @@
       </div>
     </div>
     <CoolLightBox
-      :items="imagesLightBox(collage.photos)"
+      :items="imagesLightBox(detailGalleries)"
       :index="index"
       :slideshow="false"
       @close="index = null"
@@ -212,6 +235,7 @@ import {
   Ref
 } from '@nuxtjs/composition-api'
 // Interfaces or types
+import MasonryWall from '@yeger/vue2-masonry-wall'
 import { PhotoCollageWrapper, } from "vue-photo-collage";
 import CoolLightBox from 'vue-cool-lightbox'
 import { VuexModuleMarketplaces} from '~/types/marketplace/marketplace'
@@ -225,7 +249,8 @@ export default defineComponent({
   name: 'DetailMarketplace',
   components: {
     PhotoCollageWrapper,
-    CoolLightBox
+    CoolLightBox,
+    MasonryWall
   },
   layout: 'default',
   setup() {
@@ -259,25 +284,33 @@ export default defineComponent({
       width: "auto",
       height: ["calc(50vh - 2em)", "calc(50vh - 1em)"],
       layout: [1, 2, 1],
-      photos: tempData.photos,
-      // photos: detailGalleries.value,
+      // photos: tempData.photos,
+      photosMax: detailGalleries.value?.slice(0, 7),
+      photos: detailGalleries.value,
       // photos: storeDetailMarketplace.state.marketplaces.marketplaces.galleries,
       showNumOfRemainingPhotos: true,
     }
+    console.log({collage})
     const index = ref(null)
     const showImg = (indexInput: any) => {
       index.value = indexInput
     }
     const silentbox = ref(null)
-    const itemClickHandler = (data: {id: number, source: string}, column: number) => {
-      const item = Object.assign({}, data);
-      showImg(item.id)
+    const itemClickHandler = (
+      index: any
+      // data: {id: number, source: string}, column: number
+    ) => {
+      console.log(index)
+      // console.log(tes?.srcElement?.currentSrc)
+      // const item = Object.assign({}, data);
+      // showImg(item.id)
+      showImg(index)
     }
 
-    const imagesLightBox = (data: {source: string}[]) => {
+    const imagesLightBox = (data: {src: string}[]) => {
       if(data && data.length > 0) {
         return data.map((el, i) => {
-          return el.source
+          return el.src
         })
 
       } else {

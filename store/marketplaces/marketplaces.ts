@@ -1,5 +1,6 @@
 // Interfaces
 import { MutationTree, ActionTree } from 'vuex';
+// import imageToBase64 from 'image-to-base64';
 import { Meta } from '~/types/applications';
 import {
   Marketplace,
@@ -123,7 +124,7 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
       let temp = response?.gallery;
       if (response?.gallery?.length > 0) {
         temp = temp.map((el: Gallery) => {
-          return { source: el.path };
+          return { src: el.path };
         });
       }
 
