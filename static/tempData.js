@@ -1,8 +1,7 @@
 export default {
   photos: [
     {
-      source:
-        "https://images.unsplash.com/photo-1517088455889-bfa75135412c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=e5548929376f93d8b1b7a21097df03bd&auto=format&fit=crop&w=749&q=80",
+      source: "https://dev-lj-gallery.s3.ap-southeast-1.amazonaws.com/0b1aa44b-7a23-432f-9006-fcbd2da44ee0/79adb1cd-a118-41bf-b3a2-3f5e06a6827d_Screen Shot 2022-03-14 at 17.27.03.png",
     },
     {
       source:
@@ -81,4 +80,4 @@ export default {
       desc: 'Reference Link'
     },
   ]
-}
+};

@@ -217,7 +217,7 @@ import CoolLightBox from 'vue-cool-lightbox'
 import { VuexModuleMarketplaces} from '~/types/marketplace/marketplace'
 import tempData from '~/static/tempData'
 import { VuexModuleFilters, Zone, ServiceType} from '~/types/filters'
-import { DetailMarketplace} from '~/types/marketplace/detail'
+import { DetailMarketplace, Gallery} from '~/types/marketplace/detail'
 import 'vue-cool-lightbox/dist/vue-cool-lightbox.min.css'
 
 
@@ -236,6 +236,7 @@ export default defineComponent({
     const storeFilters= useStore<VuexModuleFilters>()
     const detailMarketplace = computed(() => storeDetailMarketplace.state.marketplaces.marketplaces.detail)
     const detailGalleries = computed(() => storeDetailMarketplace.state.marketplaces.marketplaces.galleries)
+    // const detailGalleries = ref([]) as Ref<Gallery[]>
     const zones = ref([]) as Ref<Zone[]>
 
     const selectedZone = reactive ({
@@ -258,8 +259,9 @@ export default defineComponent({
       width: "auto",
       height: ["calc(50vh - 2em)", "calc(50vh - 1em)"],
       layout: [1, 2, 1],
-      // photos: tempData.photos,
-      photos: detailGalleries.value,
+      photos: tempData.photos,
+      // photos: detailGalleries.value,
+      // photos: storeDetailMarketplace.state.marketplaces.marketplaces.galleries,
       showNumOfRemainingPhotos: true,
     }
     const index = ref(null)
@@ -349,7 +351,9 @@ export default defineComponent({
       await fetchGalleries(id.value)
       await fetchServiceZoneOnce()
       zones.value =  [ ...storeFilters.state.filters.zones]
+      // detailGalleries.value = [...storeDetailMarketplace.state.marketplaces.marketplaces.galleries]
     })
+
 
     return {
       collage,
