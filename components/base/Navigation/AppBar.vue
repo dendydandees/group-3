@@ -31,7 +31,7 @@
 
     <v-spacer />
 
-    <v-menu bottom right min-width="200px" rounded offset-y>
+    <v-menu bottom right min-width="200px" offset-y>
       <template #activator="{ on }">
         <v-btn
           text
