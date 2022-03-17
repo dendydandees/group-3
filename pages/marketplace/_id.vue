@@ -106,7 +106,8 @@
         class="detailed-info"
         cols="5"
       >
-        <v-row
+
+        <!-- <v-row
           v-for="(y, p) in tempData.infoDetail"
           :key="p"
           class="d-flex"
@@ -121,7 +122,26 @@
 
             {{y.desc}}
           </v-col>
+        </v-row> -->
+
+        <v-row
+          v-for="(y, p) in detailProfileHeader"
+          :key="p"
+          class="d-flex"
+        >
+          <v-col
+            class="detailed-text font-weight-bold text-no-wrap"
+            cols="4"
+          >
+            {{y.name}}
+          </v-col>
+          <v-col class="detailed-description">
+
+            <!-- {{y.value}} -->
+            {{convertDetailData(detailProfile[y.value])}}
+          </v-col>
         </v-row>
+
       </v-col>
       <v-col
         cols="4"
@@ -261,9 +281,55 @@ export default defineComponent({
     const storeFilters= useStore<VuexModuleFilters>()
     const detailMarketplace = computed(() => storeDetailMarketplace.state.marketplaces.marketplaces.detail)
     const detailGalleries = computed(() => storeDetailMarketplace.state.marketplaces.marketplaces.galleries)
-    // const detailGalleries = ref([]) as Ref<Gallery[]>
+    const detailProfile = computed(() => storeDetailMarketplace.state.marketplaces.marketplaces.detailProfile)
     const zones = ref([]) as Ref<Zone[]>
 
+    const detailProfileHeader = reactive([
+      {
+        name: 'Company Brief',
+        value: 'companyBrief'
+      },
+      {
+        name: 'Contact Person',
+        value: 'contactPerson'
+      },
+      {
+        name: 'Email',
+        value: 'emailAddress'
+      },
+      {
+        name: 'Phone Number',
+        value: 'phoneNumber'
+      },
+      {
+        name: 'Code',
+        value: 'code'
+      },
+      {
+        name: 'Description',
+        value: 'descriptioni'
+      },
+      {
+        name: 'Maximum Dimension',
+        value: 'maximumDimension'
+      },
+      {
+        name: 'Maximum Weight',
+        value: 'maximumWeight'
+      },
+      {
+        name: 'Pick Up & Drop Off',
+        value: 'pikupAndDropOff'
+      },
+      {
+        name: 'Prohibited Item',
+        value: 'prohibitedItem'
+      },
+      {
+        name: 'SLA',
+        value: 'sla'
+      },
+    ])
     const selectedZone = reactive ({
       value: ''
     })
@@ -387,6 +453,17 @@ export default defineComponent({
       // detailGalleries.value = [...storeDetailMarketplace.state.marketplaces.marketplaces.galleries]
     })
 
+    const convertDetailData = (data: string | number | boolean) => {
+      switch (data) {
+        case 0:
+          return ''
+        case false:
+          return 'No'
+        default:
+          return data
+      }
+    }
+
 
     return {
       collage,
@@ -404,7 +481,10 @@ export default defineComponent({
       zones,
       selectedZone,
       tempData,
-      detailGalleries
+      detailGalleries,
+      detailProfile,
+      detailProfileHeader,
+      convertDetailData
     }
   },
   head: {},

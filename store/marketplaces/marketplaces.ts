@@ -10,7 +10,8 @@ import {
 import {
   DetailMarketplace,
   Gallery,
-  DataGallery
+  DataGallery,
+  DetailProfile
 } from '~/types/marketplace/detail';
 
 interface GetMarketplaces {
@@ -44,6 +45,7 @@ export const state = () => ({
   filter,
   detail: {} as DetailMarketplace | {},
   galleries: [] as Gallery[] | [],
+  detailProfile: {} as DetailProfile | {},
 });
 
 export type RootStateMarketplaces = ReturnType<typeof state>;
@@ -57,6 +59,7 @@ export const mutations: MutationTree<RootStateMarketplaces> = {
   RESET_FILTER: (state) => (state.filter = filter),
   SET_DETAIL_MARKETPLACE: (state, value: DetailMarketplace | {}) => (state.detail = value),
   SET_GALLERY: (state, value: Gallery[] | []) => (state.galleries = value),
+  SET_DETAIL_PROFILE: (state, value: DetailProfile[] | []) => (state.detailProfile = value),
   RESET_DETAIL_MARKETPLACE: (state) => (state.detail = {} as DetailMarketplace | {})
 };
 
@@ -129,6 +132,7 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
       }
 
       commit('SET_GALLERY', temp);
+      commit('SET_DETAIL_PROFILE', response);
 
       return response;
     } catch (error) {

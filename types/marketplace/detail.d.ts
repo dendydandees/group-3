@@ -25,6 +25,8 @@ export interface DetailMarketplace {
   partnerServiceTypes: PartnerServiceType[],
   partnerServiceZones: PartnerServiceZone[],
 }
+
+
 export interface Gallery {
   id: string,
   path: string,
@@ -37,4 +39,23 @@ export interface DataGallery {
   logo: string,
   name: string,
   slug: string,
+}
+export interface DetailProfile {
+  "slug": string,
+  "name": string,
+  "code": string,
+  "logo": string,
+  "description": string,
+  "serviceType": PartnerServiceType[],
+  "serviceZone": PartnerServiceZone[],
+  "companyBrief": string,
+  "emailAddress": string,
+  "contactPerson": string,
+  "phoneNumber": string,
+  "sla": string,
+  "gallery": Gallery[],
+  "maximumWeight": number,
+  "maximumDimension": string,
+  "pikupAndDropOff": boolean,
+  "prohibitedItem": string;
 }
