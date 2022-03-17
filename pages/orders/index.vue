@@ -47,8 +47,86 @@
       </v-col>
 
       <!-- Right options -->
-      <v-col cols="12" md="auto" class="d-flex align-center">
-        <v-btn-toggle v-model="orderView" mandatory rounded dark class="mx-2">
+      <v-col
+        cols="12"
+        md="auto"
+        class="d-flex flex-column flex-md-row align-start align-md-center"
+      >
+        <v-menu
+          v-if="isOnListView"
+          bottom
+          offset-y
+          :close-on-content-click="false"
+        >
+          <template #activator="{ attrs, on }">
+            <v-btn
+              text
+              :disabled="$fetchState.pending"
+              color="primary"
+              class="white--text mx-0 mx-md-2 mb-4 mb-md-0"
+              v-bind="attrs"
+              v-on="on"
+            >
+              View Settings
+
+              <v-icon right> mdi-eye </v-icon>
+            </v-btn>
+          </template>
+
+          <v-card color="transparent" style="backdrop-filter: blur(8px)">
+            <v-row no-gutters class="py-4">
+              <v-col cols="12" class="px-4">
+                <span class="text--secondary subtitle-2">Only Show : </span>
+              </v-col>
+
+              <v-col cols="6">
+                <v-list color="transparent">
+                  <v-list-item>
+                    <v-checkbox
+                      v-model="selectedViews"
+                      on-icon="mdi-checkbox-marked-circle"
+                      off-icon="mdi-checkbox-blank-circle-outline"
+                      label="Service Type"
+                      value="serviceType"
+                    />
+                  </v-list-item>
+
+                  <v-list-item>
+                    <v-checkbox
+                      v-model="selectedViews"
+                      on-icon="mdi-checkbox-marked-circle"
+                      off-icon="mdi-checkbox-blank-circle-outline"
+                      label="Destination"
+                      value="destination"
+                    />
+                  </v-list-item>
+                </v-list>
+              </v-col>
+
+              <v-col cols="6">
+                <v-list color="transparent">
+                  <v-list-item>
+                    <v-checkbox
+                      v-model="selectedViews"
+                      on-icon="mdi-checkbox-marked-circle"
+                      off-icon="mdi-checkbox-blank-circle-outline"
+                      label="Origin"
+                      value="origin"
+                    />
+                  </v-list-item>
+                </v-list>
+              </v-col>
+            </v-row>
+          </v-card>
+        </v-menu>
+
+        <v-btn-toggle
+          v-model="orderView"
+          mandatory
+          rounded
+          dark
+          class="mx-0 mx-md-2 mb-4 mb-md-0"
+        >
           <template v-for="({ icon, text }, index) in listView">
             <v-tooltip :key="index" top color="primary">
               <template #activator="{ on, attrs }">
@@ -173,7 +251,33 @@
             show-select
             class="elevation-2"
             @update:options="fetchOrders"
+            @toggle-select-all="selectAllToggle"
           >
+            <template #[`header.data-table-select`]="{ props, on }">
+              <v-simple-checkbox
+                v-ripple
+                on-icon="mdi-checkbox-marked-circle"
+                off-icon="mdi-checkbox-blank-circle-outline"
+                indeterminate-icon="mdi-checkbox-blank-circle"
+                :disabled="$fetchState.pending || !isLabelExist"
+                v-bind="props"
+                v-on="on"
+              />
+            </template>
+
+            <template
+              #[`item.data-table-select`]="{ item, isSelected, select }"
+            >
+              <v-simple-checkbox
+                v-ripple
+                on-icon="mdi-checkbox-marked-circle"
+                off-icon="mdi-checkbox-blank-circle-outline"
+                :value="isSelected"
+                :disabled="$fetchState.pending || !item.labelPath"
+                @input="select($event)"
+              />
+            </template>
+
             <template #[`item.orderCode`]="{ item }">
               <v-btn text color="primary" @click="doGetDetails(item)">
                 {{ item.orderCode }}
@@ -237,7 +341,6 @@
           <v-card
             v-for="{ id, totalOrder, updatedAt, createdAt } in batchOrders"
             :key="id"
-            :loading="$fetchState.pending"
             elevation="2"
             class="my-4"
           >
@@ -309,7 +412,11 @@
     </v-row>
 
     <v-snackbar
-      :value="alert.isShow && alert.message.includes('Order')"
+      :value="
+        alert.isShow &&
+        alert.message.includes('Order') &&
+        alert.type === 'success'
+      "
       :timeout="2000"
       rounded="pill"
       right
@@ -327,7 +434,6 @@ import {
   defineComponent,
   useFetch,
   useStore,
-  reactive,
   watch,
   ref,
   useMeta,
@@ -337,6 +443,44 @@ import {
 // Interfaces or types
 import { Order, VuexModuleOrders } from '~/types/orders'
 import { FilterDetails, VuexModuleApplications } from '~/types/applications'
+
+interface Header {
+  text: string
+  value: string
+  sortable?: boolean
+}
+
+const initHeaders = [
+  {
+    text: 'Order ID',
+    value: 'orderCode',
+  },
+  {
+    text: 'Batch',
+    value: 'batchId',
+    sortable: false,
+  },
+  {
+    text: 'Service',
+    value: 'serviceType',
+    sortable: false,
+  },
+  {
+    text: 'Origin',
+    value: 'origin',
+    sortable: false,
+  },
+  {
+    text: 'Destination',
+    value: 'destination',
+    sortable: false,
+  },
+  {
+    text: '',
+    value: 'actions',
+    sortable: false,
+  },
+] as Header[]
 
 export default defineComponent({
   name: 'OrderPages',
@@ -379,38 +523,19 @@ export default defineComponent({
     })
 
     // manage table
-    const selectedOrders = ref([])
-    const headers = reactive([
-      {
-        text: 'Order ID',
-        value: 'orderCode',
-      },
-      {
-        text: 'Batch',
-        value: 'batchId',
-        sortable: false,
-      },
-      {
-        text: 'Service',
-        value: 'serviceType',
-        sortable: false,
-      },
-      {
-        text: 'Origin',
-        value: 'origin',
-        sortable: false,
-      },
-      {
-        text: 'Destination',
-        value: 'destination',
-        sortable: false,
-      },
-      {
-        text: '',
-        value: 'actions',
-        sortable: false,
-      },
+    const selectedOrders = ref([]) as Ref<Order[]>
+    const isLabelExist = computed(() => {
+      return orders.value.some((order) => order.labelPath)
+    })
+    const selectedViews = ref([
+      'orderCode',
+      'batchId',
+      'serviceType',
+      'destination',
+      'origin',
+      'actions',
     ])
+    const headers = ref(initHeaders) as Ref<Header[]>
     const itemsPerPageOptions = computed(() => {
       const textDefault = 'Items/Page'
       const values = [5, 10, 15, 20]
@@ -420,6 +545,17 @@ export default defineComponent({
         value,
       }))
     })
+    const selectAllToggle = ({ items }: { items: Order[]; value: boolean }) => {
+      if (selectedOrders.value.length === 0) {
+        const selectedItems = items.filter((item) => {
+          return item.labelPath
+        })
+
+        return (selectedOrders.value = [...selectedItems])
+      } else {
+        return (selectedOrders.value = [])
+      }
+    }
     const doResetPagination = () => {
       pagination.value = {
         ...pagination.value,
@@ -536,10 +672,17 @@ export default defineComponent({
       },
       { deep: true }
     )
+    // manage view table on changed
+    watch(selectedViews, (newValue) => {
+      headers.value = initHeaders.filter((header) =>
+        newValue.includes(header.value)
+      )
+    })
     // manage view on changed
     watch(orderView, (_newView) => {
       doResetFilter()
       doResetPagination()
+      selectedOrders.value = []
     })
 
     return {
@@ -554,10 +697,13 @@ export default defineComponent({
       orderView,
       isOnListView,
       selectedOrders,
+      isLabelExist,
+      selectedViews,
       headers,
       itemsPerPageOptions,
       doGetDetails,
       isShowFilter,
+      selectAllToggle,
       doResetFilter,
       fetchOrders,
       fetchDebounced,
