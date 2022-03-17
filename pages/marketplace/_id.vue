@@ -125,7 +125,7 @@
         </v-row> -->
 
         <v-row
-          v-for="(y, p) in detailProfileHeader"
+          v-for="(y, p) in detailProfileHeaderComputed"
           :key="p"
           class="d-flex"
         >
@@ -330,6 +330,13 @@ export default defineComponent({
         value: 'sla'
       },
     ])
+    const detailProfileHeaderComputed = computed(() => {
+      return detailProfileHeader.filter((el) => (
+        detailProfile.value[el.value as keyof typeof detailProfile.value] ||
+        detailProfile.value[el.value as keyof typeof detailProfile.value] === false
+      ) && el)
+    })
+    console.log(detailProfileHeaderComputed.value)
     const selectedZone = reactive ({
       value: ''
     })
@@ -484,7 +491,8 @@ export default defineComponent({
       detailGalleries,
       detailProfile,
       detailProfileHeader,
-      convertDetailData
+      convertDetailData,
+      detailProfileHeaderComputed
     }
   },
   head: {},
