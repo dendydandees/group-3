@@ -27,5 +27,6 @@ export interface RuleGroup {
   defaultPartnerID: string,
   serviceType: string,
   countryCode: string,
-  Rules: Rule[];
+  Rules: Rule[],
+  useBOB: boolean;
 }
