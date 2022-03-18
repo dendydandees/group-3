@@ -131,6 +131,8 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
         });
       }
 
+
+
       commit('SET_GALLERY', temp);
       commit('SET_DETAIL_PROFILE', response);
 
