@@ -9,8 +9,8 @@
           v-model="selectedRuleGroup.country"
           :label="'Country'"
           :placeholder="'Country'"
-          :data="zones"
-          :item-show="{text: 'country', value: 'country'}"
+          :data="countryCodes"
+          :item-show="{text: 'name', value: 'value'}"
           class="pb-3"
         />
         <LcontrolDropdownCustom
@@ -22,6 +22,7 @@
           class="pb-3"
         />
         <LcontrolDropdownCustom
+          v-if="!selectedRuleGroup.useBOB"
           v-model="selectedRuleGroup.defaultPartner"
           :label="'Default Partner'"
           :placeholder="'Default Partner'"
@@ -29,6 +30,25 @@
           :item-show="{text: 'name', value: 'id'}"
           class="pb-3"
         />
+        <div>
+          <v-switch
+            v-model="selectedRuleGroup.useBOB"
+            inset
+          >
+            <template #label>
+              <span
+                :style="`color: ${selectedRuleGroup.useBOB ? '#1961e4' : 'black'}; font-weight: 500`"
+              >
+                BOB {{selectedRuleGroup.useBOB ? 'Activated' : 'Inactive'}}
+              </span>
+            </template>
+          </v-switch>
+          <div
+            style="font-size: 14px; width: 50%; text-align: justify;"
+          >
+            BOB will help you select the most suitable network partner based on our analytical data
+          </div>
+        </div>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
@@ -56,7 +76,7 @@
           :label="'Zone'"
           :placeholder="'Zone'"
           :data="zones"
-          :item-show="{text: 'zoneName', value: 'zoneName'}"
+          :item-show="{text: 'zoneName', value: 'id'}"
           class="pb-3"
         />
         <LcontrolDropdownCustom
@@ -179,6 +199,7 @@ export default defineComponent({
     const storeFilters= useStore<VuexModuleFilters>()
     const serviceTypes = ref([ ...storeFilters.state.filters.serviceTypes ])
     const zones = ref([...storeFilters.state.filters.zones ])
+    const countryCodes = computed(() => storeFilters.state.filters.countryCodes)
     const marketplaces = computed(() => storeMarketplaces.state.marketplaces.marketplaces.marketplaces)
     const ruleAdd = ref([]) as Ref<Definition[]>
 
@@ -207,7 +228,8 @@ export default defineComponent({
     const selectedRuleGroup = reactive ({
       country: '',
       service: '',
-      defaultPartner: ''
+      defaultPartner: '',
+      useBOB: false
     })
     const selectedRule = reactive ({
       priority: '',
@@ -248,7 +270,8 @@ export default defineComponent({
       emit('addRuleGroup', {
         defaultPartnerID: selectedRuleGroup.defaultPartner,
         serviceType: selectedRuleGroup.service,
-        countryCode: selectedRuleGroup.country
+        countryCode: selectedRuleGroup.country,
+        useBOB: selectedRuleGroup.useBOB
       })
     }
     const addRules = () => {
@@ -284,6 +307,17 @@ export default defineComponent({
 
         default:
           return {text: 'zoneName', value: 'zoneName'}
+      }
+    }
+    const fetchCountryCodes = async () => {
+      try {
+        $fetchState.pending = true
+
+        await storeFilters.dispatch('filters/getCountryCodes', {params: {} })
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
       }
     }
     const fetchZones= async () => {
@@ -330,6 +364,7 @@ export default defineComponent({
 
     const { $fetchState, fetch } = useFetch(async () => {
       await fetchZones()
+      await fetchCountryCodes()
       await fetchServices()
       await fetchMarketplace(
         selectedRuleGroup.country,
@@ -343,6 +378,7 @@ export default defineComponent({
     const disabledBtn = (name: string) => {
       if(name === 'rule') {
         if(
+
           !selectedRule.zone ||
           !selectedRule.partnerID ||
           !selectedRule.priority
@@ -367,10 +403,19 @@ export default defineComponent({
 
       } else if(name === 'ruleGroup') {
         if(
-          !selectedRuleGroup.country ||
+          !selectedRuleGroup.useBOB &&
+          (!selectedRuleGroup.country ||
           !selectedRuleGroup.service ||
-          !selectedRuleGroup.defaultPartner
+          !selectedRuleGroup.defaultPartner)
         ) {
+
+          return true
+        } else if(
+          selectedRuleGroup.useBOB &&
+          (!selectedRuleGroup.country ||
+          !selectedRuleGroup.service )
+        ) {
+
           return true
         } else {
           return false
@@ -388,6 +433,7 @@ export default defineComponent({
             selectedRuleGroup.country = ''
             selectedRuleGroup.service = ''
             selectedRuleGroup.defaultPartner = ''
+            selectedRuleGroup.useBOB = false
 
           }
 
@@ -435,7 +481,8 @@ export default defineComponent({
       ruleType,
       dataOptByType,
       itemShowByType,
-      addRules
+      addRules,
+      countryCodes
     }
   },
 })

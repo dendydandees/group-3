@@ -152,16 +152,32 @@
       </div>
     </template>
     <template #[`item.defaultPartner`]="{ item }">
-      <v-row class="text--secondary my-2 px-4">
+      <v-row class="text--secondary my-2 px-4 align-center">
         <div>
           <v-chip small color="info" class="text-uppercase white--text mr-3">
             {{ $customUtils.setServiceType(item.serviceType) }}
           </v-chip>
         </div>
-        <div class="font-weight-bold subtitle-2 text-no-wrap align-center">
+        <div
+          v-if="!item.useBOB"
+          class="font-weight-bold subtitle-2 text-no-wrap align-center"
+        >
           {{ findNamePartner(item.defaultPartnerID) }}
         </div>
+        <NuxtImg
+          v-else-if="item.useBOB"
+          src="/images/BOB.svg"
+          preload
+          :height="20"
+        />
+
       </v-row>
+    </template>
+    <template #item.data-table-expand="{ expand, isExpanded, item }">
+        <v-icon v-if="item.useBOB"></v-icon>
+        <v-icon v-else @click="expand(!isExpanded)">
+          {{isExpanded ? 'mdi-chevron-up' : 'mdi-chevron-down'}}
+        </v-icon>
     </template>
     <!-- End Incoming L-Control Page -->
 

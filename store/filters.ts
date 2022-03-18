@@ -7,6 +7,7 @@ import {
 } from '~/types/filters';
 
 export const state = () => ({
+  countryCodes: [] as any | [],
   zones: [] as Zone[] | [],
   serviceTypes: [] as ServiceType[] | [],
   loaded: false as Boolean
@@ -15,6 +16,9 @@ export const state = () => ({
 export type RootStateFilter = ReturnType<typeof state>;
 
 export const mutations: MutationTree<RootStateFilter> = {
+  SET_COUNTRY_CODE: (state, value: any | []) => (
+    state.countryCodes = value
+  ),
   SET_ZONES: (state, value: Zone[] | []) => (
     state.zones = value
   ),
@@ -28,6 +32,28 @@ export const actions: ActionTree<RootStateFilter, RootStateFilter> = {
       await dispatch('getZones');
       await dispatch('getServiceTypes');
       commit('SET_LOADED', true);
+    }
+  },
+  async getCountryCodes({ commit }) {
+    try {
+      const response = await this?.$axios?.$get('/api/country-codes');
+
+      if (!response) throw response;
+      let temp = [] as any;
+      if (response) {
+        temp = Object.entries(response);
+        temp = temp.map((el: any) => {
+          return {
+            name: el[0],
+            value: el[1]
+          };
+        });
+      }
+      commit('SET_COUNTRY_CODE', temp);
+
+      return response;
+    } catch (error) {
+      return error;
     }
   },
   async getZones({ commit }) {

@@ -263,13 +263,15 @@ export default defineComponent({
         defaultPartnerID: string,
         serviceType: string,
         countryCode: string,
+        useBOB: boolean,
     }) => {
       try {
-        const {defaultPartnerID, serviceType, countryCode} = payload
+        const {defaultPartnerID, serviceType, countryCode, useBOB} = payload
         const data = {
-          defaultPartnerID,
+          defaultPartnerID: useBOB ? '' : defaultPartnerID,
           serviceType,
-          countryCode
+          countryCode,
+          useBOB
         }
 
         $fetchState.pending = true
