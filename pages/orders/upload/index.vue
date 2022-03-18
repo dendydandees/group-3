@@ -1,5 +1,12 @@
 <template>
-  <section class="pa-4 pa-md-10 py-8">
+  <section class="pa-4 pa-md-10 py-8 custom-margin">
+    <NuxtImg
+      src="/images/upload-orders/bg_luwjistik.png"
+      format="webp"
+      preload
+      class="custom-bg"
+    />
+
     <BaseBackButton @doBackTo="doBackTo" />
 
     <BaseHeadlinePage
@@ -7,7 +14,7 @@
       subtitle="Upload the new order according to the sample file provided."
     />
 
-    <!-- <v-sheet color="transparent" width="100%" class="mx-10">
+    <v-sheet color="transparent" width="100%" class="mx-10">
       <v-btn
         :color="step === 1 ? 'white' : 'primary'"
         class="custom-tab primary--text"
@@ -15,7 +22,7 @@
         <v-icon left dark size="32"> $freight </v-icon>
         Cross border
       </v-btn>
-    </v-sheet> -->
+    </v-sheet>
 
     <v-card elevation="2">
       <v-window v-model="step">
@@ -63,5 +70,23 @@ export default defineComponent({
   border-top-right-radius: 16px !important;
   border-bottom-left-radius: 0 !important;
   border-bottom-right-radius: 0 !important;
+}
+
+.custom-margin {
+  margin-bottom: 40rem;
+}
+
+.custom-bg {
+  position: absolute;
+  bottom: 500px;
+  margin-left: -100px;
+}
+
+@media only screen and (min-width: 1024px) {
+  .custom-bg {
+    bottom: 300px;
+    width: 100vw;
+    margin-left: -100px;
+  }
 }
 </style>

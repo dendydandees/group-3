@@ -48,7 +48,7 @@ export default defineComponent({
     const clientMenu = ref([
       { title: 'Orders', icon: '$order', to: '/orders' },
       { title: 'Marketplace', icon: '$marketplace', to: '/marketplace' },
-      { title: 'L-Control', icon: 'mdi-target', to: '/lControl' },
+      { title: 'L-Control', icon: '$lControl', to: '/lControl' },
     ]) as Ref<NavigationLinks[]>
     const isGroupShown = ref(true)
 
