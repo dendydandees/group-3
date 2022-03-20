@@ -26,6 +26,7 @@
           :disabled="selectedOrders.length === 0 || $fetchState.pending"
           outlined
           color="primary"
+          @click="doDownloadSelectedLabel"
         >
           Download Labels
         </v-btn>
@@ -375,6 +376,14 @@
                 </v-row>
               </v-col>
             </v-card-text>
+
+            <v-card-actions>
+              <v-spacer />
+
+              <v-btn color="primary" @click="doGetBatchDetails(id)">
+                View Details
+              </v-btn>
+            </v-card-actions>
           </v-card>
         </v-col>
       </v-row>
@@ -439,7 +448,9 @@ import {
   useMeta,
   useRouter,
   Ref,
+  useContext,
 } from '@nuxtjs/composition-api'
+import { saveAs } from 'file-saver'
 // Interfaces or types
 import { Order, VuexModuleOrders } from '~/types/orders'
 import { FilterDetails, VuexModuleApplications } from '~/types/applications'
@@ -485,8 +496,9 @@ const initHeaders = [
 export default defineComponent({
   name: 'OrderPages',
   layout: 'default',
-  setup() {
+  setup(_props) {
     useMeta({ titleTemplate: '%s | Orders' })
+    const { $dayjs } = useContext()
     const router = useRouter()
 
     // store manage
@@ -564,6 +576,32 @@ export default defineComponent({
     }
     const doGetDetails = (data: Order) => {
       router.push(`/orders/${data.id}`)
+    }
+    const doGetBatchDetails = (id: string) => {
+      orderView.value = 0
+      isShowFilter.value = true
+      setTimeout(() => {
+        filterOrder.value = {
+          orderCode: '',
+          batchId: id,
+        }
+      }, 100)
+      setTimeout(() => {
+        fetchDebounced()
+      }, 500)
+    }
+    const doDownloadSelectedLabel = async () => {
+      if (selectedOrders.value.length === 0) return
+
+      const selectedLabels = {
+        orderIds: selectedOrders.value.map((order) => order.id),
+      }
+      const response = (await storeOrders.dispatch('orders/getSelectedLabels', {
+        data: selectedLabels,
+      })) as string
+      const fileName = `order_labels_${$dayjs().format('YYYY-MM-DD_HH-mm')}.pdf`
+
+      saveAs(response, fileName)
     }
 
     // manage filter order
@@ -702,6 +740,8 @@ export default defineComponent({
       headers,
       itemsPerPageOptions,
       doGetDetails,
+      doGetBatchDetails,
+      doDownloadSelectedLabel,
       isShowFilter,
       selectAllToggle,
       doResetFilter,

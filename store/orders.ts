@@ -12,6 +12,13 @@ import {
 } from '~/types/orders'
 
 interface ParamsGetOrder extends Meta, FilterOrders {}
+interface ParamsGetBatch extends Meta, FilterBatch {}
+interface UploadCrossBorder extends Order {
+  items: OrderItem[]
+}
+interface ParamsGetSelectedLabels {
+  orderIds: string[]
+}
 
 const filterOrder = {
   orderCode: '',
@@ -79,7 +86,7 @@ export const actions: ActionTree<RootStateOrders, RootStateOrders> = {
       return error
     }
   },
-  async getBatchOrders({ commit }, { params }) {
+  async getBatchOrders({ commit }, { params }: { params: ParamsGetBatch }) {
     try {
       const response = await this.$axios.$get('/api/clients/orders/batch', {
         params,
@@ -126,11 +133,24 @@ export const actions: ActionTree<RootStateOrders, RootStateOrders> = {
       return error
     }
   },
-  async uploadCrossBorder(_store, { data }) {
+  async uploadCrossBorder(_store, { data }: { data: UploadCrossBorder }) {
     try {
       const response = await this.$axios.$post(
         `/api/clients/orders/batch`,
         data
+      )
+
+      return response
+    } catch (error) {
+      return error
+    }
+  },
+  async getSelectedLabels(_store, { data }: { data: ParamsGetSelectedLabels }) {
+    try {
+      const response = await this.$axios.$post(
+        `api/clients/orders/labels`,
+        data,
+        { responseType: 'blob' }
       )
 
       return response
