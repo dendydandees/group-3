@@ -3,7 +3,7 @@
     <v-card-text class="pa-8">
       <v-expand-transition>
         <v-alert
-          v-if="alert.isShow && alert.message.includes('Order')"
+          v-if="alert.isShow && alert.message.includes('order')"
           :type="alert.type"
           rounded="xl"
         >
@@ -117,10 +117,14 @@ export default defineComponent({
           router.push('/orders')
         }, 1500)
       } catch (error) {
+        const message =
+          (error as any)?.data?.error ??
+          `Order upload data invalid, The data contained in the file you uploaded is incorrect. Please add data according to the existing sample file!`
+
         storeApplications.commit('applications/SET_ALERT', {
           isShow: true,
           type: 'error',
-          message: `Order upload data invalid, The data contained in the file you uploaded is incorrect. Please add data according to the existing sample file!`,
+          message,
         })
       } finally {
         setTimeout(() => {

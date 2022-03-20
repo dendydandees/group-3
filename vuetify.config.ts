@@ -5,6 +5,7 @@ import Marketplace from '@/components/base/Icon/Marketplace.vue'
 import ClientConnections from '@/components/base/Icon/ClientConnections.vue'
 import Profile from '@/components/base/Icon/Profile.vue'
 import Freight from '@/components/base/Icon/Freight.vue'
+import LControl from '@/components/base/Icon/LControl.vue'
 
 export default {
   breakpoint: {
@@ -33,6 +34,7 @@ export default {
       clientConnections: { component: ClientConnections },
       profile: { component: Profile },
       freight: { component: Freight },
+      lControl: { component: LControl },
     },
   },
 }
