@@ -112,7 +112,18 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
       const response = await this?.$axios?.$get(`/api/clients/partner-details/${ id ?? '' }`);
 
       if (!response) throw response;
+      let temp = response?.partnerGallery;
+      if (response?.partnerGallery?.length > 0) {
+        temp = temp.map((el: Gallery) => {
+          return { src: el.path };
+        });
+      }
+      if (response?.partnerServiceTypes) {
+        response.partnerServiceTypes = response.partnerServiceTypes.filter((el: any) => el.name);
+      }
       commit('SET_DETAIL_MARKETPLACE', response);
+      commit('SET_GALLERY', temp);
+      // commit('SET_DETAIL_PROFILE', response);
 
       return response;
     } catch (error) {

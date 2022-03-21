@@ -145,7 +145,7 @@
           <v-col class="detailed-description">
 
             <!-- {{y.value}} -->
-            {{convertDetailData(detailProfile[y.value])}}
+            {{convertDetailData(detailMarketplace[y.value])}}
           </v-col>
         </v-row>
 
@@ -301,7 +301,6 @@ export default defineComponent({
     const storeFilters= useStore<VuexModuleFilters>()
     const detailMarketplace = computed(() => storeDetailMarketplace.state.marketplaces.marketplaces.detail)
     const detailGalleries = computed(() => storeDetailMarketplace.state.marketplaces.marketplaces.galleries)
-    const detailProfile = computed(() => storeDetailMarketplace.state.marketplaces.marketplaces.detailProfile)
     const zones = ref([]) as Ref<Zone[]>
 
     const detailProfileHeader = reactive([
@@ -352,8 +351,8 @@ export default defineComponent({
     ])
     const detailProfileHeaderComputed = computed(() => {
       return detailProfileHeader.filter((el) => (
-        detailProfile.value[el.value as keyof typeof detailProfile.value] ||
-        detailProfile.value[el.value as keyof typeof detailProfile.value] === false
+        detailMarketplace.value[el.value as keyof typeof detailMarketplace.value] ||
+        detailMarketplace.value[el.value as keyof typeof detailMarketplace.value] === false
       ) && el)
     })
     console.log(detailProfileHeaderComputed.value)
@@ -425,18 +424,6 @@ export default defineComponent({
         $fetchState.pending = false
       }
     }
-    const fetchGalleries = async (id: string) => {
-
-      try {
-        $fetchState.pending = true
-
-        await storeDetailMarketplace.dispatch('marketplaces/marketplaces/getGalleries', id)
-      } catch (error) {
-        return error
-      } finally {
-        $fetchState.pending = false
-      }
-    }
     const fetchServiceZoneOnce = async () => {
       try {
         $fetchState.pending = true
@@ -474,7 +461,6 @@ export default defineComponent({
     // fetch
     const { $fetchState, fetch } = useFetch(async () => {
       await fetchDetail(id.value)
-      await fetchGalleries(id.value)
       await fetchServiceZoneOnce()
       zones.value =  [ ...storeFilters.state.filters.zones]
       // detailGalleries.value = [...storeDetailMarketplace.state.marketplaces.marketplaces.galleries]
@@ -509,7 +495,6 @@ export default defineComponent({
       selectedZone,
       tempData,
       detailGalleries,
-      detailProfile,
       detailProfileHeader,
       convertDetailData,
       detailProfileHeaderComputed
