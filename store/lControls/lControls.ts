@@ -53,9 +53,11 @@ export const actions: ActionTree<RootStateLControls, RootStateLControls> = {
       const response = await this?.$axios?.$post(`/api/clients/rule-groups`, data);
       // const clientId = '25020c83-7c76-4a2c-8d5a-6e91590015b8';
       // const response = await this?.$axios?.$post(`/api/admin/clients/${ clientId }/rule-groups`, data);
+      if (!response) throw response;
 
       return response;
-    } catch (error) {
+    } catch (error: any) {
+      console.log({ error: error?.response?.data });
       return error;
     }
   },
