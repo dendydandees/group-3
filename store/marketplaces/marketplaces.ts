@@ -131,7 +131,9 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
         });
       }
 
-
+      if (response?.serviceType) {
+        response.serviceType = response.serviceType.filter((el: any) => el.name);
+      }
 
       commit('SET_GALLERY', temp);
       commit('SET_DETAIL_PROFILE', response);

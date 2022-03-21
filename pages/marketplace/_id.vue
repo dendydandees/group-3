@@ -12,6 +12,12 @@
           height="100px"
           class="rounded-circle mr-4"
         >
+          <v-img
+            :aspect-ratio="100/100"
+            class="rounded-circle"
+            :src="`data:image/png;base64,${detailMarketplace.logo}`"
+          >
+          </v-img>
 
         </v-card>
         <div class="profile-text">
@@ -21,6 +27,7 @@
             {{detailMarketplace.name}}
           </div>
           <v-chip-group
+            v-if="detailMarketplace.serviceType && detailMarketplace.serviceType.length > 0"
           >
             <v-chip
               v-for="(mile, i) in detailMarketplace.partnerServiceTypes"
@@ -131,7 +138,7 @@
         >
           <v-col
             class="detailed-text font-weight-bold text-no-wrap"
-            cols="4"
+            cols="5"
           >
             {{y.name}}
           </v-col>
@@ -164,12 +171,25 @@
               <div
               >
                 <NuxtImg
+                  v-if="index < 8"
                   :src="item.src"
                   preload
+
                   width="170px"
                   :style="`borderRadius: 20px;cursor: pointer; marginBottom: 8px`"
                   @click="itemClickHandler(index)"
                 />
+                <div
+                  v-if="index === 8"
+                  :style="`padding: 30px 20px ; display: flex; width: 170px; justifyContent: center; borderRadius: 20px;cursor: pointer; backgroundColor: #1961e4; overflow: hidden`"
+                  @click="itemClickHandler(index)"
+                >
+                  <span
+                    class="white--text font-weight-bold text-h5"
+                  >
+                    {{detailGalleries.length - index}} +
+                  </span>
+                </div>
               </div>
 
             </template>
