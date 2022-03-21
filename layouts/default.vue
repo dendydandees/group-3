@@ -25,6 +25,8 @@ export default defineComponent({
   middleware: 'auth',
   setup() {
     const context = useContext()
+
+    // handle sidenav
     const drawer = ref(!context.$vuetify.breakpoint.mobile) as Ref<boolean>
     const mini = ref(false) as Ref<boolean>
     const doShowSideNav = () => {

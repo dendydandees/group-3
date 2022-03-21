@@ -289,6 +289,16 @@
               </v-btn>
             </template>
 
+            <template #[`item.batchId`]="{ item }">
+              <v-btn
+                text
+                color="primary"
+                @click="doGetBatchDetails(item.batchId)"
+              >
+                {{ item.batchId }}
+              </v-btn>
+            </template>
+
             <template #[`item.serviceType`]="{ item }">
               <template v-if="item.requestedServices">
                 <v-chip
