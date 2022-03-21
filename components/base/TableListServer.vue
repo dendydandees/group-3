@@ -162,7 +162,7 @@
           v-if="!item.useBOB"
           class="font-weight-bold subtitle-2 text-no-wrap align-center"
         >
-          {{ findNamePartner(item.defaultPartnerID) }}
+          {{  findNamePartner(item.defaultPartnerID) }}
         </div>
         <NuxtImg
           v-else-if="item.useBOB"
@@ -309,7 +309,10 @@ export default defineComponent({
     }
 
     const findNamePartner = (id: string) => {
-      return marketplacesLControl.value.filter((x) => x.id === id)[0]?.name
+      if(marketplacesLControl.value && marketplacesLControl.value.length > 0) {
+        return marketplacesLControl.value.filter((x) => x.id === id)[0]?.name
+
+      }
     }
     const fetchMarketplace = async (country: string, service: string) => {
       const dataParams = {
