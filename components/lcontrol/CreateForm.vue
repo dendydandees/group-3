@@ -1,9 +1,10 @@
 <template>
-  <div>
+  <div
+  >
     <v-dialog v-model="dialogComp" persistent max-width="600">
       <v-card
         v-if="!isRule"
-        class="rounded-xl pa-6"
+        class="rounded-xl pa-6 create-form-wrapper"
       >
         <LcontrolDropdownCustom
           v-model="selectedRuleGroup.country"
@@ -50,6 +51,24 @@
           </div>
         </div>
         <v-card-actions>
+          <v-row
+            v-if="error"
+            class="error-text-span"
+          >
+
+            <v-col
+              cols="2"
+              class=" px-0"
+            >
+              Failed:
+            </v-col>
+            <v-col
+              class=" pl-0"
+            >
+              {{error}}
+
+            </v-col>
+          </v-row>
           <v-spacer></v-spacer>
           <v-btn
             color="grey darken-1"
@@ -136,7 +155,24 @@
         <v-card-actions
           class="mt-4"
         >
+          <v-row
+            v-if="error"
+            class="error-text-span"
+          >
 
+            <v-col
+              cols="2"
+              class=" px-0"
+            >
+              Failed:
+            </v-col>
+            <v-col
+              class=" pl-0"
+            >
+              {{error}}
+
+            </v-col>
+          </v-row>
           <v-spacer></v-spacer>
           <v-btn
             color="grey darken-1"
@@ -191,6 +227,10 @@ export default defineComponent({
     item: {
       type: Object,
       default: () => ({}),
+    },
+    error: {
+      type: String,
+      default: '',
     }
   },
   setup(props, {emit}) {
@@ -487,3 +527,12 @@ export default defineComponent({
   },
 })
 </script>
+<style lang="scss">
+.create-form-wrapper {
+  .error-text-span {
+    color: red;
+    font-size: 12px;
+  }
+
+}
+</style>

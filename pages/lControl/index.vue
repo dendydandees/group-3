@@ -42,6 +42,7 @@
     </v-row>
     <LcontrolCreateForm
       :dialog="dialog.ruleGroup"
+      :error="errorPost.rg"
       @toggle="toggle('ruleGroup')"
       @addRuleGroup="addRuleGroup"
     />
@@ -101,6 +102,9 @@ export default defineComponent({
     const expandedOption = ref({
       singleExpand: true,
       showExpand: true
+    })
+    const errorPost = ref({
+      rg: ''
     })
     const ruleGroupID = ref('')
     const ruleID = ref('')
@@ -276,12 +280,22 @@ export default defineComponent({
 
         $fetchState.pending = true
 
-        await storeLControls.dispatch('lControls/lControls/addRuleGroup', data)
+        const res = await storeLControls.dispatch('lControls/lControls/addRuleGroup', data)
+        if(res?.response?.data?.error) {
+          throw res?.response?.data?.error
+        }
         dialog.ruleGroup = false
         fetch()
-      } catch (error) {
+      } catch (error: any) {
+
+        if(error) {
+          errorPost.value.rg = error
+        }
         return error
       } finally {
+        setTimeout(() => {
+          errorPost.value.rg = ''
+        }, 7500);
         $fetchState.pending = false
       }
     }
@@ -291,12 +305,13 @@ export default defineComponent({
     const { $fetchState, fetch } = useFetch(async () => {
       await fetchRuleGroups()
     })
-    watch(
-      dialog,
-      (newDialog) => {
-      },
-      { deep: true }
-    )
+    // watch(
+    //   () => [dialog.ruleGroup, dialog.rule],
+    //   ([newDialogRG, newDialogR]) => {
+    //     console.log({newDialogRG})
+    //   },
+    //   { deep: true }
+    // )
 
     return {
       dialog,
@@ -314,7 +329,8 @@ export default defineComponent({
       pagination,
       expandedOption,
       dialogDeleteModal,
-      deleteRuleGroups
+      deleteRuleGroups,
+      errorPost
     }
   },
   head: {},
