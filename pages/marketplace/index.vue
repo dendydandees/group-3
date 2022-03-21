@@ -95,7 +95,7 @@
             cols="1"
           >
             <div
-              class="d-flex align-center blue--text"
+              class="d-flex align-center primary--text"
               style="height: 40px"
             >
               Filter
@@ -116,7 +116,7 @@
                 outlined
                 rounded
                 dense
-                color="blue"
+                color="primary"
                 class="custom-select mr-4"
                 clearable
               >
@@ -127,7 +127,7 @@
                 outlined
                 rounded
                 dense
-                color="blue"
+                color="primary"
                 class="custom-select"
                 clearable
               >
@@ -150,7 +150,7 @@
                   <v-chip-group
                     v-model="selectedServiceTypes.arrValue"
                     multiple
-                    active-class="blue accent-4 white--text"
+                    active-class="primary accent-4 white--text"
 
                     column
                   >
@@ -217,7 +217,7 @@
         </h1>
         <div
           v-else
-          class="blue--text subtitle-2 pl-1"
+          class="primary--text subtitle-2 pl-1"
         >
           {{meta.totalCount}} RESULTS
         </div>
@@ -240,7 +240,7 @@
                 class="rounded-xl d-flex flex-column justify-space-between  card-partner-custom"
                 width="100%"
                 height="245px"
-                color="blue"
+                color="primary"
                 :disabled="$fetchState.pending"
                 @click="changePage(partner.id)"
               >
@@ -274,7 +274,7 @@
                       <!-- this is for gradation -->
                     </div>
                     <div
-                      class="pa-4 d-flex align-center justify-space-between blue"
+                      class="pa-4 d-flex align-center justify-space-between primary"
                     >
                       <v-col
                         class="white--text pa-0"
@@ -668,16 +668,17 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+@import "~/assets/scss/color.module.scss";
   .marketplace {
     .carousel-3d-slide {
       border: unset;
       border-radius: 20px;
       /* padding: 20px; */
-      background: #48a3ee;
+      background: $primary;
       color: white;
       box-shadow: 0px 0px 40px 0px #36363626;
       &.current {
-        background: #2196F3;
+        background: $primary;
         .opacity-custom {
           opacity: 1;
         }
@@ -698,7 +699,7 @@ export default defineComponent({
         margin-bottom: unset !important;
         /* outline: 1px solid #2196F3; */
         fieldset {
-          border-color: #2196F3;
+          border-color: $primary;
         }
       }
       .v-text-field__details {
@@ -708,17 +709,17 @@ export default defineComponent({
 
     .custom-slide {
       .gradation-custom {
-        background: linear-gradient(0deg, #2196F3, transparent);
+        background: linear-gradient(0deg, $primary, transparent);
         height: 90px;
       }
       .text-custom {
-        background: #2196F3;
+        background: $primary;
       }
     }
 
     .card-partner-custom {
       .gradation-custom {
-        background: linear-gradient(0deg, #2196F3, transparent);
+        background: linear-gradient(0deg, $primary, transparent);
         height: 90px;
       }
 
@@ -770,14 +771,14 @@ export default defineComponent({
       .v-slide-group__content {
         padding: unset;
         .custom-chips {
-          color: #2196F3 ;
+          color: $primary ;
           background: transparent !important;
-          border: 1px solid #2196F3;
+          border: 1px solid $primary;
           margin: 0px 8px 0px 0;
 
           &.blue {
-            background: #2196F3 !important;
-            border: 1px solid #2196F3 !important;
+            background: $primary !important;
+            border: 1px solid $primary !important;
           }
         }
       }
