@@ -42,7 +42,7 @@
                 height="100%"
                 class="align-end opacity opacity-custom custom-slide"
 
-                src="https://cdn.vuetifyjs.com/images/cards/cooking.png"
+                :src="`data:image/png;base64,${slide.logo}`"
               >
                 <div class="gradation-custom">
                   <!-- this is for gradation -->
@@ -249,7 +249,7 @@
                   width="100%"
                   class="align-end "
 
-                  src="https://cdn.vuetifyjs.com/images/cards/cooking.png"
+                  :src="`data:image/png;base64,${partner.logo}`"
                 >
                   <v-col
                     class="pa-0 wrapper-service"
@@ -337,7 +337,7 @@
                       dense
                       color="white"
                     >
-                      mdi-account-minus
+                      mdi-account-clock
                     </v-icon>
                     <v-icon
                       v-else
