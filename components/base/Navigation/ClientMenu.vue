@@ -27,7 +27,7 @@
 
     <template v-if="mini">
       <template v-for="(menu, index) in clientMenu">
-        <BaseNavigationListItem :key="index" :items="menu" />
+        <BaseNavigationListItem :key="index" :items="menu" :mini="mini" />
       </template>
     </template>
   </v-list>
