@@ -7,7 +7,7 @@
     active-class="item-group-sidebar-active"
     class="my-0 rounded-0 item-group-sidebar"
   >
-    <v-list-item-icon>
+    <v-list-item-icon :style="{ marginRight: mini ? '0 !important' : '' }">
       <v-icon size="32" v-text="items.icon" />
     </v-list-item-icon>
 
@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
+import { defineComponent, PropType } from '@nuxtjs/composition-api'
 
 export default defineComponent({
   name: 'NavigationListItem',
@@ -26,6 +26,10 @@ export default defineComponent({
     items: {
       type: Object,
       required: true,
+    },
+    mini: {
+      type: Boolean as PropType<Boolean>,
+      default: false,
     },
   },
 })
