@@ -8,7 +8,7 @@
     class="my-0 rounded-0 item-group-sidebar"
   >
     <v-list-item-icon>
-      <v-icon large v-text="items.icon" />
+      <v-icon size="32" v-text="items.icon" />
     </v-list-item-icon>
 
     <v-list-item-content>
