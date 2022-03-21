@@ -8,6 +8,7 @@ import Freight from '@/components/base/Icon/Freight.vue'
 import LControl from '@/components/base/Icon/LControl.vue'
 
 export default {
+  rtl: false,
   breakpoint: {
     mobileBreakpoint: 'sm',
   },

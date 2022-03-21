@@ -10,6 +10,7 @@
         <v-list-item-content>
           <v-list-item-title
             class="text-uppercase text-center"
+            :class="[mini ? 'subtitle-2' : '']"
             :style="{ whiteSpace: mini ? 'unset' : '' }"
           >
             Client Portal

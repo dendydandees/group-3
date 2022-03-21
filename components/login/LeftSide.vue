@@ -96,6 +96,19 @@
         </v-alert>
       </ValidationObserver>
     </div>
+
+    <div>
+      <NuxtLink to="#" class="text-decoration-none secondary--text">
+        Forgot Password ?
+      </NuxtLink>
+
+      <p class="mt-4">
+        Don't have an account ?
+        <NuxtLink to="#" class="text-decoration-none secondary--text">
+          Register
+        </NuxtLink>
+      </p>
+    </div>
   </div>
 </template>
 

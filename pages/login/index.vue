@@ -23,10 +23,7 @@
                 src="/images/image_login.png"
                 format="webp"
                 class="d-inline-block"
-                style="
-                  width: 100%;
-                  filter: drop-shadow(1px 1px 1px rgb(0, 0, 0, 1));
-                "
+                style="width: 100%"
                 preload
               />
             </div>
@@ -45,9 +42,3 @@ export default defineComponent({
   layout: 'guest',
 })
 </script>
-
-<style lang="scss">
-body {
-  overflow: hidden;
-}
-</style>
