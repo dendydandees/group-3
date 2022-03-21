@@ -410,6 +410,11 @@ export default defineComponent({
         selectedRuleGroup.country,
         selectedRuleGroup.service
       )
+      await fetchMarketplace(
+        '',
+        '',
+        true
+      )
       zones.value =  [ ...storeFilters.state.filters.zones]
       serviceTypes.value =  [ ...storeFilters.state.filters.serviceTypes]
 
