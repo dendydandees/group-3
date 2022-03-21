@@ -22,7 +22,7 @@ export default {
           darken2: '#0947B7',
         },
         secondary: '#FF3D17',
-        base: '#F7F7F7',
+        base: '#FFFFFF',
         info: colors.teal.lighten1,
       },
     },

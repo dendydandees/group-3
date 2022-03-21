@@ -1,12 +1,5 @@
 <template>
-  <v-app-bar
-    id="app-bar-custom"
-    :elevate-on-scroll="true"
-    app
-    color="base"
-    outlined
-    tile
-  >
+  <v-app-bar id="app-bar-custom" app color="base" outlined tile elevation="0">
     <v-app-bar-nav-icon
       v-if="$vuetify.breakpoint.mobile"
       @click.stop="$emit('doShowSideNav')"
@@ -109,6 +102,7 @@ export default defineComponent({
     const { $auth } = useContext()
     const storeOfApplications = useStore<VuexModuleApplications>()
 
+    // Handle user
     const user = computed(() =>
       $auth.$storage.getUniversal('user')
     ) as ComputedRef<User>
