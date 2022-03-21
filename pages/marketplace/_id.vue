@@ -7,7 +7,7 @@
         class="d-flex align-center mr-8"
       >
         <v-card
-          color="blue"
+          color="primary"
           width="100px"
           height="100px"
           class="rounded-circle mr-4"
@@ -79,7 +79,7 @@
             :class="`text-star d-flex align-center ${tempData.rateDetail.length - 1 !== n ? 'mb-3' : ''}`"
           >
             <v-col
-              class="mr-3 blue--text"
+              class="mr-3 primary--text"
               cols="3"
             >
               {{u.name}}
@@ -97,9 +97,9 @@
           </div>
         </div>
         <v-btn
-          color="white darken-1 blue--text"
+          color="white darken-1 primary--text"
           rounded
-          class="my-13 btn-rate-sheet custom-btn-blue"
+          class="my-13 btn-rate-sheet custom-btn-primary"
         >
           Download Rate Sheet
         </v-btn>
@@ -198,7 +198,7 @@
       </v-col>
     </v-row>
     <div class="bottom-row">
-      <div class="title-filter blue--text display-1 mb-7">
+      <div class="title-filter primary--text display-1 mb-7">
         Coverage Area
       </div>
       <div
@@ -213,7 +213,7 @@
           outlined
           rounded
           dense
-          color="blue"
+          color="primary"
           clearable
           class="custom-select mr-3"
           :full-width="true"
@@ -224,7 +224,7 @@
           outlined
           rounded
           dense
-          color="blue"
+          color="primary"
           clearable
           class="custom-select mr-3"
         />
@@ -505,6 +505,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+@import "~/assets/scss/color.module.scss";
   .detail-marketplace {
     .custom-select {
       max-width: 200px;
@@ -548,10 +549,10 @@ export default defineComponent({
       color: white !important;
     }
   }
-  .custom-btn-blue {
+  .custom-btn-primary {
     transition: all .3s;
     &:hover {
-      background: blue !important;
+      background: $primary !important;
       color: white !important;
     }
   }
