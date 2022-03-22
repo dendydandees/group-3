@@ -231,6 +231,14 @@ export default defineComponent({
     error: {
       type: String,
       default: '',
+    },
+    countryCode: {
+      type: String,
+      default: '',
+    },
+    service: {
+      type: String,
+      default: '',
     }
   },
   setup(props, {emit}) {
@@ -238,10 +246,11 @@ export default defineComponent({
     const storeMarketplaces = useStore<VuexModuleMarketplaces>()
     const storeFilters= useStore<VuexModuleFilters>()
     const serviceTypes = ref([ ...storeFilters.state.filters.serviceTypes ])
-    const zones = ref([...storeFilters.state.filters.zones ])
+    const zones = computed(() => storeFilters.state.filters.zones)
     const countryCodes = computed(() => storeFilters.state.filters.countryCodes)
     const marketplaces = computed(() => storeMarketplaces.state.marketplaces.marketplaces.marketplaces)
     const ruleAdd = ref([]) as Ref<Definition[]>
+    console.log({zones})
 
     const ruleType = computed(() => ([
       {
@@ -363,8 +372,10 @@ export default defineComponent({
     const fetchZones= async () => {
       try {
         $fetchState.pending = true
-
-        await storeFilters.dispatch('filters/getZones')
+        const params = {
+          country: props.countryCode
+        }
+        await storeFilters.dispatch('filters/getZones', {params})
       } catch (error) {
         return error
       } finally {
@@ -388,8 +399,10 @@ export default defineComponent({
         page:1,
         perPage: 100,
         country,
-        service
+        service: [service]
       }
+
+      // console.log({dataParams})
 
       try {
         $fetchState.pending = true
@@ -406,16 +419,16 @@ export default defineComponent({
       await fetchZones()
       await fetchCountryCodes()
       await fetchServices()
-      await fetchMarketplace(
-        selectedRuleGroup.country,
-        selectedRuleGroup.service
-      )
+      // await fetchMarketplace(
+      //   selectedRuleGroup.country,
+      //   selectedRuleGroup.service,
+      // )
       await fetchMarketplace(
         '',
         '',
         true
       )
-      zones.value =  [ ...storeFilters.state.filters.zones]
+      // zones.value =  [ ...storeFilters.state.filters.zones]
       serviceTypes.value =  [ ...storeFilters.state.filters.serviceTypes]
 
     })
@@ -487,6 +500,7 @@ export default defineComponent({
             selectedRule.priority = ''
             selectedRule.zone = ''
             ruleAdd.value = []
+            fetchZones()
           }
         } else if(!newDialogComp) {
           if(!props.isRule) {
@@ -500,11 +514,33 @@ export default defineComponent({
       },
       { deep: true }
     )
+    // watch(
+    //   [() => (selectedRuleGroup.service), () => (selectedRuleGroup.country)],
+    //   ([newSelectedService, newSelectedCountry]) => {
+    //     fetchMarketplace(newSelectedCountry, newSelectedService)
+    //     selectedRuleGroup.defaultPartner = ''
+    //   },
+    //   { deep: true }
+    // )
     watch(
-      [() => (selectedRuleGroup.service), () => (selectedRuleGroup.country)],
+      () => [selectedRuleGroup.service, selectedRuleGroup.country],
       ([newSelectedService, newSelectedCountry]) => {
         fetchMarketplace(newSelectedCountry, newSelectedService)
         selectedRuleGroup.defaultPartner = ''
+      },
+      { deep: true }
+    )
+    watch(
+      () => [selectedRule.zone],
+      ([newSelectedZone]) => {
+        const temp = [...zones.value].filter((x: any) => x.id === newSelectedZone)
+
+
+        fetchMarketplace(
+          temp[0]?.zoneName,
+          props.service
+        )
+        selectedRule.partnerID = ''
       },
       { deep: true }
     )

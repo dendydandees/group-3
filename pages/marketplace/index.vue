@@ -17,7 +17,7 @@
           class="mb-14"
         />
         <div
-          v-if="!filter.search && !filter.country && !filter.service"
+          v-if="!filter.search && !filter.country && filter.service.length === 0"
         >
           <h1 class="headline font-weight-bold mb-2 text-capitalize">
             Featured Network <br>
@@ -29,7 +29,7 @@
             :display="3"
             :height="475"
             :width="586"
-            :autoplay="false"
+            :autoplay="true"
             :on-main-slide-click="changePage"
           >
             <slide
@@ -171,7 +171,7 @@
           </v-col>
         </v-card>
         <div
-          v-if="!filter.search && !filter.country && !filter.service"
+          v-if="!filter.search && !filter.country && filter.service.length === 0"
         >
           <h1 class="headline font-weight-bold mb-6  mt-16 text-capitalize">
             Your Network <br>
@@ -454,8 +454,8 @@ export default defineComponent({
     const filter = ref({
       ...storeMarketplaces.state.marketplaces.marketplaces.filter
     })
-    const zones = ref([]) as Ref<Zone[]>
-    const serviceTypes = ref({ ...storeFilters.state.filters.serviceTypes })
+    const zones = computed(() => storeFilters.state.filters.zones)
+    const serviceTypes = computed(() => storeFilters.state.filters.serviceTypes)
     const idPartner = ref ({}) as Ref<Marketplace | {}>
     // status connect - none - pending - connected
     const statusConnect = reactive ({
@@ -553,8 +553,8 @@ export default defineComponent({
         }
       )
       await fetchServiceZoneOnce()
-      zones.value =  [ ...storeFilters.state.filters.zones]
-      serviceTypes.value =  [ ...storeFilters.state.filters.serviceTypes]
+      // zones.value =  [ ...storeFilters.state.filters.zones]
+      // serviceTypes.value =  [ ...storeFilters.state.filters.serviceTypes]
     })
 
     const locationMapping = (partnerServiceZones: PartnerServiceZone[]) => {

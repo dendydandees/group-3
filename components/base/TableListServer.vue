@@ -300,7 +300,7 @@ export default defineComponent({
       emit('doGetDetails', data)
     }
     const addRuleModal = (data: RuleGroup) => {
-      emit('addRuleModal', data.id)
+      emit('addRuleModal', data)
       // console.log('addRuleModal', data)
       fetchMarketplace(data.countryCode, data.serviceType)
     }

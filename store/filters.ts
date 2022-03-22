@@ -28,11 +28,11 @@ export const mutations: MutationTree<RootStateFilter> = {
 
 export const actions: ActionTree<RootStateFilter, RootStateFilter> = {
   async getOnce({ dispatch, commit, state }) {
-    if (!state.loaded) {
-      await dispatch('getZones');
-      await dispatch('getServiceTypes');
-      commit('SET_LOADED', true);
-    }
+    // if (!state.loaded) {
+    await dispatch('getZones', { params: {} });
+    await dispatch('getServiceTypes');
+    // commit('SET_LOADED', true);
+    // }
   },
   async getCountryCodes({ commit }) {
     try {
@@ -56,9 +56,12 @@ export const actions: ActionTree<RootStateFilter, RootStateFilter> = {
       return error;
     }
   },
-  async getZones({ commit }) {
+  async getZones({ commit }, { params }: { params: { country: string; }; }) {
+    const uri = params
+      ? `?country=${ params.country ?? '' }`
+      : '';
     try {
-      const response = await this?.$axios?.$get('/api/clients/zones');
+      const response = await this?.$axios?.$get(`/api/clients/zones${ uri }`);
       const { zones } = response;
 
       if (!zones) throw response;
