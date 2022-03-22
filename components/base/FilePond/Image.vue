@@ -82,15 +82,15 @@ export default defineComponent({
       labelFileTypeNotAllowed: 'Partner profile logo file is invalid type',
       acceptedFileTypes: ['image/png', 'image/jpeg'],
       // Image crop
-      allowImageCrop: true,
+      allowImageCrop: false,
       imageCropAspectRatio: '1:1',
       // Image preview
       allowImagePreview: true,
       imagePreviewHeight: 120,
       // Image Resize
-      allowImageResize: true,
-      imageResizeTargetWidth: 120,
-      imageResizeTargetHeight: 120,
+      allowImageResize: false,
+      // imageResizeTargetWidth: 120,
+      // imageResizeTargetHeight: 120,
       // Imgae ransform
       allowImageTransform: true,
       // Image Edit
