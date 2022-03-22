@@ -65,12 +65,17 @@ export const mutations: MutationTree<RootStateMarketplaces> = {
 
 export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> = {
   async getMarketplaces({ commit, state }, { params, isLControl }: GetMarketplaces) {
+    // console.log(params);
     let serviceParams = 'service=';
     if (params && params?.service.length > 0) {
       serviceParams = params.service.map((el, i) => {
         return `service=${ el }`;
       }).join('&');
     }
+    // else if (params && typeof params.service === 'string') {
+    //   serviceParams = `service=${ params.service }`;
+    // }
+    // console.log({ serviceParams });
     const uri = params
       ? `?page=${ params.page ?? '' }&perPage=${ params.perPage ?? '' }&search=${ params.search ?? '' }&country=${ params.country ?? '' }&${ serviceParams ?? '' }`
       : '';
@@ -85,9 +90,11 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
         totalPage,
         totalCount,
       };
+      if (!isLControl) {
+        commit('SET_MARKETPLACES', data);
+        commit('SET_META', meta);
 
-      commit('SET_MARKETPLACES', data);
-      commit('SET_META', meta);
+      }
       if (!state.loadedLControl || isLControl) {
         commit('SET_MARKETPLACES_LCONTROL', data);
         commit('SET_LOADED_LCONTROL', true);

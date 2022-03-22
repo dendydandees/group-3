@@ -49,6 +49,8 @@
     <LcontrolCreateForm
       :is-rule="true"
       :dialog="dialog.rule"
+      :country-code="countryCode"
+      :service="service"
       @toggle="toggle('rule')"
       @addRules="addRules"
     />
@@ -106,6 +108,8 @@ export default defineComponent({
     const errorPost = ref({
       rg: ''
     })
+    const service = ref('')
+    const countryCode = ref('')
     const ruleGroupID = ref('')
     const ruleID = ref('')
 
@@ -167,8 +171,10 @@ export default defineComponent({
       toggle('ruleGroup')
     }
 
-    const addRuleModal = (id: string) => {
-      ruleGroupID.value = id
+    const addRuleModal = (data: RuleGroup) => {
+      service.value = data.serviceType
+      countryCode.value = data.countryCode
+      ruleGroupID.value = data.id
       toggle('rule')
     }
 
@@ -330,7 +336,9 @@ export default defineComponent({
       expandedOption,
       dialogDeleteModal,
       deleteRuleGroups,
-      errorPost
+      errorPost,
+      countryCode,
+      service
     }
   },
   head: {},
