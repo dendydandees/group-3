@@ -76,6 +76,7 @@ export default defineComponent({
 })
 </script>
 <style lang="scss">
+@import "~/assets/scss/color.module.scss";
   /* .v-text-field--outlined >>> fieldset {
     border-color: blue
   }
@@ -86,11 +87,11 @@ export default defineComponent({
 
   .input-custom{
     fieldset {
-      border-color: #2196F3;
+      border-color: $primary;
     }
     .v-text-field__slot {
       label {
-        color: #2196F3;
+        color: $primary;
         font-weight: 700;
         font-size: large;
       }

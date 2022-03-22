@@ -29,7 +29,7 @@
             :display="3"
             :height="475"
             :width="586"
-            :autoplay="true"
+            :autoplay="false"
             :on-main-slide-click="changePage"
           >
             <slide
@@ -42,7 +42,7 @@
                 height="100%"
                 class="align-end opacity opacity-custom custom-slide"
 
-                :src="`data:image/png;base64,${slide.logo}`"
+                :src="slide.partnerGallery[0] ? slide.partnerGallery[0].path : null"
               >
                 <div class="gradation-custom">
                   <!-- this is for gradation -->
@@ -233,6 +233,7 @@
               cols="3"
               class="d-flex align-center justify-space-between pa-4"
             >
+
               <v-card
                 elevation="1"
                 shaped
@@ -241,15 +242,16 @@
                 width="100%"
                 height="245px"
                 color="primary"
+
                 :disabled="$fetchState.pending"
                 @click="changePage(partner.id)"
               >
+                  <!-- :src="`data:image/png;base64,${partner.logo}`" -->
                 <v-img
                   height="100%"
                   width="100%"
                   class="align-end "
-
-                  :src="`data:image/png;base64,${partner.logo}`"
+                  :src="partner.partnerGallery[0] ? partner.partnerGallery[0].path : null"
                 >
                   <v-col
                     class="pa-0 wrapper-service"
