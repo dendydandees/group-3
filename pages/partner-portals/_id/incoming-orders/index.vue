@@ -92,18 +92,18 @@ export default defineComponent({
         sortable: false,
       },
       {
-        text: 'Consignee',
-        value: 'incomingConsignee',
-        sortable: false,
-      },
-      {
-        text: 'Pickup',
-        value: 'incomingPickup',
-        sortable: false,
-      },
-      {
         text: 'Service Type',
         value: 'serviceType',
+        sortable: false,
+      },
+      {
+        text: 'Origin',
+        value: 'incomingOrigin',
+        sortable: false,
+      },
+      {
+        text: 'Destination',
+        value: 'incomingPickup',
         sortable: false,
       },
     ])

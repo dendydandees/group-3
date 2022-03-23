@@ -23,57 +23,27 @@
       </span>
     </template>
 
-    <!-- Consignee data -->
-    <template #[`item.incomingConsignee`]="{ item }">
-      <div class="text--secondary my-2">
-        <p class="mb-2 font-weight-bold subtitle-2">
-          {{ item.order.consigneeName }}
-        </p>
-
-        <p class="mb-1">
-          {{ item.order.consigneeAddress }}
-        </p>
-
-        <p class="ma-0">
-          {{
-            $customUtils.setAddress([
-              item.order.consigneeCity,
-              item.order.consigneeProvince,
-              item.order.consigneeCountry,
-              item.order.consigneePostal,
-            ])
-          }}
-        </p>
+    <!-- Origin data -->
+    <template #[`item.incomingOrigin`]="{ item }">
+      <div class="text--secondary">
+        {{ item.order.consigneeState }}
       </div>
     </template>
 
     <!-- Pickup data -->
     <template #[`item.incomingPickup`]="{ item }">
-      <div class="text--secondary my-2">
-        <p class="mb-2 font-weight-bold subtitle-2">
-          {{ item.order.pickupContactName }}
-        </p>
-
-        <p class="mb-1">
-          {{ item.order.pickupAddress }}
-        </p>
-
-        <p class="ma-0">
-          {{
-            $customUtils.setAddress([
-              item.order.pickupCity,
-              item.order.pickupProvince,
-              item.order.pickupCountry,
-              item.order.pickupPostal,
-            ])
-          }}
-        </p>
+      <div class="text--secondary">
+        {{ item.order.pickupState }}
       </div>
     </template>
 
     <!-- Service type -->
     <template #[`item.serviceType`]="{ item }">
-      <v-chip small color="info" class="text-uppercase mb-2 white--text">
+      <v-chip
+        small
+        :color="setColor(item.serviceType)"
+        class="text-uppercase white--text"
+      >
         {{ $customUtils.setServiceType(item.serviceType) }}
       </v-chip>
     </template>
@@ -170,14 +140,13 @@
           preload
           :height="20"
         />
-
       </v-row>
     </template>
-    <template #item.data-table-expand="{ expand, isExpanded, item }">
-        <v-icon v-if="item.useBOB"></v-icon>
-        <v-icon v-else @click="expand(!isExpanded)">
-          {{isExpanded ? 'mdi-chevron-up' : 'mdi-chevron-down'}}
-        </v-icon>
+    <template #[`item.data-table-expand`]="{ expand, isExpanded, item }">
+      <v-icon v-if="item.useBOB"></v-icon>
+      <v-icon v-else @click="expand(!isExpanded)">
+        {{ isExpanded ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
+      </v-icon>
     </template>
     <!-- End Incoming L-Control Page -->
 
@@ -275,6 +244,15 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
+    // For incoming orders
+    const setColor = (data: string) => {
+      return data === 'LAST_MILE'
+        ? 'primary'
+        : data === 'CUSTOMS'
+        ? 'info'
+        : 'secondary'
+    }
+    // end incoming orders
     const storeMarketplaces = useStore<VuexModuleMarketplaces>()
     const marketplaces = computed(
       () => storeMarketplaces.state.marketplaces.marketplaces.marketplaces
@@ -337,6 +315,7 @@ export default defineComponent({
     }
 
     return {
+      setColor,
       pagination,
       footerProps,
       fetch,
