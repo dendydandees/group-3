@@ -305,8 +305,8 @@
                   v-for="service in item.requestedServices"
                   :key="service"
                   small
-                  :color="service === 'LAST_MILE' ? 'primary' : 'secondary'"
-                  class="text-uppercase mb-2 white--text"
+                  :color="setColor(service)"
+                  class="text-uppercase white--text"
                 >
                   {{ $customUtils.setServiceType(service) }}
                 </v-chip>
@@ -315,14 +315,14 @@
 
             <!-- Origin data -->
             <template #[`item.origin`]="{ item }">
-              <div class="text--secondary my-2">
+              <div class="text--secondary">
                 {{ item.consigneeState }}
               </div>
             </template>
 
             <!-- Destination data -->
             <template #[`item.destination`]="{ item }">
-              <div class="text--secondary my-2">
+              <div class="text--secondary">
                 {{ item.pickupState }}
               </div>
             </template>
@@ -567,6 +567,13 @@ export default defineComponent({
         value,
       }))
     })
+    const setColor = (data: string) => {
+      return data === 'LAST_MILE'
+        ? 'primary'
+        : data === 'CUSTOMS'
+        ? 'info'
+        : 'secondary'
+    }
     const selectAllToggle = ({ items }: { items: Order[]; value: boolean }) => {
       if (selectedOrders.value.length === 0) {
         const selectedItems = items.filter((item) => {
@@ -753,6 +760,7 @@ export default defineComponent({
       doGetBatchDetails,
       doDownloadSelectedLabel,
       isShowFilter,
+      setColor,
       selectAllToggle,
       doResetFilter,
       fetchOrders,
