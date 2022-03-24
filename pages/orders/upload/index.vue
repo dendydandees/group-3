@@ -20,7 +20,7 @@
           :key="text"
           :color="isActive(index) ? 'white' : 'primary'"
           :class="[isActive(index) ? 'primary--text' : 'white--text']"
-          class="custom-tab"
+          class="custom-tab mx-2"
           @click="doChangeWindow(index)"
         >
           <v-icon left dark size="28"> {{ icon }} </v-icon>
