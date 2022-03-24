@@ -254,6 +254,7 @@
             @update:options="fetchOrders"
             @toggle-select-all="selectAllToggle"
           >
+            <!-- checkbox on header table -->
             <template #[`header.data-table-select`]="{ props, on }">
               <v-simple-checkbox
                 v-ripple
@@ -266,6 +267,7 @@
               />
             </template>
 
+            <!-- checkbox on table body each item -->
             <template
               #[`item.data-table-select`]="{ item, isSelected, select }"
             >
@@ -279,6 +281,7 @@
               />
             </template>
 
+            <!-- order item cell -->
             <template #[`item.orderCode`]="{ item }">
               <v-btn text color="primary" @click="doGetDetails(item)">
                 {{ item.orderCode }}
@@ -289,6 +292,7 @@
               </v-btn>
             </template>
 
+            <!-- batch id cell -->
             <template #[`item.batchId`]="{ item }">
               <v-btn
                 text
@@ -299,13 +303,14 @@
               </v-btn>
             </template>
 
+            <!-- service type cell -->
             <template #[`item.serviceType`]="{ item }">
               <template v-if="item.requestedServices">
                 <v-chip
                   v-for="service in item.requestedServices"
                   :key="service"
                   small
-                  :color="setColor(service)"
+                  :color="$customUtils.setColorServiceType(service)"
                   class="text-uppercase white--text"
                 >
                   {{ $customUtils.setServiceType(service) }}
@@ -313,20 +318,21 @@
               </template>
             </template>
 
-            <!-- Origin data -->
+            <!-- origin cell -->
             <template #[`item.origin`]="{ item }">
               <div class="text--secondary">
                 {{ item.consigneeState }}
               </div>
             </template>
 
-            <!-- Destination data -->
+            <!-- destination cell -->
             <template #[`item.destination`]="{ item }">
               <div class="text--secondary">
                 {{ item.pickupState }}
               </div>
             </template>
 
+            <!-- actions cell -->
             <template #[`item.actions`]="{ item }">
               <div class="d-flex align-center">
                 <v-btn
@@ -567,13 +573,6 @@ export default defineComponent({
         value,
       }))
     })
-    const setColor = (data: string) => {
-      return data === 'LAST_MILE'
-        ? 'primary'
-        : data === 'CUSTOMS'
-        ? 'info'
-        : 'secondary'
-    }
     const selectAllToggle = ({ items }: { items: Order[]; value: boolean }) => {
       if (selectedOrders.value.length === 0) {
         const selectedItems = items.filter((item) => {
@@ -760,7 +759,6 @@ export default defineComponent({
       doGetBatchDetails,
       doDownloadSelectedLabel,
       isShowFilter,
-      setColor,
       selectAllToggle,
       doResetFilter,
       fetchOrders,

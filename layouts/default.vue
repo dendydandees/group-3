@@ -51,10 +51,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-html {
-  overflow: auto !important;
-}
-
 .main-content {
   margin-bottom: 35rem;
 }

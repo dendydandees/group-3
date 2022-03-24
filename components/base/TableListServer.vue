@@ -41,7 +41,7 @@
     <template #[`item.serviceType`]="{ item }">
       <v-chip
         small
-        :color="setColor(item.serviceType)"
+        :color="$customUtils.setColorServiceType(item.serviceType)"
         class="text-uppercase white--text"
       >
         {{ $customUtils.setServiceType(item.serviceType) }}
@@ -132,7 +132,7 @@
           v-if="!item.useBOB"
           class="font-weight-bold subtitle-2 text-no-wrap align-center"
         >
-          {{  findNamePartner(item.defaultPartnerID) }}
+          {{ findNamePartner(item.defaultPartnerID) }}
         </div>
         <NuxtImg
           v-else-if="item.useBOB"
@@ -244,14 +244,6 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
-    // For incoming orders
-    const setColor = (data: string) => {
-      return data === 'LAST_MILE'
-        ? 'primary'
-        : data === 'CUSTOMS'
-        ? 'info'
-        : 'secondary'
-    }
     // end incoming orders
     const storeMarketplaces = useStore<VuexModuleMarketplaces>()
     const marketplaces = computed(
@@ -287,9 +279,8 @@ export default defineComponent({
     }
 
     const findNamePartner = (id: string) => {
-      if(marketplacesLControl.value && marketplacesLControl.value.length > 0) {
+      if (marketplacesLControl.value && marketplacesLControl.value.length > 0) {
         return marketplacesLControl.value.filter((x) => x.id === id)[0]?.name
-
       }
     }
     const fetchMarketplace = async (country: string, service: string) => {
@@ -315,7 +306,6 @@ export default defineComponent({
     }
 
     return {
-      setColor,
       pagination,
       footerProps,
       fetch,

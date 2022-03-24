@@ -1,5 +1,12 @@
 <template>
-  <v-app-bar id="app-bar-custom" app color="base" outlined tile elevation="0">
+  <v-app-bar
+    id="app-bar-custom"
+    app
+    color="transparent"
+    outlined
+    tile
+    elevation="0"
+  >
     <v-app-bar-nav-icon
       v-if="$vuetify.breakpoint.mobile"
       @click.stop="$emit('doShowSideNav')"
@@ -24,57 +31,55 @@
 
     <v-spacer />
 
-    <v-menu bottom right min-width="200px" offset-y>
-      <template #activator="{ on }">
-        <v-btn
-          text
-          x-large
-          :icon="$vuetify.breakpoint.mobile"
-          color="primary"
-          class="pa-0"
-          v-on="on"
-        >
-          <v-icon
-            left
-            size="48"
-            class="mr-0 mr-md-2 mt-0 mt-md-1"
+    <div class="white" style="border-radius: 24px">
+      <v-menu bottom offset-y>
+        <template #activator="{ on }">
+          <v-btn
+            text
+            x-large
+            :icon="$vuetify.breakpoint.mobile"
             color="primary"
+            class="pa-0 px-2"
+            v-on="on"
           >
-            {{ $vuetify.breakpoint.mobile ? 'mdi-account-circle' : '$profile' }}
-          </v-icon>
-
-          <div class="d-none d-md-flex flex-column text-start">
-            <p
-              class="ma-0 subtitle-2 font-weight-bold text-truncate"
-              style="max-width: 150px"
+            <v-icon
+              left
+              size="48"
+              class="mr-0 mr-md-2 mt-0 mt-md-1"
+              color="primary"
             >
-              {{ user.role }}
-            </p>
+              {{
+                $vuetify.breakpoint.mobile ? 'mdi-account-circle' : '$profile'
+              }}
+            </v-icon>
 
-            <p
-              class="ma-0 subtitle-2 text-truncate text-lowercase"
-              style="max-width: 150px"
-            >
-              {{ user.email }}
-            </p>
-          </div>
-        </v-btn>
-      </template>
+            <div class="d-none d-md-flex flex-column text-start">
+              <p class="ma-0 subtitle-2 font-weight-bold">
+                {{ user.role }}
+              </p>
 
-      <v-card>
-        <v-list-item-content class="justify-center">
-          <div class="mx-auto text-center">
-            <v-btn rounded nuxt to="/account-profiles" color="primary">
-              Profile
-            </v-btn>
+              <p class="ma-0 subtitle-2 text-lowercase">
+                {{ user.email }}
+              </p>
+            </div>
+          </v-btn>
+        </template>
 
-            <v-divider class="my-3" />
+        <v-card>
+          <v-list-item-content class="justify-center">
+            <div class="mx-auto text-center">
+              <v-btn rounded nuxt to="/account-profiles" color="primary">
+                Profile
+              </v-btn>
 
-            <v-btn rounded text @click="doLogout"> Log out </v-btn>
-          </div>
-        </v-list-item-content>
-      </v-card>
-    </v-menu>
+              <v-divider class="my-3" />
+
+              <v-btn rounded text @click="doLogout"> Log out </v-btn>
+            </div>
+          </v-list-item-content>
+        </v-card>
+      </v-menu>
+    </div>
   </v-app-bar>
 </template>
 

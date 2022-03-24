@@ -11,9 +11,7 @@
     </div>
 
     <div class="mb-15">
-      <h1 class="primary--text font-weight-regular text-h4 mb-4">
-        Welcome Back!
-      </h1>
+      <h1 class="primary--text font-weight-bold text-h4 mb-4">Welcome Back!</h1>
 
       <span>Login with your account!</span>
     </div>

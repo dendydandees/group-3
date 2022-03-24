@@ -49,8 +49,12 @@ export default defineComponent({
       type: Array,
       required: true,
     },
+    step: {
+      type: Number,
+      required: true,
+    },
   },
-  setup(_props, { emit }) {
+  setup(props, { emit }) {
     // store manage
     const storeApplications = useStore<VuexModuleApplications>()
 
@@ -91,8 +95,8 @@ export default defineComponent({
           formatKey = formatKey.replaceAll(/[*]/g, '')
         }
 
-        if (key.includes('_')) {
-          formatKey = formatKey.replace(/(_)./g, (s) =>
+        if (key.match(/\s/g)) {
+          formatKey = formatKey.replace(/\s./g, (s) =>
             s.slice(-1).toUpperCase()
           )
         }
@@ -126,7 +130,10 @@ export default defineComponent({
           const data = new Uint8Array(arrayBuffer)
           const workbook = read(data, { type: 'array' })
           // find the name of your sheet in the workbook first
-          const worksheetOrders = workbook.Sheets.Orders
+          const worksheetOrders =
+            workbook.Sheets[
+              props.step === 0 ? 'Domestic Orders' : 'Crossborder Orders'
+            ]
           const worksheetItems = workbook.Sheets['Order Items']
           // convert to json format
           let orders = utils.sheet_to_json(worksheetOrders) as Order[]
@@ -143,17 +150,9 @@ export default defineComponent({
             })
           }
 
-          // format keys orders data
-          orders = orders.map((data) => {
-            // format key orders data
-            return formatKey(data)
-          })
-
-          // format keys order items data
-          orderItems = orderItems.map((data) => {
-            // format key orders data
-            return formatKey(data)
-          })
+          // format keys data
+          orders = orders.map((data) => formatKey(data))
+          orderItems = orderItems.map((data) => formatKey(data))
 
           // filter excel data notes
           orders = orders.filter((data) => !Object.keys(data).includes('note'))
@@ -164,20 +163,18 @@ export default defineComponent({
           // merge orders and order items
           const batchOrders = orders.map((order) => {
             const items = orderItems
-              .filter((item) => {
-                return order.orderCode === item.orderCode
-              })
+              .filter((item) => order.orderCode === item.orderCode)
               .map((order) => ({
                 ...order,
-                price: order.price.toString(),
                 productCode: order.productCode.toString(),
               }))
 
             return {
               ...order,
               items,
+              uploadType: props.step === 0 ? 'domestic' : 'crossBorder',
               consigneePostal: order.consigneePostal.toString(),
-              pickupPostal: order.pickupPostal.toString(),
+              senderPostal: order?.senderPostal?.toString(),
             }
           })
 

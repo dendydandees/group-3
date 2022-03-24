@@ -15,19 +15,28 @@
     />
 
     <v-sheet color="transparent" width="100%" class="mx-10">
-      <v-btn
-        :color="step === 1 ? 'white' : 'primary'"
-        class="custom-tab primary--text"
-      >
-        <v-icon left dark size="32"> $freight </v-icon>
-        Cross border
-      </v-btn>
+      <template v-for="({ text, icon }, index) in stepList">
+        <v-btn
+          :key="text"
+          :color="isActive(index) ? 'white' : 'primary'"
+          :class="[isActive(index) ? 'primary--text' : 'white--text']"
+          class="custom-tab"
+          @click="doChangeWindow(index)"
+        >
+          <v-icon left dark size="28"> {{ icon }} </v-icon>
+          {{ text }}
+        </v-btn>
+      </template>
     </v-sheet>
 
     <v-card elevation="2">
       <v-window v-model="step">
+        <v-window-item :value="0">
+          <OrdersUploadForm :step="step" />
+        </v-window-item>
+
         <v-window-item :value="1">
-          <OrdersUploadCrossBorder />
+          <OrdersUploadForm :step="step" />
         </v-window-item>
       </v-window>
     </v-card>
@@ -40,16 +49,37 @@ import {
   useMeta,
   useRouter,
   ref,
+  computed,
 } from '@nuxtjs/composition-api'
 
 export default defineComponent({
   name: 'UploadOrdersPages',
   setup() {
-    useMeta({ titleTemplate: '%s | Upload Orders' })
-
     const router = useRouter()
 
-    const step = ref(1)
+    // manage windows
+    const step = ref(10)
+    const stepList = ref([
+      {
+        text: 'Domestic',
+        icon: '$domestic',
+      },
+      {
+        text: 'Cross border',
+        icon: '$freight',
+      },
+    ])
+    const isActive = (data: number) => step.value === data
+    const doChangeWindow = (data: number) => {
+      step.value = data
+    }
+    // manage title
+    const currentTitle = computed(() =>
+      step.value === 0 ? 'Domestic' : 'Cross Border'
+    )
+    useMeta(() => ({
+      title: `Client Portal | Upload ${currentTitle.value} Orders`,
+    }))
 
     const doBackTo = () => {
       router.go(-1)
@@ -57,6 +87,9 @@ export default defineComponent({
 
     return {
       step,
+      stepList,
+      isActive,
+      doChangeWindow,
       doBackTo,
     }
   },
