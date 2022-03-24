@@ -11,9 +11,7 @@
     </template>
 
     <template #footer>
-      <v-divider class="my-4" />
-
-      <p class="ma-0 text-right font-weight-bold">
+      <p class="ma-0 mt-6 text-right font-weight-bold">
         Total
         <span class="primary--text title ml-2">
           {{ setTotal() }}
@@ -49,7 +47,7 @@ export default defineComponent({
       hideDefaultFooter: true,
       headers: [
         {
-          text: 'Product Code',
+          text: 'Product ID',
           value: 'productCode',
         },
         {

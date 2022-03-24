@@ -4,27 +4,26 @@
       <v-progress-linear color="info" height="8" indeterminate />
     </template>
 
-    <v-card-text class="body-1 white--text">
-      <h2 class="font-weight-bold title">Order Details</h2>
+    <BaseLoading v-if="fetchState.pending" color="white" />
 
-      <v-divider class="grey lighten-4 my-4" />
-
-      <BaseLoading v-if="fetchState.pending" color="white" />
-
+    <v-card-text class="body-1 pa-6 grey--text text--lighten-4">
       <v-expand-transition>
         <div v-if="!fetchState.pending">
-          <h3 class="font-weight-medium subtitle-1">
+          <h2 class="font-weight-bold headline white--text mb-4">
             {{ order.orderCode }}
-          </h3>
+          </h2>
 
-          <p class="mb-4">
-            {{ order.length }} (cm) x {{ order.width }} (cm) x
-            {{ order.height }} (cm) &bull; {{ order.weight }} (kg)
+          <p class="mb-0">
+            {{ order.length.toFixed(1) }} (cm) x
+            {{ order.width.toFixed(1) }} (cm) x
+            {{ order.height.toFixed(1) }} (cm)
           </p>
 
-          <v-chip small color="success" class="text-uppercase mb-2 black--text">
+          <p class="mb-0">{{ order.weight.toFixed(1) }} kg</p>
+
+          <p class="mb-0 text-uppercase">
             {{ order.paymentType }}
-          </v-chip>
+          </p>
         </div>
       </v-expand-transition>
     </v-card-text>
