@@ -3,7 +3,10 @@
     <v-card-text class="pa-8">
       <v-expand-transition>
         <v-alert
-          v-if="alert.isShow && alert.message.includes('order')"
+          v-if="
+            (alert.isShow && alert.message.includes('Order')) ||
+            alert.message.includes('order')
+          "
           :type="alert.type"
           rounded="xl"
         >
@@ -14,17 +17,18 @@
       <OrdersFilePondCSV
         ref="filePond"
         v-model="form"
+        :step="step"
         @changeLoading="loading = !loading"
       />
 
       <span class="caption text--secondary">
         Download sample file:
         <a
-          href="/files/Sample_Orders.xlsx"
+          :href="`/files/orders/${exampleFile}`"
           download
           class="secondary--text text-decoration-none font-weight-bold"
         >
-          Sample_Orders.xlsx
+          {{ exampleFile }}
         </a>
       </span>
     </v-card-text>
@@ -57,8 +61,8 @@ import {
   Ref,
   useStore,
   useRouter,
-  useMeta,
   onMounted,
+  watch,
 } from '@nuxtjs/composition-api'
 
 // Interfaces adn types
@@ -66,18 +70,29 @@ import { VuexModuleApplications } from '~/types/applications'
 import { VuexModuleOrders } from '~/types/orders'
 
 export default defineComponent({
-  setup() {
-    useMeta({ titleTemplate: '%s | Upload Orders' })
+  props: {
+    step: {
+      type: Number,
+      required: true,
+    },
+  },
+  setup(props) {
     const router = useRouter()
-    // store manage
+    // manage store
     const storeApplications = useStore<VuexModuleApplications>()
     const storeOfOrders = useStore<VuexModuleOrders>()
     const alert = computed(() => storeApplications.state.applications.alert)
 
+    const exampleFile = computed(() =>
+      props.step === 0
+        ? 'sample_orders_domestic.xlsx'
+        : 'sample_orders_cross_borders.xlsx'
+    )
+
+    // manage upload
+    const loading = ref(false)
     const form = ref([])
     const filePond = ref(null) as Ref<any>
-    const loading = ref(false)
-
     const doResetForm = () => {
       try {
         loading.value = true
@@ -137,8 +152,17 @@ export default defineComponent({
       storeApplications.commit('applications/RESET_ALERT')
     })
 
+    // reset form if window upload changed
+    watch(
+      () => props.step,
+      () => {
+        doResetForm()
+      }
+    )
+
     return {
       alert,
+      exampleFile,
       form,
       filePond,
       loading,
@@ -146,6 +170,5 @@ export default defineComponent({
       doSubmitForm,
     }
   },
-  head: {},
 })
 </script>

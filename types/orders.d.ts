@@ -22,14 +22,22 @@ export interface Order {
   height: number
   weight: number
   paymentType: string
-  pickupContactName: string
-  pickupContactNumber: string
-  pickupState: string
-  pickupCity: string
-  pickupProvince: string
-  pickupPostal: string
-  pickupCountry: string
-  pickupAddress: string
+  pickupContactName?: string
+  pickupContactNumber?: string
+  pickupState?: string
+  pickupCity?: string
+  pickupProvince?: string
+  pickupPostal?: string
+  pickupCountry?: string
+  pickupAddress?: string
+  senderContactName?: string
+  senderContactNumber?: string
+  senderState?: string
+  senderCity?: string
+  senderProvince?: string
+  senderPostal?: string
+  senderCountry?: string
+  senderAddress?: string
   refID: number
   labelPath: string
 }

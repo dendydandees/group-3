@@ -6,6 +6,7 @@ import ClientConnections from '@/components/base/Icon/ClientConnections.vue'
 import Profile from '@/components/base/Icon/Profile.vue'
 import Freight from '@/components/base/Icon/Freight.vue'
 import LControl from '@/components/base/Icon/LControl.vue'
+import Domestic from '@/components/base/Icon/Domestic.vue'
 
 export default {
   rtl: false,
@@ -36,6 +37,7 @@ export default {
       profile: { component: Profile },
       freight: { component: Freight },
       lControl: { component: LControl },
+      domestic: { component: Domestic },
     },
   },
 }

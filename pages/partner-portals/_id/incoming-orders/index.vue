@@ -163,6 +163,7 @@ export default defineComponent({
     )
 
     const { $fetchState, fetch } = useFetch(async () => {
+      storeApplications.commit('applications/RESET_ALERT')
       await fetchIncomingOrders(pagination.value)
     })
 
