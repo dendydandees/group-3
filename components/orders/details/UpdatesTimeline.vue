@@ -14,6 +14,8 @@
             :key="update.id"
             small
             class="mb-10"
+            fill-dot
+            :color="$customUtils.setColorServiceType(update.serviceType)"
           >
             <v-row justify="space-between">
               <v-col cols="auto">
@@ -22,7 +24,7 @@
                 </h3>
 
                 <p class="ma-0 caption">
-                  {{ update.serviceType }}
+                  {{ $customUtils.setServiceType(update.serviceType) }}
                 </p>
               </v-col>
               <v-col class="text-right" cols="auto">
@@ -65,3 +67,10 @@ export default defineComponent({
   },
 })
 </script>
+
+<style lang="scss">
+.v-timeline:before {
+  width: 0px !important;
+  border: 1px dashed $secondary;
+}
+</style>
