@@ -175,7 +175,6 @@ export default defineComponent({
         const user = {
           clientId,
           role: role.toLowerCase().replaceAll('_', ' '),
-          initial: email.charAt(0).toUpperCase(),
           email,
           partnerProfiles,
         }
