@@ -44,8 +44,8 @@
           >
             <v-icon
               left
-              size="48"
-              class="mr-0 mr-md-2 mt-0 mt-md-1"
+              size="40"
+              class="mr-0 mr-md-1 mt-0 mt-md-1"
               color="primary"
             >
               {{
@@ -54,7 +54,9 @@
             </v-icon>
 
             <div class="d-none d-md-flex flex-column text-start">
-              <p class="ma-0 subtitle-2 font-weight-bold">
+              <p
+                class="ma-0 subtitle-2 font-weight-bold text-capitalize text-left"
+              >
                 {{ user.role }}
               </p>
 
@@ -66,17 +68,35 @@
         </template>
 
         <v-card>
-          <v-list-item-content class="justify-center">
-            <div class="mx-auto text-center">
-              <v-btn rounded nuxt to="/account-profiles" color="primary">
+          <v-list>
+            <!-- to profile -->
+            <v-list-item nuxt to="/account-profiles" color="primary">
+              <v-list-item-avatar color="primary">
+                <v-icon dark class="white--text mt-0 mt-md-1" size="32">
+                  {{
+                    $vuetify.breakpoint.mobile
+                      ? 'mdi-account-circle'
+                      : '$profile'
+                  }}
+                </v-icon>
+              </v-list-item-avatar>
+
+              <v-list-item-content class="font-weight-bold">
                 Profile
-              </v-btn>
+              </v-list-item-content>
+            </v-list-item>
 
-              <v-divider class="my-3" />
+            <v-divider class="my-2" />
 
-              <v-btn rounded text @click="doLogout"> Log out </v-btn>
-            </div>
-          </v-list-item-content>
+            <!-- to logout -->
+            <v-list-item link color="primary" @click="doLogout">
+              <v-list-item-icon>
+                <v-icon> mdi-logout-variant </v-icon>
+              </v-list-item-icon>
+
+              <v-list-item-content> Log out </v-list-item-content>
+            </v-list-item>
+          </v-list>
         </v-card>
       </v-menu>
     </div>

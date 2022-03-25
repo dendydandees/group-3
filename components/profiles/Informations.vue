@@ -6,9 +6,7 @@
           <v-row align="center">
             <v-col cols="12" md="auto">
               <v-avatar size="56" color="secondary">
-                <span class="text-uppercase font-weight-bold title">
-                  {{ user.initial }}
-                </span>
+                <v-icon dark x-large>mdi-account-circle</v-icon>
               </v-avatar>
             </v-col>
 
