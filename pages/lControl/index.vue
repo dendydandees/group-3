@@ -105,6 +105,7 @@
                 color="#FF3D17"
                 :style="`${selected.countryIndex === null ? 'visibility: hidden;' : ''}`"
                 class="ma-0"
+                @change="handleBob"
               >
                 <template #label>
                   <span
@@ -157,7 +158,7 @@
             :class="`zone-text`"
           >
             <div
-              v-for="(el, i) in zones"
+              v-for="(el, i) in zonesCust"
               :key="i"
               :class="`text`"
               :style="`${selected.serviceIndex === null ? 'visibility: hidden;' : ''}`"
@@ -173,13 +174,14 @@
                     v-if="true"
                     style="font-size: 15px; line-height: 18px; color: #575757"
                   >
-                    Waiting for Setup
+                  {{!el.partnerID ? 'Waiting for Setup' : ''}}
+
                   </span>
                   <v-btn
                     color="primary darken-1 white--text ml-6"
-                    @click="indexSelect({index: i, value: el.id, name: el.zoneName}, 'zone')"
+                    @click="indexSelect({index: i, value: el.id, name: el.zoneName, data: el}, 'zone')"
                   >
-                    {{false ? 'SETUP' : 'UPDATE'}}
+                    {{!el.partnerID ? 'SETUP' : 'UPDATE'}}
                   </v-btn>
 
                 </div>
@@ -240,6 +242,8 @@
               <v-btn
                 color="primary darken-1 white--text"
                 style="align-self: end"
+                :disabled="!selected.partnerID"
+                @click="btnAction"
               >
                 SAVE CHANGES
               </v-btn>
@@ -290,13 +294,19 @@ export default defineComponent({
       return computeLControls(storeLControls.state.lControls.lControls.lControls)
     })
     const lControlsCust = ref([]) as Ref<RuleGroup[] | []>
-    console.log(lControlsCust)
+    const zonesCust = ref([]) as Ref<any>
+
     const selected = ref({
       countryIndex: null as {index: number, value: string} | null,
       serviceIndex: null as {index: number, value: string} | null,
       zoneIndex: null as {index: number, value: string, name?: string} | null,
       partnerID: '' as string,
-      useBOB: false as boolean
+      useBOB: false as boolean,
+      ruleGroupID: '' as string,
+      rules: [] as any,
+      ruleID: '' as string,
+      isUpdate: false as boolean,
+      priority: null as number | null
     })
 
     const breadcrumbs = ref([
@@ -375,7 +385,7 @@ export default defineComponent({
       }
     }
 
-    const indexSelect = async (data:{index: number, value: string, name?: string}, type: string) => {
+    const indexSelect = async (data:{index: number, value: string, name?: string, data?: any}, type: string) => {
       switch (type) {
         case 'country':
           selected.value.countryIndex = {index: data.index, value: data.value}
@@ -403,9 +413,122 @@ export default defineComponent({
             service: selected.value.serviceIndex?.value,
             zone: selected.value.zoneIndex.value
           })
+          selected.value.partnerID = data.data.partnerID
+          selected.value.ruleGroupID = data.data.ruleGroupID
+          selected.value.rules = data.data.rules
+          selected.value.ruleID = data.data.ruleID
+          selected.value.priority = data.data.priority
+          selected.value.isUpdate = !!data.data.partnerID
+          console.log(selected.value, data)
           break;
         default:
           break;
+      }
+    }
+    const addRules = async () => {
+      try {
+        const payload = {
+          id: selected.value.ruleGroupID,
+          data: {
+            partnerID: selected.value.partnerID,
+            priority: selected.value.rules.length + 1,
+            definitions: [
+              {
+                type: "RULE_TYPE_ZONE",
+                value: selected.value.zoneIndex?.value
+              }
+            ]
+          }
+        }
+
+        $fetchState.pending = true
+
+        const res = await storeLControls.dispatch('lControls/lControls/addRules', payload)
+        console.log('this is add RULE', res?.response?.data)
+      } catch (error) {
+        console.log( error)
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+    const updateRules = async () => {
+      try {
+        const payload = {
+          id: selected.value.ruleID,
+          data: {
+            partnerID: selected.value.partnerID,
+            priority: selected.value.priority
+          }
+        }
+
+        $fetchState.pending = true
+
+        const res = await storeLControls.dispatch('lControls/lControls/updateRules', payload)
+      } catch (error) {
+        console.log( error)
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+    const addRuleGroup = async () => {
+      try {
+        const data = {
+          defaultPartnerID: selected.value.partnerID,
+          serviceType: selected.value.serviceIndex?.value,
+          countryCode: selected.value.countryIndex?.value,
+        }
+
+        $fetchState.pending = true
+
+        const res = await storeLControls.dispatch('lControls/lControls/addRuleGroup', data)
+        if(res) {
+          selected.value.ruleGroupID = res?.id
+        }
+      } catch (error: any) {
+        console.log(error)
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+    const updateRuleGroup = async () => {
+      try {
+        const data = {
+          defaultPartnerID: selected.value.partnerID,
+          ruleGroupID: selected.value.ruleGroupID
+        }
+
+        $fetchState.pending = true
+
+        const res = await storeLControls.dispatch('lControls/lControls/updateRuleGroup', data)
+      } catch (error: any) {
+        console.log(error)
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+    const addBOB = async () => {
+      try {
+        const payload = selected.value.countryIndex?.value
+
+        $fetchState.pending = true
+
+        const res = await storeLControls.dispatch(`lControls/lControls/addBOB`, payload)
+      } catch (error) {
+        console.log( error)
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+    const deleteBOB = async () => {
+      try {
+        const payload = selected.value.countryIndex?.value
+        $fetchState.pending = true
+
+        const res = await storeLControls.dispatch('lControls/lControls/deleteBOB', payload)
+      } catch (error) {
+        console.log( error)
+      } finally {
+        $fetchState.pending = false
       }
     }
     const { $fetchState, fetch } = useFetch(async () => {
@@ -415,6 +538,39 @@ export default defineComponent({
       lControlsCust.value = [...storeLControls.state.lControls.lControls.lControls]
     })
 
+    const btnAction = async () => {
+      try {
+        const actionRG = addRuleGroup
+        let actionR = addRules
+        if(selected.value.isUpdate) {
+          await updateRuleGroup()
+          actionR = updateRules
+        }
+        // alert(selected.value.ruleGroupID)
+        if(!selected.value.ruleGroupID) {
+          const res = await addRuleGroup()
+          console.log('res dr actionBtn', res)
+        }
+        await actionR()
+        await fetchRuleGroups()
+
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    const handleBob = async (e: boolean) => {
+      try {
+        if(e) {
+          await addBOB()
+        } else {
+          await deleteBOB()
+        }
+        console.log({e})
+      } catch (error) {
+        console.log(error)
+      }
+    }
 
     const backBtnHandler = () => {
       selected.value.zoneIndex = null
@@ -450,6 +606,24 @@ export default defineComponent({
           selected.value.zoneIndex = null
           selected.value.serviceIndex = null
           selected.value.useBOB = false
+        }
+
+        if(newCountryIndex) {
+          const countryID = newCountryIndex.value
+          if(lControls.value && lControls.value.length > 0) {
+            const temp = [...lControls.value]
+            let isUseBOB = false
+            temp.forEach((el: RuleGroup) => {
+              if(
+                (el.countryCode === countryID) &&
+                (el.useBOB)
+              ) {
+                isUseBOB = true
+              }
+            })
+            selected.value.useBOB = isUseBOB
+            console.log({isUseBOB})
+          }
         }
       },
       { deep: true }
@@ -500,10 +674,13 @@ export default defineComponent({
               let serviceType = '' as any
               let priority = null as any
               let definitions = [] as any
+              let rules = [] as any
               if(temp && temp.length > 0) {
                 temp.forEach((d: RuleGroup) => {
+                  ruleGroupID = d.id
                   serviceType = d.serviceType
                   if(d.Rules && d.Rules.length > 0) {
+                    rules = d.Rules
                     d.Rules.forEach((c: Rule) => {
                     definitions = [...c.definitions].filter((e: Definition) => !e.type.includes('ZONE'))
                     if(c.definitions && c.definitions.length > 0) {
@@ -511,7 +688,6 @@ export default defineComponent({
                         console.log(e.value === el.id)
                         if(e.value === el.id) {
                           partnerID = c.partnerID
-                          ruleGroupID = c.ruleGroupID
                           priority = c.priority
                           ruleID = e.ruleID
                         }
@@ -527,12 +703,13 @@ export default defineComponent({
                 ruleID,
                 ruleGroupID,
                 priority,
+                rules,
                 definitions,
                 serviceType
               }
             })
-
-            console.log(computeZone)
+            zonesCust.value = computeZone
+            // console.log({computeZone}, zonesCust)
           }
         },
       { deep: true }
@@ -552,9 +729,12 @@ export default defineComponent({
       countryCodes,
       serviceTypes,
       zones,
+      zonesCust,
       marketplaces,
       indexSelect,
-      backBtnHandler
+      backBtnHandler,
+      btnAction,
+      handleBob
     }
   },
   head: {},

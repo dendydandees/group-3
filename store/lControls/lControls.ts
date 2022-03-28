@@ -17,6 +17,12 @@ interface inputAddRules {
   ruleID: string;
 }
 
+interface inputPatchRules {
+  data: { partnerID: string, priority: number; },
+  id: string,
+  ruleID: string;
+}
+
 export const state = () => ({
   lControls: [] as RuleGroup[] | [],
   meta: {
@@ -61,9 +67,30 @@ export const actions: ActionTree<RootStateLControls, RootStateLControls> = {
       return error;
     }
   },
+  async updateRuleGroup({ commit }, data: { defaultPartnerID: string, ruleGroupID: string; }) {
+    try {
+      const response = await this?.$axios?.$patch(`/api/clients/rule-groups/${ data.ruleGroupID }`, { defaultPartnerID: data.defaultPartnerID });
+      // const clientId = '25020c83-7c76-4a2c-8d5a-6e91590015b8';
+      // const response = await this?.$axios?.$post(`/api/admin/clients/${ clientId }/rule-groups`, data);
+      if (!response) throw response;
+
+      return response;
+    } catch (error: any) {
+      console.log({ error: error?.response?.data });
+      return error;
+    }
+  },
   async addRules({ commit }, { id, data }: inputAddRules) {
     try {
       const response = await this?.$axios?.$post(`/api/clients/rule-groups/${ id ?? '' }/rules`, data);
+      return response;
+    } catch (error) {
+      return error;
+    }
+  },
+  async updateRules({ commit }, { id, data }: inputPatchRules) {
+    try {
+      const response = await this?.$axios?.$patch(`/api/clients/rules/${ id ?? '' }`, data);
       return response;
     } catch (error) {
       return error;
@@ -84,5 +111,24 @@ export const actions: ActionTree<RootStateLControls, RootStateLControls> = {
     } catch (error) {
       return error;
     }
-  }
+  },
+  async addBOB({ commit }, country: string) {
+    try {
+      const dataUser = JSON.parse(localStorage.getItem('auth.user') as any);
+      const response = await this?.$axios?.$post(`/api/clients/${ dataUser?.clientId }/use-bob?country=${ country }`);
+      return response;
+    } catch (error) {
+      return error;
+    }
+  },
+  async deleteBOB({ commit }, country: string) {
+    try {
+      const dataUser = JSON.parse(localStorage.getItem('auth.user') as any);
+      const response = await this?.$axios?.$delete(`/api/clients/${ dataUser?.clientId }/use-bob?country=${ country }`);
+      console.log({ response });
+      return response;
+    } catch (error) {
+      return error;
+    }
+  },
 };
