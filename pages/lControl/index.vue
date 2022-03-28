@@ -68,15 +68,15 @@
       >
         <div class="country-wrapper-content scroller">
           <div
-            v-for="(el, i) in 20"
+            v-for="(el, i) in countryCodes"
             :key="i"
             :class="`text padding-text-country ${ selected.countryIndex && selected.countryIndex.index === i ? 'service-color' : ''}`"
-            @click="indexSelect({index: i, value: ''}, 'country')"
+            @click="indexSelect({index: i, value: el.value}, 'country')"
           >
             <div
               :class="`${selected.countryIndex && selected.countryIndex.index === i ? 'red-color' : ''}`"
             >
-              INDONESIA
+              {{el.name}}
             </div>
             <div
               class="text-sub"
@@ -88,13 +88,13 @@
         <div class="service-wrapper-content service-color scroller blue-scroller">
 
             <div
-              v-for="(el, i) in 3"
+              v-for="(el, i) in serviceTypes"
               :key="i"
               :class="`text ${selected.serviceIndex && selected.serviceIndex.index === i ? 'red-color' : ''} ${selected.useBOB ? 'disabled' : ''}`"
               :style="`${selected.countryIndex === null ? 'visibility: hidden;' : ''}line-height: 36px`"
-              @click="indexSelect({index: i, value: ''}, 'service')"
+              @click="indexSelect({index: i, value: el.name}, 'service')"
             >
-              First Mile
+              {{$customUtils.setServiceType(el.name)}}
             </div>
             <div
               v-if="selected.countryIndex !== null"
@@ -157,7 +157,7 @@
             :class="`zone-text`"
           >
             <div
-              v-for="(el, i) in 5"
+              v-for="(el, i) in zones"
               :key="i"
               :class="`text`"
               :style="`${selected.serviceIndex === null ? 'visibility: hidden;' : ''}`"
@@ -166,7 +166,7 @@
                 :class="`d-flex align-center justify-space-between`"
               >
                 <div>
-                  Kuala Lumpur
+                  {{el.zoneName}}
                 </div>
                 <div>
                   <span
@@ -177,7 +177,7 @@
                   </span>
                   <v-btn
                     color="primary darken-1 white--text ml-6"
-                    @click="indexSelect({index: i, value: '', name: 'kUALA lUMPUR'}, 'zone')"
+                    @click="indexSelect({index: i, value: el.id, name: el.zoneName}, 'zone')"
                   >
                     {{false ? 'SETUP' : 'UPDATE'}}
                   </v-btn>
@@ -230,9 +230,10 @@
                   {{selected.zoneIndex && selected.zoneIndex.name}}
                 </div>
                 <LcontrolDropdownCustom
+                  v-model="selected.partnerID"
                   :label="'Zone Default Network Partner'"
                   :placeholder="'Default Partner'"
-                  :data="[]"
+                  :data="marketplaces"
                   :item-show="{text: 'name', value: 'id'}"
                 />
               </div>
@@ -268,7 +269,8 @@ import {
   onUnmounted
 } from '@nuxtjs/composition-api'
 // Interfaces or types
-import { VuexModuleLControls,Definition,Rule,RuleGroup } from '~/types/lControl/lControl'
+import { VuexModuleFilters, Zone, ServiceType} from '~/types/filters'
+import { VuexModuleLControls,Definition,Rule , RuleGroup } from '~/types/lControl/lControl'
 import { VuexModuleApplications, ModalConfirm } from '~/types/applications'
 import { Marketplace, VuexModuleMarketplaces, PartnerServiceZone } from '~/types/marketplace/marketplace'
 
@@ -277,10 +279,23 @@ export default defineComponent({
   name: 'LControl',
   layout: 'default',
   setup() {
+    const storeMarketplaces = useStore<VuexModuleMarketplaces>()
+    const storeFilters= useStore<VuexModuleFilters>()
+    const storeLControls = useStore<VuexModuleLControls>()
+    const countryCodes = computed(() => storeFilters.state.filters.countryCodes)
+    const serviceTypes = computed(() => storeFilters.state.filters.serviceTypes)
+    const zones = computed(() => storeFilters.state.filters.zones)
+    const marketplaces = computed(() => storeMarketplaces.state.marketplaces.marketplaces.marketplaces)
+    const lControls = computed(() => {
+      return computeLControls(storeLControls.state.lControls.lControls.lControls)
+    })
+    const lControlsCust = ref([]) as Ref<RuleGroup[] | []>
+    console.log(lControlsCust)
     const selected = ref({
       countryIndex: null as {index: number, value: string} | null,
       serviceIndex: null as {index: number, value: string} | null,
       zoneIndex: null as {index: number, value: string, name?: string} | null,
+      partnerID: '' as string,
       useBOB: false as boolean
     })
 
@@ -293,15 +308,87 @@ export default defineComponent({
       },
     ]) as Ref<{text?: string, disabled: boolean, first?: boolean, href?: string}[]>
 
-    const indexSelect = (data:{index: number, value: string, name?: string}, type: string) => {
+
+    const fetchCountryCodes = async () => {
+      try {
+        $fetchState.pending = true
+
+        await storeFilters.dispatch('filters/getCountryCodes', {params: {} })
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+    const fetchServices = async () => {
+      try {
+        $fetchState.pending = true
+
+        await storeFilters.dispatch('filters/getServiceTypes')
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+    const fetchZones= async () => {
+      try {
+        $fetchState.pending = true
+        const params = {
+          country: selected.value.countryIndex?.value
+        }
+        await storeFilters.dispatch('filters/getZones', {params})
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+    const fetchMarketplace = async (params: {country?: string, service?: string, zone?: string, isLControl?: Boolean}) => {
+      const dataParams = {
+        page:1,
+        perPage: 100,
+        country: params.country,
+        service: params.service ? [params.service] : [],
+        zone: params.zone
+      }
+
+      try {
+        $fetchState.pending = true
+
+        await storeFilters.dispatch('marketplaces/marketplaces/getMarketplaces', { params: dataParams, isLControl: params.isLControl})
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+    const fetchRuleGroups = async () => {
+      try {
+        $fetchState.pending = true
+
+        await storeLControls.dispatch('lControls/lControls/getLControls', {params: {} })
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+
+    const indexSelect = async (data:{index: number, value: string, name?: string}, type: string) => {
       switch (type) {
         case 'country':
           selected.value.countryIndex = {index: data.index, value: data.value}
           // FETCH SERVICE if vuex is still empty
+          if(serviceTypes.value?.length === 0) {
+            await fetchServices()
+
+          }
           break;
         case 'service':
           selected.value.serviceIndex = {index: data.index, value: data.value}
           // FETCH ZONE BY COUNTRY
+          await fetchZones()
           break;
         case 'zone':
           selected.value.zoneIndex = {index: data.index, value: data.value, name: data.name}
@@ -311,20 +398,32 @@ export default defineComponent({
             // href: 'breadcrumbs_link_1',
           }]
           // FETCH PARTNER BY COUNTRY, SERVICE, ZONE
+          await fetchMarketplace({
+            country: selected.value.countryIndex?.value,
+            service: selected.value.serviceIndex?.value,
+            zone: selected.value.zoneIndex.value
+          })
           break;
         default:
           break;
       }
     }
-
     const { $fetchState, fetch } = useFetch(async () => {
       // FETCH COUNTRY
+      await fetchCountryCodes()
+      await fetchRuleGroups()
+      lControlsCust.value = [...storeLControls.state.lControls.lControls.lControls]
     })
 
 
     const backBtnHandler = () => {
       selected.value.zoneIndex = null
       breadcrumbs.value = [breadcrumbs.value[0]]
+    }
+
+    function computeLControls(data: RuleGroup[]) {
+      console.log(data)
+      return data
     }
 
     onUnmounted(() => {
@@ -357,6 +456,89 @@ export default defineComponent({
     )
 
     watch(
+      () => [selected.value.serviceIndex],
+      ([newServiceIndex]) => {
+          backBtnHandler()
+        },
+      { deep: true }
+    )
+
+    watch(
+      () => [selected.value.countryIndex, selected.value.serviceIndex, selected.value.zoneIndex],
+      ([newCountryIndex, newServiceIndex, newZoneIndex]) => {
+          selected.value.partnerID = ''
+        },
+      { deep: true }
+    )
+
+    watch(
+      () => [selected.value.countryIndex, selected.value.serviceIndex, selected.value.zoneIndex, zones],
+      ([newCountryIndex, newServiceIndex, newZoneIndex, newZones]) => {
+          let temp = [...lControls.value] as RuleGroup[]
+          if(newCountryIndex) {
+            temp = temp.filter((el: RuleGroup) => (el.countryCode === newCountryIndex?.value))
+          }
+          if(newServiceIndex) {
+            temp = temp.filter((el: RuleGroup) => (el.serviceType === newServiceIndex?.value))
+          }
+          if(newZoneIndex) {
+            // temp = temp.filter((d: RuleGroup) => d.Rules.every((c: Rule) => {
+            //   return c.definitions.filter((e: Definition) => {
+            //     console.log({e, newZoneIndex: newZoneIndex.value}, e.value === newZoneIndex?.value)
+            //     return e.value === newZoneIndex?.value
+            //     })
+            //   })
+            // )
+          }
+
+          if(newZones && newZones.value?.length > 0) {
+            let computeZone = [...newZones.value]
+            computeZone = computeZone.map((el: any) => {
+              let partnerID = '' as any
+              let ruleID = '' as any
+              let ruleGroupID = '' as any
+              let serviceType = '' as any
+              let priority = null as any
+              let definitions = [] as any
+              if(temp && temp.length > 0) {
+                temp.forEach((d: RuleGroup) => {
+                  serviceType = d.serviceType
+                  if(d.Rules && d.Rules.length > 0) {
+                    d.Rules.forEach((c: Rule) => {
+                    definitions = [...c.definitions].filter((e: Definition) => !e.type.includes('ZONE'))
+                    if(c.definitions && c.definitions.length > 0) {
+                      c.definitions.forEach((e: Definition) => {
+                        console.log(e.value === el.id)
+                        if(e.value === el.id) {
+                          partnerID = c.partnerID
+                          ruleGroupID = c.ruleGroupID
+                          priority = c.priority
+                          ruleID = e.ruleID
+                        }
+                      })
+                    }
+                    })
+                  }
+                })
+              }
+              return {
+                ...el,
+                partnerID,
+                ruleID,
+                ruleGroupID,
+                priority,
+                definitions,
+                serviceType
+              }
+            })
+
+            console.log(computeZone)
+          }
+        },
+      { deep: true }
+    )
+
+    watch(
       selected,
       (newSelected) => {
         console.log(newSelected)
@@ -367,6 +549,10 @@ export default defineComponent({
     return {
       selected,
       breadcrumbs,
+      countryCodes,
+      serviceTypes,
+      zones,
+      marketplaces,
       indexSelect,
       backBtnHandler
     }

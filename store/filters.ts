@@ -64,7 +64,10 @@ export const actions: ActionTree<RootStateFilter, RootStateFilter> = {
       const response = await this?.$axios?.$get(`/api/clients/zones${ uri }`);
       const { zones } = response;
 
-      if (!zones) throw response;
+      if (!zones) {
+        commit('SET_ZONES', []);
+        throw response;
+      };
 
       commit('SET_ZONES', zones);
 
