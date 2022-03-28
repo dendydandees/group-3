@@ -64,7 +64,7 @@
                       <v-chip
                         v-for="(mile, i) in slide.partnerServiceTypes"
                         :key="i"
-                        class="mr-1 my-1"
+                        class="mr-1 my-1 "
                         color="pink"
                         text-color="white"
                         small
@@ -743,6 +743,11 @@ export default defineComponent({
         backdrop-filter: blur(100px);
         opacity: 1;
       }
+
+    }
+
+    .chip-custom-types {
+
     }
 
 
@@ -777,6 +782,10 @@ export default defineComponent({
           background: transparent !important;
           border: 1px solid $primary;
           margin: 0px 8px 0px 0;
+
+          &.v-chip--active {
+            background: $primary !important;
+          }
 
           &.blue {
             background: $primary !important;

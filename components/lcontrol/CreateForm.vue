@@ -394,12 +394,16 @@ export default defineComponent({
       }
     }
 
-    const fetchMarketplace = async (country: string, service: string, isLControl?: Boolean) => {
+    const fetchMarketplace = async (params: {country?: string, service?: string, zone?: string, isLControl?: Boolean}) => {
       const dataParams = {
         page:1,
         perPage: 100,
-        country,
-        service: [service]
+        country: params.country,
+        service: params.service ? [params.service] : [],
+        zone: params.zone
+        // country: '',
+        // service: [],
+        // zone: 'f56daeb2-7784-4a01-9000-1c0584ab730b'
       }
 
       // console.log({dataParams})
@@ -407,7 +411,7 @@ export default defineComponent({
       try {
         $fetchState.pending = true
 
-        await storeFilters.dispatch('marketplaces/marketplaces/getMarketplaces', { params: dataParams, isLControl })
+        await storeFilters.dispatch('marketplaces/marketplaces/getMarketplaces', { params: dataParams, isLControl: params.isLControl })
       } catch (error) {
         return error
       } finally {
@@ -424,9 +428,9 @@ export default defineComponent({
       //   selectedRuleGroup.service,
       // )
       await fetchMarketplace(
-        '',
-        '',
-        true
+        {
+        isLControl: true
+        }
       )
       // zones.value =  [ ...storeFilters.state.filters.zones]
       serviceTypes.value =  [ ...storeFilters.state.filters.serviceTypes]
@@ -505,9 +509,9 @@ export default defineComponent({
         } else if(!newDialogComp) {
           if(!props.isRule) {
             fetchMarketplace(
-              '',
-              '',
-              true
+              {
+              isLControl: true
+              }
             )
           }
         }
@@ -525,7 +529,7 @@ export default defineComponent({
     watch(
       () => [selectedRuleGroup.service, selectedRuleGroup.country],
       ([newSelectedService, newSelectedCountry]) => {
-        fetchMarketplace(newSelectedCountry, newSelectedService)
+        fetchMarketplace({country: newSelectedCountry, service: newSelectedService})
         selectedRuleGroup.defaultPartner = ''
       },
       { deep: true }
@@ -537,8 +541,11 @@ export default defineComponent({
 
 
         fetchMarketplace(
-          temp[0]?.zoneName,
-          props.service
+          {
+            country: props.countryCode,
+            service: props.service,
+            zone: newSelectedZone
+          }
         )
         selectedRule.partnerID = ''
       },

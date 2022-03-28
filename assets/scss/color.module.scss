@@ -1,10 +1,11 @@
 $primary: #1961e4;
 $primary-darken-1: #1457d0;
 $primary-darken-2: #0947b7;
+$blueControl: #EDF5FF;
 
 :export {
   primary: $primary;
   primaryDarken1: $primary-darken-1;
   primaryDarken2: $primary-darken-2;
-
+  blueLControl: $blueControl;
 }

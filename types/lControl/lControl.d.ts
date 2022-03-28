@@ -19,7 +19,8 @@ export interface Rule {
   ruleGroupID: string,
   partnerID: string,
   priority: number,
-  definitions: Definition[];
+  definitions: Definition[],
+  rules: Rule[];
 }
 
 export interface RuleGroup {

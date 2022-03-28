@@ -21,6 +21,7 @@ interface GetMarketplaces {
     search: string,
     country: string,
     service: string[];
+    zone: string;
   },
   isLControl: Boolean;
 }
@@ -68,6 +69,7 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
     // console.log(params);
     let serviceParams = 'service=';
     if (params && params?.service.length > 0) {
+      console.log(params.service);
       serviceParams = params.service.map((el, i) => {
         return `service=${ el }`;
       }).join('&');
@@ -77,7 +79,7 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
     // }
     // console.log({ serviceParams });
     const uri = params
-      ? `?page=${ params.page ?? '' }&perPage=${ params.perPage ?? '' }&search=${ params.search ?? '' }&country=${ params.country ?? '' }&${ serviceParams ?? '' }`
+      ? `?page=${ params.page ?? '' }&perPage=${ params.perPage ?? '' }&search=${ params.search ?? '' }&country=${ params.country ?? '' }&${ serviceParams ?? '' }&zone=${ params.zone ?? '' } `
       : '';
     try {
       const response = await this?.$axios?.$get(`/api/clients/partners${ uri }`);

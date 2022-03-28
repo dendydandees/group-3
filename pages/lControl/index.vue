@@ -1,69 +1,259 @@
 <template>
-  <section class="pa-4 pa-md-10 py-8 marketplace">
-    <BaseHeadlinePageCustom
-      title="L-Control"
-      subtitle="Automate your process"
+  <section class="pa-4 pa-md-10 py-8 l-control">
+    <v-card
+      elevation="2"
     >
-    </BaseHeadlinePageCustom>
-    <v-row align="center">
-      <v-col>
-        <v-btn
-          @click="toggle()"
+      <div class="header">
+        <div
+          class="text"
         >
-          Add Country
-        </v-btn>
-      </v-col>
-    </v-row>
-    <!-- <v-row>
-      {{JSON.stringify(lControls)}}
-      <v-col>
-        <v-btn
-          @click="addRules()"
+          L-CONTROL
+        </div>
+      </div>
+      <div
+        class="body-wrapper border-bottom"
+      >
+        <div class="country-wrapper">
+          <div
+            class="text"
+          >
+            COUNTRY
+          </div>
+        </div>
+        <div class="service-wrapper service-color">
+          <div
+            class="text"
+          >
+            SERVICE
+          </div>
+
+        </div>
+        <div class="zone-wrapper">
+          <div
+            class="text"
+          >
+            <v-breadcrumbs
+              :items="breadcrumbs"
+              divider=">"
+              class="pa-0"
+            >
+              <template #item="{ item }">
+                <v-breadcrumbs-item
+                  :href="item.href"
+                  :disabled="item.disabled"
+                  :class="`${!item.first ? 'active-bread' : ''}`"
+                >
+                  {{ item.text.toUpperCase() }}
+                </v-breadcrumbs-item>
+              </template>
+            </v-breadcrumbs>
+            <!-- ZONE
+            <span>
+              <v-icon
+                large
+                color="black"
+              >
+                mdi-menu-left
+              </v-icon>
+              <span>
+                KUALA LUMPUR
+              </span>
+            </span> -->
+          </div>
+
+        </div>
+      </div>
+      <div
+        class="content-wrapper"
+      >
+        <div class="country-wrapper-content scroller">
+          <div
+            v-for="(el, i) in countryCodes"
+            :key="i"
+            :class="`text padding-text-country ${ selected.countryIndex && selected.countryIndex.index === i ? 'service-color' : ''}`"
+            @click="indexSelect({index: i, value: el.value}, 'country')"
+          >
+            <div
+              :class="`${selected.countryIndex && selected.countryIndex.index === i ? 'red-color' : ''}`"
+            >
+              {{el.name}}
+            </div>
+            <div
+              class="text-sub"
+            >
+              Manually Updated
+            </div>
+          </div>
+        </div>
+        <div class="service-wrapper-content service-color scroller blue-scroller">
+
+            <div
+              v-for="(el, i) in serviceTypes"
+              :key="i"
+              :class="`text ${selected.serviceIndex && selected.serviceIndex.index === i ? 'red-color' : ''} ${selected.useBOB ? 'disabled' : ''}`"
+              :style="`${selected.countryIndex === null ? 'visibility: hidden;' : ''}line-height: 36px`"
+              @click="indexSelect({index: i, value: el.name}, 'service')"
+            >
+              {{$customUtils.setServiceType(el.name)}}
+            </div>
+            <div
+              v-if="selected.countryIndex !== null"
+            >
+              <v-switch
+                v-model="selected.useBOB"
+                inset
+                color="#FF3D17"
+                :style="`${selected.countryIndex === null ? 'visibility: hidden;' : ''}`"
+                class="ma-0"
+                @change="handleBob"
+              >
+                <template #label>
+                  <span
+                    :style="`color: ${selected.useBOB ? '#FF3D17' : '#1961E4'}; font-weight: 500;white-space: nowrap`"
+                  >
+                    BOB {{selected.useBOB ? 'Activated' : 'Inactive'}}
+                  </span>
+                  <NuxtImg
+                    src="/images/qMark.svg"
+                    preload
+                    :height="18"
+                    class="ml-2"
+                  />
+                </template>
+              </v-switch>
+              <v-card
+                class="pa-4"
+                elevation="3"
+                style="height: 100%;"
+              >
+                <div
+                  class="d-flex align-center mb-3"
+                >
+                  <NuxtImg
+                    src="/images/qMark.svg"
+                    preload
+                    :height="18"
+                    class="mr-1 "
+                  />
+                  <span
+                    style="color: #FF3D17;font-size: 13px;line-height: 16px;"
+                  >
+                    What is BOB?
+                  </span>
+                </div>
+                <div
+                  style="color: #1961E4;font-size: 14px;line-height: 17px;"
+                >
+                  BOB will help you select the most suitable network partner based on our analytical data
+                </div>
+              </v-card>
+            </div>
+
+        </div>
+        <div
+          :class="`zone-wrapper-content ${selected.useBOB ? 'd-flex align-center justify-center' : ''} scroller`"
         >
-          Add rules
-        </v-btn>
-      </v-col>
-    </v-row> -->
-    <v-row align="center">
-      <v-col cols="12">
-        <BaseTableListServer
-          v-model="pagination"
-          item-key="id"
-          :loading="$fetchState.pending"
-          :items="lControls"
-          :headers="headers"
-          :hide-default-footer="true"
-          :meta="meta"
-          :expanded-option="expandedOption"
-          @addRuleModal="addRuleModal"
-          @dialogDeleteModal="dialogDeleteModal"
-        />
-      </v-col>
-    </v-row>
-    <LcontrolCreateForm
-      :dialog="dialog.ruleGroup"
-      :error="errorPost.rg"
-      @toggle="toggle('ruleGroup')"
-      @addRuleGroup="addRuleGroup"
-    />
-    <LcontrolCreateForm
-      :is-rule="true"
-      :dialog="dialog.rule"
-      :country-code="countryCode"
-      :service="service"
-      @toggle="toggle('rule')"
-      @addRules="addRules"
-    />
-    <BaseModalConfirm
-      v-model="dialog.deleteRule"
-      :dialog-settings="dialogSettings"
-      @doSubmit="deleteRules"
-    />
-    <BaseModalConfirm
-      v-model="dialog.deleteRuleGroup"
-      :dialog-settings="dialogSettings"
-      @doSubmit="deleteRuleGroups"
-    />
+          <div
+            v-if="selected.zoneIndex === null && !selected.useBOB"
+            :class="`zone-text`"
+          >
+            <div
+              v-for="(el, i) in zonesCust"
+              :key="i"
+              :class="`text`"
+              :style="`${selected.serviceIndex === null ? 'visibility: hidden;' : ''}`"
+            >
+              <div
+                :class="`d-flex align-center justify-space-between`"
+              >
+                <div>
+                  {{el.zoneName}}
+                </div>
+                <div>
+                  <span
+                    v-if="true"
+                    style="font-size: 15px; line-height: 18px; color: #575757"
+                  >
+                  {{!el.partnerID ? 'Waiting for Setup' : ''}}
+
+                  </span>
+                  <v-btn
+                    color="primary darken-1 white--text ml-6"
+                    @click="indexSelect({index: i, value: el.id, name: el.zoneName, data: el}, 'zone')"
+                  >
+                    {{!el.partnerID ? 'SETUP' : 'UPDATE'}}
+                  </v-btn>
+
+                </div>
+              </div>
+
+            </div>
+          </div>
+          <div
+            v-else-if="selected.useBOB"
+            :class="`d-flex flex-column align-center justify-center`"
+            style="width: 400px"
+          >
+            <!-- <div> -->
+              <NuxtImg
+                src="/images/BOB.svg"
+                preload
+                :width="400"
+                class="mb-4"
+              />
+              <div
+                style="text-align: center; font-size: 14px; line-height: 20px;"
+              >
+                BOB is Luwjistik’s own in-house tool that simplifies your shipping process by giving you a fixed end-to-end rate instead of a modular rate. Using our machine learning we will automatically choose the best freight forwarder, custom broker and last mile provider for needs. With BOB, you would not need to connect to different partners in multiple countries as we will do that on your behalf.
+              </div>
+            <!-- </div> -->
+          </div>
+          <div
+            v-else
+            class="content-zone-selected"
+          >
+            <v-btn
+              icon
+              color="primary"
+              @click="backBtnHandler()"
+            >
+              <v-icon>
+                mdi-arrow-left-thick
+              </v-icon>
+            </v-btn>
+            <div
+              class="zone-column-right"
+            >
+              <div>
+                <div
+                  style="line-height: 36px;font-size: 18px;font-weight: 700;"
+                  class="mb-3"
+                >
+                  {{selected.zoneIndex && selected.zoneIndex.name}}
+                </div>
+                <LcontrolDropdownCustom
+                  v-model="selected.partnerID"
+                  :label="'Zone Default Network Partner'"
+                  :placeholder="'Default Partner'"
+                  :data="marketplaces"
+                  :item-show="{text: 'name', value: 'id'}"
+                />
+              </div>
+              <v-btn
+                color="primary darken-1 white--text"
+                style="align-self: end"
+                :disabled="!selected.partnerID"
+                @click="btnAction"
+              >
+                SAVE CHANGES
+              </v-btn>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </v-card>
   </section>
 </template>
 
@@ -80,9 +270,11 @@ import {
   useMeta,
   useRouter,
   PropType,
+  onUnmounted
 } from '@nuxtjs/composition-api'
 // Interfaces or types
-import { VuexModuleLControls,Definition,Rule,RuleGroup } from '~/types/lControl/lControl'
+import { VuexModuleFilters, Zone, ServiceType} from '~/types/filters'
+import { VuexModuleLControls,Definition,Rule , RuleGroup } from '~/types/lControl/lControl'
 import { VuexModuleApplications, ModalConfirm } from '~/types/applications'
 import { Marketplace, VuexModuleMarketplaces, PartnerServiceZone } from '~/types/marketplace/marketplace'
 
@@ -91,111 +283,96 @@ export default defineComponent({
   name: 'LControl',
   layout: 'default',
   setup() {
-    // store manage
     const storeMarketplaces = useStore<VuexModuleMarketplaces>()
+    const storeFilters= useStore<VuexModuleFilters>()
     const storeLControls = useStore<VuexModuleLControls>()
-    const storeApplications = useStore<VuexModuleApplications>()
+    const countryCodes = computed(() => storeFilters.state.filters.countryCodes)
+    const serviceTypes = computed(() => storeFilters.state.filters.serviceTypes)
+    const zones = computed(() => storeFilters.state.filters.zones)
     const marketplaces = computed(() => storeMarketplaces.state.marketplaces.marketplaces.marketplaces)
-    const lControls = computed(() => storeLControls.state.lControls.lControls.lControls)
-    const meta = computed(() => storeLControls.state.lControls.lControls.meta)
-    const pagination = ref({
-      ...storeApplications.state.applications.pagination,
+    const lControls = computed(() => {
+      return computeLControls(storeLControls.state.lControls.lControls.lControls)
     })
-    const expandedOption = ref({
-      singleExpand: true,
-      showExpand: true
-    })
-    const errorPost = ref({
-      rg: ''
-    })
-    const service = ref('')
-    const countryCode = ref('')
-    const ruleGroupID = ref('')
-    const ruleID = ref('')
+    const lControlsCust = ref([]) as Ref<RuleGroup[] | []>
+    const zonesCust = ref([]) as Ref<any>
 
-    const headers = reactive([
-      {
-        text: 'Country',
-        value: 'countryCode',
-        sortable: false,
-      },
-      {
-        text: 'Default Partner',
-        value: 'defaultPartner',
-        sortable: false,
-      },
-      {
-        text: '',
-        value: 'actionsLControl',
-        sortable: false,
-      },
-      {
-        text: '',
-        value: 'data-table-expand' ,
-        sortable: false,
-      },
-    ])
-
-    const method = reactive({
-      opt: 'add'
+    const selected = ref({
+      countryIndex: null as {index: number, value: string} | null,
+      serviceIndex: null as {index: number, value: string} | null,
+      zoneIndex: null as {index: number, value: string, name?: string} | null,
+      partnerID: '' as string,
+      useBOB: false as boolean,
+      ruleGroupID: '' as string,
+      rules: [] as any,
+      ruleID: '' as string,
+      isUpdate: false as boolean,
+      priority: null as number | null
     })
-    const dialog = reactive({
-      ruleGroup: false,
-      rule: false,
-      deleteRule: false,
-      deleteRuleGroup: false,
-    })
-    const dialogSettings = ref({
-      loading: false,
-      title: 'Are you sure you want to delete this rule?',
-      content: '',
-      cancelText: 'No',
-      submitText: 'Yes',
-      submitColor: 'red white--text',
-    }) as Ref<ModalConfirm>
 
-    const toggle = (key: string) => {
-      if (method.opt === 'add' || method.opt === 'edit') {
-        switch (key) {
-          case 'rule':
-            dialog.rule = !dialog.rule
-            break;
-          default:
-            dialog.ruleGroup = !dialog.ruleGroup
-            break;
+    const breadcrumbs = ref([
+      {
+        text: 'ZONE',
+        disabled: false,
+        first: true
+        // href: 'breadcrumbs_dashboard',
+      },
+    ]) as Ref<{text?: string, disabled: boolean, first?: boolean, href?: string}[]>
+
+
+    const fetchCountryCodes = async () => {
+      try {
+        $fetchState.pending = true
+
+        await storeFilters.dispatch('filters/getCountryCodes', {params: {} })
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+    const fetchServices = async () => {
+      try {
+        $fetchState.pending = true
+
+        await storeFilters.dispatch('filters/getServiceTypes')
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+    const fetchZones= async () => {
+      try {
+        $fetchState.pending = true
+        const params = {
+          country: selected.value.countryIndex?.value
         }
-
+        await storeFilters.dispatch('filters/getZones', {params})
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
       }
     }
-    const addPartner = () => {
-      toggle('ruleGroup')
-    }
+    const fetchMarketplace = async (params: {country?: string, service?: string, zone?: string, isLControl?: Boolean}) => {
+      const dataParams = {
+        page:1,
+        perPage: 100,
+        country: params.country,
+        service: params.service ? [params.service] : [],
+        zone: params.zone
+      }
 
-    const addRuleModal = (data: RuleGroup) => {
-      service.value = data.serviceType
-      countryCode.value = data.countryCode
-      ruleGroupID.value = data.id
-      toggle('rule')
-    }
+      try {
+        $fetchState.pending = true
 
-
-    const dialogDeleteModal = (data: {id: string, name: string}) => {
-      switch (data.name) {
-        case 'rule':
-          dialog.deleteRule = true
-          ruleID.value = data.id
-          break;
-
-        default:
-          dialog.deleteRuleGroup = true
-          ruleGroupID.value = data.id
-          dialogSettings.value.title = 'Are you sure you want to delete this rule group?'
-          break;
+        await storeFilters.dispatch('marketplaces/marketplaces/getMarketplaces', { params: dataParams, isLControl: params.isLControl})
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
       }
     }
-
-
-
     const fetchRuleGroups = async () => {
       try {
         $fetchState.pending = true
@@ -207,138 +384,357 @@ export default defineComponent({
         $fetchState.pending = false
       }
     }
-    const addRules = async (data: Rule) => {
-      try {
 
-        const id = ruleGroupID.value
-        if(data.definitions) {
-          data.definitions = data.definitions.map((el: Definition, i) => {
-            delete el.id
-            return el
+    const indexSelect = async (data:{index: number, value: string, name?: string, data?: any}, type: string) => {
+      switch (type) {
+        case 'country':
+          selected.value.countryIndex = {index: data.index, value: data.value}
+          // FETCH SERVICE if vuex is still empty
+          if(serviceTypes.value?.length === 0) {
+            await fetchServices()
+
+          }
+          break;
+        case 'service':
+          selected.value.serviceIndex = {index: data.index, value: data.value}
+          // FETCH ZONE BY COUNTRY
+          await fetchZones()
+          break;
+        case 'zone':
+          selected.value.zoneIndex = {index: data.index, value: data.value, name: data.name}
+          breadcrumbs.value = [...breadcrumbs.value, {
+            text: data.name,
+            disabled: false,
+            // href: 'breadcrumbs_link_1',
+          }]
+          // FETCH PARTNER BY COUNTRY, SERVICE, ZONE
+          await fetchMarketplace({
+            country: selected.value.countryIndex?.value,
+            service: selected.value.serviceIndex?.value,
+            zone: selected.value.zoneIndex.value
           })
-        }
+          selected.value.partnerID = data.data.partnerID
+          selected.value.ruleGroupID = data.data.ruleGroupID
+          selected.value.rules = data.data.rules
+          selected.value.ruleID = data.data.ruleID
+          selected.value.priority = data.data.priority
+          selected.value.isUpdate = !!data.data.partnerID
+          console.log(selected.value, data)
+          break;
+        default:
+          break;
+      }
+    }
+    const addRules = async () => {
+      try {
         const payload = {
-          id,
-          data
+          id: selected.value.ruleGroupID,
+          data: {
+            partnerID: selected.value.partnerID,
+            priority: selected.value.rules.length + 1,
+            definitions: [
+              {
+                type: "RULE_TYPE_ZONE",
+                value: selected.value.zoneIndex?.value
+              }
+            ]
+          }
         }
 
         $fetchState.pending = true
 
-        await storeLControls.dispatch('lControls/lControls/addRules', payload)
-        dialog.ruleGroup = false
-        fetch()
+        const res = await storeLControls.dispatch('lControls/lControls/addRules', payload)
+        console.log('this is add RULE', res?.response?.data)
       } catch (error) {
-        return error
+        console.log( error)
       } finally {
-        toggle('rule')
         $fetchState.pending = false
       }
     }
-    const deleteRules  = async () => {
+    const updateRules = async () => {
       try {
-        dialogSettings.value.loading = true
+        const payload = {
+          id: selected.value.ruleID,
+          data: {
+            partnerID: selected.value.partnerID,
+            priority: selected.value.priority
+          }
+        }
 
         $fetchState.pending = true
 
-        await storeLControls.dispatch('lControls/lControls/deleteRules', {ruleID: ruleID.value})
-        fetch()
+        const res = await storeLControls.dispatch('lControls/lControls/updateRules', payload)
       } catch (error) {
-        return error
+        console.log( error)
       } finally {
-        dialogSettings.value.loading = false
-        dialog.deleteRule = false
         $fetchState.pending = false
       }
     }
-
-    const deleteRuleGroups  = async () => {
+    const addRuleGroup = async () => {
       try {
-        dialogSettings.value.loading = true
-
-        $fetchState.pending = true
-
-        await storeLControls.dispatch('lControls/lControls/deleteRuleGroups', ruleGroupID.value)
-        fetch()
-      } catch (error) {
-        return error
-      } finally {
-        dialogSettings.value.loading = false
-        dialog.deleteRuleGroup = false
-        $fetchState.pending = false
-      }
-    }
-
-    const addRuleGroup = async (
-      payload: {
-        defaultPartnerID: string,
-        serviceType: string,
-        countryCode: string,
-        useBOB: boolean,
-    }) => {
-      try {
-        const {defaultPartnerID, serviceType, countryCode, useBOB} = payload
         const data = {
-          defaultPartnerID: useBOB ? '' : defaultPartnerID,
-          serviceType,
-          countryCode,
-          useBOB
+          defaultPartnerID: selected.value.partnerID,
+          serviceType: selected.value.serviceIndex?.value,
+          countryCode: selected.value.countryIndex?.value,
         }
 
         $fetchState.pending = true
 
         const res = await storeLControls.dispatch('lControls/lControls/addRuleGroup', data)
-        if(res?.response?.data?.error) {
-          throw res?.response?.data?.error
+        if(res) {
+          selected.value.ruleGroupID = res?.id
         }
-        dialog.ruleGroup = false
-        fetch()
       } catch (error: any) {
-
-        if(error) {
-          errorPost.value.rg = error
-        }
-        return error
+        console.log(error)
       } finally {
-        setTimeout(() => {
-          errorPost.value.rg = ''
-        }, 7500);
         $fetchState.pending = false
       }
     }
+    const updateRuleGroup = async () => {
+      try {
+        const data = {
+          defaultPartnerID: selected.value.partnerID,
+          ruleGroupID: selected.value.ruleGroupID
+        }
 
+        $fetchState.pending = true
 
+        const res = await storeLControls.dispatch('lControls/lControls/updateRuleGroup', data)
+      } catch (error: any) {
+        console.log(error)
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+    const addBOB = async () => {
+      try {
+        const payload = selected.value.countryIndex?.value
 
+        $fetchState.pending = true
+
+        const res = await storeLControls.dispatch(`lControls/lControls/addBOB`, payload)
+      } catch (error) {
+        console.log( error)
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+    const deleteBOB = async () => {
+      try {
+        const payload = selected.value.countryIndex?.value
+        $fetchState.pending = true
+
+        const res = await storeLControls.dispatch('lControls/lControls/deleteBOB', payload)
+      } catch (error) {
+        console.log( error)
+      } finally {
+        $fetchState.pending = false
+      }
+    }
     const { $fetchState, fetch } = useFetch(async () => {
+      // FETCH COUNTRY
+      await fetchCountryCodes()
       await fetchRuleGroups()
+      lControlsCust.value = [...storeLControls.state.lControls.lControls.lControls]
     })
-    // watch(
-    //   () => [dialog.ruleGroup, dialog.rule],
-    //   ([newDialogRG, newDialogR]) => {
-    //     console.log({newDialogRG})
-    //   },
-    //   { deep: true }
-    // )
+
+    const btnAction = async () => {
+      try {
+        const actionRG = addRuleGroup
+        let actionR = addRules
+        if(selected.value.isUpdate) {
+          await updateRuleGroup()
+          actionR = updateRules
+        }
+        // alert(selected.value.ruleGroupID)
+        if(!selected.value.ruleGroupID) {
+          const res = await addRuleGroup()
+          console.log('res dr actionBtn', res)
+        }
+        await actionR()
+        await fetchRuleGroups()
+
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    const handleBob = async (e: boolean) => {
+      try {
+        if(e) {
+          await addBOB()
+        } else {
+          await deleteBOB()
+        }
+        console.log({e})
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    const backBtnHandler = () => {
+      selected.value.zoneIndex = null
+      breadcrumbs.value = [breadcrumbs.value[0]]
+    }
+
+    function computeLControls(data: RuleGroup[]) {
+      console.log(data)
+      return data
+    }
+
+    onUnmounted(() => {
+      // DELETE SERVICE ON VUEX
+    })
+
+    watch(
+      () => [selected.value.useBOB],
+      ([newUseBOB]) => {
+        if(newUseBOB) {
+          breadcrumbs.value = [breadcrumbs.value[0]]
+          selected.value.zoneIndex = null
+          selected.value.serviceIndex = null
+        }
+      },
+      { deep: true }
+    )
+
+    watch(
+      () => [selected.value.countryIndex],
+      ([newCountryIndex]) => {
+        if(newCountryIndex !== null) {
+          breadcrumbs.value = [breadcrumbs.value[0]]
+          selected.value.zoneIndex = null
+          selected.value.serviceIndex = null
+          selected.value.useBOB = false
+        }
+
+        if(newCountryIndex) {
+          const countryID = newCountryIndex.value
+          if(lControls.value && lControls.value.length > 0) {
+            const temp = [...lControls.value]
+            let isUseBOB = false
+            temp.forEach((el: RuleGroup) => {
+              if(
+                (el.countryCode === countryID) &&
+                (el.useBOB)
+              ) {
+                isUseBOB = true
+              }
+            })
+            selected.value.useBOB = isUseBOB
+            console.log({isUseBOB})
+          }
+        }
+      },
+      { deep: true }
+    )
+
+    watch(
+      () => [selected.value.serviceIndex],
+      ([newServiceIndex]) => {
+          backBtnHandler()
+        },
+      { deep: true }
+    )
+
+    watch(
+      () => [selected.value.countryIndex, selected.value.serviceIndex, selected.value.zoneIndex],
+      ([newCountryIndex, newServiceIndex, newZoneIndex]) => {
+          selected.value.partnerID = ''
+        },
+      { deep: true }
+    )
+
+    watch(
+      () => [selected.value.countryIndex, selected.value.serviceIndex, selected.value.zoneIndex, zones],
+      ([newCountryIndex, newServiceIndex, newZoneIndex, newZones]) => {
+          let temp = [...lControls.value] as RuleGroup[]
+          if(newCountryIndex) {
+            temp = temp.filter((el: RuleGroup) => (el.countryCode === newCountryIndex?.value))
+          }
+          if(newServiceIndex) {
+            temp = temp.filter((el: RuleGroup) => (el.serviceType === newServiceIndex?.value))
+          }
+          if(newZoneIndex) {
+            // temp = temp.filter((d: RuleGroup) => d.Rules.every((c: Rule) => {
+            //   return c.definitions.filter((e: Definition) => {
+            //     console.log({e, newZoneIndex: newZoneIndex.value}, e.value === newZoneIndex?.value)
+            //     return e.value === newZoneIndex?.value
+            //     })
+            //   })
+            // )
+          }
+
+          if(newZones && newZones.value?.length > 0) {
+            let computeZone = [...newZones.value]
+            computeZone = computeZone.map((el: any) => {
+              let partnerID = '' as any
+              let ruleID = '' as any
+              let ruleGroupID = '' as any
+              let serviceType = '' as any
+              let priority = null as any
+              let definitions = [] as any
+              let rules = [] as any
+              if(temp && temp.length > 0) {
+                temp.forEach((d: RuleGroup) => {
+                  ruleGroupID = d.id
+                  serviceType = d.serviceType
+                  if(d.Rules && d.Rules.length > 0) {
+                    rules = d.Rules
+                    d.Rules.forEach((c: Rule) => {
+                    definitions = [...c.definitions].filter((e: Definition) => !e.type.includes('ZONE'))
+                    if(c.definitions && c.definitions.length > 0) {
+                      c.definitions.forEach((e: Definition) => {
+                        console.log(e.value === el.id)
+                        if(e.value === el.id) {
+                          partnerID = c.partnerID
+                          priority = c.priority
+                          ruleID = e.ruleID
+                        }
+                      })
+                    }
+                    })
+                  }
+                })
+              }
+              return {
+                ...el,
+                partnerID,
+                ruleID,
+                ruleGroupID,
+                priority,
+                rules,
+                definitions,
+                serviceType
+              }
+            })
+            zonesCust.value = computeZone
+            // console.log({computeZone}, zonesCust)
+          }
+        },
+      { deep: true }
+    )
+
+    watch(
+      selected,
+      (newSelected) => {
+        console.log(newSelected)
+      },
+      { deep: true }
+    )
 
     return {
-      dialog,
-      dialogSettings,
-      method,
-      toggle,
-      addPartner,
-      addRuleGroup,
-      lControls,
-      addRules,
-      addRuleModal,
-      deleteRules,
-      headers,
-      meta,
-      pagination,
-      expandedOption,
-      dialogDeleteModal,
-      deleteRuleGroups,
-      errorPost,
-      countryCode,
-      service
+      selected,
+      breadcrumbs,
+      countryCodes,
+      serviceTypes,
+      zones,
+      zonesCust,
+      marketplaces,
+      indexSelect,
+      backBtnHandler,
+      btnAction,
+      handleBob
     }
   },
   head: {},
@@ -346,65 +742,190 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-  .marketplace {
-    .carousel-3d-slide {
-      border: unset;
-      border-radius: 20px;
-      /* padding: 20px; */
-      background: #48a3ee;
-      color: white;
-      box-shadow: 0px 0px 40px 0px #36363626;
-      &.current {
-        background: #2196F3;
-        .opacity-custom {
-          opacity: 1;
-        }
-      }
-      .opacity-custom {
-        opacity: .7;
+@import "~/assets/scss/color.module.scss";
+  .l-control {
+    .v-card {
+      overflow: hidden;
+      height: calc(100vh - 144px);;
+      max-height: 798px;
+    }
+    .header {
+      padding: 33px 44px 20px 44px;
+      .text {
+        color: $primary;
+        font-size: 25px;
+        line-height: 30px;
       }
     }
-    .custom-select {
-      .v-select__slot {
-        label {
-          font-size: 12px;
-          color: red;
-          font-weight: bold;
+    .service-color {
+      background: #EDF5FF !important;
+    }
+    .border-bottom{
+      border-bottom: 1px dashed red;
+    }
+    .body-wrapper{
+      display: flex;
+      width: 100%;
+      padding: 0 44px;
+      border-bottom-left-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+      /* height: 100%; */
+      .text {
+        font-size: 20px;
+        line-height: 24px;
+        font-weight: 500;
+      }
+      .country-wrapper, .service-wrapper {
+        min-width: 250px;
+      }
+      .zone-wrapper {
+        width: 100%;
+        .v-breadcrumbs {
+          li {
+            font-size: 20px;
+            line-height: 24px;
+          }
+          .active-bread {
+            color: $primary;
+          }
         }
       }
-      .v-input__slot {
-        margin-bottom: unset !important;
-        /* outline: 1px solid #2196F3; */
-        fieldset {
-          border-color: #2196F3;
-        }
+      .country-wrapper, .service-wrapper, .zone-wrapper {
+        padding-top: 31px;
+        padding-bottom: 23px;
+        /* border-bottom: 1px dashed red; */
       }
-      .v-text-field__details {
-        display: none;
+      .zone-wrapper, .service-wrapper {
+        padding-left: 30px;
       }
     }
-
-    .custom-chips {
-      color: #2196F3;
-      background: transparent !important;
-      border: 1px solid #2196F3;
+    .red-color {
+      color: #FF3D17;
     }
-  }
-  .card-chip-group {
-    .v-slide-group__next, .v-slide-group__prev {
-      min-width: unset;
-      flex: unset;
-      i {
-        color: rgba(255, 255, 255, 0.534);
+    .content-wrapper {
+      display: flex;
+      height: calc(100% - 162px);
+      width: 100%;
+      /* padding: 0 44px; */
+      /* height: 100%; */
+      .disabled {
+        pointer-events: none;
+        opacity: .4;
+        cursor: not-allowed;
+      }
+      .text {
         font-size: 18px;
+        line-height: 22px;
+        cursor: pointer;
+        transition: all .3s;
+
+        &:hover {
+          opacity: .8;
+          background: #edf5ff73;
+        }
+
+
+
+        .text-sub {
+          font-size: 15px;
+          line-height: 18px;
+          margin-top: 15px;
+          color: #AAAAAA;
+        }
       }
+      .padding-text-country {
+        padding: 40px 44px;
+      }
+
+      .scroller {
+          &::-webkit-scrollbar {
+              width: .2em; /* counts only for the vertical scrollbar */
+              height: .2em; /* counts only for the horizontal scrollbar */
+          }
+          &::-webkit-scrollbar-thumb {
+            background: #c9e1ff;
+          }
+          &::-webkit-scrollbar-thumb:hover {
+            background: $primary;
+            opacity: .8;
+          }
+      }
+      .blue-scroller {
+          &::-webkit-scrollbar-track {
+            background: #EDF5FF;
+          }
+      }
+
+      .country-wrapper-content {
+        min-width: calc(250px + 44px);
+        overflow-y: scroll;
+      }
+      .service-wrapper-content {
+          min-width: 250px;
+          width: 250px;
+          overflow-y: scroll;
+
+
+      }
+      .service-wrapper-content {
+        & > * {
+          padding: 25px 30px;
+          &:first-child {
+            padding-top: 50px;
+          }
+          &:last-child {
+              margin-right: 0px;
+          }
+        }
+      }
+
+      .zone-wrapper-content {
+        width: 100%;
+        overflow-y: scroll;
+        .text {
+          cursor: unset;
+          &:hover {
+
+              opacity: 1;
+              background: unset;
+          }
+
+        }
+        .zone-text {
+          & > * {
+            padding: 25px 30px;
+            &:first-child {
+              padding-top: 50px;
+            }
+            &:last-child {
+                margin-right: 0px;
+            }
+          }
+        }
+        .content-zone-selected {
+          height: 100%;
+          padding: 50px 30px;
+          display: flex;
+          & > * {
+            &:first-child {
+
+              margin-right: 15px;
+            }
+            &:last-child {
+                width: 100%;
+            }
+          }
+          .zone-column-right {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+          }
+        }
+      }
+
+
     }
 
-    .v-chip--disabled {
-      opacity: 1;
-    }
-    .v-slide-group__prev--disabled, .v-slide-group__next--disabled {
-      display: none;
-    }
   }
 </style>
