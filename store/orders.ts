@@ -23,14 +23,10 @@ interface ParamsGetSelectedLabels {
 const filterOrder = {
   orderCode: '',
   batchId: '',
-<<<<<<< HEAD
   originCountry: '',
   destinationCountry: '',
   serviceType: '',
-} as FilterOrders
-=======
 } as FilterOrders;
->>>>>>> 1adc335 ([INTEGRATE]:)
 
 const filterBatch = {
   batchId: '',
