@@ -1,4 +1,38 @@
 export default {
+  detailUpcomingOrder: {
+    pickupDetail: { "id": "14c070c8-9ada-4b26-ad7b-0718e4a2108a", "orderCode": "Luw20211101-103", "clientId": "f92ba95b-0f80-4a06-b01c-75827976c37f", "consigneeName": "Nam", "consigneeNumber": "+8490999878", "consigneeAddress": "Ho Chi Minh City ", "consigneePostal": "5753", "consigneeCountry": "SG", "consigneeCity": "", "consigneeState": "Singapore", "consigneeProvince": "Singapore", "consigneeEmail": "smith@mailinator.com", "length": 10, "width": 50, "height": 40, "weight": 30, "paymentType": "prepaid", "pickupContactName": "Oliver Nguyen", "pickupContactNumber": "+84990993841", "pickupState": "Dong Nai", "pickupCity": "", "pickupProvince": "Dong Nai", "pickupPostal": "11470", "pickupCountry": "SG", "pickupAddress": "Dong Nai province", "refID": null, "labelPath": null, "requestedServices": null, "batchId": "d90620c6-be51-49a8-a0a4-b67662df7c8a" },
+    consigneeDetail: { "id": "14c070c8-9ada-4b26-ad7b-0718e4a2108a", "orderCode": "Luw20211101-103", "clientId": "f92ba95b-0f80-4a06-b01c-75827976c37f", "consigneeName": "Nam", "consigneeNumber": "+8490999878", "consigneeAddress": "Ho Chi Minh City ", "consigneePostal": "5753", "consigneeCountry": "SG", "consigneeCity": "", "consigneeState": "Singapore", "consigneeProvince": "Singapore", "consigneeEmail": "smith@mailinator.com", "length": 10, "width": 50, "height": 40, "weight": 30, "paymentType": "prepaid", "pickupContactName": "Oliver Nguyen", "pickupContactNumber": "+84990993841", "pickupState": "Dong Nai", "pickupCity": "", "pickupProvince": "Dong Nai", "pickupPostal": "11470", "pickupCountry": "SG", "pickupAddress": "Dong Nai province", "refID": null, "labelPath": null, "requestedServices": null, "batchId": "d90620c6-be51-49a8-a0a4-b67662df7c8a" },
+    orderItems: [{ "id": "2d0341d5-8d2e-425d-8cd9-ea5343a9f631", "orderId": "14c070c8-9ada-4b26-ad7b-0718e4a2108a", "description": "Logitech MX2 Anywhere Bluetooth mouse", "quantity": 5, "productCode": "446", "sku": "PO-918242213418", "category": "Face Care", "price": "65.00", "currency": "USD" }, { "id": "4a37b9ba-44fc-4097-8085-ac89587234f1", "orderId": "14c070c8-9ada-4b26-ad7b-0718e4a2108a", "description": "High Quality 1.6L Removable Water Tank 20Bar Semi-Automatic Espresso Coffee Machine With Milk Frother", "quantity": 2, "productCode": "558", "sku": "PO-918242213417", "category": "Face Care", "price": "750.00", "currency": "USD" }],
+    orderDetails: { "id": "14c070c8-9ada-4b26-ad7b-0718e4a2108a", "orderCode": "Luw20211101-103", "clientId": "f92ba95b-0f80-4a06-b01c-75827976c37f", "consigneeName": "Nam", "consigneeNumber": "+8490999878", "consigneeAddress": "Ho Chi Minh City ", "consigneePostal": "5753", "consigneeCountry": "SG", "consigneeCity": "", "consigneeState": "Singapore", "consigneeProvince": "Singapore", "consigneeEmail": "smith@mailinator.com", "length": 10, "width": 50, "height": 40, "weight": 30, "paymentType": "prepaid", "pickupContactName": "Oliver Nguyen", "pickupContactNumber": "+84990993841", "pickupState": "Dong Nai", "pickupCity": "", "pickupProvince": "Dong Nai", "pickupPostal": "11470", "pickupCountry": "SG", "pickupAddress": "Dong Nai province", "refID": null, "labelPath": null, "requestedServices": null, "batchId": "d90620c6-be51-49a8-a0a4-b67662df7c8a" },
+    timeline: [
+      {
+        id: 2,
+        serviceType: 'FIRST_MILE',
+        partnerName: 'Ninja Van',
+        externalTrackingNumber: 'dsadasdasdasdsadsadsadsa',
+        externalTracking: {
+          id: '',
+          partnerUpdates: null
+        },
+        orderCode: '',
+        orderID: '',
+        partnerID: ''
+      },
+      {
+        id: 2,
+        serviceType: 'FIRST_MILE',
+        partnerName: 'Ninja Van',
+        externalTrackingNumber: 'dsadasdasdasdsadsadsadsa',
+        externalTracking: {
+          id: '',
+          partnerUpdates: null
+        },
+        orderCode: '',
+        orderID: '',
+        partnerID: ''
+      },
+    ]
+  },
   photos: [
     {
       src: "https://dev-lj-gallery.s3.ap-southeast-1.amazonaws.com/0b1aa44b-7a23-432f-9006-fcbd2da44ee0/79adb1cd-a118-41bf-b3a2-3f5e06a6827d_Screen Shot 2022-03-14 at 17.27.03.png",

@@ -33,6 +33,8 @@
 <script lang="ts">
 import { computed, defineComponent, useStore } from '@nuxtjs/composition-api'
 import { VuexModuleOrders } from '~/types/orders'
+import { VuexModuleIncomingOrders } from '~/types/partnerPortals/incomingOrders'
+import tempData from '~/static/tempData'
 
 export default defineComponent({
   props: {
@@ -40,10 +42,23 @@ export default defineComponent({
       type: Object,
       default: () => ({}),
     },
+    isUpcoming: {
+      type: Boolean,
+      default: false,
+    }
   },
-  setup() {
+  setup(props, { emit }) {
     const store = useStore<VuexModuleOrders>()
-    const order = computed(() => store.state.orders.orderDetails.order)
+    const storeIncomingOrders = useStore<VuexModuleIncomingOrders>()
+    const order = computed(() => {
+      return props.isUpcoming
+      ?
+      storeIncomingOrders.state.partnerPortals.incomingOrders.incomingOrderDetails.order.order
+      :
+      store.state.orders.orderDetails.order
+    })
+
+    console.log('OrderDetail:',tempData.detailUpcomingOrder.orderDetails, order.value)
 
     return {
       order,
