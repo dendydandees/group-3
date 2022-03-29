@@ -24,6 +24,8 @@ const filterOrder = {
   orderCode: '',
   batchId: '',
   originCountry: '',
+  createdFrom: '',
+  createdTo: '',
   destinationCountry: '',
   serviceType: '',
 } as FilterOrders;

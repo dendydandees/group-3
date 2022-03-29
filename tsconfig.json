@@ -26,8 +26,7 @@
       "@nuxt/image",
       "@nuxtjs/sentry",
       "nuxt-webpack-optimisations",
-      "@nuxtjs/dayjs",
-      "dayjs/plugin/relativeTime"
+      "@nuxtjs/date-fns"
     ],
     "typeRoots": ["./types"]
   },

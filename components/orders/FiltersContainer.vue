@@ -2,14 +2,20 @@
   <v-row v-if="isShowFilter" align="center">
     <v-col cols="12">
       <v-sheet class="white pa-6 elevation-1 rounded-xl">
-        <span class="subtitle-1 font-weight-medium mb-4 d-block"> Filter </span>
+        <span class="subtitle-1 font-weight-bold text-uppercase mb-4 d-block">
+          Filter
+        </span>
 
         <slot name="filterList" />
 
         <div class="d-flex mt-6">
           <v-spacer />
 
-          <v-btn text color="error" small @click="$emit('doResetFilter')">
+          <v-btn plain small class="mx-2" @click="$emit('doToggleFilter')">
+            Close
+          </v-btn>
+
+          <v-btn plain color="error" small @click="$emit('doResetFilter')">
             Clear Filter
           </v-btn>
         </div>
