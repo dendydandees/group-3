@@ -36,6 +36,77 @@
       />
     </v-col>
 
+    <!-- created from  -->
+    <v-col cols="12" md="3">
+      <v-menu
+        v-model="menu.createdFrom"
+        :close-on-content-click="false"
+        transition="scale-transition"
+        offset-y
+        min-width="auto"
+      >
+        <template #activator="{ on, attrs }">
+          <v-text-field
+            :value="date.createdFrom"
+            label="Created From"
+            placeholder="Enter your created from..."
+            readonly
+            clearable
+            single-line
+            outlined
+            rounded
+            dense
+            hide-details
+            v-bind="attrs"
+            v-on="on"
+          />
+        </template>
+
+        <v-date-picker
+          v-model="filterOrder.createdFrom"
+          :max="filterOrder.createdTo"
+          show-adjacent-months
+          @input="menu.createdFrom = false"
+        />
+      </v-menu>
+    </v-col>
+
+    <!-- created to  -->
+    <v-col cols="12" md="3">
+      <v-menu
+        v-model="menu.createdTo"
+        :close-on-content-click="false"
+        transition="scale-transition"
+        offset-y
+        min-width="auto"
+      >
+        <template #activator="{ on, attrs }">
+          <v-text-field
+            :value="date.createdTo"
+            v-bind="attrs"
+            readonly
+            clearable
+            single-line
+            outlined
+            rounded
+            dense
+            hide-details
+            label="Created To"
+            placeholder="Enter your created to..."
+            class="input-filter elevation-1"
+            v-on="on"
+          />
+        </template>
+
+        <v-date-picker
+          v-model="filterOrder.createdTo"
+          :min="filterOrder.createdFrom"
+          show-adjacent-months
+          @input="menu.createdTo = false"
+        />
+      </v-menu>
+    </v-col>
+
     <!-- origin country -->
     <v-col cols="12" md="3">
       <v-autocomplete
@@ -125,12 +196,35 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
-    const { app } = useContext()
+    const { app, $dateFns } = useContext()
+
     const storeFilter = useStore<VuexModuleFilters>()
     const filterOrder = computed({
       get: () => props.value,
       set: (value) => emit('input', value),
     })
+
+    // manage date for filter by created from and to
+    const menu = ref({
+      createdFrom: false,
+      createdTo: false,
+    })
+    const date = computed(() => ({
+      createdFrom: filterOrder.value.createdFrom
+        ? $dateFns.format(
+            $dateFns.parseISO(filterOrder.value.createdFrom),
+            'MMMM do yyyy'
+          )
+        : '',
+      createdTo: filterOrder.value.createdTo
+        ? $dateFns.format(
+            $dateFns.parseISO(filterOrder.value.createdTo),
+            'MMMM do yyyy'
+          )
+        : '',
+    }))
+
+    // manage filter by country origin, destination  and service type
     const search = ref({
       originCountry: '',
       destinationCountry: '',
@@ -172,7 +266,9 @@ export default defineComponent({
 
     return {
       filterOrder,
+      menu,
       search,
+      date,
       serviceTypes,
       country,
     }

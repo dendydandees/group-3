@@ -54,6 +54,7 @@
     <v-expand-transition>
       <OrdersFiltersContainer
         :is-show-filter="isShowFilter"
+        @doToggleFilter="isShowFilter = !isShowFilter"
         @doResetFilter="doResetFilter"
       >
         <template #filterList>
@@ -179,7 +180,7 @@ export default defineComponent({
   name: 'OrderPages',
   layout: 'default',
   setup() {
-    const { $dayjs } = useContext()
+    const { $dateFns } = useContext()
     const router = useRouter()
 
     // store manage
@@ -262,7 +263,10 @@ export default defineComponent({
       const response = (await storeOrders.dispatch('orders/getSelectedLabels', {
         data: selectedLabels,
       })) as string
-      const fileName = `order_labels_${$dayjs().format('YYYY-MM-DD_HH-mm')}.pdf`
+      const fileName = `order_labels_${$dateFns.format(
+        new Date(),
+        'yyyy-MM-dd_HH-mm'
+      )}.pdf`
 
       saveAs(response, fileName)
     }
@@ -274,6 +278,8 @@ export default defineComponent({
       filterOrder.value = {
         orderCode: '',
         batchId: '',
+        createdFrom: '',
+        createdTo: '',
         serviceType: '',
         originCountry: '',
         destinationCountry: '',

@@ -17,7 +17,7 @@
               <span class="d-block"> Last Updated </span>
 
               <span class="d-block">
-                {{ $dayjs(updatedAt).format('MMM DD, YYYY HH:mm') }}
+                {{ $dateFns.format(updatedAt, 'MMM dd, yyyy HH:mm') }}
               </span>
             </v-col>
 
@@ -25,7 +25,7 @@
               <span class="d-block"> Created </span>
 
               <span class="d-block">
-                {{ $dayjs(createdAt).format('MMM DD, YYYY HH:mm') }}
+                {{ $dateFns.format(createdAt, 'MMM dd, yyyy HH:mm') }}
               </span>
             </v-col>
 

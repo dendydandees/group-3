@@ -89,6 +89,7 @@ export default {
     // https://github.com/harlan-zw/nuxt-webpack-optimisations
     'nuxt-webpack-optimisations',
     '@nuxtjs/svg',
+    '@nuxtjs/date-fns',
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -98,7 +99,6 @@ export default {
     '@nuxtjs/auth-next',
     '@nuxt/image',
     '@nuxtjs/sentry',
-    '@nuxtjs/dayjs',
   ],
 
   // Auth modules configuration: https://auth.nuxtjs.org
@@ -163,12 +163,6 @@ export default {
     config: {
       release: process.env.RELEASE || '',
     },
-  },
-
-  dayjs: {
-    locales: ['en'],
-    defaultLocale: 'en',
-    plugins: ['utc', 'timezone'],
   },
 
   webpackOptimisations: {
