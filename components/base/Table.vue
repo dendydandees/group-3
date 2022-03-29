@@ -1,0 +1,163 @@
+<template>
+  <v-data-table
+    v-model="selected"
+    :item-key="itemKey"
+    :items="items"
+    :headers="headers"
+    :options="options"
+    :loading="loading"
+    hide-default-footer
+    :show-select="showSelect"
+    class="elevation-2"
+    @update:options="fetch"
+    @toggle-select-all="doSelectAll"
+  >
+    <!-- checkbox on header table -->
+    <template #[`header.data-table-select`]="{ props, on }">
+      <v-simple-checkbox
+        v-ripple
+        on-icon="mdi-checkbox-marked-circle"
+        off-icon="mdi-checkbox-blank-circle-outline"
+        indeterminate-icon="mdi-checkbox-blank-circle"
+        :disabled="loading || !isSelectDisabled"
+        v-bind="props"
+        v-on="on"
+      />
+    </template>
+
+    <!-- checkbox on table body each item -->
+    <template #[`item.data-table-select`]="{ item, isSelected, select }">
+      <v-simple-checkbox
+        v-ripple
+        on-icon="mdi-checkbox-marked-circle"
+        off-icon="mdi-checkbox-blank-circle-outline"
+        :value="isSelected"
+        :disabled="loading || !item.labelPath"
+        @input="select($event)"
+      />
+    </template>
+
+    <!-- order item cell -->
+    <template #[`item.orderCode`]="{ item }">
+      <v-btn text color="primary" @click="$emit('doGetDetails', item)">
+        {{ item.orderCode }}
+      </v-btn>
+    </template>
+
+    <!-- batch id cell -->
+    <template #[`item.batchId`]="{ item }">
+      <v-btn
+        text
+        color="primary"
+        @click="$emit('doGetBatchDetails', item.batchId)"
+      >
+        {{ item.batchId }}
+      </v-btn>
+    </template>
+
+    <!-- service type cell -->
+    <template #[`item.serviceType`]="{ item }">
+      <template v-if="item.requestedServices">
+        <v-chip
+          v-for="service in item.requestedServices"
+          :key="service"
+          small
+          :color="$customUtils.setColorServiceType(service)"
+          class="text-uppercase white--text"
+        >
+          {{ $customUtils.setServiceType(service) }}
+        </v-chip>
+      </template>
+    </template>
+
+    <!-- origin cell -->
+    <template #[`item.origin`]="{ item }">
+      <div class="text--secondary">
+        {{ item.consigneeState }}
+      </div>
+    </template>
+
+    <!-- destination cell -->
+    <template #[`item.destination`]="{ item }">
+      <div class="text--secondary">
+        {{ item.pickupState }}
+      </div>
+    </template>
+
+    <!-- actions cell -->
+    <template #[`item.actions`]="{ item }">
+      <div class="d-flex align-center">
+        <v-btn
+          small
+          download
+          :href="item.labelPath || ''"
+          :loading="loading"
+          :disabled="!item.labelPath"
+          color="info"
+          class="ma-2"
+        >
+          Download
+        </v-btn>
+      </div>
+    </template>
+  </v-data-table>
+</template>
+
+<script lang="ts">
+import { defineComponent, computed, PropType } from '@nuxtjs/composition-api'
+import { FilterDetails, Pagination } from '~/types/applications'
+
+export default defineComponent({
+  name: 'BaseTable',
+  props: {
+    value: {
+      type: Array,
+      default: () => [],
+    },
+    itemKey: {
+      type: String,
+      required: true,
+    },
+    items: {
+      type: Array,
+      required: true,
+    },
+    headers: {
+      type: Array,
+      required: true,
+    },
+    options: {
+      type: Object as PropType<Pagination>,
+      required: true,
+    },
+    loading: {
+      type: Boolean,
+    },
+    showSelect: {
+      type: Boolean,
+      default: false,
+    },
+    isSelectDisabled: {
+      type: Boolean,
+    },
+  },
+  setup(props, { emit }) {
+    const selected = computed({
+      get: () => props.value,
+      set: (value) => emit('input', value),
+    })
+    const fetch = (data: FilterDetails) => {
+      emit('fetch', data)
+    }
+    const doSelectAll = (data: []) => {
+      emit('doSelectAll', data)
+    }
+
+    return {
+      selected,
+      fetch,
+      doSelectAll,
+    }
+  },
+})
+</script>
