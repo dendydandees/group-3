@@ -23,6 +23,9 @@ interface ParamsGetSelectedLabels {
 const filterOrder = {
   orderCode: '',
   batchId: '',
+  originCountry: '',
+  destinationCountry: '',
+  serviceType: '',
 } as FilterOrders
 
 const filterBatch = {

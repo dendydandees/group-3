@@ -78,6 +78,9 @@ export interface OrderDetails {
 export interface FilterOrders {
   orderCode: string
   batchId: string
+  originCountry: string
+  destinationCountry: string
+  serviceType: string
 }
 
 export interface BatchOrders {
