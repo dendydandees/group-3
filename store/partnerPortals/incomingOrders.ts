@@ -1,14 +1,14 @@
 // Interfaces
-import { MutationTree, ActionTree } from 'vuex'
-import { Meta } from '~/types/applications'
+import { MutationTree, ActionTree } from 'vuex';
+import { Meta } from '~/types/applications';
 import {
   IncomingOrder,
   FilterOrders,
-} from '~/types/partnerPortals/incomingOrders'
+} from '~/types/partnerPortals/incomingOrders';
 
 const filter = {
   search: '',
-} as FilterOrders
+} as FilterOrders;
 
 export const state = () => ({
   incomingOrders: [] as IncomingOrder | [],
@@ -18,9 +18,14 @@ export const state = () => ({
     totalCount: 10,
   } as Meta,
   filter: filter as FilterOrders,
-})
+  incomingOrderDetails: {
+    order: {} as any | {},
+    // orderItems: [] as OrderItem | [],
+    // orderAllocationUpdates: [] as OrderAllocationUpdate | [],
+  } as any,
+});
 
-export type RootStateIncomingOrders = ReturnType<typeof state>
+export type RootStateIncomingOrders = ReturnType<typeof state>;
 
 export const mutations: MutationTree<RootStateIncomingOrders> = {
   SET_CLIENT_CONNECTIONS: (state, value: IncomingOrder) =>
@@ -28,7 +33,9 @@ export const mutations: MutationTree<RootStateIncomingOrders> = {
   SET_META: (state, value: Meta) => (state.meta = value),
   SET_FILTER: (state, value: FilterOrders) => (state.filter = value),
   RESET_FILTER: (state) => (state.filter = filter),
-}
+  SET_INCOMING_ORDER_DETAILS: (state, value: any) =>
+    (state.incomingOrderDetails = value),
+};
 
 export const actions: ActionTree<
   RootStateIncomingOrders,
@@ -36,29 +43,55 @@ export const actions: ActionTree<
 > = {
   async getIncomingOrders(
     { commit },
-    { id, params }: { id: string; params: Meta }
+    { id, params }: { id: string; params: Meta; }
   ) {
     try {
       const response = await this.$axios.$get(
-        `/api/clients/partners/${id}/orders`,
+        `/api/clients/partners/${ id }/orders`,
         {
           params,
         }
-      )
-      const { data, page, totalPage, totalCount } = response
+      );
+      const { data, page, totalPage, totalCount } = response;
 
-      if (!data) throw response
+      if (!data) throw response;
 
-      commit('SET_CLIENT_CONNECTIONS', data)
+      commit('SET_CLIENT_CONNECTIONS', data);
       commit('SET_META', {
         page,
         totalPage,
         totalCount,
-      })
+      });
 
-      return response
+      return response;
     } catch (error) {
-      return error
+      return error;
     }
   },
-}
+  async getIncomingOrderDetails({ commit }, params: { id: string, partnerId: string; }) {
+    try {
+      const request = [
+        this.$axios.$get(`/api/clients/partners/${ params?.partnerId ?? '' }/orders/${ params?.id ?? '' }`),
+        // this.$axios.$get(`/api/clients/orders/${id}/items`),
+        // this.$axios.$get(`/api/clients/orders/${id}/updates`),
+      ];
+      const [
+        responseIncomingOrderDetails,
+        // responseOrderItems,
+        // responseOrderUpdates
+      ] =
+        await Promise.all(request);
+      const data = {
+        order: responseIncomingOrderDetails ?? {},
+        // orderItems: responseOrderItems?.orderItems ?? [],
+        // orderAllocationUpdates: responseOrderUpdates?.allocationUpdates ?? [],
+      };
+
+      commit('SET_INCOMING_ORDER_DETAILS', data);
+
+      return data;
+    } catch (error) {
+      return error;
+    }
+  },
+};

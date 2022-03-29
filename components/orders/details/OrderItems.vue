@@ -29,6 +29,8 @@ import {
   useStore,
 } from '@nuxtjs/composition-api'
 import { OrderItem, VuexModuleOrders } from '~/types/orders'
+import { VuexModuleIncomingOrders } from '~/types/partnerPortals/incomingOrders'
+import tempData from '~/static/tempData'
 
 export default defineComponent({
   props: {
@@ -36,12 +38,26 @@ export default defineComponent({
       type: Object,
       default: () => ({}),
     },
+    isUpcoming: {
+      type: Boolean,
+      default: false,
+    }
   },
-  setup() {
+  setup(props, { emit }) {
     const store = useStore<VuexModuleOrders>()
+    const storeIncomingOrders = useStore<VuexModuleIncomingOrders>()
     const orderItems = computed(
-      () => store.state.orders.orderDetails.orderItems
+      () => {
+        return props.isUpcoming
+        ?
+        storeIncomingOrders.state.partnerPortals.incomingOrders.incomingOrderDetails?.order?.order?.items
+        :
+        store.state.orders.orderDetails.orderItems
+      }
     )
+
+    console.log('orderItems: ',tempData.detailUpcomingOrder.orderItems, orderItems.value)
+
     const tableSettings = reactive({
       itemKey: 'id',
       hideDefaultFooter: true,
@@ -76,8 +92,8 @@ export default defineComponent({
       return parseFloat(price).toFixed(2)
     }
     const setTotal = () => {
-      const orderItems = store.state.orders.orderDetails.orderItems
-      const totalPrice = orderItems.reduce(
+      const orderItemsTemp = orderItems.value && orderItems.value.length > 0 ? orderItems.value : []
+      const totalPrice = orderItemsTemp.reduce(
         (previous: number, current: OrderItem) => {
           const total = previous + parseFloat(current.price)
 
@@ -85,7 +101,7 @@ export default defineComponent({
         },
         0
       )
-      const currency = orderItems.length !== 0 ? orderItems[0].currency : ''
+      const currency = orderItemsTemp.length !== 0 ? orderItemsTemp[0].currency : ''
 
       return `${currency} ${totalPrice.toFixed(2)}`
     }

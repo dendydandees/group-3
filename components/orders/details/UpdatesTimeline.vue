@@ -16,6 +16,7 @@
             class="mb-10"
             fill-dot
             :color="$customUtils.setColorServiceType(update.serviceType)"
+
           >
             <v-row justify="space-between">
               <v-col cols="auto">
@@ -47,6 +48,7 @@
 <script lang="ts">
 import { computed, defineComponent, useStore } from '@nuxtjs/composition-api'
 import { VuexModuleOrders } from '~/types/orders'
+import tempData from '~/static/tempData'
 
 export default defineComponent({
   props: {
@@ -54,12 +56,24 @@ export default defineComponent({
       type: Object,
       default: () => ({}),
     },
+    isUpcoming: {
+      type: Boolean,
+      default: false,
+    }
   },
-  setup() {
+  setup(props, { emit }) {
     const store = useStore<VuexModuleOrders>()
     const orderAllocationUpdates = computed(
-      () => store.state.orders.orderDetails.orderAllocationUpdates
+      () => {
+        return props.isUpcoming
+        ?
+        tempData.detailUpcomingOrder.timeline
+        :
+        store.state.orders.orderDetails.orderAllocationUpdates
+      }
     )
+
+    console.log(tempData.detailUpcomingOrder.timeline)
 
     return {
       orderAllocationUpdates,
