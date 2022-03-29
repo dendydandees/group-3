@@ -40,7 +40,7 @@
                     <img
                       :src="`data:image/png;base64,${profiles.logo}`"
                       :alt="form.name"
-                      style="object-fit:cover"
+                      style="object-fit: cover"
                     />
                   </v-avatar>
                 </v-fade-transition>
@@ -196,7 +196,6 @@ export default defineComponent({
   },
   middleware: 'partner',
   setup() {
-    useMeta({ titleTemplate: '%s | Partner Profiles' })
     const route = useRoute()
     const router = useRouter()
 
@@ -281,6 +280,8 @@ export default defineComponent({
       await storeProfiles.dispatch('partnerPortals/profiles/getProfile', id)
       form.value = { ...profiles.value }
     })
+
+    useMeta(() => ({ title: 'Partner Portal | Partner Profiles' }))
 
     return {
       alert,

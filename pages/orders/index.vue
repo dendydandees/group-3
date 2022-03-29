@@ -179,7 +179,6 @@ export default defineComponent({
   name: 'OrderPages',
   layout: 'default',
   setup() {
-    useMeta({ titleTemplate: '%s | Orders' })
     const { $dayjs } = useContext()
     const router = useRouter()
 
@@ -246,7 +245,7 @@ export default defineComponent({
       isShowFilter.value = true
       setTimeout(() => {
         filterOrder.value = {
-          orderCode: '',
+          ...filterOrder.value,
           batchId: id,
         }
       }, 100)
@@ -275,6 +274,9 @@ export default defineComponent({
       filterOrder.value = {
         orderCode: '',
         batchId: '',
+        serviceType: '',
+        originCountry: '',
+        destinationCountry: '',
       }
       filterBatch.value = {
         batchId: '',
@@ -386,6 +388,12 @@ export default defineComponent({
       doResetFilter()
       selectedOrders.value = []
     })
+
+    // manage page title
+    const title = computed(() => {
+      return orderView.value === 0 ? 'Order List' : 'Batch List'
+    })
+    useMeta(() => ({ title: `Client Portal | ${title.value}` }))
 
     return {
       orders,

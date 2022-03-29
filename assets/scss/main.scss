@@ -52,7 +52,7 @@
   border-bottom-right-radius: 0 !important;
 }
 
-// input fields style
+// form fields style
 .v-input fieldset {
   color: $primary !important;
 }
@@ -86,6 +86,17 @@
   .v-select__selection {
     color: $primary;
   }
+}
+
+.v-text-field {
+  .v-label {
+    color: $primary !important;
+    font-size: large;
+  }
+}
+
+.v-autocomplete__content.v-menu__content {
+  border-radius: 1rem !important;
 }
 
 // data table

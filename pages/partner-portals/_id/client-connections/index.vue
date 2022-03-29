@@ -179,8 +179,6 @@ import { FilterDetails, VuexModuleApplications } from '~/types/applications'
 export default defineComponent({
   name: 'ClientConnectionsPages',
   setup(_props, { root }) {
-    useMeta({ titleTemplate: '%s | Client Connections' })
-
     // store manage
     const storeClientConnections = useStore<VuexModuleClientConnections>()
     const storeApplications = useStore<VuexModuleApplications>()
