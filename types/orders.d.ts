@@ -82,7 +82,9 @@ export interface FilterOrders {
   createdTo: string
   originCountry: string
   destinationCountry: string
-  serviceType: string
+  serviceType: string[]
+  originPortId: string
+  destinationPortId: string
 }
 
 export interface BatchOrders {

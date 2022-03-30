@@ -26,3 +26,15 @@ export interface CountryCode {
   name: string
   value: string
 }
+
+export interface Ports {
+  data: {
+    code: string
+    countryCode: string
+    id: string
+    name: string
+  }[]
+  page: number
+  totalCount: number
+  totalPage: number
+}

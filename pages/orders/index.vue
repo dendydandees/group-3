@@ -273,9 +273,11 @@ export default defineComponent({
         batchId: '',
         createdFrom: '',
         createdTo: '',
-        serviceType: '',
+        serviceType: [],
         originCountry: '',
         destinationCountry: '',
+        originPortId: '',
+        destinationPortId: '',
       }
       filterBatch.value = {
         batchId: '',
@@ -301,13 +303,10 @@ export default defineComponent({
 
       if (isOnListView.value) {
         const { sortBy, sortDesc } = params
-        const orderCode = filterOrder?.value.orderCode ?? null
-        const batchId = filterOrder?.value.batchId ?? null
 
         dataParams = {
           ...dataParams,
-          orderCode,
-          batchId,
+          ...filterOrder.value,
           sortBy: sortBy && sortBy[0] === 'orderCode' ? 'order_code' : null,
           sortDesc: sortDesc ? sortDesc[0] : null,
         }
