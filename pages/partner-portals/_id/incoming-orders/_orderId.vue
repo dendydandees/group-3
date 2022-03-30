@@ -12,6 +12,7 @@
         ORDERS
       </div>
       <div
+        v-if="idObj.previous && idObj.id"
         class="primary--text"
         style="font-size: 20px; line-height: 24px"
       >

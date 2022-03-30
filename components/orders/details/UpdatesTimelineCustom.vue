@@ -14,10 +14,10 @@
           <v-timeline-item
             v-for="(el, i) in orderAllocationUpdates"
             :key="i"
-            color="primary"
+            :color="colorByService(el)"
             small
             right
-            class="pb-14"
+            :class="`pb-14`"
           >
             <template #opposite>
               <div>
@@ -25,13 +25,13 @@
                   style="font-size: 16px;line-height: 27px"
                 >
                   <!-- 17:05 -->
-                  {{el.time ? el.time : '-'}}
+                  {{el.externalTracking.partnerUpdates && el.externalTracking.partnerUpdates.CreatedAt ? parseDateTime({data: el.externalTracking.partnerUpdates.CreatedAt, isTime: true}) : '-'}}
                 </div>
                 <div
                   style="font-size: 16px;line-height: 27px"
                 >
                   <!-- Tue, Mar 15, 2022 -->
-                  {{el.time ? el.time : '-'}}
+                  {{el.externalTracking.partnerUpdates && el.externalTracking.partnerUpdates.CreatedAt ? parseDateTime({data: el.externalTracking.partnerUpdates.CreatedAt}) : '-'}}
                 </div>
               </div>
             </template>
@@ -45,23 +45,25 @@
                   class="mb-3 top"
                 >
                   <!-- Delivered to Customer Panjangggggggg -->
-                  {{el.status ? el.status : '-'}}
+                  {{el.externalTracking.partnerUpdates && el.externalTracking.partnerUpdates.Status ? el.externalTracking.partnerUpdates.Status : '-'}}
                 </div>
                 <div
                   class="bottom"
                   style="font-size: 16px;line-height: 20px;color: #AFAFAF"
                 >
                   <!-- Order has been received by customer -->
-                  {{el.desc ? el.desc : '-'}}
+                  {{el.externalTracking.partnerUpdates && el.externalTracking.partnerUpdates.Comments ? el.externalTracking.partnerUpdates.Comments : '-'}}
                 </div>
               </div>
               <div
-                v-if="i === 0"
+              v-if="
+                validationDiffService(el, i)
+              "
                 class="appent-text"
                 style="font-size: 23px;line-height: 25px"
               >
                 <div
-                  class="top primary--text"
+                  :class="`top ${colorByService(el)}--text`"
                 >
                   {{$customUtils.setServiceType(el.serviceType)}}
                 </div>
@@ -81,6 +83,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, useStore } from '@nuxtjs/composition-api'
+import moment from 'moment';
 import { VuexModuleOrders } from '~/types/orders'
 import { VuexModuleIncomingOrders } from '~/types/partnerPortals/incomingOrders'
 import tempData from '~/static/tempData'
@@ -99,21 +102,74 @@ export default defineComponent({
   setup(props, { emit }) {
     const store = useStore<VuexModuleOrders>()
     const storeIncomingOrders = useStore<VuexModuleIncomingOrders>()
+    const reqServiceType = computed(
+      () => {
+        return props.isUpcoming
+        ?
+        storeIncomingOrders.state.partnerPortals?.incomingOrders?.incomingOrderDetails?.order?.order?.requestedServices
+        // tempData.detailUpcomingOrder.timeline
+        :
+        ''
+      }
+    )
     const orderAllocationUpdates = computed(
       () => {
         return props.isUpcoming
         ?
-        storeIncomingOrders.state.partnerPortals.incomingOrders.incomingOrderDetails.order.allocation
+        // storeIncomingOrders.state.partnerPortals.incomingOrders.incomingOrderDetails.order.allocation
+        onlyReqServiceTypeData(storeIncomingOrders.state.partnerPortals.incomingOrders.incomingOrderDetails.order.allocation)
         // tempData.detailUpcomingOrder.timeline
         :
         store.state.orders.orderDetails.orderAllocationUpdates
       }
     )
 
+    function onlyReqServiceTypeData (data: any) {
+      let filteredData = []
+      if(reqServiceType.value) {
+        filteredData = [...data].filter((el:any) => el.serviceType === reqServiceType.value )
+      }
+      return filteredData
+    }
+
+    const colorByService = (el: any) => {
+      switch (el.serviceType) {
+        case 'FIRST_MILE':
+          return 'primary'
+        case 'LAST_MILE':
+          return 'purple'
+        case 'CUSTOMS':
+          return 'green'
+        case 'FREIGHT_FORWARDER':
+          return 'secondary'
+        default:
+          return 'primary';
+      }
+    }
+
+    const parseDateTime = (payload: {data: any, isTime?: boolean}) => {
+      let temp = ''
+      if(payload.isTime) {
+        temp = moment(payload.data).format('HH:mm')
+      } else {
+        temp = moment(payload.data).format('ddd, MMM DD, YYYY')
+      }
+      return temp
+    }
+
+    const validationDiffService = (el: any, i: number) => {
+        return el.serviceType !== (
+          orderAllocationUpdates.value[i - 1] && orderAllocationUpdates.value[i - 1].serviceType && orderAllocationUpdates.value[i - 1].serviceType
+        )
+    }
+
     console.log(tempData.detailUpcomingOrder.timeline)
 
     return {
       orderAllocationUpdates,
+      colorByService,
+      validationDiffService,
+      parseDateTime
     }
   },
 })
@@ -127,7 +183,7 @@ export default defineComponent({
   .milestone-wrapper {
     .v-timeline--dense .v-timeline-item__opposite {
       display: inline-block;
-      min-width: 141.5px;
+      min-width: 150px;
     }
 
     .v-timeline-item__opposite {
@@ -138,7 +194,7 @@ export default defineComponent({
 
     /* line */
     .v-application--is-ltr, .v-timeline--dense:not(.v-timeline--reverse):before {
-      left: 180.5px !important;
+      left: 189px !important;
       height: calc(100% - 114px);
       margin-top: 3.5px;
     }
