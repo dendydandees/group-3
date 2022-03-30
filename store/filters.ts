@@ -1,11 +1,13 @@
 // Interfaces
 import { MutationTree, ActionTree } from 'vuex'
-import { ServiceType, Zone, CountryCode } from '~/types/filters'
+import { ServiceType, Zone, CountryCode, Ports } from '~/types/filters'
+import { Meta } from '~/types/applications'
 
 export const state = () => ({
   countryCodes: [] as CountryCode[],
   zones: [] as Zone[],
   serviceTypes: [] as ServiceType[],
+  ports: {} as Ports,
   loaded: false as Boolean,
 })
 
@@ -17,6 +19,7 @@ export const mutations: MutationTree<RootStateFilter> = {
   SET_ZONES: (state, value: Zone[]) => (state.zones = value),
   SET_SERVICE_TYPES: (state, value: ServiceType[]) =>
     (state.serviceTypes = value),
+  SET_PORTS: (state, value: Ports) => (state.ports = value),
   SET_LOADED: (state, value: Boolean) => (state.loaded = value),
 }
 
@@ -77,6 +80,17 @@ export const actions: ActionTree<RootStateFilter, RootStateFilter> = {
       if (!serviceTypes) throw response
 
       commit('SET_SERVICE_TYPES', serviceTypes)
+
+      return response
+    } catch (error) {
+      return error
+    }
+  },
+  async getPorts({ commit }, { params }: { params: Meta }) {
+    try {
+      const response = await this.$axios.$get('/api/clients/ports', { params })
+
+      commit('SET_PORTS', response)
 
       return response
     } catch (error) {

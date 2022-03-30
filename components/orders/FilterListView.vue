@@ -1,7 +1,7 @@
 <template>
-  <v-row align="center" class="ma-0">
+  <v-row align="center" class="ma-0" no-gutters>
     <!-- order code -->
-    <v-col cols="12" md="3">
+    <v-col cols="12" md="3" class="px-2 py-4">
       <v-text-field
         v-model="filterOrder.orderCode"
         clearable
@@ -10,8 +10,8 @@
         rounded
         single-line
         hide-details
-        label="Order code"
-        placeholder="Enter your order code..."
+        label="Order ID"
+        placeholder="Enter your order id..."
         background-color="white"
         type="search"
         class="input-filter elevation-1"
@@ -19,7 +19,7 @@
     </v-col>
 
     <!-- batch id -->
-    <v-col cols="12" md="3">
+    <v-col cols="12" md="3" class="px-2 py-4">
       <v-text-field
         v-model="filterOrder.batchId"
         clearable
@@ -28,8 +28,8 @@
         rounded
         single-line
         hide-details
-        label="Batch code"
-        placeholder="Enter your batch code..."
+        label="Batch ID"
+        placeholder="Enter your batch id..."
         background-color="white"
         type="search"
         class="input-filter elevation-1"
@@ -37,7 +37,7 @@
     </v-col>
 
     <!-- created from  -->
-    <v-col cols="12" md="3">
+    <v-col cols="12" md="3" class="px-2 py-4">
       <v-menu
         v-model="menu.createdFrom"
         :close-on-content-click="false"
@@ -48,8 +48,7 @@
         <template #activator="{ on, attrs }">
           <v-text-field
             :value="date.createdFrom"
-            label="Created From"
-            placeholder="Enter your created from..."
+            v-bind="attrs"
             readonly
             clearable
             single-line
@@ -57,8 +56,11 @@
             rounded
             dense
             hide-details
-            v-bind="attrs"
+            label="Created From"
+            placeholder="Enter your created from..."
+            class="input-filter elevation-1"
             v-on="on"
+            @click:clear="filterOrder.createdFrom = null"
           />
         </template>
 
@@ -72,7 +74,7 @@
     </v-col>
 
     <!-- created to  -->
-    <v-col cols="12" md="3">
+    <v-col cols="12" md="3" class="px-2 py-4">
       <v-menu
         v-model="menu.createdTo"
         :close-on-content-click="false"
@@ -95,6 +97,7 @@
             placeholder="Enter your created to..."
             class="input-filter elevation-1"
             v-on="on"
+            @click:clear="filterOrder.createdTo = null"
           />
         </template>
 
@@ -108,7 +111,7 @@
     </v-col>
 
     <!-- origin country -->
-    <v-col cols="12" md="3">
+    <v-col cols="12" md="3" class="px-2 py-4">
       <v-autocomplete
         v-model="filterOrder.originCountry"
         :items="country"
@@ -123,14 +126,14 @@
         item-text="name"
         item-value="value"
         background-color="white"
-        label="Origin country"
+        label="Origin Country"
         placeholder="Enter your origin country..."
         class="input-filter elevation-1"
       />
     </v-col>
 
     <!-- destination country -->
-    <v-col cols="12" md="3">
+    <v-col cols="12" md="3" class="px-2 py-4">
       <v-autocomplete
         v-model="filterOrder.destinationCountry"
         :items="country"
@@ -145,14 +148,66 @@
         item-text="name"
         item-value="value"
         background-color="white"
-        label="Destination country"
+        label="Destination Country"
         placeholder="Enter your destination country..."
         class="input-filter elevation-1"
       />
     </v-col>
 
+    <!-- origin port -->
+    <v-col cols="12" md="3" class="px-2 py-4">
+      <v-autocomplete
+        v-model="filterOrder.originPortId"
+        :items="ports.data"
+        :search-input.sync="search.originPortId"
+        clearable
+        cache-items
+        outlined
+        rounded
+        dense
+        single-line
+        hide-details
+        item-text="name"
+        item-value="id"
+        background-color="white"
+        label="Origin Port"
+        placeholder="Enter your origin port..."
+        class="input-filter elevation-1"
+      >
+        <template #append-item>
+          <div v-intersect="portIntersect" />
+        </template>
+      </v-autocomplete>
+    </v-col>
+
+    <!-- destination port -->
+    <v-col cols="12" md="3" class="px-2 py-4">
+      <v-autocomplete
+        v-model="filterOrder.destinationPortId"
+        :items="ports.data"
+        :search-input.sync="search.destinationPortId"
+        clearable
+        cache-items
+        outlined
+        rounded
+        dense
+        single-line
+        hide-details
+        item-text="name"
+        item-value="id"
+        background-color="white"
+        label="Destination Port"
+        placeholder="Enter your destination port..."
+        class="input-filter elevation-1"
+      >
+        <template #append-item>
+          <div v-intersect="portIntersect" />
+        </template>
+      </v-autocomplete>
+    </v-col>
+
     <!-- service type -->
-    <v-col cols="12" md="3">
+    <v-col cols="12" md="3" class="px-2 py-4">
       <v-autocomplete
         v-model="filterOrder.serviceType"
         :items="serviceTypes"
@@ -164,8 +219,13 @@
         dense
         single-line
         hide-details
+        multiple
+        small-chips
+        deletable-chips
+        item-text="text"
+        item-value="value"
         background-color="white"
-        label="Service type"
+        label="Service Type"
         placeholder="Enter your service type..."
         class="input-filter elevation-1"
       />
@@ -185,7 +245,8 @@ import {
   useContext,
 } from '@nuxtjs/composition-api'
 // types
-import { CountryCode, ServiceType, VuexModuleFilters } from '~/types/filters'
+import { Pagination } from '~/types/applications'
+import { CountryCode, VuexModuleFilters, Ports } from '~/types/filters'
 import { FilterOrders } from '~/types/orders'
 
 export default defineComponent({
@@ -224,23 +285,64 @@ export default defineComponent({
         : '',
     }))
 
-    // manage filter by country origin, destination  and service type
+    // manage filter
     const search = ref({
       originCountry: '',
       destinationCountry: '',
       serviceType: '',
+      originPortId: '',
+      destinationPortId: '',
     })
-    const serviceTypes = ref([]) as Ref<ServiceType[]>
+    const serviceTypes = ref([]) as Ref<{ text: string; value: string }[]>
     const country = ref([]) as Ref<CountryCode[]>
+
+    // manage ports
+    const ports = computed(() => storeFilter.state.filters.ports) as Ref<Ports>
+    const portsMeta = ref({
+      page: 1,
+      itemsPerPage: 10,
+    }) as Ref<Pagination>
+    const getPorts = async (params: Pagination) => {
+      const { page, itemsPerPage: perPage } = params
+      await storeFilter.dispatch('filters/getPorts', {
+        params: {
+          page,
+          perPage,
+        },
+      })
+    }
+    const portIntersect = async (
+      _entries: IntersectionObserverEntry[],
+      _observer: IntersectionObserver,
+      isIntersecting: boolean
+    ) => {
+      if (
+        !isIntersecting ||
+        portsMeta.value.itemsPerPage >= ports.value.totalCount
+      ) {
+        return
+      }
+
+      portsMeta.value = {
+        page: 1,
+        itemsPerPage: portsMeta.value.itemsPerPage + 10,
+      }
+
+      await getPorts(portsMeta.value)
+    }
 
     useFetch(async () => {
       await storeFilter.dispatch('filters/getServiceTypes')
       await storeFilter.dispatch('filters/getZones', { params: {} })
       await storeFilter.dispatch('filters/getCountryCodes')
+      await getPorts(portsMeta.value)
 
       // format service types
       const formatServiceTypes = storeFilter.state.filters.serviceTypes.map(
-        (type) => app.$customUtils.setServiceType(type.name)
+        (type) => ({
+          text: app.$customUtils.setServiceType(type.name),
+          value: type.name,
+        })
       )
 
       serviceTypes.value = formatServiceTypes
@@ -271,6 +373,8 @@ export default defineComponent({
       date,
       serviceTypes,
       country,
+      ports,
+      portIntersect,
     }
   },
 })
