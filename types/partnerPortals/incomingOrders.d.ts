@@ -54,5 +54,11 @@ export interface IncomingOrder {
 }
 
 export interface FilterOrders {
-  search: string
+  orderCode: string
+  batchId: string
+  createdFrom: string
+  createdTo: string
+  originCountry: string
+  destinationCountry: string
+  serviceType: string
 }

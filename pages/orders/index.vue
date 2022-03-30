@@ -30,14 +30,11 @@
       />
 
       <!-- Right options -->
-      <OrdersRightOptions
-        :is-on-list-view="isOnListView"
-        :loading="$fetchState.pending"
-      >
+      <OrdersRightOptions :loading="$fetchState.pending" :is-able-upload="true">
         <template #viewSettings>
           <OrdersViewSettings
+            v-if="isOnListView"
             v-model="selectedViews"
-            :is-on-list-view="isOnListView"
             :loading="$fetchState.pending"
           />
         </template>
@@ -136,7 +133,6 @@ import { saveAs } from 'file-saver'
 // Interfaces or types
 import { Order, VuexModuleOrders } from '~/types/orders'
 import { FilterDetails, VuexModuleApplications } from '~/types/applications'
-import { VuexModuleFilters } from '~/types/filters'
 
 interface Header {
   text: string
@@ -183,10 +179,9 @@ export default defineComponent({
     const { $dateFns } = useContext()
     const router = useRouter()
 
-    // store manage
+    // manage store
     const storeOrders = useStore<VuexModuleOrders>()
     const storeApplications = useStore<VuexModuleApplications>()
-    const storeFilters = useStore<VuexModuleFilters>()
     const orders = computed(() => storeOrders.state.orders.orders)
     const meta = computed(() => storeOrders.state.orders.meta)
     const pagination = ref({
@@ -199,7 +194,6 @@ export default defineComponent({
       ...storeOrders.state.orders.filterBatch,
     })
     const alert = computed(() => storeApplications.state.applications.alert)
-    const serviceTypes = ref([...storeFilters.state.filters.serviceTypes])
 
     // manage view
     const orderView = ref(0)
@@ -273,7 +267,6 @@ export default defineComponent({
 
     // manage filter order
     const isShowFilter = ref(false)
-    const country = ref([])
     const doResetFilter = () => {
       filterOrder.value = {
         orderCode: '',
@@ -402,26 +395,29 @@ export default defineComponent({
     useMeta(() => ({ title: `Client Portal | ${title.value}` }))
 
     return {
+      // manage store
       orders,
       meta,
       pagination,
       filterOrder,
       filterBatch,
       alert,
-      serviceTypes,
+      // manage view
       orderView,
       isOnListView,
+      // manage table
       selectedOrders,
       isLabelExist,
       selectedViews,
       headers,
+      selectAllToggle,
       doGetDetails,
       doGetBatchDetails,
       doDownloadSelectedLabel,
+      // manage filter order
       isShowFilter,
-      country,
-      selectAllToggle,
       doResetFilter,
+      // manage fetch
       fetchOrders,
       fetchDebounced,
     }

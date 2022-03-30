@@ -8,7 +8,13 @@
 
     <slot name="toggleView" />
 
-    <v-btn :disabled="loading" color="primary" nuxt to="/orders/upload">
+    <v-btn
+      v-if="isAbleUpload"
+      :disabled="loading"
+      color="primary"
+      nuxt
+      to="/orders/upload"
+    >
       Upload Orders
     </v-btn>
   </v-col>
@@ -21,6 +27,10 @@ export default defineComponent({
   props: {
     loading: {
       type: Boolean,
+    },
+    isAbleUpload: {
+      type: Boolean,
+      default: false,
     },
   },
 })

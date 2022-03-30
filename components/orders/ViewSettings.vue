@@ -1,5 +1,5 @@
 <template>
-  <v-menu v-if="isOnListView" bottom offset-y :close-on-content-click="false">
+  <v-menu bottom offset-y :close-on-content-click="false">
     <template #activator="{ attrs, on }">
       <v-btn
         text
@@ -71,9 +71,6 @@ export default defineComponent({
     value: {
       type: Array as PropType<string[]>,
       required: true,
-    },
-    isOnListView: {
-      type: Boolean,
     },
     loading: {
       type: Boolean,
