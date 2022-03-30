@@ -12,16 +12,44 @@ export default {
         externalTrackingNumber: 'dsadasdasdasdsadsadsadsa',
         externalTracking: {
           id: '',
-          partnerUpdates: null
+          partnerUpdates:
+          {
+            "ID": "f454c615-1933-420a-9a51-6b33eceda7b2",
+            "CreatedAt": "2022-03-30T10:41:29.181923+07:00",
+            "UpdatedAt": "2022-03-30T10:41:29.181923+07:00",
+            "DeletedAt": null,
+            "PartnerID": "a5dc2dc4-e16d-42a6-9b33-bdd11a325cd5",
+            "ExternalTrackingID": "cc57a363-254a-4651-8fe2-0bf68a32f32d",
+            "ExternalTracking": {
+              "ID": "",
+              "CreatedAt": "0001-01-01T00:00:00Z",
+              "UpdatedAt": "0001-01-01T00:00:00Z",
+              "DeletedAt": null,
+              "OrderID": "",
+              "PartnerID": "",
+              "TrackingNumber": "",
+              "LabelUrl": null,
+              "PartnerUpdate": null
+            },
+            "Status": "Out for delivery",
+            "Hash": "ABC",
+            "UpdateTimestamp": "2022-03-30T10:41:29.180454+07:00",
+            "Comments": "casdcsadcascdascdsacdacdsdcsacsacdascdsacsacascas",
+            "PODReceiverName": "",
+            "PODReceiverContact": "",
+            "PODURI": "",
+            "RawPayload": ""
+          },
         },
         orderCode: '',
         orderID: '',
-        partnerID: ''
+        partnerID: '',
+        order: {}
       },
       {
         id: 2,
-        serviceType: 'FIRST_MILE',
-        partnerName: 'Ninja Van',
+        serviceType: 'CUSTOMS',
+        partnerName: 'World Asia Logistics',
         externalTrackingNumber: 'dsadasdasdasdsadsadsadsa',
         externalTracking: {
           id: '',
@@ -29,7 +57,132 @@ export default {
         },
         orderCode: '',
         orderID: '',
-        partnerID: ''
+        partnerID: '',
+        order: {}
+      },
+      {
+        id: 2,
+        serviceType: 'CUSTOMS',
+        partnerName: 'World Asia Logistics',
+        externalTrackingNumber: 'dsadasdasdasdsadsadsadsa',
+        externalTracking: {
+          id: '',
+          partnerUpdates:
+          {
+            "ID": "f454c615-1933-420a-9a51-6b33eceda7b2",
+            "CreatedAt": "2022-03-30T10:41:29.181923+07:00",
+            "UpdatedAt": "2022-03-30T10:41:29.181923+07:00",
+            "DeletedAt": null,
+            "PartnerID": "a5dc2dc4-e16d-42a6-9b33-bdd11a325cd5",
+            "ExternalTrackingID": "cc57a363-254a-4651-8fe2-0bf68a32f32d",
+            "ExternalTracking": {
+              "ID": "",
+              "CreatedAt": "0001-01-01T00:00:00Z",
+              "UpdatedAt": "0001-01-01T00:00:00Z",
+              "DeletedAt": null,
+              "OrderID": "",
+              "PartnerID": "",
+              "TrackingNumber": "",
+              "LabelUrl": null,
+              "PartnerUpdate": null
+            },
+            "Status": "Out for delivery",
+            "Hash": "ABC",
+            "UpdateTimestamp": "2022-03-30T10:41:29.180454+07:00",
+            "Comments": "",
+            "PODReceiverName": "",
+            "PODReceiverContact": "",
+            "PODURI": "",
+            "RawPayload": ""
+          },
+        },
+        orderCode: '',
+        orderID: '',
+        partnerID: '',
+        order: {}
+      },
+      {
+        id: 2,
+        serviceType: 'FREIGHT_FORWARDER',
+        partnerName: 'Lion Air',
+        externalTrackingNumber: 'dsadasdasdasdsadsadsadsa',
+        externalTracking: {
+          id: '',
+          partnerUpdates: null
+        },
+        orderCode: '',
+        orderID: '',
+        partnerID: '',
+        order: {}
+      },
+      {
+        id: 2,
+        serviceType: 'FREIGHT_FORWARDER',
+        partnerName: 'Lion Air',
+        externalTrackingNumber: 'dsadasdasdasdsadsadsadsa',
+        externalTracking: {
+          id: '',
+          partnerUpdates: null
+        },
+        orderCode: '',
+        orderID: '',
+        partnerID: '',
+        order: {}
+      },
+      {
+        id: 2,
+        serviceType: 'LAST_MILE',
+        partnerName: 'Pickupp',
+        externalTrackingNumber: 'dsadasdasdasdsadsadsadsa',
+        externalTracking: {
+          id: '',
+          partnerUpdates: null
+        },
+        orderCode: '',
+        orderID: '',
+        partnerID: '',
+        order: {}
+      },
+      {
+        id: 2,
+        serviceType: 'LAST_MILE',
+        partnerName: 'Pickupp',
+        externalTrackingNumber: 'dsadasdasdasdsadsadsadsa',
+        externalTracking: {
+          id: '',
+          partnerUpdates:
+          {
+            "ID": "f454c615-1933-420a-9a51-6b33eceda7b2",
+            "CreatedAt": "2022-03-30T10:41:29.181923+07:00",
+            "UpdatedAt": "2022-03-30T10:41:29.181923+07:00",
+            "DeletedAt": null,
+            "PartnerID": "a5dc2dc4-e16d-42a6-9b33-bdd11a325cd5",
+            "ExternalTrackingID": "cc57a363-254a-4651-8fe2-0bf68a32f32d",
+            "ExternalTracking": {
+              "ID": "",
+              "CreatedAt": "0001-01-01T00:00:00Z",
+              "UpdatedAt": "0001-01-01T00:00:00Z",
+              "DeletedAt": null,
+              "OrderID": "",
+              "PartnerID": "",
+              "TrackingNumber": "",
+              "LabelUrl": null,
+              "PartnerUpdate": null
+            },
+            "Status": "Out for delivery",
+            "Hash": "ABC",
+            "UpdateTimestamp": "2022-03-30T10:41:29.180454+07:00",
+            "Comments": "",
+            "PODReceiverName": "",
+            "PODReceiverContact": "",
+            "PODURI": "",
+            "RawPayload": ""
+          },
+        },
+        orderCode: '',
+        orderID: '',
+        partnerID: '',
+        order: {}
       },
     ]
   },
