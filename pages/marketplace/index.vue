@@ -526,7 +526,28 @@ export default defineComponent({
       try {
         $fetchState.pending = true
 
-        await storeMarketplaces.dispatch('marketplaces/marketplaces/getMarketplaces', { params: dataParams })
+        await storeMarketplaces.dispatch('marketplaces/marketplaces/getMarketplaces', { params: dataParams})
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+    const fetchMarketplaceConnected = async (params: FilterDetails) => {
+      const { page, itemsPerPage, search, country,service} = params
+      const perPage = itemsPerPage !== -1 ? itemsPerPage : meta.value.totalCount
+      const dataParams = {
+        page: 1,
+        perPage: 6,
+        search,
+        country,
+        service
+      }
+
+      try {
+        $fetchState.pending = true
+
+        await storeMarketplaces.dispatch('marketplaces/marketplaces/getMarketplacesConnected', { params: dataParams})
       } catch (error) {
         return error
       } finally {
@@ -547,6 +568,12 @@ export default defineComponent({
     }
     const { $fetchState, fetch } = useFetch(async () => {
       await fetchMarketplace(
+        {
+          ...filter.value,
+          ...pagination.value
+        }
+      )
+      await fetchMarketplaceConnected(
         {
           ...filter.value,
           ...pagination.value
@@ -600,7 +627,13 @@ export default defineComponent({
           ...newFilter
         })
 
-        fetch()
+        // fetch()
+        fetchMarketplace(
+        {
+          ...filter.value,
+          ...pagination.value
+        }
+      )
       },
       { deep: true }
     )
