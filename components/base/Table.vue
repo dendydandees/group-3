@@ -84,6 +84,13 @@
       </div>
     </template>
 
+    <!-- creation date cell -->
+    <template #[`item.creationDate`]="{ item }">
+      <div class="text--secondary">
+        {{ $dateFns.format(item.createdAt, 'MMM dd, yyyy HH:mm') }}
+      </div>
+    </template>
+
     <!-- actions cell -->
     <template #[`item.actions`]="{ item }">
       <div class="d-flex align-center">
