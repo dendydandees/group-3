@@ -13,7 +13,9 @@ const filterOrders = {
   createdTo: '',
   destinationCountry: '',
   originCountry: '',
-  serviceType: '',
+  serviceType: [],
+  originPortId: '',
+  destinationPortId: '',
 } as FilterOrders
 
 export const state = () => ({

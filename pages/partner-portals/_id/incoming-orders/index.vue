@@ -82,6 +82,7 @@ import {
   watch,
   useRoute,
   useRouter,
+  useContext,
 } from '@nuxtjs/composition-api'
 // Interface and types
 import { FilterDetails, VuexModuleApplications } from '~/types/applications'
@@ -127,6 +128,7 @@ export default defineComponent({
   name: 'OrdersIncomingPages',
   middleware: 'partner',
   setup() {
+    const { app } = useContext()
     const route = useRoute()
     const router = useRouter()
     // manage store
@@ -188,9 +190,11 @@ export default defineComponent({
         batchId: '',
         createdFrom: '',
         createdTo: '',
-        serviceType: '',
         originCountry: '',
         destinationCountry: '',
+        serviceType: [],
+        originPortId: '',
+        destinationPortId: '',
       }
     }
 
@@ -207,12 +211,11 @@ export default defineComponent({
       const id = route.value.params.id
       const { page, itemsPerPage } = pagination.value
       const perPage = itemsPerPage !== -1 ? itemsPerPage : meta.value.totalCount
-      const orderCode = filterOrders?.value?.orderCode ?? null
-      const dataParams = {
+      const dataParams = app.$customUtils.setURLParams({
         page,
         perPage,
-        orderCode,
-      }
+        ...filterOrders.value,
+      })
 
       try {
         $fetchState.pending = true
