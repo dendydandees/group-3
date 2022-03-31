@@ -36,6 +36,7 @@ const filter = {
 } as FilterDetails;
 
 export const state = () => ({
+  marketplacesAll: [] as Marketplace[] | [],
   marketplaces: [] as Marketplace[] | [],
   marketplacesLControl: [] as Marketplace[] | [],
   marketplacesConnected: [] as Marketplace[] | [],
@@ -54,6 +55,7 @@ export const state = () => ({
 export type RootStateMarketplaces = ReturnType<typeof state>;
 
 export const mutations: MutationTree<RootStateMarketplaces> = {
+  SET_MARKETPLACES_ALL: (state, value: Marketplace[] | []) => (state.marketplacesAll = value),
   SET_MARKETPLACES: (state, value: Marketplace[] | []) => (state.marketplaces = value),
   SET_MARKETPLACES_LCONTROL: (state, value: Marketplace[] | []) => (state.marketplacesLControl = value),
   SET_MARKETPLACES_CONNECTED: (state, value: Marketplace[] | []) => (state.marketplacesConnected = value),
@@ -68,6 +70,25 @@ export const mutations: MutationTree<RootStateMarketplaces> = {
 };
 
 export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> = {
+  async getMarketplacesAll({ commit, state }) {
+    try {
+      const response = await this?.$axios?.$get(`/api/clients/partners?page=1&perPage=1000`);
+      const { data, page, totalPage, totalCount } = response;
+
+      if (!data) throw response;
+
+      const meta = {
+        page,
+        totalPage,
+        totalCount,
+      };
+      commit('SET_MARKETPLACES_ALL', data);
+
+      return response;
+    } catch (error) {
+      return error;
+    }
+  },
   async getMarketplaces({ commit, state }, { params, isLControl }: GetMarketplaces) {
     let serviceParams = 'service=';
     if (params && params?.service.length > 0) {
