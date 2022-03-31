@@ -236,6 +236,7 @@
                   :label="'Zone Default Network Partner'"
                   :placeholder="'Default Partner'"
                   :data="marketplaces"
+                  :disabled-drop="$fetchState.pending"
                   :item-show="{text: 'name', value: 'id'}"
                 />
               </div>
@@ -243,6 +244,7 @@
                 color="primary darken-1 white--text"
                 style="align-self: end"
                 :disabled="!selected.partnerID"
+                :loading="$fetchState.pending"
                 @click="btnAction"
               >
                 SAVE CHANGES

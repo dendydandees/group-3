@@ -16,11 +16,13 @@
       :item-text="itemShow.text"
       :item-value="itemShow.value"
       :placeholder="placeholder"
+      :disabled="disabledDrop"
+      :loading="disabledDrop"
       outlined
       rounded
       dense
       color="blue"
-      class="custom-select"
+      :class="`custom-select ${disabledDrop ? 'disabled-drop' : ''}`"
     >
     </v-select>
   </div>
@@ -79,6 +81,10 @@ export default defineComponent({
     value: {
       type: String as PropType<String | ''>,
       default: '',
+    },
+    disabledDrop: {
+      type: Boolean,
+      default: true,
     }
   },
   setup(props, {emit}) {
@@ -88,6 +94,14 @@ export default defineComponent({
     const selectedValue = reactive ({
       value: ''
     })
+    console.log({disabledDrop: props.disabledDrop})
+    watch(
+      () => [props.disabledDrop],
+      ([newDisabled]) => {
+        console.log({newDisabled})
+      },
+      { deep: true }
+    )
     // const partnerComp = computed({
     //   get: () => props.value,
     //   set: (value: String) => {
@@ -129,6 +143,13 @@ export default defineComponent({
       }
       .v-text-field__details {
         display: none;
+      }
+      &.disabled-drop {
+        cursor: not-allowed;
+        opacity: .5;
+        .v-input__control {
+          pointer-events: none;
+        }
       }
     }
   }

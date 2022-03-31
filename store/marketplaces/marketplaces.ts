@@ -23,7 +23,8 @@ interface GetMarketplaces {
     service: string[];
     zone: string;
   },
-  isLControl: Boolean;
+  isLControl: Boolean,
+  isConnected?: Boolean;
 }
 
 const filter = {
@@ -37,6 +38,7 @@ const filter = {
 export const state = () => ({
   marketplaces: [] as Marketplace[] | [],
   marketplacesLControl: [] as Marketplace[] | [],
+  marketplacesConnected: [] as Marketplace[] | [],
   loadedLControl: false as Boolean,
   meta: {
     page: 1,
@@ -54,6 +56,7 @@ export type RootStateMarketplaces = ReturnType<typeof state>;
 export const mutations: MutationTree<RootStateMarketplaces> = {
   SET_MARKETPLACES: (state, value: Marketplace[] | []) => (state.marketplaces = value),
   SET_MARKETPLACES_LCONTROL: (state, value: Marketplace[] | []) => (state.marketplacesLControl = value),
+  SET_MARKETPLACES_CONNECTED: (state, value: Marketplace[] | []) => (state.marketplacesConnected = value),
   SET_LOADED_LCONTROL: (state, value: Boolean) => (state.loadedLControl = value),
   SET_META: (state, value: Meta) => (state.meta = value),
   SET_FILTER: (state, value: FilterDetails) => (state.filter = value),
@@ -66,18 +69,12 @@ export const mutations: MutationTree<RootStateMarketplaces> = {
 
 export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> = {
   async getMarketplaces({ commit, state }, { params, isLControl }: GetMarketplaces) {
-    // console.log(params);
     let serviceParams = 'service=';
     if (params && params?.service.length > 0) {
-      console.log(params.service);
       serviceParams = params.service.map((el, i) => {
         return `service=${ el }`;
       }).join('&');
     }
-    // else if (params && typeof params.service === 'string') {
-    //   serviceParams = `service=${ params.service }`;
-    // }
-    // console.log({ serviceParams });
     const uri = params
       ? `?page=${ params.page ?? '' }&perPage=${ params.perPage ?? '' }&search=${ params.search ?? '' }&country=${ params.country ?? '' }&${ serviceParams ?? '' }&zone=${ params.zone ?? '' } `
       : '';
@@ -101,6 +98,35 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
         commit('SET_MARKETPLACES_LCONTROL', data);
         commit('SET_LOADED_LCONTROL', true);
       }
+
+      return response;
+    } catch (error) {
+      return error;
+    }
+  },
+  async getMarketplacesConnected({ commit, state }, { params }: GetMarketplaces) {
+    let serviceParams = 'service=';
+    if (params && params?.service.length > 0) {
+      serviceParams = params.service.map((el, i) => {
+        return `service=${ el }`;
+      }).join('&');
+    }
+    const uri = params
+      ? `?connection=connected&page=${ params.page ?? '' }&perPage=${ params.perPage ?? '' }&search=${ params.search ?? '' }&country=${ params.country ?? '' }&${ serviceParams ?? '' }&zone=${ params.zone ?? '' }`
+      : '';
+    try {
+      const response = await this?.$axios?.$get(`/api/clients/partners${ uri }`);
+      const { data, page, totalPage, totalCount } = response;
+
+      if (!data) throw response;
+
+      const meta = {
+        page,
+        totalPage,
+        totalCount,
+      };
+      commit('SET_MARKETPLACES_CONNECTED', data);
+      commit('SET_META', meta);
 
       return response;
     } catch (error) {
