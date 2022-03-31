@@ -56,6 +56,16 @@
                 value="origin"
               />
             </v-list-item>
+
+            <v-list-item v-if="isOnOrdersPages">
+              <v-checkbox
+                v-model="selectedViews"
+                on-icon="mdi-checkbox-marked-circle"
+                off-icon="mdi-checkbox-blank-circle-outline"
+                label="Creation Date"
+                value="creationDate"
+              />
+            </v-list-item>
           </v-list>
         </v-col>
       </v-row>
@@ -64,7 +74,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, computed } from '@nuxtjs/composition-api'
+import {
+  defineComponent,
+  PropType,
+  computed,
+  useRoute,
+} from '@nuxtjs/composition-api'
 
 export default defineComponent({
   props: {
@@ -77,12 +92,16 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
+    const route = useRoute()
+    const isOnOrdersPages = computed(
+      () => !route.value.name?.includes('incoming-orders')
+    )
     const selectedViews = computed({
       get: () => props.value,
       set: (value) => emit('input', value),
     })
 
-    return { selectedViews }
+    return { selectedViews, isOnOrdersPages }
   },
 })
 </script>

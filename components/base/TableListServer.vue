@@ -13,41 +13,6 @@
     class="elevation-2"
     @update:options="fetch"
   >
-    <!-- Incoming Order List Page -->
-    <!-- Order code -->
-    <template #[`item.incomingOrderCode`]="{ item }">
-      {{ item.orderCode }}
-
-      <span v-if="item.order.refID" class="ml-1 text--secondary">
-        (#{{ item.order.refID }})
-      </span>
-    </template>
-
-    <!-- Origin data -->
-    <template #[`item.incomingOrigin`]="{ item }">
-      <div class="text--secondary">
-        {{ item.order.consigneeState }}
-      </div>
-    </template>
-
-    <!-- Pickup data -->
-    <template #[`item.incomingPickup`]="{ item }">
-      <div class="text--secondary">
-        {{ item.order.pickupState }}
-      </div>
-    </template>
-
-    <!-- Service type -->
-    <template #[`item.serviceType`]="{ item }">
-      <v-chip
-        small
-        :color="$customUtils.setColorServiceType(item.serviceType)"
-        class="text-uppercase white--text"
-      >
-        {{ $customUtils.setServiceType(item.serviceType) }}
-      </v-chip>
-    </template>
-
     <template #expanded-item="{ headers: expandHeaders, item }">
       <td :colspan="expandHeaders.length" :class="`expandable-custom `">
         <div
@@ -96,6 +61,7 @@
         </v-card>
       </td>
     </template>
+
     <template #[`item.actionsLControl`]="{ item }">
       <div class="d-flex align-center justify-end">
         <v-btn icon outlined color="red" @click="dialogDeleteModal(item.id)">
@@ -104,7 +70,6 @@
         </v-btn>
       </div>
     </template>
-    <!-- End Incoming Order List Page -->
 
     <!-- Start Incoming L-Control Page -->
     <template #[`item.countryCode`]="{ item }">

@@ -166,6 +166,11 @@ const initHeaders = [
     sortable: false,
   },
   {
+    text: 'Creation Date',
+    value: 'creationDate',
+    sortable: false,
+  },
+  {
     text: '',
     value: 'actions',
     sortable: false,
@@ -212,6 +217,7 @@ export default defineComponent({
       'serviceType',
       'destination',
       'origin',
+      'creationDate',
       'actions',
     ])
     const headers = ref(initHeaders) as Ref<Header[]>
