@@ -176,7 +176,7 @@ export default defineComponent({
   name: 'OrderPages',
   layout: 'default',
   setup() {
-    const { $dateFns } = useContext()
+    const { $dateFns, app } = useContext()
     const router = useRouter()
 
     // manage store
@@ -304,31 +304,26 @@ export default defineComponent({
       if (isOnListView.value) {
         const { sortBy, sortDesc } = params
 
-        dataParams = {
+        dataParams = app.$customUtils.setURLParams({
           ...dataParams,
           ...filterOrder.value,
           sortBy: sortBy && sortBy[0] === 'orderCode' ? 'order_code' : null,
           sortDesc: sortDesc ? sortDesc[0] : null,
-        }
+        })
       } else {
-        const batchId = filterBatch?.value.batchId ?? null
-
-        dataParams = {
+        dataParams = app.$customUtils.setURLParams({
           ...dataParams,
-          batchId,
-        }
+          ...filterBatch.value,
+        })
       }
 
       try {
         $fetchState.pending = true
+        const url = isOnListView.value
+          ? 'orders/getOrders'
+          : 'orders/getBatchOrders'
 
-        if (isOnListView.value) {
-          await storeOrders.dispatch('orders/getOrders', { params: dataParams })
-        } else {
-          await storeOrders.dispatch('orders/getBatchOrders', {
-            params: dataParams,
-          })
-        }
+        await storeOrders.dispatch(url, { params: dataParams })
       } catch (error) {
         return error
       } finally {

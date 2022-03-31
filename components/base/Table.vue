@@ -73,14 +73,14 @@
     <!-- origin cell -->
     <template #[`item.origin`]="{ item }">
       <div class="text--secondary">
-        {{ item.consigneeState }}
+        {{ item.pickupState }}
       </div>
     </template>
 
     <!-- destination cell -->
     <template #[`item.destination`]="{ item }">
       <div class="text--secondary">
-        {{ item.pickupState }}
+        {{ item.consigneeState }}
       </div>
     </template>
 

@@ -2,14 +2,7 @@
   <article>
     <v-card-text class="pa-8">
       <v-expand-transition>
-        <v-alert
-          v-if="
-            (alert.isShow && alert.message.includes('Order')) ||
-            alert.message.includes('order')
-          "
-          :type="alert.type"
-          rounded="xl"
-        >
+        <v-alert v-if="alert.isShow" :type="alert.type" rounded="xl">
           {{ alert.message }}
         </v-alert>
       </v-expand-transition>
