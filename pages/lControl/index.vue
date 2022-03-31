@@ -174,7 +174,7 @@
                     v-if="true"
                     style="font-size: 15px; line-height: 18px; color: #575757"
                   >
-                  {{!el.partnerID ? 'Waiting for Setup' : ''}}
+                  {{!el.partnerID ? 'Waiting for Setup' : el.partnerName}}
 
                   </span>
                   <v-btn
@@ -291,6 +291,7 @@ export default defineComponent({
     const countryCodes = computed(() => storeFilters.state.filters.countryCodes)
     const serviceTypes = computed(() => storeFilters.state.filters.serviceTypes)
     const zones = computed(() => storeFilters.state.filters.zones)
+    const marketplacesAll = computed(() => storeMarketplaces.state.marketplaces.marketplaces.marketplacesAll)
     const marketplaces = computed(() => storeMarketplaces.state.marketplaces.marketplaces.marketplaces)
     const lControls = computed(() => {
       return computeLControls(storeLControls.state.lControls.lControls.lControls)
@@ -369,6 +370,17 @@ export default defineComponent({
         $fetchState.pending = true
 
         await storeFilters.dispatch('marketplaces/marketplaces/getMarketplaces', { params: dataParams, isLControl: params.isLControl})
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+    const fetchMarketplaceAll = async () => {
+      try {
+        $fetchState.pending = true
+
+        await storeFilters.dispatch('marketplaces/marketplaces/getMarketplacesAll')
       } catch (error) {
         return error
       } finally {
@@ -535,6 +547,7 @@ export default defineComponent({
     }
     const { $fetchState, fetch } = useFetch(async () => {
       // FETCH COUNTRY
+      await fetchMarketplaceAll()
       await fetchCountryCodes()
       await fetchRuleGroups()
       lControlsCust.value = [...storeLControls.state.lControls.lControls.lControls]
@@ -582,6 +595,13 @@ export default defineComponent({
     function computeLControls(data: RuleGroup[]) {
       console.log(data)
       return data
+    }
+
+    function findNamePartner (id: string) {
+      if (marketplacesAll.value && marketplacesAll.value.length > 0) {
+        console.log(marketplacesAll.value, marketplacesAll.value.filter((x) => x.id === id)[0]?.name, id)
+        return marketplacesAll.value.filter((x) => x.id === id)[0]?.name
+      }
     }
 
     onUnmounted(() => {
@@ -671,6 +691,7 @@ export default defineComponent({
             let computeZone = [...newZones.value]
             computeZone = computeZone.map((el: any) => {
               let partnerID = '' as any
+              let partnerName = '' as any
               let ruleID = '' as any
               let ruleGroupID = '' as any
               let serviceType = '' as any
@@ -690,6 +711,7 @@ export default defineComponent({
                         console.log(e.value === el.id)
                         if(e.value === el.id) {
                           partnerID = c.partnerID
+                          partnerName = findNamePartner(c.partnerID)
                           priority = c.priority
                           ruleID = e.ruleID
                         }
@@ -702,6 +724,7 @@ export default defineComponent({
               return {
                 ...el,
                 partnerID,
+                partnerName,
                 ruleID,
                 ruleGroupID,
                 priority,
