@@ -294,7 +294,9 @@ export default defineComponent({
       destinationPortId: '',
     })
     const serviceTypes = ref([]) as Ref<{ text: string; value: string }[]>
-    const country = ref([]) as Ref<CountryCode[]>
+    const country = computed(
+      () => storeFilter.state.filters.countryCodes
+    ) as Ref<CountryCode[]>
 
     // manage ports
     const ports = computed(() => storeFilter.state.filters.ports) as Ref<Ports>
@@ -333,8 +335,9 @@ export default defineComponent({
 
     useFetch(async () => {
       await storeFilter.dispatch('filters/getServiceTypes')
-      await storeFilter.dispatch('filters/getZones', { params: {} })
-      await storeFilter.dispatch('filters/getCountryCodes')
+      await storeFilter.dispatch('filters/getCountryCodes', {
+        params: { isActive: true },
+      })
       await getPorts(portsMeta.value)
 
       // format service types
@@ -346,24 +349,6 @@ export default defineComponent({
       )
 
       serviceTypes.value = formatServiceTypes
-
-      /* format country
-       * filter duplicate zone country
-       * filter country list based on zone country filtered before
-       */
-      const countryList = storeFilter.state.filters.zones
-        .filter(
-          (value, index, array) =>
-            array.findIndex(
-              (valueArray) => valueArray.country === value.country
-            ) === index
-        )
-        .map((zone) => zone.country)
-      const formatCountry = storeFilter.state.filters.countryCodes.filter(
-        (country) => countryList.includes(country.value)
-      )
-
-      country.value = formatCountry
     })
 
     return {
