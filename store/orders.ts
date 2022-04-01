@@ -37,11 +37,11 @@ const filterBatch = {
 } as FilterBatch
 
 export const state = () => ({
-  orders: [] as Order[] | [],
+  orders: [] as Order[],
   orderDetails: {
-    order: {} as Order | {},
-    orderItems: [] as OrderItem | [],
-    orderAllocationUpdates: [] as OrderAllocationUpdate | [],
+    order: {} as Order,
+    orderItems: [] as OrderItem[],
+    orderAllocationUpdates: [] as OrderAllocationUpdate[],
   } as OrderDetails,
   batchOrders: [] as BatchOrders[],
   meta: {
@@ -56,7 +56,7 @@ export const state = () => ({
 export type RootStateOrders = ReturnType<typeof state>
 
 export const mutations: MutationTree<RootStateOrders> = {
-  SET_ORDERS: (state, value: Order[] | []) => (state.orders = value),
+  SET_ORDERS: (state, value: Order[]) => (state.orders = value),
   SET_ORDER_DETAILS: (state, value: OrderDetails) =>
     (state.orderDetails = value),
   SET_BATCH_ORDERS: (state, value: BatchOrders[]) =>

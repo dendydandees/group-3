@@ -1,7 +1,7 @@
 <template>
   <section class="pa-4 pa-md-10 py-8">
     <BaseHeadlinePage
-      title="Client Connections"
+      title="Manage Client Connections"
       subtitle="View details and manage each connected client."
     >
       <template slot="addition">

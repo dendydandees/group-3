@@ -16,15 +16,20 @@
           </v-col>
 
           <!-- Pickup details -->
-          <v-col cols="12">
+          <v-col v-if="isPickupExist" cols="12">
             <PickupDetails :fetch-state="$fetchState" />
+          </v-col>
+
+          <!-- Sender details -->
+          <v-col v-if="isSenderExist" cols="12">
+            <SenderDetails :fetch-state="$fetchState" />
           </v-col>
         </v-row>
       </v-col>
 
       <!-- Order updates -->
       <v-col cols="12" md="8">
-        <OrdersDetailsUpdatesTimeline :fetch-state="$fetchState" />
+        <UpdatesTimeline :fetch-state="$fetchState" />
       </v-col>
     </v-row>
 
@@ -53,7 +58,9 @@ import { VuexModuleOrders } from '~/types/orders'
 import OrderDetails from '~/components/orders/details/OrderDetails.vue'
 import ConsigneeDetails from '~/components/orders/details/ConsigneeDetails.vue'
 import PickupDetails from '~/components/orders/details/PickupDetails.vue'
+import SenderDetails from '~/components/orders/details/SenderDetails.vue'
 import OrderItems from '~/components/orders/details/OrderItems.vue'
+import UpdatesTimeline from '~/components/orders/details/UpdatesTimeline.vue'
 
 export default defineComponent({
   name: 'OrderDetailsPages',
@@ -61,26 +68,40 @@ export default defineComponent({
     OrderDetails,
     ConsigneeDetails,
     PickupDetails,
+    SenderDetails,
     OrderItems,
+    UpdatesTimeline,
   },
   layout: 'default',
   setup() {
     useMeta({ titleTemplate: '%s | Order Details' })
+
+    // manage route
     const route = useRoute()
     const router = useRouter()
-    const store = useStore<VuexModuleOrders>()
+    const storeOrders = useStore<VuexModuleOrders>()
     const id = computed(() => route.value.params.id)
     const doBackTo = () => {
       router.go(-1)
     }
 
+    const isPickupExist = computed(
+      () => !!storeOrders.state.orders.orderDetails.order.pickupContactName
+    )
+
+    const isSenderExist = computed(
+      () => !!storeOrders.state.orders.orderDetails.order.senderName
+    )
+
     useFetch(async () => {
-      await store.dispatch('orders/getOrderDetails', id.value)
+      await storeOrders.dispatch('orders/getOrderDetails', id.value)
     })
 
     return {
       id,
       doBackTo,
+      isPickupExist,
+      isSenderExist,
     }
   },
   head: {},
