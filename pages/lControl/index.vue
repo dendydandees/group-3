@@ -166,8 +166,10 @@
               <div
                 :class="`d-flex align-center justify-space-between`"
               >
-                <div>
-                  {{el.zoneName}}
+                <div
+                  style="max-width: 50%;"
+                >
+                  {{isCustoms() ? el.name :el.zoneName}}
                 </div>
                 <div>
                   <span
@@ -179,7 +181,7 @@
                   </span>
                   <v-btn
                     color="primary darken-1 white--text ml-6"
-                    @click="indexSelect({index: i, value: el.id, name: el.zoneName, data: el}, 'zone')"
+                    @click="indexSelect({index: i, value: el.id, name: isCustoms() ? el.name : el.zoneName, data: el}, 'zone')"
                   >
                     {{!el.partnerID ? 'SETUP' : 'UPDATE'}}
                   </v-btn>
@@ -233,7 +235,7 @@
                 </div>
                 <LcontrolDropdownCustom
                   v-model="selected.partnerID"
-                  :label="'Zone Default Network Partner'"
+                  :label="`${isCustoms() ? 'Port' : 'Zone'} Default Network Partner`"
                   :placeholder="'Default Partner'"
                   :data="marketplaces"
                   :disabled-drop="$fetchState.pending"
@@ -291,6 +293,7 @@ export default defineComponent({
     const countryCodes = computed(() => storeFilters.state.filters.countryCodes)
     const serviceTypes = computed(() => storeFilters.state.filters.serviceTypes)
     const zones = computed(() => storeFilters.state.filters.zones)
+    const ports = computed(() => storeFilters.state.filters.ports?.data) as any
     const marketplacesAll = computed(() => storeMarketplaces.state.marketplaces.marketplaces.marketplacesAll)
     const marketplaces = computed(() => storeMarketplaces.state.marketplaces.marketplaces.marketplaces)
     const lControls = computed(() => {
@@ -303,6 +306,7 @@ export default defineComponent({
       countryIndex: null as {index: number, value: string} | null,
       serviceIndex: null as {index: number, value: string} | null,
       zoneIndex: null as {index: number, value: string, name?: string} | null,
+      portIndex: null as {index: number, value: string, name?: string} | null,
       partnerID: '' as string,
       useBOB: false as boolean,
       ruleGroupID: '' as string,
@@ -314,19 +318,44 @@ export default defineComponent({
 
     const breadcrumbs = ref([
       {
-        text: 'ZONE',
+        text: isCustoms() ? 'PORT' : 'ZONE',
         disabled: false,
         first: true
         // href: 'breadcrumbs_dashboard',
       },
     ]) as Ref<{text?: string, disabled: boolean, first?: boolean, href?: string}[]>
+    watch(
+      () => [selected.value.serviceIndex],
+      ([newService]) => {
+        if(newService?.value === 'CUSTOMS') {
+          breadcrumbs.value = [
+            {
+              text: 'PORT',
+              disabled: false,
+              first: true
+              // href: 'breadcrumbs_dashboard',
+            },
+          ]
+        } else {
+          breadcrumbs.value = [
+            {
+              text: 'ZONE',
+              disabled: false,
+              first: true
+              // href: 'breadcrumbs_dashboard',
+            }
+          ]
+        }
+      },
+      { deep: true }
+    )
 
 
     const fetchCountryCodes = async () => {
       try {
         $fetchState.pending = true
 
-        await storeFilters.dispatch('filters/getCountryCodes', {params: {} })
+        await storeFilters.dispatch('filters/getCountryCodes', {params: {isActive: true} })
       } catch (error) {
         return error
       } finally {
@@ -344,6 +373,15 @@ export default defineComponent({
         $fetchState.pending = false
       }
     }
+    const getPorts = async () => {
+      await storeFilters.dispatch('filters/getPorts', {
+        params: {
+          page: 1,
+          perPage: 1000,
+        },
+        country: selected.value.countryIndex?.value
+      })
+    }
     const fetchZones= async () => {
       try {
         $fetchState.pending = true
@@ -358,12 +396,19 @@ export default defineComponent({
       }
     }
     const fetchMarketplace = async (params: {country?: string, service?: string, zone?: string, isLControl?: Boolean}) => {
-      const dataParams = {
+      let dataParams = {
         page:1,
         perPage: 100,
         country: params.country,
         service: params.service ? [params.service] : [],
         zone: params.zone
+      } as {page?: number, perPage?: number, country?: string, service?: string[], zone?: string, port?: string}
+      if(isCustoms()) {
+        delete dataParams?.zone
+        dataParams = {
+          ...dataParams,
+          port: params.zone
+        }
       }
 
       try {
@@ -412,7 +457,11 @@ export default defineComponent({
         case 'service':
           selected.value.serviceIndex = {index: data.index, value: data.value}
           // FETCH ZONE BY COUNTRY
-          await fetchZones()
+          if(selected.value.serviceIndex.value === 'CUSTOMS') {
+            await getPorts()
+          } else {
+            await fetchZones()
+          }
           break;
         case 'zone':
           selected.value.zoneIndex = {index: data.index, value: data.value, name: data.name}
@@ -581,6 +630,7 @@ export default defineComponent({
         } else {
           await deleteBOB()
         }
+        await fetchRuleGroups()
         console.log({e})
       } catch (error) {
         console.log(error)
@@ -602,6 +652,11 @@ export default defineComponent({
         console.log(marketplacesAll.value, marketplacesAll.value.filter((x) => x.id === id)[0]?.name, id)
         return marketplacesAll.value.filter((x) => x.id === id)[0]?.name
       }
+    }
+
+    function isCustoms () {
+      console.log(selected.value.serviceIndex?.value === 'CUSTOMS')
+      return selected.value.serviceIndex?.value === 'CUSTOMS'
     }
 
     onUnmounted(() => {
@@ -635,6 +690,7 @@ export default defineComponent({
           if(lControls.value && lControls.value.length > 0) {
             const temp = [...lControls.value]
             let isUseBOB = false
+            console.log('lControl', temp)
             temp.forEach((el: RuleGroup) => {
               if(
                 (el.countryCode === countryID) &&
@@ -668,8 +724,8 @@ export default defineComponent({
     )
 
     watch(
-      () => [selected.value.countryIndex, selected.value.serviceIndex, selected.value.zoneIndex, zones],
-      ([newCountryIndex, newServiceIndex, newZoneIndex, newZones]) => {
+      () => [selected.value.countryIndex, selected.value.serviceIndex, selected.value.zoneIndex, selected.value.portIndex, zones, ports],
+      ([newCountryIndex, newServiceIndex, newZoneIndex, newPortIndex, newZones, newPorts]) => {
           let temp = [...lControls.value] as RuleGroup[]
           if(newCountryIndex) {
             temp = temp.filter((el: RuleGroup) => (el.countryCode === newCountryIndex?.value))
@@ -686,9 +742,10 @@ export default defineComponent({
             //   })
             // )
           }
+          const tempNewData = isCustoms() ? newPorts : newZones
 
-          if(newZones && newZones.value?.length > 0) {
-            let computeZone = [...newZones.value]
+          if(tempNewData && tempNewData.value?.length > 0) {
+            let computeZone = isCustoms() ? [...newPorts.value]: [...newZones.value]
             computeZone = computeZone.map((el: any) => {
               let partnerID = '' as any
               let partnerName = '' as any
@@ -733,8 +790,12 @@ export default defineComponent({
                 serviceType
               }
             })
-            zonesCust.value = computeZone
-            // console.log({computeZone}, zonesCust)
+            if(isCustoms()) {
+              zonesCust.value = computeZone
+            } else {
+              zonesCust.value = computeZone
+            }
+            console.log({computeZone}, zonesCust)
           }
         },
       { deep: true }
@@ -753,13 +814,15 @@ export default defineComponent({
       breadcrumbs,
       countryCodes,
       serviceTypes,
+      ports,
       zones,
       zonesCust,
       marketplaces,
       indexSelect,
       backBtnHandler,
       btnAction,
-      handleBob
+      handleBob,
+      isCustoms
     }
   },
   head: {},

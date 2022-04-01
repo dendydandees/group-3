@@ -21,7 +21,8 @@ interface GetMarketplaces {
     search: string,
     country: string,
     service: string[];
-    zone: string;
+    zone: string,
+    port: string;
   },
   isLControl: Boolean,
   isConnected?: Boolean;
@@ -97,7 +98,7 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
       }).join('&');
     }
     const uri = params
-      ? `?page=${ params.page ?? '' }&perPage=${ params.perPage ?? '' }&search=${ params.search ?? '' }&country=${ params.country ?? '' }&${ serviceParams ?? '' }&zone=${ params.zone ?? '' } `
+      ? `?page=${ params.page ?? '' }&perPage=${ params.perPage ?? '' }&search=${ params.search ?? '' }&country=${ params.country ?? '' }&${ serviceParams ?? '' }&zone=${ params.zone ?? '' }&port=${ params.port ?? '' }`
       : '';
     try {
       const response = await this?.$axios?.$get(`/api/clients/partners${ uri }`);
