@@ -10,29 +10,25 @@
       <v-expand-transition>
         <div v-if="!fetchState.pending">
           <h2 class="font-weight-bold title white--text mb-1">
-            Consignee Details
+            Sender Details
           </h2>
 
           <h3 class="font-weight-bold subtitle-1 secondary--text mb-4">
-            {{ order.consigneeName }}
+            {{ order.senderName }}
           </h3>
 
           <p class="mb-0">
-            {{ order.consigneeNumber }}
-          </p>
-
-          <p class="mb-0">
-            {{ order.consigneeEmail }}
+            {{ order.senderNumber }}
           </p>
 
           <p class="mb-0">
             {{
               $customUtils.setAddress([
-                order.consigneeAddress,
-                order.consigneeCity,
-                order.consigneeProvince,
-                order.consigneeCountry,
-                order.consigneePostal,
+                order.senderAddress,
+                order.senderCity,
+                order.senderProvince,
+                order.senderCountry,
+                order.senderPostal,
               ])
             }}
           </p>

@@ -30,7 +30,6 @@ import {
 } from '@nuxtjs/composition-api'
 import { OrderItem, VuexModuleOrders } from '~/types/orders'
 import { VuexModuleIncomingOrders } from '~/types/partnerPortals/incomingOrders'
-import tempData from '~/static/tempData'
 
 export default defineComponent({
   props: {
@@ -41,22 +40,17 @@ export default defineComponent({
     isUpcoming: {
       type: Boolean,
       default: false,
-    }
+    },
   },
-  setup(props, { emit }) {
-    const store = useStore<VuexModuleOrders>()
+  setup(props) {
+    const storeOrders = useStore<VuexModuleOrders>()
     const storeIncomingOrders = useStore<VuexModuleIncomingOrders>()
-    const orderItems = computed(
-      () => {
-        return props.isUpcoming
-        ?
-        storeIncomingOrders.state.partnerPortals.incomingOrders.incomingOrderDetails?.order?.order?.items
-        :
-        store.state.orders.orderDetails.orderItems
-      }
-    )
-
-    console.log('orderItems: ',tempData.detailUpcomingOrder.orderItems, orderItems.value)
+    const orderItems = computed(() => {
+      return props.isUpcoming
+        ? storeIncomingOrders.state.partnerPortals.incomingOrders
+            .incomingOrderDetails?.order?.order?.items
+        : storeOrders.state.orders.orderDetails.orderItems
+    })
 
     const tableSettings = reactive({
       itemKey: 'id',
@@ -92,7 +86,8 @@ export default defineComponent({
       return parseFloat(price).toFixed(2)
     }
     const setTotal = () => {
-      const orderItemsTemp = orderItems.value && orderItems.value.length > 0 ? orderItems.value : []
+      const orderItemsTemp =
+        orderItems.value && orderItems.value.length > 0 ? orderItems.value : []
       const totalPrice = orderItemsTemp.reduce(
         (previous: number, current: OrderItem) => {
           const total = previous + parseFloat(current.price)
@@ -101,7 +96,8 @@ export default defineComponent({
         },
         0
       )
-      const currency = orderItemsTemp.length !== 0 ? orderItemsTemp[0].currency : ''
+      const currency =
+        orderItemsTemp.length !== 0 ? orderItemsTemp[0].currency : ''
 
       return `${currency} ${totalPrice.toFixed(2)}`
     }

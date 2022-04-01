@@ -19,7 +19,7 @@ export default defineNuxtPlugin((context, inject) => {
       return data === 'LAST_MILE'
         ? 'primary'
         : data === 'CUSTOMS'
-        ? 'info'
+        ? 'success'
         : 'secondary'
     },
     setURLParams: (data: Object) => {

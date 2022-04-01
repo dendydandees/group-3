@@ -30,8 +30,8 @@ export interface Order {
   pickupPostal?: string
   pickupCountry?: string
   pickupAddress?: string
-  senderContactName?: string
-  senderContactNumber?: string
+  senderName?: string
+  senderNumber?: string
   senderState?: string
   senderCity?: string
   senderProvince?: string
@@ -60,6 +60,7 @@ export interface OrderAllocationUpdate {
   orderID: string
   orderCode: string
   partnerID: string
+  order: Order
   partnerName: string
   serviceType: string
   externalTrackingNumber: string
@@ -70,7 +71,7 @@ export interface OrderAllocationUpdate {
 }
 
 export interface OrderDetails {
-  order: Order | {}
+  order: Order
   orderItems: OrderItem[]
   orderAllocationUpdates: OrderAllocationUpdate[]
 }
