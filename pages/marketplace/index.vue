@@ -12,6 +12,7 @@
         cols="7"
         class="pa-0"
       >
+
         <BaseSearchFieldCustom
           v-model="filter.search"
           class="mb-14"
@@ -85,90 +86,115 @@
       </v-col>
       <v-col
         class="pa-0 ml-15"
+        style="max-width: calc(100% - 711px);"
       >
         <v-card
-          class="pa-6 d-flex"
+          class="pa-4 d-flex"
           elevation="3"
         >
-          <v-col
-            class="pa-0 mr-6"
-            cols="1"
-          >
-            <div
-              class="d-flex align-center primary--text"
-              style="height: 40px"
-            >
-              Filter
-            </div>
-          </v-col>
-          <v-col
-            class="pa-0"
-          >
-            <div
-              class="d-flex align-center justify-space-between mb-4"
-            >
-              <v-select
-                v-model="selectedZone.value"
-                :items="zones"
-                item-text="country"
-                item-value="country"
-                label="Country"
-                outlined
-                rounded
-                dense
-                color="primary"
-                class="custom-select mr-4"
-                clearable
-              >
-              </v-select>
-              <v-select
-                :items="[]"
-                label="Ports"
-                outlined
-                rounded
-                dense
-                color="primary"
-                class="custom-select"
-                clearable
-              >
-              </v-select>
-            </div>
-            <div>
+          <v-card-text>
+
+            <v-row>
               <v-col
-                v-if="serviceTypes && serviceTypes.length > 0"
-                align-self="center"
                 class="pa-0"
+                cols="12"
+                md="2"
               >
                 <div
-                  class="red--text font-weight-bold subtitle-2 mb-3"
+                  class="d-flex align-center primary--text"
+                  style="height: 40px"
                 >
-                  Types
-                </div>
-                <div
-                  class="chip-group-custom"
-                >
-                  <v-chip-group
-                    v-model="selectedServiceTypes.arrValue"
-                    multiple
-                    active-class="primary accent-4 white--text"
-
-                    column
-                  >
-                    <v-chip
-                      v-for="(chip, i) in serviceTypes"
-                      :key="i"
-                      :value="chip.name"
-                      small
-                      class="custom-chips"
-                    >
-                      {{$customUtils.setServiceType(chip.name)}}
-                    </v-chip>
-
-                  </v-chip-group>
+                  Filter
                 </div>
               </v-col>
-            </div>
-          </v-col>
+              <v-col
+                cols="12"
+                md="10"
+                class="pa-0"
+              >
+                <v-row
+                >
+                  <!-- class="d-flex align-center justify-space-between mb-4" -->
+                  <v-col
+                    cols="12"
+                    md="6"
+                  >
+                    <v-select
+                      v-model="selectedZone.value"
+                      :items="countryCodes"
+                      item-text="name"
+                      item-value="value"
+                      label="Country"
+                      outlined
+                      rounded
+                      dense
+                      color="primary"
+                      class="custom-select"
+                      clearable
+                    >
+                    </v-select>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    md="6"
+                  >
+                    <v-select
+                      v-model="selectedPort.value"
+                      :items="!selectedZone.value  ? []  : ports"
+                      item-text="name"
+                      item-value="id"
+                      label="Ports"
+                      outlined
+                      rounded
+                      dense
+                      color="primary"
+                      :class="`custom-select ${!selectedZone.value ? 'disabled-drop' : ''}`"
+                      clearable
+
+                    >
+                    </v-select>
+
+                  </v-col>
+                </v-row>
+                <div class="mt-2">
+                  <v-col
+                    v-if="serviceTypes && serviceTypes.length > 0"
+                    align-self="center"
+                    class="pa-0"
+                  >
+                    <div
+                      class="red--text font-weight-bold subtitle-2 mb-3"
+                    >
+                      Types
+                    </div>
+                    <div
+                      class="chip-group-custom"
+                    >
+                      <v-chip-group
+                        v-model="selectedServiceTypes.arrValue"
+                        multiple
+                        active-class="primary accent-4 white--text"
+
+                        column
+                      >
+                        <v-chip
+                          v-for="(chip, i) in serviceTypes"
+                          :key="i"
+                          :value="chip.name"
+                          small
+                          class="custom-chips"
+                        >
+                          {{$customUtils.setServiceType(chip.name)}}
+                        </v-chip>
+
+                      </v-chip-group>
+                    </div>
+                  </v-col>
+                </div>
+              </v-col>
+
+            </v-row>
+          </v-card-text>
         </v-card>
         <div
           v-if="!filter.search && !filter.country && filter.service.length === 0"
@@ -448,6 +474,8 @@ export default defineComponent({
     const storeApplications = useStore<VuexModuleApplications>()
     const marketplaces = computed(() => storeMarketplaces.state.marketplaces.marketplaces.marketplaces)
     const meta = computed(() => storeMarketplaces.state.marketplaces.marketplaces.meta)
+    const countryCodes = computed(() => storeFilters.state.filters.countryCodes)
+    const ports = computed(() => storeFilters.state.filters.ports?.data) as any
     const pagination = ref({
       ...storeApplications.state.applications.pagination,
     })
@@ -462,6 +490,9 @@ export default defineComponent({
       status: 'none'
     })
     const selectedZone = reactive ({
+      value: ''
+    })
+    const selectedPort = reactive ({
       value: ''
     })
     const selectedServiceTypes = reactive ({
@@ -511,16 +542,37 @@ export default defineComponent({
       },
       { deep: true }
     )
+   const fetchCountryCodes = async () => {
+      try {
+        $fetchState.pending = true
+
+        await storeFilters.dispatch('filters/getCountryCodes', {params: {isActive: true} })
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+    const getPorts = async () => {
+      await storeFilters.dispatch('filters/getPorts', {
+        params: {
+          page: 1,
+          perPage: 1000,
+        },
+        country: selectedZone.value
+      })
+    }
 
     const fetchMarketplace = async (params: FilterDetails) => {
-      const { page, itemsPerPage, search, country,service} = params
+      const { page, itemsPerPage, search, country,service, port} = params
       const perPage = itemsPerPage !== -1 ? itemsPerPage : meta.value.totalCount
       const dataParams = {
         page,
         perPage: 8,
         search,
         country,
-        service
+        service,
+        port
       }
 
       try {
@@ -579,6 +631,7 @@ export default defineComponent({
           ...pagination.value
         }
       )
+      await fetchCountryCodes()
       await fetchServiceZoneOnce()
       // zones.value =  [ ...storeFilters.state.filters.zones]
       // serviceTypes.value =  [ ...storeFilters.state.filters.serviceTypes]
@@ -663,6 +716,17 @@ export default defineComponent({
       selectedZone,
       (newZone) => {
         filter.value.country = newZone.value
+        getPorts()
+        filter.value.port = ''
+        selectedPort.value = ''
+      },
+      { deep: true }
+    )
+    watch(
+      selectedPort,
+      (newPort) => {
+        filter.value.port = newPort.value
+        console.log(filter.value)
       },
       { deep: true }
     )
@@ -691,11 +755,14 @@ export default defineComponent({
       zones,
       selectedZone,
       serviceTypes,
+      selectedPort,
       selectedServiceTypes,
       addConnection,
       idPartner,
       pagination,
-      changePage
+      changePage,
+      countryCodes,
+      ports
     }
   },
   head: {},
@@ -723,6 +790,14 @@ export default defineComponent({
       }
     }
     .custom-select {
+      &.disabled-drop {
+        cursor: not-allowed;
+        opacity: .5;
+        .v-input__control {
+          pointer-events: none;
+        }
+
+      }
       .v-select__slot {
         label {
           font-size: 12px;

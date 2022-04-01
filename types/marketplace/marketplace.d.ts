@@ -30,7 +30,8 @@ export interface FilterDetails {
   itemsPerPage: number,
   search: string,
   country: string,
-  service: string | string[];
+  service: string | string[],
+  port: string;
 }
 
 export interface FilterMarketplaces {

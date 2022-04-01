@@ -33,7 +33,8 @@ const filter = {
   // itemsPerPage: 8,
   search: '',
   country: '',
-  service: ''
+  service: '',
+  port: '',
 } as FilterDetails;
 
 export const state = () => ({
