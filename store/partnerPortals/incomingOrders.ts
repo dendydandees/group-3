@@ -6,7 +6,7 @@ import {
   FilterOrders,
 } from '~/types/partnerPortals/incomingOrders'
 
-const filterOrders = {
+export const filterOrderInit = {
   orderCode: '',
   batchId: '',
   createdFrom: '',
@@ -16,6 +16,7 @@ const filterOrders = {
   serviceType: [],
   originPortId: '',
   destinationPortId: '',
+  status: '',
 } as FilterOrders
 
 export const state = () => ({
@@ -25,7 +26,7 @@ export const state = () => ({
     totalPage: 1,
     totalCount: 10,
   } as Meta,
-  filterOrders: filterOrders as FilterOrders,
+  filterOrders: filterOrderInit as FilterOrders,
   incomingOrderDetails: {
     order: {} as any | {},
     // orderItems: [] as OrderItem | [],
@@ -40,7 +41,7 @@ export const mutations: MutationTree<RootStateIncomingOrders> = {
     (state.incomingOrders = value),
   SET_META: (state, value: Meta) => (state.meta = value),
   SET_FILTER: (state, value: FilterOrders) => (state.filterOrders = value),
-  RESET_FILTER: (state) => (state.filterOrders = filterOrders),
+  RESET_FILTER: (state) => (state.filterOrders = filterOrderInit),
   SET_INCOMING_ORDER_DETAILS: (state, value: any) =>
     (state.incomingOrderDetails = value),
 }

@@ -20,7 +20,7 @@ interface ParamsGetSelectedLabels {
   orderIds: string[]
 }
 
-const filterOrder = {
+export const filterOrderInit = {
   orderCode: '',
   batchId: '',
   originCountry: '',
@@ -30,9 +30,10 @@ const filterOrder = {
   serviceType: [],
   originPortId: '',
   destinationPortId: '',
+  status: '',
 } as FilterOrders
 
-const filterBatch = {
+export const filterBatchInit = {
   batchId: '',
 } as FilterBatch
 
@@ -49,8 +50,8 @@ export const state = () => ({
     totalPage: 1,
     totalCount: 10,
   } as Meta,
-  filterOrder: filterOrder as FilterOrders,
-  filterBatch: filterBatch as FilterBatch,
+  filterOrder: filterOrderInit as FilterOrders,
+  filterBatch: filterBatchInit as FilterBatch,
 })
 
 export type RootStateOrders = ReturnType<typeof state>
@@ -64,9 +65,9 @@ export const mutations: MutationTree<RootStateOrders> = {
   SET_META: (state, value: Meta) => (state.meta = value),
   SET_FILTER_ORDERS: (state, value: FilterOrders) =>
     (state.filterOrder = value),
-  RESET_FILTER_ORDERS: (state) => (state.filterOrder = filterOrder),
+  RESET_FILTER_ORDERS: (state) => (state.filterOrder = filterOrderInit),
   SET_FILTER_BATCH: (state, value: FilterOrders) => (state.filterBatch = value),
-  RESET_FILTER_BATCH: (state) => (state.filterBatch = filterBatch),
+  RESET_FILTER_BATCH: (state) => (state.filterBatch = filterBatchInit),
 }
 
 export const actions: ActionTree<RootStateOrders, RootStateOrders> = {
