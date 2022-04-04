@@ -114,7 +114,7 @@
     <v-col cols="12" md="3" class="px-2 py-4">
       <v-autocomplete
         v-model="filterOrder.originCountry"
-        :items="country"
+        :items="filterData.country"
         :search-input.sync="search.originCountry"
         clearable
         cache-items
@@ -136,7 +136,7 @@
     <v-col cols="12" md="3" class="px-2 py-4">
       <v-autocomplete
         v-model="filterOrder.destinationCountry"
-        :items="country"
+        :items="filterData.country"
         :search-input.sync="search.destinationCountry"
         clearable
         cache-items
@@ -158,7 +158,7 @@
     <v-col cols="12" md="3" class="px-2 py-4">
       <v-autocomplete
         v-model="filterOrder.originPortId"
-        :items="ports.data"
+        :items="filterData.ports.data"
         :search-input.sync="search.originPortId"
         clearable
         cache-items
@@ -184,7 +184,7 @@
     <v-col cols="12" md="3" class="px-2 py-4">
       <v-autocomplete
         v-model="filterOrder.destinationPortId"
-        :items="ports.data"
+        :items="filterData.ports.data"
         :search-input.sync="search.destinationPortId"
         clearable
         cache-items
@@ -210,7 +210,7 @@
     <v-col cols="12" md="3" class="px-2 py-4">
       <v-autocomplete
         v-model="filterOrder.serviceType"
-        :items="serviceTypes"
+        :items="filterData.serviceTypes"
         :search-input.sync="search.serviceType"
         clearable
         cache-items
@@ -230,6 +230,28 @@
         class="input-filter elevation-1"
       />
     </v-col>
+
+    <!-- statuses -->
+    <v-col cols="12" md="3" class="px-2 py-4">
+      <v-autocomplete
+        v-model="filterOrder.status"
+        :items="filterData.statuses"
+        :search-input.sync="search.statuses"
+        clearable
+        cache-items
+        outlined
+        rounded
+        dense
+        single-line
+        hide-details
+        item-text="Remarks"
+        item-value="Status"
+        background-color="white"
+        label="Status"
+        placeholder="Enter your status..."
+        class="input-filter elevation-1"
+      />
+    </v-col>
   </v-row>
 </template>
 
@@ -246,8 +268,23 @@ import {
 } from '@nuxtjs/composition-api'
 // types
 import { Pagination } from '~/types/applications'
-import { CountryCode, VuexModuleFilters, Ports } from '~/types/filters'
+import {
+  CountryCode,
+  VuexModuleFilters,
+  Ports,
+  Statuses,
+} from '~/types/filters'
 import { FilterOrders } from '~/types/orders'
+
+interface FilterData {
+  serviceTypes: {
+    text: string
+    value: string
+  }[]
+  country: CountryCode[]
+  statuses: Statuses[] | { header: string }[]
+  ports: Ports
+}
 
 export default defineComponent({
   props: {
@@ -287,19 +324,21 @@ export default defineComponent({
 
     // manage filter
     const search = ref({
-      originCountry: '',
-      destinationCountry: '',
-      serviceType: '',
-      originPortId: '',
-      destinationPortId: '',
+      originCountry: null,
+      destinationCountry: null,
+      serviceType: null,
+      originPortId: null,
+      destinationPortId: null,
+      statuses: null,
     })
-    const serviceTypes = ref([]) as Ref<{ text: string; value: string }[]>
-    const country = computed(
-      () => storeFilter.state.filters.countryCodes
-    ) as Ref<CountryCode[]>
+    const filterData = ref({
+      serviceTypes: [],
+      country: storeFilter.state.filters.countryCodes,
+      statuses: [],
+      ports: storeFilter.state.filters.ports,
+    }) as Ref<FilterData>
 
     // manage ports
-    const ports = computed(() => storeFilter.state.filters.ports) as Ref<Ports>
     const portsMeta = ref({
       page: 1,
       itemsPerPage: 10,
@@ -320,7 +359,7 @@ export default defineComponent({
     ) => {
       if (
         !isIntersecting ||
-        portsMeta.value.itemsPerPage >= ports.value.totalCount
+        portsMeta.value.itemsPerPage >= filterData.value.ports.totalCount
       ) {
         return
       }
@@ -333,32 +372,69 @@ export default defineComponent({
       await getPorts(portsMeta.value)
     }
 
+    // manage service types
+    const formatServiceTypes = () => {
+      return storeFilter.state.filters.serviceTypes.map((type) => ({
+        text: app.$customUtils.setServiceType(type.name),
+        value: type.name,
+      }))
+    }
+
+    // manage statuses
+    const formatStatuses = () => {
+      const status = [...storeFilter.state.filters.statuses].sort(
+        (itemA, itemB) => {
+          const nameA = (itemA.ServiceType as string).toUpperCase()
+          const nameB = (itemB.ServiceType as string).toUpperCase()
+
+          if (nameA < nameB) {
+            return -1
+          }
+          if (nameA > nameB) {
+            return 1
+          }
+
+          return 0
+        }
+      ) as Statuses[]
+
+      let currentType = ''
+      status.forEach((item, index) => {
+        const serviceType = app.$customUtils.setServiceType(item.ServiceType)
+
+        if (currentType === serviceType) return
+
+        currentType = serviceType
+        status.splice(index, 0, { header: serviceType } as any)
+      })
+
+      return status
+    }
+
     useFetch(async () => {
       await storeFilter.dispatch('filters/getServiceTypes')
       await storeFilter.dispatch('filters/getCountryCodes', {
         params: { isActive: true },
       })
       await getPorts(portsMeta.value)
+      await storeFilter.dispatch('filters/getStatuses')
 
       // format service types
-      const formatServiceTypes = storeFilter.state.filters.serviceTypes.map(
-        (type) => ({
-          text: app.$customUtils.setServiceType(type.name),
-          value: type.name,
-        })
-      )
+      filterData.value.serviceTypes = formatServiceTypes()
 
-      serviceTypes.value = formatServiceTypes
+      // format statuses
+      filterData.value.statuses = formatStatuses()
     })
 
     return {
       filterOrder,
+      // manage date for filter by created from and to
       menu,
-      search,
       date,
-      serviceTypes,
-      country,
-      ports,
+      // manage filter
+      search,
+      filterData,
+      // manage ports
       portIntersect,
     }
   },

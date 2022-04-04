@@ -84,6 +84,7 @@ import {
   useRouter,
   useContext,
 } from '@nuxtjs/composition-api'
+import { filterOrderInit } from '~/store/partnerPortals/incomingOrders'
 // Interface and types
 import { FilterDetails, VuexModuleApplications } from '~/types/applications'
 import {
@@ -185,17 +186,7 @@ export default defineComponent({
     // manage filter order
     const isShowFilter = ref(false)
     const doResetFilter = () => {
-      filterOrders.value = {
-        orderCode: '',
-        batchId: '',
-        createdFrom: '',
-        createdTo: '',
-        originCountry: '',
-        destinationCountry: '',
-        serviceType: [],
-        originPortId: '',
-        destinationPortId: '',
-      }
+      filterOrders.value = filterOrderInit
     }
 
     // manage fetch

@@ -130,6 +130,7 @@ import {
   useContext,
 } from '@nuxtjs/composition-api'
 import { saveAs } from 'file-saver'
+import { filterOrderInit, filterBatchInit } from '@/store/orders'
 // Interfaces or types
 import { Order, VuexModuleOrders } from '~/types/orders'
 import { FilterDetails, VuexModuleApplications } from '~/types/applications'
@@ -274,20 +275,8 @@ export default defineComponent({
     // manage filter order
     const isShowFilter = ref(false)
     const doResetFilter = () => {
-      filterOrder.value = {
-        orderCode: '',
-        batchId: '',
-        createdFrom: '',
-        createdTo: '',
-        serviceType: [],
-        originCountry: '',
-        destinationCountry: '',
-        originPortId: '',
-        destinationPortId: '',
-      }
-      filterBatch.value = {
-        batchId: '',
-      }
+      filterOrder.value = filterOrderInit
+      filterBatch.value = filterBatchInit
     }
 
     // Debounced fetch

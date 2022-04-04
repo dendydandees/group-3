@@ -86,6 +86,7 @@ export interface FilterOrders {
   serviceType: string[]
   originPortId: string
   destinationPortId: string
+  status: string
 }
 
 export interface BatchOrders {

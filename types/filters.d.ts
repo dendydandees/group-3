@@ -38,3 +38,9 @@ export interface Ports {
   totalCount: number
   totalPage: number
 }
+
+export interface Statuses {
+  Remarks: string
+  ServiceType: string
+  Status: string
+}
