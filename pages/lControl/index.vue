@@ -752,6 +752,7 @@ export default defineComponent({
         newCountryIndex,
         newServiceIndex,
         newZoneIndex,
+        newPortIndex,
         newZones,
         newPorts,
       ]) => {
@@ -831,6 +832,7 @@ export default defineComponent({
           } else {
             zonesCust.value = computeZone
           }
+          console.log({computeZone, zonesCust: zonesCust.value})
         }
       },
       { deep: true }
