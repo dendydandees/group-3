@@ -14,59 +14,75 @@
     <v-expand-transition>
       <v-card-text v-if="!fetchState.pending" class="body-1 pa-6">
         <v-timeline dense>
-          <v-timeline-item
-            v-for="{
-              id,
-              serviceType,
-              partnerName,
-              order: { createdAt },
-            } in orderAllocationUpdates"
-            :key="id"
-            small
-            class="mb-10"
-            fill-dot
-            :color="$customUtils.setColorServiceType(serviceType)"
+          <template
+            v-for="(
+              {
+                id,
+                serviceType,
+                partnerName,
+                externalTracking: { partnerUpdates },
+              },
+              indexAllocation
+            ) in orderAllocationUpdates"
           >
-            <template #opposite>
-              <span class="d-block body-2">
-                {{ $dateFns.format(createdAt, 'HH:mm') }}
-              </span>
+            <v-timeline-item
+              v-for="(
+                { comments, status, updateTimestamp }, indexUpdates
+              ) in partnerUpdates"
+              :key="`${id}, ${status}`"
+              small
+              class="mb-10"
+              fill-dot
+              :color="$customUtils.setColorServiceType(serviceType)"
+            >
+              <template #opposite>
+                <span class="d-block body-2">
+                  {{ $dateFns.format(updateTimestamp, 'HH:mm') }}
+                </span>
 
-              <span class="d-block body-2">
-                {{ $dateFns.format(createdAt, 'E, MMM dd, yyyy') }}
-              </span>
-            </template>
+                <span class="d-block body-2">
+                  {{ $dateFns.format(updateTimestamp, 'E, MMM dd, yyyy') }}
+                </span>
+              </template>
 
-            <v-row justify="space-between" align="start">
-              <v-col cols="4">
-                <!-- <h4 class="body-1 ma-0 font-weight-bold text--primary">
-                  Hub Transfer
-                </h4>
+              <v-row justify="space-between" align="start">
+                <v-col cols="4">
+                  <div>
+                    <h4 class="body-1 ma-0 font-weight-bold text--primary">
+                      {{ status }}
+                    </h4>
 
-                <p class="body-2">
-                  Order is being transferred to destination hub
-                </p> -->
-              </v-col>
+                    <p v-if="comments" class="body-2">
+                      {{ comments }}
+                    </p>
+                  </div>
+                </v-col>
 
-              <v-col cols="8" class="text-right py-0">
-                <h3
-                  class="title text-capitalize"
-                  :class="[
-                    `${$customUtils.setColorServiceType(serviceType)}--text`,
-                  ]"
+                <v-col
+                  v-if="indexAllocation !== indexUpdates"
+                  cols="8"
+                  class="text-right py-0"
                 >
-                  {{ $customUtils.setServiceType(serviceType.toLowerCase()) }}
-                </h3>
+                  <h3
+                    class="title text-capitalize"
+                    :class="[
+                      `${$customUtils.setColorServiceType(serviceType)}--text`,
+                    ]"
+                  >
+                    {{ $customUtils.setServiceType(serviceType.toLowerCase()) }}
+                  </h3>
 
-                <h2 class="title font-weight-medium text--primary">
-                  <span>By</span>
-                  <span class="font-weight-bold">
-                    {{ partnerName }}
-                  </span>
-                </h2>
-              </v-col>
-            </v-row>
-          </v-timeline-item>
+                  <h2 class="title font-weight-medium text--primary">
+                    <span>By</span>
+
+                    <span class="font-weight-bold">
+                      {{ partnerName }}
+                    </span>
+                  </h2>
+                </v-col>
+              </v-row>
+            </v-timeline-item>
+          </template>
         </v-timeline>
       </v-card-text>
     </v-expand-transition>

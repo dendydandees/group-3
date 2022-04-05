@@ -1,16 +1,21 @@
 <template>
   <section class="pa-4 pa-md-10 py-8 detail-upcoming">
-    <!-- <BaseBackButton @doBackTo="doBackTo" /> -->
-    <div class="mb-7">
-      <div style="font-size: 25px; line-height: 30px" class="mb-4">ORDERS</div>
-      <div
-        v-if="idObj.previous && idObj.id"
-        class="primary--text"
-        style="font-size: 20px; line-height: 24px"
-      >
-        {{ idObj.previous }} > {{ idObj.id }}
-      </div>
-    </div>
+    <v-row>
+      <v-col cols="12">
+        <v-btn text small class="pa-0 mb-2" @click="doBackTo">
+          <v-icon left dark tite elevation="0"> mdi-arrow-left-thin </v-icon>
+          Back
+        </v-btn>
+
+        <h2 class="headline mb-4 font-weight-bold">ORDERS</h2>
+
+        <v-breadcrumbs :items="breadCrumbsItems" class="pa-0">
+          <template #divider>
+            <v-icon>mdi-chevron-right</v-icon>
+          </template>
+        </v-breadcrumbs>
+      </v-col>
+    </v-row>
 
     <v-row align="stretch">
       <v-col cols="12" md="4">
@@ -34,10 +39,7 @@
 
       <!-- Order updates -->
       <v-col cols="12" md="8">
-        <OrdersDetailsUpdatesTimelineCustom
-          :fetch-state="$fetchState"
-          :is-upcoming="true"
-        />
+        <UpdatesTimeline :fetch-state="$fetchState" :is-upcoming="true" />
       </v-col>
     </v-row>
 
@@ -57,14 +59,18 @@ import {
   useStore,
   computed,
   useRoute,
+  useRouter,
+  ComputedRef,
 } from '@nuxtjs/composition-api'
-// types
-import { VuexModuleIncomingOrders } from '~/types/partnerPortals/incomingOrders'
 // components
 import OrderDetails from '~/components/orders/details/OrderDetails.vue'
 import ConsigneeDetails from '~/components/orders/details/ConsigneeDetails.vue'
 import PickupDetails from '~/components/orders/details/PickupDetails.vue'
 import OrderItems from '~/components/orders/details/OrderItems.vue'
+import UpdatesTimeline from '~/components/orders/details/UpdatesTimeline.vue'
+// types
+import { VuexModuleIncomingOrders } from '~/types/partnerPortals/incomingOrders'
+import { Breadcrumbs } from '~/types/applications'
 
 export default defineComponent({
   name: 'DetailOrdersIncomingPages',
@@ -73,25 +79,48 @@ export default defineComponent({
     ConsigneeDetails,
     PickupDetails,
     OrderItems,
+    UpdatesTimeline,
   },
   middleware: 'partner',
   setup() {
+    // manage route
     const route = useRoute()
+    const router = useRouter()
+    const doBackTo = () => {
+      router.go(-1)
+    }
+
+    // manage store
     const storeIncomingOrders = useStore<VuexModuleIncomingOrders>()
-    const idObj = computed(() => {
-      const storeOrder =
+    const detailsOrder = computed(
+      () =>
         storeIncomingOrders.state.partnerPortals?.incomingOrders
           ?.incomingOrderDetails?.order?.order
-      return {
-        id: storeOrder?.orderCode,
-        previous: storeOrder?.batchId,
-      }
-    })
+    )
 
+    // manage breadcrumbs
+    const breadCrumbsItems = computed(() => {
+      const partnerId = route.value.params?.id
+
+      return [
+        {
+          text: detailsOrder.value?.batchId,
+          disabled: false,
+          to: `/partner-portals/${partnerId}/incoming-orders?batchId=${detailsOrder.value?.batchId}`,
+          exact: true,
+        },
+        {
+          text: detailsOrder.value?.orderCode,
+          disabled: true,
+          to: '#',
+        },
+      ]
+    }) as ComputedRef<Breadcrumbs[]>
+
+    // manage fetch
     const fetchIncomingOrderDetail = async () => {
       const partnerId = route.value.params.id
       const id = route.value.params.orderId
-      // const id = '1d6f9538-44ce-4e99-9ca2-4e5e35174436'
       const dataParams = {
         id,
         partnerId,
@@ -109,13 +138,15 @@ export default defineComponent({
         $fetchState.pending = false
       }
     }
-
     const { $fetchState } = useFetch(async () => {
       await fetchIncomingOrderDetail()
     })
 
     return {
-      idObj,
+      // manage route
+      doBackTo,
+      // manage breadcrumbs
+      breadCrumbsItems,
     }
   },
   head: {},
