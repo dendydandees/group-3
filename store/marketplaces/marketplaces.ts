@@ -180,8 +180,9 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
       );
 
       return response;
-    } catch (error) {
-      return error;
+    } catch (error: any) {
+      console.log('errorAdd', { error });
+      return error?.response?.data;
     }
   },
   async getDetail({ commit }, id: string) {

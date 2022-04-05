@@ -370,6 +370,7 @@
     <MarketplaceAddForm
       :dialog="dialog"
       :data="idPartner"
+      :error="errorAdd.value"
       @toggle="toggle()"
       @add="addConnection(idPartner.id)"
     />
@@ -449,6 +450,9 @@ export default defineComponent({
     const dialog = reactive({
       status: false,
     })
+    const errorAdd = reactive({
+      value: '',
+    })
     const toggle = () => {
       if (method.opt === 'add' || method.opt === 'edit') {
         dialog.status = !dialog.status
@@ -464,13 +468,16 @@ export default defineComponent({
       try {
         $fetchState.pending = true
 
-        await storeMarketplaces.dispatch(
+        const res = await storeMarketplaces.dispatch(
           'marketplaces/marketplaces/addConnection',
           { id }
         )
+        if(res?.error) throw res?.error
         dialog.status = false
         fetch()
-      } catch (error) {
+      } catch (error: any) {
+        console.log(error)
+        errorAdd.value = error
         return error
       } finally {
         $fetchState.pending = false
@@ -482,6 +489,7 @@ export default defineComponent({
       ([newDialog]) => {
         if (!newDialog.status) {
           idPartner.value = {}
+          errorAdd.value = ''
         }
       },
       { deep: true }
@@ -712,7 +720,8 @@ export default defineComponent({
       changePage,
       countryCodes,
       ports,
-      marketplacesConnected
+      marketplacesConnected,
+      errorAdd
     }
   },
   head: {},
