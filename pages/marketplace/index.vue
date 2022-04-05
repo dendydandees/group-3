@@ -561,14 +561,17 @@ export default defineComponent({
       }
     }
     const { $fetchState, fetch } = useFetch(async () => {
-      await fetchMarketplace({
-        ...filter.value,
-        ...pagination.value,
-      })
-      await fetchMarketplaceConnected({
-        ...filter.value,
-        ...pagination.value,
-      })
+      await fetchMarketplace(
+        {
+          ...filter.value,
+          ...pagination.value
+        }
+      )
+      await fetchMarketplaceConnected(
+        {
+          ...filter.value,
+        }
+      )
       await fetchCountryCodes()
       await fetchServiceZoneOnce()
       // zones.value =  [ ...storeFilters.state.filters.zones]
