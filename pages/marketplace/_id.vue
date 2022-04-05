@@ -262,10 +262,10 @@ export default defineComponent({
         name: 'Company Brief',
         value: 'companyBrief',
       },
-      {
-        name: 'Contact Person',
-        value: 'contactPerson',
-      },
+      // {
+      //   name: 'Contact Person',
+      //   value: 'contactPerson',
+      // },
       // {
       //   name: 'Email',
       //   value: 'emailAddress',
