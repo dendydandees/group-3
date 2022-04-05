@@ -151,7 +151,6 @@ const initHeaders = [
   {
     text: 'Batch',
     value: 'batchId',
-    sortable: false,
   },
   {
     text: 'Service',
@@ -164,14 +163,27 @@ const initHeaders = [
     sortable: false,
   },
   {
+    text: 'Origin Port',
+    value: 'originPort',
+    sortable: false,
+    width: 150,
+  },
+  {
     text: 'Destination',
     value: 'destination',
     sortable: false,
   },
   {
+    text: 'Destination Port',
+    value: 'destinationPort',
+    sortable: false,
+    width: 180,
+  },
+  {
     text: 'Creation Date',
     value: 'creationDate',
     sortable: false,
+    width: 180,
   },
   {
     text: '',
@@ -219,8 +231,10 @@ export default defineComponent({
       'orderCode',
       'batchId',
       'serviceType',
-      'destination',
       'origin',
+      'originPort',
+      'destination',
+      'destinationPort',
       'creationDate',
       'actions',
     ])

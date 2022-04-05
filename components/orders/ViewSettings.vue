@@ -38,8 +38,18 @@
                 v-model="selectedViews"
                 on-icon="mdi-checkbox-marked-circle"
                 off-icon="mdi-checkbox-blank-circle-outline"
-                label="Destination"
-                value="destination"
+                label="Origin"
+                value="origin"
+              />
+            </v-list-item>
+
+            <v-list-item>
+              <v-checkbox
+                v-model="selectedViews"
+                on-icon="mdi-checkbox-marked-circle"
+                off-icon="mdi-checkbox-blank-circle-outline"
+                label="Origin Port"
+                value="originPort"
               />
             </v-list-item>
           </v-list>
@@ -52,12 +62,22 @@
                 v-model="selectedViews"
                 on-icon="mdi-checkbox-marked-circle"
                 off-icon="mdi-checkbox-blank-circle-outline"
-                label="Origin"
-                value="origin"
+                label="Destination"
+                value="destination"
               />
             </v-list-item>
 
-            <v-list-item v-if="isOnOrdersPages">
+            <v-list-item>
+              <v-checkbox
+                v-model="selectedViews"
+                on-icon="mdi-checkbox-marked-circle"
+                off-icon="mdi-checkbox-blank-circle-outline"
+                label="Destination Port"
+                value="destinationPort"
+              />
+            </v-list-item>
+
+            <v-list-item>
               <v-checkbox
                 v-model="selectedViews"
                 on-icon="mdi-checkbox-marked-circle"

@@ -23,6 +23,7 @@ export interface ExternalTracking {
 export interface Order {
   id: string
   orderCode: string
+  batchId: string
   clientId: string
   consigneeName: string
   consigneeNumber: string
@@ -38,16 +39,29 @@ export interface Order {
   height: number
   weight: number
   paymentType: string
-  pickupContactName: string
-  pickupContactNumber: string
-  pickupState: string
-  pickupCity: string
-  pickupProvince: string
-  pickupPostal: string
-  pickupCountry: string
-  pickupAddress: string
-  refID: null
-  labelPath: null
+  pickupContactName?: string
+  pickupContactNumber?: string
+  pickupState?: string
+  pickupCity?: string
+  pickupProvince?: string
+  pickupPostal?: string
+  pickupCountry?: string
+  pickupAddress?: string
+  senderName?: string
+  senderNumber?: string
+  senderState?: string
+  senderCity?: string
+  senderProvince?: string
+  senderPostal?: string
+  senderCountry?: string
+  senderAddress?: string
+  refID: number
+  labelPath: string
+  requestedServices: string[]
+  destPort: { code: string }
+  destPortId: string
+  senderPort?: { code: string }
+  senderPortId?: string
 }
 
 export interface IncomingOrder {

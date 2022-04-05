@@ -41,6 +41,11 @@ export interface Order {
   senderAddress?: string
   refID: number
   labelPath: string
+  requestedServices: string[]
+  destPort: { code: string }
+  destPortId: string
+  senderPort?: { code: string }
+  senderPortId?: string
 }
 
 export interface OrderItem {
