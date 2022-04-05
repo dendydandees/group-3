@@ -57,7 +57,7 @@
 
     <!-- service type cell -->
     <template #[`item.serviceType`]="{ item }">
-      <template v-if="item.requestedServices">
+      <div v-if="item.requestedServices" class="d-flex align-center">
         <v-chip
           v-for="service in item.requestedServices"
           :key="service"
@@ -67,7 +67,7 @@
         >
           {{ $customUtils.setServiceType(service) }}
         </v-chip>
-      </template>
+      </div>
     </template>
 
     <!-- origin cell -->
@@ -77,10 +77,24 @@
       </div>
     </template>
 
+    <!-- origin port cell -->
+    <template #[`item.originPort`]="{ item }">
+      <div class="text--secondary">
+        {{ item.senderPort.code }}
+      </div>
+    </template>
+
     <!-- destination cell -->
     <template #[`item.destination`]="{ item }">
       <div class="text--secondary">
         {{ item.consigneeState }}
+      </div>
+    </template>
+
+    <!-- destination port cell -->
+    <template #[`item.destinationPort`]="{ item }">
+      <div class="text--secondary">
+        {{ item.destPort.code }}
       </div>
     </template>
 
