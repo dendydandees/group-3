@@ -63,3 +63,10 @@ export interface Pagination {
   sortBy?: string[]
   sortDesc?: boolean[]
 }
+
+export interface Breadcrumbs {
+  text: string
+  disabled: boolean
+  to: string
+  exact?: boolean
+}

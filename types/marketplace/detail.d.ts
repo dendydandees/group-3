@@ -1,61 +1,60 @@
-import { RootStateDetailMarketplace } from '~/store/marketplaces/detail';
+import { RootStateDetailMarketplace } from '~/store/marketplaces/detail'
 
 export interface VuexModuleDetailMarketplace {
-  detailMarketplace: RootStateDetailMarketplace;
+  detailMarketplace: RootStateDetailMarketplace
 }
 
 export interface PartnerServiceType {
-  id: string,
-  name: string;
+  id: string
+  name: string
 }
 
 export interface PartnerServiceZone {
-  id: string,
-  zone_country: string;
+  id: string
+  zone_country: string
 }
 
 export interface DetailMarketplace {
-  id: string,
-  name: string,
-  slug: string,
-  logo: string,
-  description: string,
-  clientId: string,
-  status: string,
-  partnerServiceTypes: PartnerServiceType[],
-  partnerServiceZones: PartnerServiceZone[],
+  id: string
+  name: string
+  slug: string
+  logo: string
+  description: string
+  clientId: string
+  status: string
+  partnerServiceTypes: PartnerServiceType[]
+  partnerServiceZones: PartnerServiceZone[]
 }
-
 
 export interface Gallery {
-  id: string,
-  path: string,
-  partnerId: string,
-  logo: string,
+  id: string
+  path: string
+  partnerId: string
+  logo: string
 }
 export interface DataGallery {
-  description: string,
-  gallery: Gallery[],
-  logo: string,
-  name: string,
-  slug: string,
+  description: string
+  gallery: Gallery[]
+  logo: string
+  name: string
+  slug: string
 }
 export interface DetailProfile {
-  "slug": string,
-  "name": string,
-  "code": string,
-  "logo": string,
-  "description": string,
-  "serviceType": PartnerServiceType[],
-  "serviceZone": PartnerServiceZone[],
-  "companyBrief": string,
-  "emailAddress": string,
-  "contactPerson": string,
-  "phoneNumber": string,
-  "sla": string,
-  "gallery": Gallery[],
-  "maximumWeight": number,
-  "maximumDimension": string,
-  "pikupAndDropOff": boolean,
-  "prohibitedItem": string;
+  slug: string
+  name: string
+  code: string
+  logo: string
+  description: string
+  serviceType: PartnerServiceType[]
+  serviceZone: PartnerServiceZone[]
+  companyBrief: string
+  emailAddress: string
+  contactPerson: string
+  phoneNumber: string
+  sla: string
+  gallery: Gallery[]
+  maximumWeight: number
+  maximumDimension: string
+  pikupAndDropOff: boolean
+  prohibitedItem: string
 }

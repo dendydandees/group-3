@@ -1,14 +1,7 @@
 <template>
-  <div
-  >
-    <v-dialog
-      v-model="dialogComp"
-      max-width="258"
-      @click:outside="toggle()"
-    >
-      <v-card
-        class="rounded-xl pa-6 add-form-marketplace"
-      >
+  <div>
+    <v-dialog v-model="dialogComp" max-width="258" @click:outside="toggle()">
+      <v-card class="rounded-xl pa-6 add-form-marketplace">
         <div class="header d-flex align-center mb-3">
           <v-img
             :width="53"
@@ -20,16 +13,13 @@
             class="rounded-circle mr-4"
             src="https://cdn.vuetifyjs.com/images/cards/cooking.png"
           />
-          <div
-            class="header-text"
-            style="font-size: 24px;"
-          >
-            {{data.name}}
+          <div class="header-text" style="font-size: 24px">
+            {{ data.name }}
           </div>
         </div>
         <div
           v-if="data.partnerServiceTypes && data.partnerServiceTypes.length > 0"
-          class="service d-flex align-center "
+          class="service d-flex align-center"
         >
           <div
             v-for="(x, i) in data.partnerServiceTypes"
@@ -44,11 +34,11 @@
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width:'100%',
-              marginRight: i !== 1 ? '11px' : 'unset'
+              width: '100%',
+              marginRight: i !== 1 ? '11px' : 'unset',
             }"
           >
-            {{$customUtils.setServiceType(x.name)}}
+            {{ $customUtils.setServiceType(x.name) }}
           </div>
         </div>
         <div
@@ -57,14 +47,16 @@
           :style="{
             fontSize: '11px',
             lineHeight: '14px',
-            marginTop: '21px'
+            marginTop: '21px',
           }"
         >
-          {{data.description}}
+          {{ data.description }}
         </div>
         <div class="country-port mt-4 mb-4">
           <div
-            v-if="data.partnerServiceZones && data.partnerServiceZones.length > 0"
+            v-if="
+              data.partnerServiceZones && data.partnerServiceZones.length > 0
+            "
             class="country d-flex align-start mb-3"
           >
             <NuxtImg
@@ -72,12 +64,10 @@
               preload
               :style="{
                 marginRight: '6px',
-                minWidth: '22px'
+                minWidth: '22px',
               }"
             />
-            <div
-              class="country-text"
-            >
+            <div class="country-text">
               <div
                 :style="{
                   fontSize: '8px',
@@ -94,29 +84,20 @@
                   lineHeight: '14px',
                 }"
               >
-                <span
-                  v-for="(x, i) in data.partnerServiceZones"
-                  :key="i"
-                >
-                  {{x.zone_country}}{{(
-                    data.partnerServiceZones.length - 1) !== i
-                    ? ', '
-                    : ''
-                  }}
+                <span v-for="(x, i) in data.partnerServiceZones" :key="i">
+                  {{ x.zone_country
+                  }}{{ data.partnerServiceZones.length - 1 !== i ? ', ' : '' }}
                 </span>
               </div>
             </div>
           </div>
-          <div
-            v-if="false"
-            class="port d-flex align-start"
-          >
+          <div v-if="false" class="port d-flex align-start">
             <NuxtImg
               src="/images/portIcon.svg"
               preload
               :style="{
                 marginRight: '6px',
-                minWidth: '22px'
+                minWidth: '22px',
               }"
             />
             <div class="port-text">
@@ -124,7 +105,7 @@
                 :style="{
                   fontSize: '8px',
                   lineHeight: '10px',
-                  marginBottom: '6px'
+                  marginBottom: '6px',
                 }"
               >
                 PORT OF SERVICE
@@ -141,9 +122,7 @@
             </div>
           </div>
         </div>
-        <div
-          class="btn-connect d-flex justify-center"
-        >
+        <div class="btn-connect d-flex justify-center">
           <v-btn
             color="white darken-1 red--text"
             :style="{
@@ -177,25 +156,14 @@
 </template>
 
 <script lang="ts">
-import {
-  computed,
-  defineComponent,
-  useFetch,
-  useStore,
-  reactive,
-  watch,
-  ref,
-  useMeta,
-  useRouter,
-  PropType
-} from '@nuxtjs/composition-api'
-import { VuexModuleMarketplaces, Marketplace} from '~/types/marketplace/marketplace'
+import { computed, defineComponent, PropType } from '@nuxtjs/composition-api'
+import { Marketplace } from '~/types/marketplace/marketplace'
 
-interface FeedbackMessage {
-  alert: boolean
-  type: string
-  message: string | unknown
-}
+// interface FeedbackMessage {
+//   alert: boolean
+//   type: string
+//   message: string | unknown
+// }
 
 export default defineComponent({
   props: {
@@ -212,10 +180,10 @@ export default defineComponent({
       default: () => ({}),
     },
   },
-  setup(props, {emit}) {
+  setup(props, { emit }) {
     const dialogComp = computed({
       get: () => props.dialog.status,
-      set: (value: boolean) => emit('input', value)
+      set: (value: boolean) => emit('input', value),
     })
     const toggle = () => {
       emit('toggle')
@@ -225,29 +193,25 @@ export default defineComponent({
       emit('add')
     }
 
-    watch(
-      dialogComp,
-      (newDialogComp) => {
-        console.log({newDialogComp})
-      }
-    )
-    console.log({dialogComp})
+    // watch(dialogComp, (newDialogComp) => {
+    //   console.log({ newDialogComp })
+    // })
+    // console.log({ dialogComp })
     return {
       toggle,
       dialogComp,
-      addConnection
+      addConnection,
     }
   },
 })
 </script>
 <style lang="scss">
-  .add-form-marketplace {
-    &.v-card {
-      background-color: unset !important;
-      backdrop-filter: blur(21px) brightness(1.4) !important;
-    }
-    .btn-connect {
-
-    }
+.add-form-marketplace {
+  &.v-card {
+    background-color: unset !important;
+    backdrop-filter: blur(21px) brightness(1.4) !important;
   }
+  // .btn-connect {
+  // }
+}
 </style>

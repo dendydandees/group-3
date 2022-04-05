@@ -6,10 +6,7 @@
         <slot name="addition" />
       </h1>
 
-      <v-subheader
-        v-if="subtitle"
-        class="pa-0 subtitle-1"
-      >
+      <v-subheader v-if="subtitle" class="pa-0 subtitle-1">
         {{ subtitle }}
       </v-subheader>
     </v-col>

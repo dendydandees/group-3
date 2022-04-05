@@ -128,6 +128,8 @@ import {
   useRouter,
   Ref,
   useContext,
+  onMounted,
+  useRoute,
 } from '@nuxtjs/composition-api'
 import { saveAs } from 'file-saver'
 import { filterOrderInit, filterBatchInit } from '@/store/orders'
@@ -183,6 +185,7 @@ export default defineComponent({
   layout: 'default',
   setup() {
     const { $dateFns, app } = useContext()
+    const route = useRoute()
     const router = useRouter()
 
     // manage store
@@ -330,6 +333,14 @@ export default defineComponent({
         storeApplications.commit('applications/RESET_ALERT')
       }, 3000)
       await fetchOrders(pagination.value)
+    })
+
+    onMounted(() => {
+      const batchId = route.value.query?.batchId as string
+
+      if (batchId) {
+        doGetBatchDetails(batchId)
+      }
     })
 
     // manage filter on changed

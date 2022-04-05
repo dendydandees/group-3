@@ -7,6 +7,7 @@ export interface VuexModuleOrders {
 export interface Order {
   id: string
   orderCode: string
+  batchId: string
   clientId: string
   consigneeName: string
   consigneeNumber: string
@@ -66,7 +67,16 @@ export interface OrderAllocationUpdate {
   externalTrackingNumber: string
   externalTracking: {
     id: string
-    partnerUpdates: string
+    partnerUpdates: {
+      comments: string
+      id: string
+      podReceiverContact: string
+      podReceiverName: string
+      podURI: string
+      rawPayload: string
+      status: string
+      updateTimestamp: Date
+    }
   }
 }
 

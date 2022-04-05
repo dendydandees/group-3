@@ -1,29 +1,16 @@
 <template>
   <div>
     <v-dialog v-model="dialogComp" persistent max-width="450">
-      <v-card
-        class="rounded-xl pa-2"
-      >
-        ini image
-      </v-card>
+      <v-card class="rounded-xl pa-2"> ini image </v-card>
     </v-dialog>
   </div>
 </template>
 
 <script lang="ts">
-import {
-  computed,
-  defineComponent,
-  useFetch,
-  useStore,
-  reactive,
-  watch,
-  ref,
-  useMeta,
-  useRouter,
-} from '@nuxtjs/composition-api'
+import { computed, defineComponent } from '@nuxtjs/composition-api'
 
 export default defineComponent({
+  name: 'MarketplaceImage',
   props: {
     dialog: {
       type: Object,
@@ -38,10 +25,10 @@ export default defineComponent({
       default: () => ({}),
     },
   },
-  setup(props, {emit}) {
+  setup(props, { emit }) {
     const dialogComp = computed({
       get: () => props.dialog.status,
-      set: (value: boolean) => emit('input', value)
+      set: (value: boolean) => emit('input', value),
     })
     const toggle = () => {
       emit('toggle')
@@ -53,7 +40,7 @@ export default defineComponent({
     return {
       toggle,
       dialogComp,
-      addConnection
+      addConnection,
     }
   },
 })

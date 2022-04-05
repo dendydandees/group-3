@@ -63,7 +63,7 @@
           :key="service"
           small
           :color="$customUtils.setColorServiceType(service)"
-          class="text-uppercase white--text"
+          class="text-uppercase white--text ma-1"
         >
           {{ $customUtils.setServiceType(service) }}
         </v-chip>

@@ -5,19 +5,18 @@
 // }
 
 export interface RuleDefinitions {
-  ruleType: string,
-  value: string;
+  ruleType: string
+  value: string
 }
 
 export interface Rules {
-  priority: number,
-  partnerID: string;
-  ruleDefinitions: RuleDefinitions[];
+  priority: number
+  partnerID: string
+  ruleDefinitions: RuleDefinitions[]
 }
 
-
 export interface LControl {
-  CountryCode: string,
-  ServiceTypeID: string,
-  rules: Rules[];
+  CountryCode: string
+  ServiceTypeID: string
+  rules: Rules[]
 }

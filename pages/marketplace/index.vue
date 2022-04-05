@@ -5,23 +5,16 @@
       subtitle="Find and connect with our best vendors"
     >
     </BaseHeadlinePageCustom>
-    <v-row
-      class="mt-6"
-    >
-      <v-col
-        cols="7"
-        class="pa-0"
-      >
-
-        <BaseSearchFieldCustom
-          v-model="filter.search"
-          class="mb-14"
-        />
+    <v-row class="mt-6">
+      <v-col cols="7" class="pa-0">
+        <BaseSearchFieldCustom v-model="filter.search" class="mb-14" />
         <div
-          v-if="!filter.search && !filter.country && filter.service.length === 0"
+          v-if="
+            !filter.search && !filter.country && filter.service.length === 0
+          "
         >
           <h1 class="headline font-weight-bold mb-2 text-capitalize">
-            Featured Network <br>
+            Featured Network <br />
             Partners
           </h1>
           <carousel-3d
@@ -37,13 +30,14 @@
               v-for="(slide, i) in marketplaces.slice(0, 5)"
               :key="i"
               :index="i"
-              style="cursor:pointer"
+              style="cursor: pointer"
             >
               <v-img
                 height="100%"
                 class="align-end opacity opacity-custom custom-slide"
-
-                :src="slide.partnerGallery[0] ? slide.partnerGallery[0].path : null"
+                :src="
+                  slide.partnerGallery[0] ? slide.partnerGallery[0].path : null
+                "
               >
                 <div class="gradation-custom">
                   <!-- this is for gradation -->
@@ -51,10 +45,8 @@
                 <div
                   class="py-7 px-10 text-custom d-flex align-center justify-space-between"
                 >
-                  <v-col
-                    class="text-h4 white--text pa-0"
-                  >
-                    {{slide.name}}
+                  <v-col class="text-h4 white--text pa-0">
+                    {{ slide.name }}
                   </v-col>
                   <v-col
                     v-if="slide.partnerServiceTypes.length > 0"
@@ -63,43 +55,30 @@
                   >
                     <div>
                       <v-chip
-                        v-for="(mile, i) in slide.partnerServiceTypes"
-                        :key="i"
-                        class="mr-1 my-1 "
+                        v-for="(mile, index) in slide.partnerServiceTypes"
+                        :key="index"
+                        class="mr-1 my-1"
                         color="pink"
                         text-color="white"
                         small
                         disabled
                         style="opacity: 1"
                       >
-                        {{$customUtils.setServiceType(mile.name)}}
+                        {{ $customUtils.setServiceType(mile.name) }}
                       </v-chip>
-
                     </div>
                   </v-col>
                 </div>
               </v-img>
             </slide>
           </carousel-3d>
-
         </div>
       </v-col>
-      <v-col
-        class="pa-0 ml-15"
-        style="max-width: calc(100% - 711px);"
-      >
-        <v-card
-          class="pa-4 d-flex"
-          elevation="3"
-        >
+      <v-col class="pa-0 ml-15" style="max-width: calc(100% - 711px)">
+        <v-card class="pa-4 d-flex" elevation="3">
           <v-card-text>
-
             <v-row>
-              <v-col
-                class="pa-0"
-                cols="12"
-                md="2"
-              >
+              <v-col class="pa-0" cols="12" md="2">
                 <div
                   class="d-flex align-center primary--text"
                   style="height: 40px"
@@ -107,18 +86,10 @@
                   Filter
                 </div>
               </v-col>
-              <v-col
-                cols="12"
-                md="10"
-                class="pa-0"
-              >
-                <v-row
-                >
+              <v-col cols="12" md="10" class="pa-0">
+                <v-row>
                   <!-- class="d-flex align-center justify-space-between mb-4" -->
-                  <v-col
-                    cols="12"
-                    md="6"
-                  >
+                  <v-col cols="12" md="6">
                     <v-select
                       v-model="selectedZone.value"
                       :items="countryCodes"
@@ -134,13 +105,10 @@
                     >
                     </v-select>
                   </v-col>
-                  <v-col
-                    cols="12"
-                    md="6"
-                  >
+                  <v-col cols="12" md="6">
                     <v-select
                       v-model="selectedPort.value"
-                      :items="!selectedZone.value  ? []  : ports"
+                      :items="!selectedZone.value ? [] : ports"
                       item-text="name"
                       item-value="id"
                       label="Ports"
@@ -148,12 +116,12 @@
                       rounded
                       dense
                       color="primary"
-                      :class="`custom-select ${!selectedZone.value ? 'disabled-drop' : ''}`"
+                      :class="`custom-select ${
+                        !selectedZone.value ? 'disabled-drop' : ''
+                      }`"
                       clearable
-
                     >
                     </v-select>
-
                   </v-col>
                 </v-row>
                 <div class="mt-2">
@@ -162,19 +130,14 @@
                     align-self="center"
                     class="pa-0"
                   >
-                    <div
-                      class="red--text font-weight-bold subtitle-2 mb-3"
-                    >
+                    <div class="red--text font-weight-bold subtitle-2 mb-3">
                       Types
                     </div>
-                    <div
-                      class="chip-group-custom"
-                    >
+                    <div class="chip-group-custom">
                       <v-chip-group
                         v-model="selectedServiceTypes.arrValue"
                         multiple
                         active-class="primary accent-4 white--text"
-
                         column
                       >
                         <v-chip
@@ -184,37 +147,31 @@
                           small
                           class="custom-chips"
                         >
-                          {{$customUtils.setServiceType(chip.name)}}
+                          {{ $customUtils.setServiceType(chip.name) }}
                         </v-chip>
-
                       </v-chip-group>
                     </div>
                   </v-col>
                 </div>
               </v-col>
-
             </v-row>
           </v-card-text>
         </v-card>
         <div
-          v-if="!filter.search && !filter.country && filter.service.length === 0"
+          v-if="
+            !filter.search && !filter.country && filter.service.length === 0
+          "
         >
-          <h1 class="headline font-weight-bold mb-6  mt-16 text-capitalize">
-            Your Network <br>
+          <h1 class="headline font-weight-bold mb-6 mt-16 text-capitalize">
+            Your Network <br />
             Partners
           </h1>
           <div class="container-your-partner">
-            <div
-              class="wrapper-your-partner"
-            >
+            <div class="wrapper-your-partner">
               <v-row>
-                <v-col
-                  v-for="(x, i) in 6"
-                  :key="i"
-                  cols="4"
-                >
+                <v-col v-for="(x, i) in 6" :key="i" cols="4">
                   <v-img
-                    :aspect-ratio="156/156"
+                    :aspect-ratio="156 / 156"
                     class="rounded-circle"
                     src="https://cdn.vuetifyjs.com/images/cards/cooking.png"
                   >
@@ -223,79 +180,67 @@
               </v-row>
             </div>
             <div class="button-your-partner d-flex justify-center mt-6">
-              <v-btn
-                plain
-                color="red"
-              >
-                View your connected vendors
-              </v-btn>
+              <v-btn plain color="red"> View your connected vendors </v-btn>
             </div>
           </div>
-
         </div>
       </v-col>
     </v-row>
     <v-row>
       <v-col>
-        <h1 v-if="!filter.search && !filter.country && !filter.service" class="headline font-weight-bold mb-2 text-capitalize">
-          Network Partners in<br>
+        <h1
+          v-if="!filter.search && !filter.country && !filter.service"
+          class="headline font-weight-bold mb-2 text-capitalize"
+        >
+          Network Partners in<br />
           your area
         </h1>
-        <div
-          v-else
-          class="primary--text subtitle-2 pl-1"
-        >
-          {{meta.totalCount}} RESULTS
+        <div v-else class="primary--text subtitle-2 pl-1">
+          {{ meta.totalCount }} RESULTS
         </div>
-        <v-container
-          fluid
-          class="px-0"
-        >
-          <v-row
-          >
+        <v-container fluid class="px-0">
+          <v-row>
             <v-col
               v-for="(partner, u) in marketplaces"
               :key="u"
               cols="3"
               class="d-flex align-center justify-space-between pa-4"
             >
-
               <v-card
                 elevation="1"
                 shaped
                 tile
-                class="rounded-xl d-flex flex-column justify-space-between  card-partner-custom"
+                class="rounded-xl d-flex flex-column justify-space-between card-partner-custom"
                 width="100%"
                 height="245px"
                 color="primary"
-
                 :disabled="$fetchState.pending"
                 @click="changePage(partner.id)"
               >
-                  <!-- :src="`data:image/png;base64,${partner.logo}`" -->
+                <!-- :src="`data:image/png;base64,${partner.logo}`" -->
                 <v-img
                   height="100%"
                   width="100%"
-                  class="align-end "
-                  :src="partner.partnerGallery[0] ? partner.partnerGallery[0].path : null"
+                  class="align-end"
+                  :src="
+                    partner.partnerGallery[0]
+                      ? partner.partnerGallery[0].path
+                      : null
+                  "
                 >
-                  <v-col
-                    class="pa-0 wrapper-service"
-                    cols="7"
-                  >
-                      <div>
-                        <v-chip
-                          v-for="(mile, i) in partner.partnerServiceTypes"
-                          :key="i"
-                          class="mr-1 my-0 custom-chip"
-                          text-color="white"
-                          x-small
-                          disabled
-                        >
-                          {{$customUtils.setServiceType(mile.name)}}
-                        </v-chip>
-
-                      </div>
+                  <v-col class="pa-0 wrapper-service" cols="7">
+                    <div>
+                      <v-chip
+                        v-for="(mile, i) in partner.partnerServiceTypes"
+                        :key="i"
+                        class="mr-1 my-0 custom-chip"
+                        text-color="white"
+                        x-small
+                        disabled
+                      >
+                        {{ $customUtils.setServiceType(mile.name) }}
+                      </v-chip>
+                    </div>
                   </v-col>
                   <div>
                     <div class="gradation-custom">
@@ -309,7 +254,7 @@
                         style="font-size: 33px"
                         :cols="!partner.partnerServiceZones ? 12 : 0"
                       >
-                        {{partner.name}}
+                        {{ partner.name }}
                       </v-col>
                       <v-col
                         v-if="partner.partnerServiceZones"
@@ -331,15 +276,11 @@
                           height="22.69"
                           class="mr-2"
                         />
-                        <div
-                          style="word-break: break-word;font-size: 10px"
-                        >
-                          {{locationMapping(partner.partnerServiceZones)}}
+                        <div style="word-break: break-word; font-size: 10px">
+                          {{ locationMapping(partner.partnerServiceZones) }}
                         </div>
                       </v-col>
-
                     </div>
-
                   </div>
                   <v-btn
                     v-if="partner.status !== 'connected'"
@@ -367,11 +308,7 @@
                     >
                       mdi-account-clock
                     </v-icon>
-                    <v-icon
-                      v-else
-                      dense
-                      color="white"
-                    >
+                    <v-icon v-else dense color="white">
                       mdi-account-multiple-check
                     </v-icon>
                   </v-btn>
@@ -381,7 +318,6 @@
                     text-color="white"
                     x-small
                     disabled
-
                     class="custom-chip-connected"
                   >
                     <!-- Connected -->
@@ -390,44 +326,32 @@
               </v-card>
             </v-col>
           </v-row>
-          <div
-            class="d-flex align-center justify-center pt-4"
-          >
+          <div class="d-flex align-center justify-center pt-4">
             <div>
               <v-btn
                 fab
                 small
                 plain
-                :disabled="(pagination.page === 1) || $fetchState.pending"
+                :disabled="pagination.page === 1 || $fetchState.pending"
                 @click="nextOrPrev('-')"
               >
-                <v-icon
-                  dense
-                  color="black"
-                >
-                  mdi-menu-left
-                </v-icon>
+                <v-icon dense color="black"> mdi-menu-left </v-icon>
               </v-btn>
             </div>
-            <div
-              class="px-3"
-            >
-              {{meta.page}}
+            <div class="px-3">
+              {{ meta.page }}
             </div>
             <div>
               <v-btn
                 fab
                 small
                 plain
-                :disabled="(pagination.page >= meta.totalPage) || $fetchState.pending"
+                :disabled="
+                  pagination.page >= meta.totalPage || $fetchState.pending
+                "
                 @click="nextOrPrev('+')"
               >
-                <v-icon
-                  dense
-                  color="black"
-                >
-                  mdi-menu-right
-                </v-icon>
+                <v-icon dense color="black"> mdi-menu-right </v-icon>
               </v-btn>
             </div>
           </div>
@@ -452,16 +376,18 @@ import {
   reactive,
   watch,
   ref,
-  useMeta,
   useRouter,
   Ref,
-  useRoute
 } from '@nuxtjs/composition-api'
 // Interfaces or types
-import { Marketplace, VuexModuleMarketplaces,FilterDetails, PartnerServiceZone } from '~/types/marketplace/marketplace'
-import { VuexModuleFilters, Zone, ServiceType} from '~/types/filters'
+import {
+  Marketplace,
+  VuexModuleMarketplaces,
+  FilterDetails,
+  PartnerServiceZone,
+} from '~/types/marketplace/marketplace'
+import { VuexModuleFilters } from '~/types/filters'
 import { VuexModuleApplications } from '~/types/applications'
-
 
 export default defineComponent({
   name: 'MarketPlace',
@@ -470,43 +396,46 @@ export default defineComponent({
     const router = useRouter()
     // store manage
     const storeMarketplaces = useStore<VuexModuleMarketplaces>()
-    const storeFilters= useStore<VuexModuleFilters>()
+    const storeFilters = useStore<VuexModuleFilters>()
     const storeApplications = useStore<VuexModuleApplications>()
-    const marketplaces = computed(() => storeMarketplaces.state.marketplaces.marketplaces.marketplaces)
-    const meta = computed(() => storeMarketplaces.state.marketplaces.marketplaces.meta)
+    const marketplaces = computed(
+      () => storeMarketplaces.state.marketplaces.marketplaces.marketplaces
+    )
+    const meta = computed(
+      () => storeMarketplaces.state.marketplaces.marketplaces.meta
+    )
     const countryCodes = computed(() => storeFilters.state.filters.countryCodes)
     const ports = computed(() => storeFilters.state.filters.ports?.data) as any
     const pagination = ref({
       ...storeApplications.state.applications.pagination,
     })
     const filter = ref({
-      ...storeMarketplaces.state.marketplaces.marketplaces.filter
+      ...storeMarketplaces.state.marketplaces.marketplaces.filter,
     })
     const zones = computed(() => storeFilters.state.filters.zones)
     const serviceTypes = computed(() => storeFilters.state.filters.serviceTypes)
-    const idPartner = ref ({}) as Ref<Marketplace | {}>
+    const idPartner = ref({}) as Ref<Marketplace | {}>
     // status connect - none - pending - connected
-    const statusConnect = reactive ({
-      status: 'none'
+    const statusConnect = reactive({
+      status: 'none',
     })
-    const selectedZone = reactive ({
-      value: ''
+    const selectedZone = reactive({
+      value: '',
     })
-    const selectedPort = reactive ({
-      value: ''
+    const selectedPort = reactive({
+      value: '',
     })
-    const selectedServiceTypes = reactive ({
-      arrValue: []
+    const selectedServiceTypes = reactive({
+      arrValue: [],
     })
-
 
     const slides = 7
     const chips = 6
     const method = reactive({
-      opt: 'add'
+      opt: 'add',
     })
     const dialog = reactive({
-      status: false
+      status: false,
     })
     const toggle = () => {
       if (method.opt === 'add' || method.opt === 'edit') {
@@ -523,7 +452,10 @@ export default defineComponent({
       try {
         $fetchState.pending = true
 
-        await storeMarketplaces.dispatch('marketplaces/marketplaces/addConnection', {id})
+        await storeMarketplaces.dispatch(
+          'marketplaces/marketplaces/addConnection',
+          { id }
+        )
         dialog.status = false
         fetch()
       } catch (error) {
@@ -536,17 +468,19 @@ export default defineComponent({
     watch(
       [dialog],
       ([newDialog]) => {
-        if(!newDialog.status) {
+        if (!newDialog.status) {
           idPartner.value = {}
         }
       },
       { deep: true }
     )
-   const fetchCountryCodes = async () => {
+    const fetchCountryCodes = async () => {
       try {
         $fetchState.pending = true
 
-        await storeFilters.dispatch('filters/getCountryCodes', {params: {isActive: true} })
+        await storeFilters.dispatch('filters/getCountryCodes', {
+          params: { isActive: true },
+        })
       } catch (error) {
         return error
       } finally {
@@ -559,26 +493,30 @@ export default defineComponent({
           page: 1,
           perPage: 1000,
         },
-        country: selectedZone.value
+        country: selectedZone.value,
       })
     }
 
     const fetchMarketplace = async (params: FilterDetails) => {
-      const { page, itemsPerPage, search, country,service, port} = params
-      const perPage = itemsPerPage !== -1 ? itemsPerPage : meta.value.totalCount
+      const { page, search, country, service, port } = params
+      // const { page, itemsPerPage, search, country, service, port } = params
+      // const perPage = itemsPerPage !== -1 ? itemsPerPage : meta.value.totalCount
       const dataParams = {
         page,
         perPage: 8,
         search,
         country,
         service,
-        port
+        port,
       }
 
       try {
         $fetchState.pending = true
 
-        await storeMarketplaces.dispatch('marketplaces/marketplaces/getMarketplaces', { params: dataParams})
+        await storeMarketplaces.dispatch(
+          'marketplaces/marketplaces/getMarketplaces',
+          { params: dataParams }
+        )
       } catch (error) {
         return error
       } finally {
@@ -586,20 +524,24 @@ export default defineComponent({
       }
     }
     const fetchMarketplaceConnected = async (params: FilterDetails) => {
-      const { page, itemsPerPage, search, country,service} = params
-      const perPage = itemsPerPage !== -1 ? itemsPerPage : meta.value.totalCount
+      const { search, country, service } = params
+      // const { page, itemsPerPage, search, country, service } = params
+      // const perPage = itemsPerPage !== -1 ? itemsPerPage : meta.value.totalCount
       const dataParams = {
         page: 1,
         perPage: 6,
         search,
         country,
-        service
+        service,
       }
 
       try {
         $fetchState.pending = true
 
-        await storeMarketplaces.dispatch('marketplaces/marketplaces/getMarketplacesConnected', { params: dataParams})
+        await storeMarketplaces.dispatch(
+          'marketplaces/marketplaces/getMarketplacesConnected',
+          { params: dataParams }
+        )
       } catch (error) {
         return error
       } finally {
@@ -619,18 +561,14 @@ export default defineComponent({
       }
     }
     const { $fetchState, fetch } = useFetch(async () => {
-      await fetchMarketplace(
-        {
-          ...filter.value,
-          ...pagination.value
-        }
-      )
-      await fetchMarketplaceConnected(
-        {
-          ...filter.value,
-          ...pagination.value
-        }
-      )
+      await fetchMarketplace({
+        ...filter.value,
+        ...pagination.value,
+      })
+      await fetchMarketplaceConnected({
+        ...filter.value,
+        ...pagination.value,
+      })
       await fetchCountryCodes()
       await fetchServiceZoneOnce()
       // zones.value =  [ ...storeFilters.state.filters.zones]
@@ -638,8 +576,8 @@ export default defineComponent({
     })
 
     const locationMapping = (partnerServiceZones: PartnerServiceZone[]) => {
-      if(partnerServiceZones && partnerServiceZones.length > 0) {
-        const tempZone = partnerServiceZones.map((el, i) => {
+      if (partnerServiceZones && partnerServiceZones.length > 0) {
+        const tempZone = partnerServiceZones.map((el) => {
           return el.zone_country
         })
         return tempZone.join(', ')
@@ -651,12 +589,11 @@ export default defineComponent({
     const nextOrPrev = (type: string) => {
       switch (type) {
         case '+':
-
           pagination.value = {
             ...pagination.value,
             page: pagination.value.page + 1,
           }
-          break;
+          break
         case '-':
           pagination.value = {
             ...pagination.value,
@@ -664,7 +601,7 @@ export default defineComponent({
           }
           break
         default:
-          break;
+          break
       }
     }
 
@@ -677,16 +614,14 @@ export default defineComponent({
         }
 
         storeFilters.commit('marketplaces/marketplaces/SET_FILTER', {
-          ...newFilter
+          ...newFilter,
         })
 
         // fetch()
-        fetchMarketplace(
-        {
+        fetchMarketplace({
           ...filter.value,
-          ...pagination.value
-        }
-      )
+          ...pagination.value,
+        })
       },
       { deep: true }
     )
@@ -726,14 +661,13 @@ export default defineComponent({
       selectedPort,
       (newPort) => {
         filter.value.port = newPort.value
-        console.log(filter.value)
       },
       { deep: true }
     )
 
-    const changePage = (id: string | {index: number}) => {
+    const changePage = (id: string | { index: number }) => {
       let tempId = id
-      if(typeof id === 'object') {
+      if (typeof id === 'object') {
         tempId = marketplaces.value[id.index].id
       }
       router.push(`/marketplace/${tempId}`)
@@ -762,7 +696,7 @@ export default defineComponent({
       pagination,
       changePage,
       countryCodes,
-      ports
+      ports,
     }
   },
   head: {},
@@ -770,138 +704,135 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import "~/assets/scss/color.module.scss";
-  .marketplace {
-    .carousel-3d-slide {
-      border: unset;
-      border-radius: 20px;
-      /* padding: 20px; */
+@import '~/assets/scss/color.module.scss';
+.marketplace {
+  .carousel-3d-slide {
+    border: unset;
+    border-radius: 20px;
+    /* padding: 20px; */
+    background: $primary;
+    color: white;
+    box-shadow: 0px 0px 40px 0px #36363626;
+    &.current {
       background: $primary;
-      color: white;
-      box-shadow: 0px 0px 40px 0px #36363626;
-      &.current {
-        background: $primary;
-        .opacity-custom {
-          opacity: 1;
-        }
-      }
       .opacity-custom {
-        opacity: .7;
+        opacity: 1;
       }
     }
-    .custom-select {
-      &.disabled-drop {
-        cursor: not-allowed;
-        opacity: .5;
-        .v-input__control {
-          pointer-events: none;
-        }
+    .opacity-custom {
+      opacity: 0.7;
+    }
+  }
+  .custom-select {
+    &.disabled-drop {
+      cursor: not-allowed;
+      opacity: 0.5;
+      .v-input__control {
+        pointer-events: none;
+      }
+    }
+    .v-select__slot {
+      label {
+        font-size: 12px;
+        color: red;
+        font-weight: bold;
+      }
+    }
+    .v-input__slot {
+      margin-bottom: unset !important;
+      /* outline: 1px solid #2196F3; */
+      fieldset {
+        border-color: $primary;
+      }
+    }
+    .v-text-field__details {
+      display: none;
+    }
+  }
 
-      }
-      .v-select__slot {
-        label {
-          font-size: 12px;
-          color: red;
-          font-weight: bold;
+  .custom-slide {
+    .gradation-custom {
+      background: linear-gradient(0deg, $primary, transparent);
+      height: 90px;
+    }
+    .text-custom {
+      background: $primary;
+    }
+  }
+
+  .card-partner-custom {
+    .gradation-custom {
+      background: linear-gradient(0deg, $primary, transparent);
+      height: 90px;
+    }
+
+    .custom-chip-connected {
+      position: absolute !important;
+      top: 20px;
+      right: 20px;
+      opacity: 1 !important;
+    }
+
+    .wrapper-service {
+      position: absolute;
+      left: 20px;
+      top: 18px;
+    }
+
+    .custom-chip {
+      background-color: unset !important;
+      backdrop-filter: blur(100px);
+      opacity: 1;
+    }
+  }
+
+  // .chip-custom-types {
+  // }
+
+  .chip-group-custom {
+    .card-chip-group {
+      .v-slide-group__next,
+      .v-slide-group__prev {
+        min-width: unset;
+        flex: unset;
+        i {
+          color: rgba(255, 255, 255, 0.534);
+          font-size: 18px;
         }
       }
-      .v-input__slot {
-        margin-bottom: unset !important;
-        /* outline: 1px solid #2196F3; */
-        fieldset {
-          border-color: $primary;
-        }
+
+      .v-chip--disabled {
+        opacity: 1;
       }
-      .v-text-field__details {
+      .v-slide-group__prev--disabled,
+      .v-slide-group__next--disabled {
         display: none;
       }
     }
-
-    .custom-slide {
-      .gradation-custom {
-        background: linear-gradient(0deg, $primary, transparent);
-        height: 90px;
-      }
-      .text-custom {
-        background: $primary;
-      }
+    .custom-chip-connected {
+      position: absolute !important;
+      top: 20px;
+      right: 20px;
+      opacity: 1 !important;
     }
+    .v-slide-group__content {
+      padding: unset;
+      .custom-chips {
+        color: $primary;
+        background: transparent !important;
+        border: 1px solid $primary;
+        margin: 0px 8px 0px 0;
 
-    .card-partner-custom {
-      .gradation-custom {
-        background: linear-gradient(0deg, $primary, transparent);
-        height: 90px;
-      }
-
-      .custom-chip-connected {
-        position: absolute !important;
-        top: 20px;
-        right: 20px;
-        opacity: 1 !important;
-      }
-
-      .wrapper-service {
-        position: absolute;
-        left: 20px;
-        top: 18px;
-      }
-
-      .custom-chip {
-        background-color: unset !important;
-        backdrop-filter: blur(100px);
-        opacity: 1;
-      }
-
-    }
-
-    .chip-custom-types {
-
-    }
-
-
-    .chip-group-custom {
-      .card-chip-group {
-        .v-slide-group__next, .v-slide-group__prev {
-          min-width: unset;
-          flex: unset;
-          i {
-            color: rgba(255, 255, 255, 0.534);
-            font-size: 18px;
-          }
+        &.v-chip--active {
+          background: $primary !important;
         }
 
-        .v-chip--disabled {
-          opacity: 1;
-        }
-        .v-slide-group__prev--disabled, .v-slide-group__next--disabled {
-          display: none;
+        &.blue {
+          background: $primary !important;
+          border: 1px solid $primary !important;
         }
       }
-      .custom-chip-connected {
-        position: absolute !important;
-        top: 20px;
-        right: 20px;
-        opacity: 1 !important;
-      }
-      .v-slide-group__content {
-        padding: unset;
-        .custom-chips {
-          color: $primary ;
-          background: transparent !important;
-          border: 1px solid $primary;
-          margin: 0px 8px 0px 0;
-
-          &.v-chip--active {
-            background: $primary !important;
-          }
-
-          &.blue {
-            background: $primary !important;
-            border: 1px solid $primary !important;
-          }
-        }
-      }
-
     }
   }
+}
 </style>

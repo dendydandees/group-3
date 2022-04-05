@@ -83,6 +83,7 @@ import {
   useRoute,
   useRouter,
   useContext,
+  onMounted,
 } from '@nuxtjs/composition-api'
 import { filterOrderInit } from '~/store/partnerPortals/incomingOrders'
 // Interface and types
@@ -228,6 +229,14 @@ export default defineComponent({
       storeApplications.commit('applications/RESET_ALERT')
 
       await fetchIncomingOrders(pagination.value)
+    })
+
+    onMounted(() => {
+      const batchId = route.value.query?.batchId as string
+
+      if (batchId) {
+        doGetBatchDetails(batchId)
+      }
     })
 
     // manage filter on changed

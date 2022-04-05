@@ -8,7 +8,16 @@ export interface VuexModuleIncomingOrders {
 
 export interface ExternalTracking {
   id: string
-  partnerUpdates: null
+  partnerUpdates: {
+    comments: string
+    id: string
+    podReceiverContact: string
+    podReceiverName: string
+    podURI: string
+    rawPayload: string
+    status: string
+    updateTimestamp: Date
+  }
 }
 
 export interface Order {
