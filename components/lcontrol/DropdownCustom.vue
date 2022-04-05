@@ -1,12 +1,7 @@
 <template>
-  <div
-    class="dropdown-custom"
-  >
-    <div
-      v-if="label"
-      class="h-5 text-break font-weight-medium pb-1"
-    >
-      {{label}}
+  <div class="dropdown-custom">
+    <div v-if="label" class="h-5 text-break font-weight-medium pb-1">
+      {{ label }}
     </div>
     <!-- {{JSON.stringify(data)}} -->
     <v-select
@@ -32,21 +27,15 @@
 import {
   computed,
   defineComponent,
-  useFetch,
-  useStore,
-  reactive,
   watch,
-  ref,
-  useMeta,
-  useRouter,
-  PropType
+  PropType,
 } from '@nuxtjs/composition-api'
 
-interface FeedbackMessage {
-  alert: boolean
-  type: string
-  message: string | unknown
-}
+// interface FeedbackMessage {
+//   alert: boolean
+//   type: string
+//   message: string | unknown
+// }
 
 export default defineComponent({
   props: {
@@ -67,12 +56,12 @@ export default defineComponent({
       default: '',
     },
     itemShow: {
-      type: Object as PropType<{text: string, value: string}>,
+      type: Object as PropType<{ text: string; value: string }>,
       default: () => ({}),
     },
     data: {
-      type: Array ,
-      default: () => ([]),
+      type: Array,
+      default: () => [],
     },
     partner: {
       type: String as PropType<String | ''>,
@@ -85,20 +74,19 @@ export default defineComponent({
     disabledDrop: {
       type: Boolean,
       default: true,
-    }
+    },
   },
-  setup(props, {emit}) {
+  setup(props, { emit }) {
     const toggle = () => {
       emit('toggle')
     }
-    const selectedValue = reactive ({
-      value: ''
-    })
-    console.log({disabledDrop: props.disabledDrop})
+    // const selectedValue = reactive({
+    //   value: '',
+    // })
     watch(
       () => [props.disabledDrop],
-      ([newDisabled]) => {
-        console.log({newDisabled})
+      () => {
+        // console.log({ newDisabled })
       },
       { deep: true }
     )
@@ -113,44 +101,44 @@ export default defineComponent({
       get: () => props.value,
       set: (value: String) => {
         emit('input', value)
-      }
+      },
     })
 
     return {
       toggle,
-      selectedComp
+      selectedComp,
     }
   },
 })
 </script>
 <style lang="scss">
-  .dropdown-custom {
-    width: 100%;
-    .custom-select {
-      .v-select__slot {
-        label {
-          /* font-size: 12px;
+.dropdown-custom {
+  width: 100%;
+  .custom-select {
+    // .v-select__slot {
+    // label {
+    /* font-size: 12px;
           color: red; */
-          /* font-weight: bold; */
-        }
+    /* font-weight: bold; */
+    // }
+    // }
+    .v-input__slot {
+      margin-bottom: unset !important;
+      /* outline: 1px solid #2196F3; */
+      fieldset {
+        border-color: #2196f3;
       }
-      .v-input__slot {
-        margin-bottom: unset !important;
-        /* outline: 1px solid #2196F3; */
-        fieldset {
-          border-color: #2196F3;
-        }
-      }
-      .v-text-field__details {
-        display: none;
-      }
-      &.disabled-drop {
-        cursor: not-allowed;
-        opacity: .5;
-        .v-input__control {
-          pointer-events: none;
-        }
+    }
+    .v-text-field__details {
+      display: none;
+    }
+    &.disabled-drop {
+      cursor: not-allowed;
+      opacity: 0.5;
+      .v-input__control {
+        pointer-events: none;
       }
     }
   }
+}
 </style>

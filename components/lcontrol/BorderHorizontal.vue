@@ -1,35 +1,20 @@
 <template>
-  <div
-    class="custom-border"
-  >
-  </div>
+  <div class="custom-border" />
 </template>
 
 <script lang="ts">
-import {
-  computed,
-  defineComponent,
-  useFetch,
-  useStore,
-  reactive,
-  watch,
-  ref,
-  useMeta,
-  useRouter,
-} from '@nuxtjs/composition-api'
+import { defineComponent } from '@nuxtjs/composition-api'
 
 export default defineComponent({
-  props: {
-  },
-  setup(props, {emit}) {
-    return {
-    }
+  props: {},
+  setup() {
+    return {}
   },
 })
 </script>
 <style lang="scss">
-  .custom-border{
-    border: 1px solid grey;
-    border-bottom-width: 0;
-  }
+.custom-border {
+  border: 1px solid grey;
+  border-bottom-width: 0;
+}
 </style>

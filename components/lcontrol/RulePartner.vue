@@ -1,9 +1,7 @@
 <template>
-  <div
-    class="custom-rule"
-  >
+  <div class="custom-rule">
     <div>
-      {{namePartnerPriority[index]}}
+      {{ namePartnerPriority[index] }}
     </div>
     <div>
       <div
@@ -11,9 +9,7 @@
         :key="i"
         class="d-flex align-center pb-3"
       >
-        <div
-          class="pr-3"
-        >
+        <div class="pr-3">
           <LcontrolDropdownCustom
             v-model="ruleOpt.value"
             :title="'Rule'"
@@ -58,27 +54,15 @@
             ></v-text-field>
           </template>
         </v-range-slider>
-        <v-btn
-          color="blue darken-1 white--text"
-          @click="addDeleteRule('-', i)"
-        >
+        <v-btn color="blue darken-1 white--text" @click="addDeleteRule('-', i)">
           -
         </v-btn>
       </div>
-      <v-btn
-        color="blue darken-1 white--text"
-        @click="addDeleteRule('+')"
-      >
+      <v-btn color="blue darken-1 white--text" @click="addDeleteRule('+')">
         + add condition
       </v-btn>
-      <div
-        class="d-flex align-center pb-3"
-      >
-        <div
-          class="pr-3"
-        >
-          Partner
-        </div>
+      <div class="d-flex align-center pb-3">
+        <div class="pr-3">Partner</div>
         <LcontrolDropdownCustom
           v-model="partnerComp.value"
           :placeholder="'Partner'"
@@ -107,17 +91,13 @@
 import {
   computed,
   defineComponent,
-  useFetch,
-  useStore,
   reactive,
   watch,
   ref,
-  useMeta,
-  useRouter,
   PropType,
 } from '@nuxtjs/composition-api'
 // Interfaces or types
-import { RuleDefinitions,Rules,LControl } from '~/types/lcontrolOld'
+import { RuleDefinitions } from '~/types/lcontrolOld'
 
 export default defineComponent({
   props: {
@@ -136,51 +116,47 @@ export default defineComponent({
     partner: {
       type: String as PropType<String | ''>,
       default: '',
-    }
+    },
   },
-  setup(props, {emit}) {
+  setup(props, { emit }) {
     const arrRule = reactive({
-      data: [] as {index: number}[]
+      data: [] as { index: number }[],
     })
     const range = ref([-20, 70])
     const partnerComp = reactive({
-      value: ''
+      value: '',
     })
     const ruleOpt = reactive({
-      value: ''
+      value: '',
     })
-    const namePartnerPriority =[
-      'Primary',
-      'Secondary',
-      'Tertiary'
-    ] as string[]
+    const namePartnerPriority = ['Primary', 'Secondary', 'Tertiary'] as string[]
     const dataPartner = [
       {
         name: 'RPX',
-        value: 'rpx'
+        value: 'rpx',
       },
       {
         name: 'JNE',
-        value: 'jne'
+        value: 'jne',
       },
       {
         name: 'JNT',
-        value: 'jnt'
+        value: 'jnt',
       },
     ]
     const dataOptRuleName = [
       {
         name: 'Zone',
-        value: 'zone'
+        value: 'zone',
       },
       {
         name: 'Order',
-        value: 'order'
+        value: 'order',
       },
       {
         name: 'Price',
-        value: 'price'
-      }
+        value: 'price',
+      },
     ]
     const rulesComp = computed({
       get: () => props.value,
@@ -189,17 +165,17 @@ export default defineComponent({
         // console.log({rulesComp: value})
 
         emit('input', value)
-      }
+      },
     })
-    const partnerCompForParent = computed({
-      get: () => props.partner,
-      set: (value: String) => {
-        // console.log({partnerCompForParent: value})
-        emit('input', value)
-      }
-    })
+    // const partnerCompForParent = computed({
+    //   get: () => props.partner,
+    //   set: (value: String) => {
+    //     // console.log({partnerCompForParent: value})
+    //     emit('input', value)
+    //   },
+    // })
 
-    const addDeleteRule = (status: String, index: number)=> {
+    const addDeleteRule = (status: String, index: number) => {
       switch (status) {
         case '+':
           // console.log('ruleDefinitioan', rulesComp.value, partnerCompForParent.value)
@@ -209,22 +185,22 @@ export default defineComponent({
             ...rulesComp.value,
             {
               ruleType: `ZONE${rulesComp.value.length + 1}`,
-              value: "Bandung"
-            }
+              value: 'Bandung',
+            },
           ]
           // arrRule.data.push({index: arrRule.data.length + 1})
-          break;
+          break
         case '-':
-          rulesComp.value.splice(index,1);
+          rulesComp.value.splice(index, 1)
           // arrRule.data.splice(index,1);
-          break;
+          break
         default:
-          break;
+          break
       }
     }
     watch(
       partnerComp,
-      (newData) => {
+      () => {
         // console.log('selected rulePartner', newData.value)
         // partnerCompForParent.value = newData.value
       },
@@ -232,14 +208,14 @@ export default defineComponent({
     )
     watch(
       rulesComp,
-      (newData) => {
+      () => {
         // console.log('selected rulesComp', newData)
       },
       { deep: true }
     )
     watch(
       ruleOpt,
-      (newData) => {
+      () => {
         // alert(newData.value)
       },
       { deep: true }
@@ -254,13 +230,12 @@ export default defineComponent({
       partnerComp,
       dataOptRuleName,
       ruleOpt,
-      range
+      range,
     }
   },
 })
 </script>
 <style lang="scss">
-  .custom-rule{
-
-  }
+// .custom-rule {
+// }
 </style>

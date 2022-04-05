@@ -1,11 +1,7 @@
 <template>
   <section class="pa-4 pa-md-10 py-8 detail-marketplace">
-    <div
-      class="top-row d-flex align-center mb-9"
-    >
-      <div
-        class="d-flex align-center mr-8"
-      >
+    <div class="top-row d-flex align-center mb-9">
+      <div class="d-flex align-center mr-8">
         <v-card
           color="primary"
           width="100px"
@@ -13,30 +9,29 @@
           class="rounded-circle mr-4"
         >
           <v-img
-            :aspect-ratio="100/100"
+            :aspect-ratio="100 / 100"
             class="rounded-circle"
             :src="`data:image/png;base64,${detailMarketplace.logo}`"
           >
           </v-img>
-
         </v-card>
         <div class="profile-text">
-          <div
-            class="headline font-weight-bold"
-          >
-            {{detailMarketplace.name}}
+          <div class="headline font-weight-bold">
+            {{ detailMarketplace.name }}
           </div>
           <v-chip-group
-            v-if="detailMarketplace.serviceType && detailMarketplace.serviceType.length > 0"
+            v-if="
+              detailMarketplace.serviceType &&
+              detailMarketplace.serviceType.length > 0
+            "
           >
             <v-chip
               v-for="(mile, i) in detailMarketplace.partnerServiceTypes"
               :key="i"
               small
             >
-              {{mile.name}}
+              {{ mile.name }}
             </v-chip>
-
           </v-chip-group>
         </div>
       </div>
@@ -50,39 +45,27 @@
         >
           {{
             detailMarketplace.status === 'none'
-            ?
-            'Connect with Vendor'
-            :
-            detailMarketplace.status
+              ? 'Connect with Vendor'
+              : detailMarketplace.status
           }}
         </v-btn>
-        <v-btn
-          color="white darken-1 red--text "
-          rounded
-          class="custom-btn-red"
-        >
+        <v-btn color="white darken-1 red--text " rounded class="custom-btn-red">
           Add to Compare
         </v-btn>
       </div>
     </div>
-    <v-row
-      class="middle-row d-flex align-start mb-16"
-    >
-      <v-col
-        class="rate d-flex flex-column align-center"
-        cols="3"
-      >
+    <v-row class="middle-row d-flex align-start mb-16">
+      <v-col class="rate d-flex flex-column align-center" cols="3">
         <div class="text-star-wrapper">
           <div
             v-for="(u, n) in tempData.rateDetail"
             :key="n"
-            :class="`text-star d-flex align-center ${tempData.rateDetail.length - 1 !== n ? 'mb-3' : ''}`"
+            :class="`text-star d-flex align-center ${
+              tempData.rateDetail.length - 1 !== n ? 'mb-3' : ''
+            }`"
           >
-            <v-col
-              class="mr-3 primary--text"
-              cols="3"
-            >
-              {{u.name}}
+            <v-col class="mr-3 primary--text" cols="3">
+              {{ u.name }}
             </v-col>
             <v-col>
               <NuxtImg
@@ -103,17 +86,9 @@
         >
           Download Rate Sheet
         </v-btn>
-        <NuxtImg
-          src="/images/logo-detail.svg"
-          width="290"
-          preload
-        />
+        <NuxtImg src="/images/logo-detail.svg" width="290" preload />
       </v-col>
-      <v-col
-        class="detailed-info"
-        cols="5"
-      >
-
+      <v-col class="detailed-info" cols="5">
         <!-- <v-row
           v-for="(y, p) in tempData.infoDetail"
           :key="p"
@@ -136,45 +111,34 @@
           :key="p"
           class="d-flex"
         >
-          <v-col
-            class="detailed-text font-weight-bold text-no-wrap"
-            cols="5"
-          >
-            {{y.name}}
+          <v-col class="detailed-text font-weight-bold text-no-wrap" cols="5">
+            {{ y.name }}
           </v-col>
           <v-col class="detailed-description">
-
             <!-- {{y.value}} -->
-            {{convertDetailData(detailMarketplace[y.value])}}
+            {{ convertDetailData(detailMarketplace[y.value]) }}
           </v-col>
         </v-row>
-
       </v-col>
-      <v-col
-        cols="4"
-       class="gallery">
-        <div
-          class="mb-4 font-weight-bold"
-        >
-          Gallery
-        </div>
-        <div
-          style="width: 100%"
-        >
+      <v-col cols="4" class="gallery">
+        <div class="mb-4 font-weight-bold">Gallery</div>
+        <div style="width: 100%">
           <!-- <PhotoCollageWrapper
             v-bind="collage"
             @itemClick="itemClickHandler"
           /> -->
-          <MasonryWall :items="detailGalleries" :ssr-columns="2" :column-width="160" :gap="8">
-            <template
-              #default="{ item, index}">
-              <div
-              >
+          <MasonryWall
+            :items="detailGalleries"
+            :ssr-columns="2"
+            :column-width="160"
+            :gap="8"
+          >
+            <template #default="{ item, index }">
+              <div>
                 <NuxtImg
                   v-if="index < 8"
                   :src="item.src"
                   preload
-
                   width="170px"
                   :style="`borderRadius: 20px;cursor: pointer; marginBottom: 8px`"
                   @click="itemClickHandler(index)"
@@ -184,26 +148,19 @@
                   :style="`padding: 30px 20px ; display: flex; width: 170px; justifyContent: center; borderRadius: 20px;cursor: pointer; backgroundColor: #1961e4; overflow: hidden`"
                   @click="itemClickHandler(index)"
                 >
-                  <span
-                    class="white--text font-weight-bold text-h5"
-                  >
-                    {{detailGalleries.length - index}} +
+                  <span class="white--text font-weight-bold text-h5">
+                    {{ detailGalleries.length - index }} +
                   </span>
                 </div>
               </div>
-
             </template>
           </MasonryWall>
         </div>
       </v-col>
     </v-row>
     <div class="bottom-row">
-      <div class="title-filter primary--text display-1 mb-7">
-        Coverage Area
-      </div>
-      <div
-        class="btn-filter-map d-flex align-center"
-      >
+      <div class="title-filter primary--text display-1 mb-7">Coverage Area</div>
+      <div class="btn-filter-map d-flex align-center">
         <v-select
           v-model="selectedZone.value"
           :items="zones"
@@ -235,11 +192,7 @@
         >
           Download Coverage Area
         </v-btn>
-        <v-btn
-          color="white darken-1 red--text"
-          rounded
-          class="custom-btn-red"
-        >
+        <v-btn color="white darken-1 red--text" rounded class="custom-btn-red">
           Download SLA
         </v-btn>
       </div>
@@ -268,29 +221,25 @@ import {
   useStore,
   useRoute,
   reactive,
-  watch,
   ref,
-  useMeta,
-  useRouter,
-  Ref
+  Ref,
 } from '@nuxtjs/composition-api'
 // Interfaces or types
 import MasonryWall from '@yeger/vue2-masonry-wall'
-import { PhotoCollageWrapper, } from "vue-photo-collage";
+// import { PhotoCollageWrapper } from 'vue-photo-collage'
 import CoolLightBox from 'vue-cool-lightbox'
-import { VuexModuleMarketplaces} from '~/types/marketplace/marketplace'
+import { VuexModuleMarketplaces } from '~/types/marketplace/marketplace'
 import tempData from '~/static/tempData'
-import { VuexModuleFilters, Zone, ServiceType} from '~/types/filters'
-import { DetailMarketplace, Gallery} from '~/types/marketplace/detail'
+import { VuexModuleFilters, Zone } from '~/types/filters'
+import { DetailMarketplace } from '~/types/marketplace/detail'
 import 'vue-cool-lightbox/dist/vue-cool-lightbox.min.css'
-
 
 export default defineComponent({
   name: 'DetailMarketplace',
   components: {
-    PhotoCollageWrapper,
+    // PhotoCollageWrapper,
     CoolLightBox,
-    MasonryWall
+    MasonryWall,
   },
   layout: 'default',
   setup() {
@@ -298,83 +247,92 @@ export default defineComponent({
     const id = computed(() => route.value.params.id)
     // store manage
     const storeDetailMarketplace = useStore<VuexModuleMarketplaces>()
-    const storeFilters= useStore<VuexModuleFilters>()
-    const detailMarketplace = computed(() => storeDetailMarketplace.state.marketplaces.marketplaces.detail)
-    const detailGalleries = computed(() => storeDetailMarketplace.state.marketplaces.marketplaces.galleries)
+    const storeFilters = useStore<VuexModuleFilters>()
+    const detailMarketplace = computed(
+      () => storeDetailMarketplace.state.marketplaces.marketplaces.detail
+    )
+    const detailGalleries = computed(
+      () => storeDetailMarketplace.state.marketplaces.marketplaces.galleries
+    )
     const zones = ref([]) as Ref<Zone[]>
 
     const detailProfileHeader = reactive([
       {
         name: 'Company Brief',
-        value: 'companyBrief'
+        value: 'companyBrief',
       },
       {
         name: 'Contact Person',
-        value: 'contactPerson'
+        value: 'contactPerson',
       },
       {
         name: 'Email',
-        value: 'emailAddress'
+        value: 'emailAddress',
       },
       {
         name: 'Phone Number',
-        value: 'phoneNumber'
+        value: 'phoneNumber',
       },
       {
         name: 'Code',
-        value: 'code'
+        value: 'code',
       },
       {
         name: 'Description',
-        value: 'descriptioni'
+        value: 'descriptioni',
       },
       {
         name: 'Maximum Dimension',
-        value: 'maximumDimension'
+        value: 'maximumDimension',
       },
       {
         name: 'Maximum Weight',
-        value: 'maximumWeight'
+        value: 'maximumWeight',
       },
       {
         name: 'Pick Up & Drop Off',
-        value: 'pikupAndDropOff'
+        value: 'pikupAndDropOff',
       },
       {
         name: 'Prohibited Item',
-        value: 'prohibitedItem'
+        value: 'prohibitedItem',
       },
       {
         name: 'SLA',
-        value: 'sla'
+        value: 'sla',
       },
     ])
     const detailProfileHeaderComputed = computed(() => {
-      return detailProfileHeader.filter((el) => (
-        detailMarketplace.value[el.value as keyof typeof detailMarketplace.value] ||
-        detailMarketplace.value[el.value as keyof typeof detailMarketplace.value] === false
-      ) && el)
+      return detailProfileHeader.filter(
+        (el) =>
+          (detailMarketplace.value[
+            el.value as keyof typeof detailMarketplace.value
+          ] ||
+            detailMarketplace.value[
+              el.value as keyof typeof detailMarketplace.value
+            ] === false) &&
+          el
+      )
     })
-    console.log(detailProfileHeaderComputed.value)
-    const selectedZone = reactive ({
-      value: ''
+    const selectedZone = reactive({
+      value: '',
     })
     const method = reactive({
-      opt: 'add'
+      opt: 'add',
     })
     const dialog = reactive({
-      status: false
+      status: false,
     })
-    const idPartner = reactive ({
+    const idPartner = reactive({
       value: '' as String,
-      name: '' as String
+      name: '' as String,
     })
 
     const collage = {
-      gapSize: "1em",
-      borderRadius: "1em",
-      width: "auto",
-      height: ["calc(50vh - 2em)", "calc(50vh - 1em)"],
+      gapSize: '1em',
+      borderRadius: '1em',
+      width: 'auto',
+      height: ['calc(50vh - 2em)', 'calc(50vh - 1em)'],
       layout: [1, 2, 1],
       // photos: tempData.photos,
       photosMax: detailGalleries.value?.slice(0, 7),
@@ -382,7 +340,6 @@ export default defineComponent({
       // photos: storeDetailMarketplace.state.marketplaces.marketplaces.galleries,
       showNumOfRemainingPhotos: true,
     }
-    console.log({collage})
     const index = ref(null)
     const showImg = (indexInput: any) => {
       index.value = indexInput
@@ -392,19 +349,17 @@ export default defineComponent({
       index: any
       // data: {id: number, source: string}, column: number
     ) => {
-      console.log(index)
       // console.log(tes?.srcElement?.currentSrc)
       // const item = Object.assign({}, data);
       // showImg(item.id)
       showImg(index)
     }
 
-    const imagesLightBox = (data: {src: string}[]) => {
-      if(data && data.length > 0) {
-        return data.map((el, i) => {
+    const imagesLightBox = (data: { src: string }[]) => {
+      if (data && data.length > 0) {
+        return data.map((el) => {
           return el.src
         })
-
       } else {
         return []
       }
@@ -413,11 +368,13 @@ export default defineComponent({
     // action
 
     const fetchDetail = async (id: string) => {
-
       try {
         $fetchState.pending = true
 
-        await storeDetailMarketplace.dispatch('marketplaces/marketplaces/getDetail', id)
+        await storeDetailMarketplace.dispatch(
+          'marketplaces/marketplaces/getDetail',
+          id
+        )
       } catch (error) {
         return error
       } finally {
@@ -449,7 +406,10 @@ export default defineComponent({
       try {
         $fetchState.pending = true
 
-        await storeDetailMarketplace.dispatch('marketplaces/marketplaces/addConnection', {id})
+        await storeDetailMarketplace.dispatch(
+          'marketplaces/marketplaces/addConnection',
+          { id }
+        )
         dialog.status = false
         fetch()
       } catch (error) {
@@ -462,7 +422,7 @@ export default defineComponent({
     const { $fetchState, fetch } = useFetch(async () => {
       await fetchDetail(id.value)
       await fetchServiceZoneOnce()
-      zones.value =  [ ...storeFilters.state.filters.zones]
+      zones.value = [...storeFilters.state.filters.zones]
       // detailGalleries.value = [...storeDetailMarketplace.state.marketplaces.marketplaces.galleries]
     })
 
@@ -476,7 +436,6 @@ export default defineComponent({
           return data
       }
     }
-
 
     return {
       collage,
@@ -497,7 +456,7 @@ export default defineComponent({
       detailGalleries,
       detailProfileHeader,
       convertDetailData,
-      detailProfileHeaderComputed
+      detailProfileHeaderComputed,
     }
   },
   head: {},
@@ -505,60 +464,60 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import "~/assets/scss/color.module.scss";
-  .detail-marketplace {
-    .custom-select {
-      max-width: 200px;
-      .v-input__slot {
-        margin-bottom: 0px;
-      }
-      .v-text-field__details {
-        display: none;
-      }
+@import '~/assets/scss/color.module.scss';
+.detail-marketplace {
+  .custom-select {
+    max-width: 200px;
+    .v-input__slot {
+      margin-bottom: 0px;
     }
-    .cool-lightbox-toolbar {
-      button[title="Show thumbnails"] {
-        display: none;
-      }
-      button[title="Close"] {
-        display: none;
-      }
-    }
-    .cool-lightbox__slide__img {
-      img {
-        border-radius: 20px;
-      }
-    }
-    .cool-lightbox-button__icon {
-      border-radius: 20px;
-    }
-    .cool-lightbox-thumbs {
+    .v-text-field__details {
       display: none;
     }
   }
-  .text-star-wrapper {
-    width: 100%;
-  }
-  .btn-rate-sheet {
-    width: 100%;
-  }
-  .custom-btn-red {
-    transition: all .3s;
-    &:hover {
-      background: red !important;
-      color: white !important;
+  .cool-lightbox-toolbar {
+    button[title='Show thumbnails'] {
+      display: none;
+    }
+    button[title='Close'] {
+      display: none;
     }
   }
-  .custom-btn-primary {
-    transition: all .3s;
-    &:hover {
-      background: $primary !important;
-      color: white !important;
+  .cool-lightbox__slide__img {
+    img {
+      border-radius: 20px;
     }
   }
-  .profile-text {
-    .headline {
-      max-width: 200px;
-    }
+  .cool-lightbox-button__icon {
+    border-radius: 20px;
   }
+  .cool-lightbox-thumbs {
+    display: none;
+  }
+}
+.text-star-wrapper {
+  width: 100%;
+}
+.btn-rate-sheet {
+  width: 100%;
+}
+.custom-btn-red {
+  transition: all 0.3s;
+  &:hover {
+    background: red !important;
+    color: white !important;
+  }
+}
+.custom-btn-primary {
+  transition: all 0.3s;
+  &:hover {
+    background: $primary !important;
+    color: white !important;
+  }
+}
+.profile-text {
+  .headline {
+    max-width: 200px;
+  }
+}
 </style>

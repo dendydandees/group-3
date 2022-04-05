@@ -28,12 +28,12 @@ export default defineComponent({
       default: null,
     },
     filter: {
-      type: Object as PropType<{status: boolean}>,
-      default: () => ({status: false}),
+      type: Object as PropType<{ status: boolean }>,
+      default: () => ({ status: false }),
     },
     icon: {
-      type: Object as PropType<{active: string, passive: string}>,
-      default: () => ({active: null, passive: null}),
+      type: Object as PropType<{ active: string; passive: string }>,
+      default: () => ({ active: null, passive: null }),
     },
   },
   setup(props, { emit }) {
@@ -55,11 +55,15 @@ export default defineComponent({
     })
 
     // :append-icon="showFilterComp.status ? icon.active : icon.passive"
-    const customAppendIcon = (status: Boolean, keyword: String, iconFilter: { active: string; passive: string }) => {
-      if(!keyword) {
-        if(status) {
+    const customAppendIcon = (
+      status: Boolean,
+      keyword: String,
+      iconFilter: { active: string; passive: string }
+    ) => {
+      if (!keyword) {
+        if (status) {
           return iconFilter.active
-        } else{
+        } else {
           return iconFilter.passive
         }
       } else {
@@ -70,14 +74,14 @@ export default defineComponent({
     return {
       search,
       showFilterComp,
-      customAppendIcon
+      customAppendIcon,
     }
   },
 })
 </script>
 <style lang="scss">
-@import "~/assets/scss/color.module.scss";
-  /* .v-text-field--outlined >>> fieldset {
+@import '~/assets/scss/color.module.scss';
+/* .v-text-field--outlined >>> fieldset {
     border-color: blue
   }
 
@@ -85,19 +89,19 @@ export default defineComponent({
     color: blue !important;
   } */
 
-  .input-custom{
-    fieldset {
-      border-color: $primary;
+.input-custom {
+  fieldset {
+    border-color: $primary;
+  }
+  .v-text-field__slot {
+    label {
+      color: $primary;
+      font-weight: 700;
+      font-size: large;
     }
-    .v-text-field__slot {
-      label {
-        color: $primary;
-        font-weight: 700;
-        font-size: large;
-      }
-      .v-text-field__suffix {
-        color: red;
-      }
+    .v-text-field__suffix {
+      color: red;
     }
   }
+}
 </style>
