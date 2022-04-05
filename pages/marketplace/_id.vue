@@ -254,6 +254,7 @@ export default defineComponent({
     const detailGalleries = computed(
       () => storeDetailMarketplace.state.marketplaces.marketplaces.galleries
     )
+    console.log({detailGalleries, detailMarketplace})
     const zones = ref([]) as Ref<Zone[]>
 
     const detailProfileHeader = reactive([
@@ -265,14 +266,14 @@ export default defineComponent({
         name: 'Contact Person',
         value: 'contactPerson',
       },
-      {
-        name: 'Email',
-        value: 'emailAddress',
-      },
-      {
-        name: 'Phone Number',
-        value: 'phoneNumber',
-      },
+      // {
+      //   name: 'Email',
+      //   value: 'emailAddress',
+      // },
+      // {
+      //   name: 'Phone Number',
+      //   value: 'phoneNumber',
+      // },
       {
         name: 'Code',
         value: 'code',

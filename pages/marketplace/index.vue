@@ -169,13 +169,22 @@
           <div class="container-your-partner">
             <div class="wrapper-your-partner">
               <v-row>
-                <v-col v-for="(x, i) in 6" :key="i" cols="4">
-                  <v-img
-                    :aspect-ratio="156 / 156"
-                    class="rounded-circle"
-                    src="https://cdn.vuetifyjs.com/images/cards/cooking.png"
-                  >
-                  </v-img>
+                <v-col v-for="(x, i) in marketplacesConnected" :key="i" cols="4">
+                  <v-tooltip bottom>
+                    <template #activator="{ on, attrs }">
+                      <v-img
+                        :aspect-ratio="156 / 156"
+                        class="rounded-circle blue"
+                        :src="`data:image/png;base64,${x.logo}`"
+                        v-bind="attrs"
+                        v-on="on"
+                      >
+                        <!-- src="https://cdn.vuetifyjs.com/images/cards/cooking.png" -->
+                      </v-img>
+                    </template>
+                    <span>{{x.name}}</span>
+                  </v-tooltip>
+
                 </v-col>
               </v-row>
             </div>
@@ -400,6 +409,9 @@ export default defineComponent({
     const storeApplications = useStore<VuexModuleApplications>()
     const marketplaces = computed(
       () => storeMarketplaces.state.marketplaces.marketplaces.marketplaces
+    )
+    const marketplacesConnected = computed(
+      () => storeMarketplaces.state.marketplaces.marketplaces.marketplacesConnected
     )
     const meta = computed(
       () => storeMarketplaces.state.marketplaces.marketplaces.meta
@@ -700,6 +712,7 @@ export default defineComponent({
       changePage,
       countryCodes,
       ports,
+      marketplacesConnected
     }
   },
   head: {},
