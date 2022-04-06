@@ -60,10 +60,10 @@ export default defineComponent({
     // manage windows
     const step = ref(1)
     const stepList = ref([
-      // {
-      //   text: 'Domestic',
-      //   icon: '$domestic',
-      // },
+      {
+        text: 'Domestic',
+        icon: '$domestic',
+      },
       {
         text: 'Cross border',
         icon: '$freight',

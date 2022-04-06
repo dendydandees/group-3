@@ -49,11 +49,12 @@
     <!-- batch id cell -->
     <template #[`item.batchId`]="{ item }">
       <v-btn
+        v-if="item.batchCode"
         text
         color="primary"
-        @click="$emit('doGetBatchDetails', item.batchId)"
+        @click="$emit('doGetBatchDetails', item.batchCode)"
       >
-        {{ item.batchId }}
+        {{ item.batchCode }}
       </v-btn>
     </template>
 
