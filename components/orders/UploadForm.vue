@@ -81,6 +81,9 @@ export default defineComponent({
         ? 'sample_orders_domestic.xlsx'
         : 'sample_orders_cross_borders.xlsx'
     )
+    const uploadType = computed(() =>
+      props.step === 0 ? 'domestic' : 'crossBorder'
+    )
 
     // manage upload
     const loading = ref(false)
@@ -107,12 +110,10 @@ export default defineComponent({
 
         if (form.value.length === 0) throw new Error('error')
 
-        const response = await storeOfOrders.dispatch(
-          'orders/uploadCrossBorder',
-          {
-            data: form.value,
-          }
-        )
+        const response = await storeOfOrders.dispatch('orders/uploadOrders', {
+          data: form.value,
+          type: uploadType.value,
+        })
 
         if (response !== 'ok') throw response.response
 

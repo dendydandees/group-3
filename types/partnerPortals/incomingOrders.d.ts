@@ -62,6 +62,8 @@ export interface Order {
   destPortId: string
   senderPort?: { code: string }
   senderPortId?: string
+  codCurrency?: string
+  codValue?: number
 }
 
 export interface IncomingOrder {
