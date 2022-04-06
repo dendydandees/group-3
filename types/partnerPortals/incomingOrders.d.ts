@@ -1,92 +1,93 @@
-import { RootStateIncomingOrders } from '~/store/partnerPortals/incomingOrders'
+import { RootStateIncomingOrders } from '~/store/partnerPortals/incomingOrders';
 
 export interface VuexModuleIncomingOrders {
   partnerPortals: {
-    incomingOrders: RootStateIncomingOrders
-  }
+    incomingOrders: RootStateIncomingOrders;
+  };
 }
 
 export interface ExternalTracking {
-  id: string
+  id: string;
   partnerUpdates: {
-    comments: string
-    id: string
-    podReceiverContact: string
-    podReceiverName: string
-    podURI: string
-    rawPayload: string
-    status: string
-    updateTimestamp: Date
-  }
+    comments: string;
+    id: string;
+    podReceiverContact: string;
+    podReceiverName: string;
+    podURI: string;
+    rawPayload: string;
+    status: string;
+    updateTimestamp: Date;
+  };
 }
 
 export interface Order {
-  id: string
-  orderCode: string
-  batchId: string
-  clientId: string
-  consigneeName: string
-  consigneeNumber: string
-  consigneeAddress: string
-  consigneePostal: string
-  consigneeCountry: string
-  consigneeCity: string
-  consigneeState: string
-  consigneeProvince: string
-  consigneeEmail: string
-  length: number
-  width: number
-  height: number
-  weight: number
-  paymentType: string
-  pickupContactName?: string
-  pickupContactNumber?: string
-  pickupState?: string
-  pickupCity?: string
-  pickupProvince?: string
-  pickupPostal?: string
-  pickupCountry?: string
-  pickupAddress?: string
-  senderName?: string
-  senderNumber?: string
-  senderState?: string
-  senderCity?: string
-  senderProvince?: string
-  senderPostal?: string
-  senderCountry?: string
-  senderAddress?: string
-  refID: number
-  labelPath: string
-  requestedServices: string[]
-  destPort: { code: string }
-  destPortId: string
-  senderPort?: { code: string }
-  senderPortId?: string
-  codCurrency?: string
-  codValue?: number
+  id: string;
+  orderCode: string;
+  batchId: string;
+  clientId: string;
+  consigneeName: string;
+  consigneeNumber: string;
+  consigneeAddress: string;
+  consigneePostal: string;
+  consigneeCountry: string;
+  consigneeCity: string;
+  consigneeState: string;
+  consigneeProvince: string;
+  consigneeEmail: string;
+  length: number;
+  width: number;
+  height: number;
+  weight: number;
+  paymentType: string;
+  pickupContactName?: string;
+  pickupContactNumber?: string;
+  pickupState?: string;
+  pickupCity?: string;
+  pickupProvince?: string;
+  pickupPostal?: string;
+  pickupCountry?: string;
+  pickupAddress?: string;
+  senderName?: string;
+  senderNumber?: string;
+  senderState?: string;
+  senderCity?: string;
+  senderProvince?: string;
+  senderPostal?: string;
+  senderCountry?: string;
+  senderAddress?: string;
+  refID: number;
+  labelPath: string;
+  requestedServices: string[];
+  destPort: { code: string; };
+  destPortId: string;
+  senderPort?: { code: string; };
+  senderPortId?: string;
+  codCurrency?: string;
+  codValue?: number;
 }
 
 export interface IncomingOrder {
-  id: string
-  orderID: string
-  orderCode: string
-  partnerID: string
-  partnerName: string
-  serviceType: string
-  externalTrackingNumber: null
-  order: Order
-  externalTracking: ExternalTracking
+  id: string;
+  orderID: string;
+  orderCode: string;
+  partnerID: string;
+  partnerName: string;
+  serviceType: string;
+  externalTrackingNumber: null;
+  order: Order;
+  externalTracking: ExternalTracking;
+  labelPath: string;
 }
 
 export interface FilterOrders {
-  orderCode: string
-  batchId: string
-  createdFrom: string
-  createdTo: string
-  originCountry: string
-  destinationCountry: string
-  serviceType: string[]
-  originPortId: string
-  destinationPortId: string
-  status: string
+  orderCode: string;
+  batchId: string;
+  createdFrom: string;
+  createdTo: string;
+  originCountry: string;
+  destinationCountry: string;
+  serviceType: string[];
+  originPortId: string;
+  destinationPortId: string;
+  status: string;
 }

@@ -19,6 +19,7 @@
         on-icon="mdi-checkbox-marked-circle"
         off-icon="mdi-checkbox-blank-circle-outline"
         indeterminate-icon="mdi-checkbox-blank-circle"
+        color="primary"
         :disabled="loading || !isSelectDisabled"
         v-bind="props"
         v-on="on"
@@ -31,8 +32,9 @@
         v-ripple
         on-icon="mdi-checkbox-marked-circle"
         off-icon="mdi-checkbox-blank-circle-outline"
+        color="primary"
         :value="isSelected"
-        :disabled="loading || !item.labelPath"
+        :disabled="loading || validateSelect(item)"
         @input="select($event)"
       />
     </template>
@@ -73,7 +75,7 @@
     <!-- origin cell -->
     <template #[`item.origin`]="{ item }">
       <div class="text--secondary">
-        {{ item.pickupState }}
+        {{ item.pickupCountry || item.senderCountry }}
       </div>
     </template>
 
@@ -87,7 +89,7 @@
     <!-- destination cell -->
     <template #[`item.destination`]="{ item }">
       <div class="text--secondary">
-        {{ item.consigneeState }}
+        {{ item.consigneeCountry }}
       </div>
     </template>
 
@@ -125,8 +127,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, PropType } from '@nuxtjs/composition-api'
+import { defineComponent, computed, PropType, useRoute } from '@nuxtjs/composition-api'
 import { FilterDetails, Pagination } from '~/types/applications'
+import { Order } from '~/types/orders'
+
+import { IncomingOrder } from '~/types/partnerPortals/incomingOrders'
 
 export default defineComponent({
   name: 'BaseTable',
@@ -160,9 +165,11 @@ export default defineComponent({
     },
     isSelectDisabled: {
       type: Boolean,
+      default: false,
     },
   },
   setup(props, { emit }) {
+    const route = useRoute()
     const selected = computed({
       get: () => props.value,
       set: (value) => emit('input', value),
@@ -174,10 +181,21 @@ export default defineComponent({
       emit('doSelectAll', data)
     }
 
+    const validateSelect = (item: Order | IncomingOrder) => {
+      if(route.value.name === 'partner-portals-id-incoming-orders') {
+        return false
+      } else if (route.value.name === 'orders') {
+        return !item.labelPath
+      } else {
+        return false
+      }
+    }
+
     return {
       selected,
       fetch,
       doSelectAll,
+      validateSelect
     }
   },
 })
