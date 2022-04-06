@@ -24,10 +24,29 @@
       <!-- Right options -->
       <OrdersRightOptions :loading="$fetchState.pending">
         <template #viewSettings>
-          <OrdersViewSettings
-            v-model="selectedViews"
-            :loading="$fetchState.pending"
-          />
+          <div>
+            <v-btn
+              color="primary"
+              :disabled="selectedOrders && selectedOrders.length === 0"
+              class="mx-1"
+              @click="toggleUpdate()"
+            >
+              Update Status
+            </v-btn>
+            <v-btn
+              color="error"
+              :disabled="selectedOrders && selectedOrders.length === 0"
+              class="mx-1"
+              @click="toggleUpdate({isDelete: true})"
+            >
+              Delete Status
+            </v-btn>
+            <OrdersViewSettings
+              v-model="selectedViews"
+              :loading="$fetchState.pending"
+            />
+
+          </div>
         </template>
       </OrdersRightOptions>
     </v-row>
@@ -48,12 +67,16 @@
     <v-row align="center">
       <v-col cols="12">
         <BaseTable
+          v-model="selectedOrders"
           item-key="id"
           :items="incomingOrders"
           :headers="headers"
           :options="pagination"
           :loading="$fetchState.pending"
+          :is-select-disabled="true"
+          :show-select="true"
           @fetch="fetchIncomingOrders"
+          @doSelectAll="selectAllToggle"
           @doGetDetails="doGetDetails"
           @doGetBatchDetails="doGetBatchDetails"
         />
@@ -67,6 +90,35 @@
       :loading="$fetchState.pending"
       @resetPage="pagination.page = 1"
     />
+
+    <!-- Update Status -->
+    <BaseModalForm
+      v-model="dialog.form"
+      :dialog-settings="dialogSettings"
+
+      @doSubmit="updateStatus"
+    >
+      <template #modalFields>
+        <OrdersUpdateStatusContent
+        v-model="selectedUpdate"
+        :is-open="dialog.form" />
+      </template>
+    </BaseModalForm>
+
+    <!-- Delete Status -->
+    <BaseModalForm
+      v-model="dialog.delete"
+      :dialog-settings="dialogSettings"
+      @doSubmit="deleteStatus"
+
+    >
+      <template #modalFields>
+        <OrdersDeleteStatusContent
+          :selected="selectedOrders"
+          :is-open="dialog.delete"
+        />
+      </template>
+    </BaseModalForm>
   </section>
 </template>
 
@@ -87,7 +139,7 @@ import {
 } from '@nuxtjs/composition-api'
 import { filterOrderInit } from '~/store/partnerPortals/incomingOrders'
 // Interface and types
-import { FilterDetails, VuexModuleApplications } from '~/types/applications'
+import { FilterDetails, ModalConfirm, VuexModuleApplications } from '~/types/applications'
 import {
   IncomingOrder,
   VuexModuleIncomingOrders,
@@ -167,6 +219,33 @@ export default defineComponent({
       ...storeIncomingOrders.state.partnerPortals.incomingOrders.filterOrders,
     })
 
+
+    // manage modal
+    const selectedUpdate = ref({
+      status: '',
+      updateDate: '',
+      updateTime: ''
+    })
+    const dialog = ref({
+      confirm: false,
+      form: false,
+      delete: false,
+    })
+    const dialogSettings = ref({
+      loading: false,
+      title: '',
+      content: '',
+      cancelText: '',
+      submitText: '',
+      submitColor: '',
+    }) as Ref<ModalConfirm>
+
+    // manage table
+    const selectedOrders = ref([]) as Ref<IncomingOrder[]>
+    const isLabelExist = computed(() => {
+      return incomingOrders.value.some((order) => order.labelPath)
+    })
+
     // manage table
     const headers = ref(initHeaders) as Ref<Header[]>
     const selectedViews = ref([
@@ -180,6 +259,55 @@ export default defineComponent({
       'creationDate',
       'actions',
     ])
+    const selectAllToggle = ({ items }: { items: IncomingOrder[]; value: boolean }) => {
+      if (selectedOrders.value.length === 0) {
+        // const selectedItems = items.filter((item) => {
+
+        //   return item.labelPath
+        // })
+        const selectedItems = items
+
+        return (selectedOrders.value = [...selectedItems])
+      } else {
+        return (selectedOrders.value = [])
+      }
+    }
+
+    // update status
+    const toggleUpdate = (params: {isDelete?: boolean}) => {
+      if(params?.isDelete) {
+        dialogSettings.value = {
+          loading: false,
+          title: 'Delete Status',
+          content: '',
+          cancelText: 'Cancel',
+          submitText: 'Delete',
+          submitColor: 'error',
+        }
+        dialog.value.delete = true
+      } else {
+        dialogSettings.value = {
+          loading: false,
+          title: 'Update Status',
+          content: '',
+          cancelText: 'Cancel',
+          submitText: 'Update',
+          submitColor: 'primary',
+        }
+        dialog.value.form = true
+      }
+    }
+    function updateStatus() {
+      console.log('submit update date time', selectedUpdate.value)
+      dialog.value.form = false
+      selectedOrders.value = []
+    }
+    function deleteStatus() {
+      console.log('submit delete', selectedOrders.value)
+      dialog.value.delete = false
+      selectedOrders.value = []
+    }
+
     const doResetPagination = () => {
       pagination.value = {
         ...pagination.value,
@@ -298,8 +426,11 @@ export default defineComponent({
       pagination,
       filterOrders,
       // manage table
-      headers,
+      selectedOrders,
+      isLabelExist,
       selectedViews,
+      headers,
+      selectAllToggle,
       doGetDetails,
       doGetBatchDetails,
       // manage filter order
@@ -308,6 +439,12 @@ export default defineComponent({
       // manage fetch
       fetchIncomingOrders,
       fetchDebounced,
+      dialog,
+      dialogSettings,
+      toggleUpdate,
+      selectedUpdate,
+      updateStatus,
+      deleteStatus
     }
   },
   head: {},
