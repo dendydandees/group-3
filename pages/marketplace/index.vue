@@ -600,10 +600,13 @@ export default defineComponent({
 
     const locationMapping = (partnerServiceZones: PartnerServiceZone[]) => {
       if (partnerServiceZones && partnerServiceZones.length > 0) {
-        const tempZone = partnerServiceZones.map((el) => {
-          return el.zone_country
+        const temp = [] as string[]
+        partnerServiceZones.forEach((el:{id: string, zone_country: string}) => {
+          if(!temp.includes(el.zone_country)) {
+            temp.push(el.zone_country)
+          }
         })
-        return tempZone.join(', ')
+        return temp.join(', ')
       } else {
         return ''
       }
