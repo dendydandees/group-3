@@ -117,3 +117,45 @@ export interface BatchOrders {
 export interface FilterBatch {
   batchId: string
 }
+
+export interface OrderUpload {
+  id: string
+  orderCode: string
+  batchId: string
+  clientId: string
+  consigneeName: string
+  consigneeNumber: string
+  consigneeAddress: string
+  consigneePostal: string
+  consigneeCountry: string
+  consigneeCity: string
+  consigneeState: string
+  consigneeProvince: string
+  consigneeEmail: string
+  destPort: string
+  length: number
+  width: number
+  height: number
+  weight: number
+  paymentType: string
+  pickupContactName?: string
+  pickupContactNumber?: string
+  pickupState?: string
+  pickupCity?: string
+  pickupProvince?: string
+  pickupPostal?: string
+  pickupCountry?: string
+  pickupAddress?: string
+  senderName?: string
+  senderNumber?: string
+  senderState?: string
+  senderCity?: string
+  senderProvince?: string
+  senderPostal?: string
+  senderCountry?: string
+  senderAddress?: string
+  senderPort: string
+  requestedServices: string[]
+  codCurrency: string
+  codValue: number
+}

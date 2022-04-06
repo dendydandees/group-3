@@ -175,6 +175,7 @@ export default defineComponent({
               uploadType: props.step === 0 ? 'domestic' : 'crossBorder',
               consigneePostal: order.consigneePostal.toString(),
               senderPostal: order?.senderPostal?.toString(),
+              codValue: parseFloat(order.codValue as unknown as string),
             }
           })
 

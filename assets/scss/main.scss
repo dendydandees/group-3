@@ -73,6 +73,10 @@
   }
 }
 
+.v-input--has-state.error--text .v-label {
+  color: $secondary !important;
+}
+
 .input-select-filter {
   fieldset {
     border-color: $primary;
