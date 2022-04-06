@@ -89,7 +89,7 @@ export default defineComponent({
       const newObject = {} as any
 
       for (const [key, value] of Object.entries(data)) {
-        let formatKey = key
+        let formatKey = key.toLowerCase()
 
         if (key.includes('*')) {
           formatKey = formatKey.replaceAll(/[*]/g, '')

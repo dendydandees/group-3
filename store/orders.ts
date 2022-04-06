@@ -13,8 +13,9 @@ import {
 
 interface ParamsGetOrder extends Meta, FilterOrders {}
 interface ParamsGetBatch extends Meta, FilterBatch {}
-interface UploadCrossBorder extends Order {
-  items: OrderItem[]
+interface UploadOrders extends Order {
+  type: string
+  data: OrderItem[]
 }
 interface ParamsGetSelectedLabels {
   orderIds: string[]
@@ -141,10 +142,10 @@ export const actions: ActionTree<RootStateOrders, RootStateOrders> = {
       return error
     }
   },
-  async uploadCrossBorder(_store, { data }: { data: UploadCrossBorder }) {
+  async uploadOrders(_store, { data, type }: UploadOrders) {
     try {
       const response = await this.$axios.$post(
-        `/api/clients/orders/batch`,
+        `/api/clients/orders/batch/${type}`,
         data
       )
 
