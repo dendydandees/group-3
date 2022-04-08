@@ -33,14 +33,14 @@
             >
               Update Status
             </v-btn>
-            <v-btn
+            <!-- <v-btn
               color="error"
               :disabled="selectedOrders && selectedOrders.length === 0"
               class="mx-1"
               @click="toggleUpdate({isDelete: true})"
             >
               Delete Status
-            </v-btn>
+            </v-btn> -->
             <OrdersViewSettings
               v-model="selectedViews"
               :loading="$fetchState.pending"
@@ -73,7 +73,7 @@
           :headers="headers"
           :options="pagination"
           :loading="$fetchState.pending"
-          :is-select-disabled="true"
+          :is-select-disabled="isExternalTrackingExist"
           :show-select="true"
           @fetch="fetchIncomingOrders"
           @doSelectAll="selectAllToggle"
@@ -139,11 +139,17 @@ import {
 } from '@nuxtjs/composition-api'
 import { filterOrderInit } from '~/store/partnerPortals/incomingOrders'
 // Interface and types
-import { FilterDetails, ModalConfirm, VuexModuleApplications } from '~/types/applications'
+import { FilterDetails, ModalConfirm, VuexModuleApplications, Alert } from '~/types/applications'
+import { Order } from '~/types/orders'
 import {
   IncomingOrder,
+  OrderAllocation,
   VuexModuleIncomingOrders,
 } from '~/types/partnerPortals/incomingOrders'
+import {
+  VuexModuleFilters,
+  Statuses,
+} from '~/types/filters'
 
 interface Header {
   text: string
@@ -199,12 +205,13 @@ export default defineComponent({
   name: 'OrdersIncomingPages',
   middleware: 'partner',
   setup() {
-    const { app } = useContext()
+    const { app, $dateFns } = useContext()
     const route = useRoute()
     const router = useRouter()
     // manage store
     const storeIncomingOrders = useStore<VuexModuleIncomingOrders>()
     const storeApplications = useStore<VuexModuleApplications>()
+    const storeFilter = useStore<VuexModuleFilters>()
     const incomingOrders = computed(
       () =>
         storeIncomingOrders.state.partnerPortals.incomingOrders.incomingOrders
@@ -218,6 +225,7 @@ export default defineComponent({
     const filterOrders = ref({
       ...storeIncomingOrders.state.partnerPortals.incomingOrders.filterOrders,
     })
+
 
 
     // manage modal
@@ -245,6 +253,14 @@ export default defineComponent({
     const isLabelExist = computed(() => {
       return incomingOrders.value.some((order) => order.labelPath)
     })
+    const isExternalTrackingExist = computed(() => {
+      return  incomingOrders.value.some((order: IncomingOrder) => {
+        return order.orderAllocations.some((el: OrderAllocation) => el.externalTrackingNumber)
+
+        })
+    })
+
+    console.log(isExternalTrackingExist.value)
 
     // manage table
     const headers = ref(initHeaders) as Ref<Header[]>
@@ -265,7 +281,10 @@ export default defineComponent({
 
         //   return item.labelPath
         // })
-        const selectedItems = items
+        const selectedItems = incomingOrders.value.filter((order: IncomingOrder) => {
+        return order.orderAllocations.some((el: OrderAllocation) => el.externalTrackingNumber)
+
+        })
 
         return (selectedOrders.value = [...selectedItems])
       } else {
@@ -297,10 +316,90 @@ export default defineComponent({
         dialog.value.form = true
       }
     }
-    function updateStatus() {
-      console.log('submit update date time', selectedUpdate.value)
-      dialog.value.form = false
-      selectedOrders.value = []
+
+    function setTime (data: number) {
+      let decimalTime = data
+      if(decimalTime < 0) decimalTime = decimalTime * -1
+      decimalTime = decimalTime * 60 * 60;
+      let hours = Math.floor((decimalTime / (60 * 60))) as any
+      decimalTime = decimalTime - (hours * 60 * 60)
+      let minutes = Math.floor((decimalTime / 60)) as any
+      decimalTime = decimalTime - (minutes * 60)
+      if(hours < 10)
+      {
+        hours = "0" + hours;
+      }
+      if(minutes < 10)
+      {
+        minutes = "0" + minutes;
+      }
+      return "" + hours + ":" + minutes
+    }
+    function setGMT(data: number) {
+      const temp = setTime(data)
+      if(data > 0) {
+        return `+${temp}`
+      } else {
+        return `-${temp}`
+      }
+    }
+    function setStatusRemarks(data: string, type: string) {
+      let status = [...storeFilter.state.filters.statuses] as Statuses[]
+      status = status.filter((el:Statuses) => el.Status === data)
+      switch (type) {
+        case 'remarks':
+          return status[0]?.Remarks ?? ''
+        case 'service':
+          return status[0]?.ServiceType ?? ''
+        default:
+          return ''
+      }
+    }
+
+    function setAlert (value: Alert) {
+      storeApplications.commit('applications/SET_ALERT', value)
+    }
+    function resetAlert () {
+      storeApplications.commit('applications/RESET_ALERT')
+    }
+    async function updateStatus() {
+      // console.log('submit update date time', selectedUpdate.value)
+      resetAlert()
+
+      try {
+        const arrStringIDs = [...selectedOrders.value].map((el:IncomingOrder) => {
+          return el.id
+        })
+        const gmt = setGMT(new Date().getTimezoneOffset()/-60)
+        const dateToISO = `${selectedUpdate.value.updateDate}T${selectedUpdate.value.updateTime}:00${gmt}`
+        const payload = {
+          orderIDs: arrStringIDs,
+          status: selectedUpdate.value.status,
+          timestamp: dateToISO,
+          service_type: setStatusRemarks(selectedUpdate.value.status, 'service'),
+          remarks: setStatusRemarks(selectedUpdate.value.status, 'remarks'),
+        }
+
+        console.log({payload})
+
+        $fetchState.pending = true
+
+        const res = await storeIncomingOrders.dispatch('partnerPortals/incomingOrders/updateStatus', payload)
+
+        if(res?.response && res?.response?.status !== 200) {
+          throw res?.response?.data?.error
+        }
+        dialog.value.form = false
+        selectedOrders.value = []
+      } catch (error: any) {
+        setAlert({
+          isShow: true,
+          type: 'error',
+          message: error,
+        })
+      } finally {
+        $fetchState.pending = false
+      }
     }
     function deleteStatus() {
       console.log('submit delete', selectedOrders.value)
@@ -444,7 +543,8 @@ export default defineComponent({
       toggleUpdate,
       selectedUpdate,
       updateStatus,
-      deleteStatus
+      deleteStatus,
+      isExternalTrackingExist
     }
   },
   head: {},

@@ -4,6 +4,7 @@ import { Meta } from '~/types/applications';
 import {
   IncomingOrder,
   FilterOrders,
+  InputUpdateStatus
 } from '~/types/partnerPortals/incomingOrders';
 
 export const filterOrderInit = {
@@ -104,6 +105,19 @@ export const actions: ActionTree<
       commit('SET_INCOMING_ORDER_DETAILS', data);
 
       return data;
+    } catch (error) {
+      return error;
+    }
+  },
+  async updateStatus(_store, data: InputUpdateStatus) {
+    try {
+      const response = await this.$axios.$post(
+        `/api/clients/update-order-status`,
+        data
+      );
+      // if (!data) throw response;
+
+      return response;
     } catch (error) {
       return error;
     }
