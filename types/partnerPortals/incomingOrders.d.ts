@@ -66,6 +66,15 @@ export interface Order {
   codValue?: number;
 }
 
+export interface OrderAllocation {
+  externalTrackingNumber: any;
+  id: string;
+  orderCode: string;
+  orderID: string;
+  partnerID: string;
+  partnerName: string;
+  serviceType: string;
+}
 export interface IncomingOrder {
   id: string;
   orderID: string;
@@ -77,6 +86,7 @@ export interface IncomingOrder {
   order: Order;
   externalTracking: ExternalTracking;
   labelPath: string;
+  orderAllocations: OrderAllocation[];
 }
 
 export interface FilterOrders {
@@ -90,4 +100,12 @@ export interface FilterOrders {
   originPortId: string;
   destinationPortId: string;
   status: string;
+}
+
+export interface InputUpdateStatus {
+  orderIDs: string[];
+  status: string;
+  timestamp: string;
+  service_type: string;
+  remarks: string;
 }

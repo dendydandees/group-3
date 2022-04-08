@@ -132,7 +132,7 @@ import { defineComponent, computed, PropType, useRoute } from '@nuxtjs/compositi
 import { FilterDetails, Pagination } from '~/types/applications'
 import { Order } from '~/types/orders'
 
-import { IncomingOrder } from '~/types/partnerPortals/incomingOrders'
+import { IncomingOrder, OrderAllocation } from '~/types/partnerPortals/incomingOrders'
 
 export default defineComponent({
   name: 'BaseTable',
@@ -182,9 +182,9 @@ export default defineComponent({
       emit('doSelectAll', data)
     }
 
-    const validateSelect = (item: Order | IncomingOrder) => {
+    const validateSelect = (item: Order | IncomingOrder ) => {
       if(route.value.name === 'partner-portals-id-incoming-orders') {
-        return false
+        return !(item as IncomingOrder).orderAllocations.some((el: OrderAllocation) => el.externalTrackingNumber)
       } else if (route.value.name === 'orders') {
         return !item.labelPath
       } else {
