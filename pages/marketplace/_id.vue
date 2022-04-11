@@ -196,6 +196,22 @@
           Download SLA
         </v-btn>
       </div>
+      <v-row
+        v-if="false"
+        align="center"
+        class="mt-2"
+      >
+        <v-col cols="12">
+          <BaseTable
+            item-key="id"
+            :items="[]"
+            :headers="headers"
+            :options="pagination"
+            :loading="$fetchState.pending"
+            @fetch="fetchIncomingOrders"
+          />
+        </v-col>
+      </v-row>
     </div>
     <CoolLightBox
       :items="imagesLightBox(detailGalleries)"
@@ -228,6 +244,7 @@ import {
 import MasonryWall from '@yeger/vue2-masonry-wall'
 // import { PhotoCollageWrapper } from 'vue-photo-collage'
 import CoolLightBox from 'vue-cool-lightbox'
+import { VuexModuleApplications } from '~/types/applications'
 import { VuexModuleMarketplaces } from '~/types/marketplace/marketplace'
 import tempData from '~/static/tempData'
 import { VuexModuleFilters, Zone } from '~/types/filters'
@@ -247,6 +264,7 @@ export default defineComponent({
     const id = computed(() => route.value.params.id)
     // store manage
     const storeDetailMarketplace = useStore<VuexModuleMarketplaces>()
+    const storeApplications = useStore<VuexModuleApplications>()
     const storeFilters = useStore<VuexModuleFilters>()
     const detailMarketplace = computed(
       () => storeDetailMarketplace.state.marketplaces.marketplaces.detail
@@ -356,6 +374,41 @@ export default defineComponent({
       showImg(index)
     }
 
+// START TABLE ZONE COD SLA
+interface Header {
+  text: string
+  value: string
+  sortable?: boolean
+}
+const pagination = ref({
+  ...storeApplications.state.applications.pagination,
+})
+const headers = [
+  {
+    text: 'Country',
+    value: 'country',
+    sortable: false,
+  },
+  {
+    text: 'Zone',
+    value: 'zone',
+    sortable: false,
+  },
+  {
+    text: 'SLA',
+    value: 'sla',
+    sortable: false,
+    // width: 150,
+  },
+  {
+    text: 'COD',
+    value: 'cod',
+    sortable: false,
+    // width: 150,
+  },
+] as Header[]
+// END TABLE ZONE COD SLA
+
     const imagesLightBox = (data: { src: string }[]) => {
       if (data && data.length > 0) {
         return data.map((el) => {
@@ -458,6 +511,9 @@ export default defineComponent({
       detailProfileHeader,
       convertDetailData,
       detailProfileHeaderComputed,
+      // TABLE ZONE COD SLA
+      headers,
+      pagination
     }
   },
   head: {},
