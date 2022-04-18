@@ -59,7 +59,10 @@
                 </v-col>
 
                 <v-col
-                  v-if="indexAllocation !== indexUpdates"
+                  v-if="
+                    partnerUpdates.length === 1 ||
+                    indexAllocation !== indexUpdates
+                  "
                   cols="8"
                   class="text-right py-0"
                 >
