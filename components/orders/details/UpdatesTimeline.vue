@@ -60,8 +60,11 @@
 
                 <v-col
                   v-if="
-                    partnerUpdates.length === 1 ||
-                    indexAllocation !== indexUpdates
+                    isShowServiceType(
+                      indexAllocation,
+                      indexUpdates,
+                      partnerUpdates
+                    )
                   "
                   cols="8"
                   class="text-right py-0"
@@ -93,10 +96,21 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, useStore } from '@nuxtjs/composition-api'
+import {
+  computed,
+  defineComponent,
+  useRoute,
+  useStore,
+} from '@nuxtjs/composition-api'
 // types
-import { VuexModuleOrders } from '~/types/orders'
-import { VuexModuleIncomingOrders } from '~/types/partnerPortals/incomingOrders'
+import {
+  PartnerUpdates as OrderUpdates,
+  VuexModuleOrders,
+} from '~/types/orders'
+import {
+  PartnerUpdates as IncomingUpdates,
+  VuexModuleIncomingOrders,
+} from '~/types/partnerPortals/incomingOrders'
 
 export default defineComponent({
   props: {
@@ -110,6 +124,8 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const route = useRoute()
+    // manage store
     const store = useStore<VuexModuleOrders>()
     const storeIncomingOrders = useStore<VuexModuleIncomingOrders>()
     const orderAllocationUpdates = computed(() => {
@@ -119,8 +135,29 @@ export default defineComponent({
         : store.state.orders.orderDetails.orderAllocationUpdates
     })
 
+    // manage partner by
+    const isShowServiceType = (
+      indexAllocation: number,
+      indexUpdates: number,
+      dataPartner: OrderUpdates[] | IncomingUpdates[]
+    ) => {
+      const isOnlyOnePartner = dataPartner.length === 1
+      const isOnlyOneUpdate = orderAllocationUpdates.value.length === 1
+
+      if (route.value.name === 'partner-portals-id-incoming-orders-orderId')
+        return false
+      if (isOnlyOnePartner) return true
+      if (isOnlyOneUpdate && indexUpdates === 0) return true
+      if (!isOnlyOneUpdate && indexAllocation !== indexUpdates) return true
+
+      return false
+    }
+
     return {
+      // manage store
       orderAllocationUpdates,
+      // manage partner by
+      isShowServiceType,
     }
   },
 })
