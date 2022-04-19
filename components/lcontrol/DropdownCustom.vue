@@ -4,22 +4,38 @@
       {{ label }}
     </div>
     <!-- {{JSON.stringify(data)}} -->
-    <v-select
-      v-model="selectedComp"
-      :label="title"
-      :items="data"
-      :item-text="itemShow.text"
-      :item-value="itemShow.value"
-      :placeholder="placeholder"
-      :disabled="disabledDrop"
-      :loading="disabledDrop"
-      outlined
-      rounded
-      dense
-      color="blue"
-      :class="`custom-select ${disabledDrop ? 'disabled-drop' : ''}`"
+    <div
+      class="d-flex align-center"
     >
-    </v-select>
+      <v-select
+        v-model="selectedComp"
+        :label="title"
+        :items="data"
+        :item-text="itemShow.text"
+        :item-value="itemShow.value"
+        :placeholder="placeholder"
+        :disabled="disabledDrop"
+        :loading="disabledDrop"
+        outlined
+        rounded
+        dense
+        color="blue"
+        :class="`custom-select ${disabledDrop ? 'disabled-drop' : ''}`"
+      >
+      </v-select>
+      <v-btn
+        v-if="isDelete"
+        color="error"
+        fab
+        x-small
+        dark
+        class="ml-3"
+        @click="actionDelete"
+      >
+        <v-icon>mdi-trash-can</v-icon>
+      </v-btn>
+
+    </div>
   </div>
 </template>
 
@@ -75,10 +91,17 @@ export default defineComponent({
       type: Boolean,
       default: true,
     },
+    isDelete: {
+      type: Boolean,
+      default: false,
+    },
   },
   setup(props, { emit }) {
     const toggle = () => {
       emit('toggle')
+    }
+    const actionDelete = () => {
+      emit('delete')
     }
     // const selectedValue = reactive({
     //   value: '',
@@ -107,6 +130,7 @@ export default defineComponent({
     return {
       toggle,
       selectedComp,
+      actionDelete
     }
   },
 })
