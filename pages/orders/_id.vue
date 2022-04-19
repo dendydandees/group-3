@@ -9,7 +9,11 @@
 
         <h2 class="headline mb-4 font-weight-bold">ORDERS</h2>
 
-        <v-breadcrumbs :items="breadCrumbsItems" class="pa-0">
+        <v-breadcrumbs
+          v-if="detailsOrder.batchId"
+          :items="breadCrumbsItems"
+          class="pa-0"
+        >
           <template #divider>
             <v-icon>mdi-chevron-right</v-icon>
           </template>
@@ -139,6 +143,7 @@ export default defineComponent({
       // manage route
       id,
       doBackTo,
+      detailsOrder,
       // check data exist
       isPickupExist,
       isSenderExist,

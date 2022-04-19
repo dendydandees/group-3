@@ -63,6 +63,16 @@ export interface OrderItem {
   currency: string
 }
 
+export interface PartnerUpdates {
+  comments: string
+  id: string
+  podReceiverContact: string
+  podReceiverName: string
+  podURI: string
+  rawPayload: string
+  status: string
+  updateTimestamp: Date
+}
 export interface OrderAllocationUpdate {
   id: string
   orderID: string
@@ -74,16 +84,7 @@ export interface OrderAllocationUpdate {
   externalTrackingNumber: string
   externalTracking: {
     id: string
-    partnerUpdates: {
-      comments: string
-      id: string
-      podReceiverContact: string
-      podReceiverName: string
-      podURI: string
-      rawPayload: string
-      status: string
-      updateTimestamp: Date
-    }
+    partnerUpdates: PartnerUpdates
   }
 }
 
