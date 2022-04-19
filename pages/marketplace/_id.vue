@@ -11,7 +11,7 @@
           <v-img
             :aspect-ratio="100 / 100"
             class="rounded-circle"
-            :src="`data:image/png;base64,${detailMarketplace.logo}`"
+            :src="`data:image/png;base64,${detailMarketplace.logo ? detailMarketplace.logo : ''}`"
           >
           </v-img>
         </v-card>
@@ -175,7 +175,7 @@
           class="custom-select mr-3"
           :full-width="true"
         />
-        <v-select
+        <!-- <v-select
           :items="[]"
           label="Select Port"
           outlined
@@ -184,7 +184,7 @@
           color="primary"
           clearable
           class="custom-select mr-3"
-        />
+        /> -->
         <v-btn
           color="white darken-1 red--text"
           rounded
@@ -197,19 +197,19 @@
         </v-btn>
       </div>
       <v-row
-        v-if="false"
+        v-if="partnerServiceZones"
         align="center"
         class="mt-2"
       >
         <v-col cols="12">
           <BaseTable
             item-key="id"
-            :items="[]"
+            :items="partnerServiceZones"
             :headers="headers"
             :options="pagination"
             :loading="$fetchState.pending"
-            @fetch="fetchIncomingOrders"
           />
+            <!-- @fetch="fetchIncomingOrders" -->
         </v-col>
       </v-row>
     </div>
@@ -237,6 +237,7 @@ import {
   useStore,
   useRoute,
   reactive,
+  watch,
   ref,
   Ref,
 } from '@nuxtjs/composition-api'
@@ -250,6 +251,7 @@ import tempData from '~/static/tempData'
 import { VuexModuleFilters, Zone } from '~/types/filters'
 import { DetailMarketplace } from '~/types/marketplace/detail'
 import 'vue-cool-lightbox/dist/vue-cool-lightbox.min.css'
+import partner from '~/middleware/partner'
 
 export default defineComponent({
   name: 'DetailMarketplace',
@@ -266,14 +268,58 @@ export default defineComponent({
     const storeDetailMarketplace = useStore<VuexModuleMarketplaces>()
     const storeApplications = useStore<VuexModuleApplications>()
     const storeFilters = useStore<VuexModuleFilters>()
+    const selectedZone = reactive({
+      value: '',
+    })
+    const zones =computed(
+      () => storeFilters.state.filters.zones
+    )
     const detailMarketplace = computed(
       () => storeDetailMarketplace.state.marketplaces.marketplaces.detail
+    ) as any
+    const partnerServiceZones = computed(
+      () => {
+        if(detailMarketplace.value && detailMarketplace.value.partnerServiceZones && detailMarketplace.value.partnerServiceZones.length > 0 && zones.value && zones.value.length > 0) {
+          const temp1 = [...detailMarketplace.value.partnerServiceZones].map(el => {
+            return {
+              countryTable: el.zone_country,
+              zoneTable: [...zones.value].filter(x => x.id === el.zone_id)[0]?.zoneName ?? '',
+              slaTable:`${el.sla_from}-${el.sla_to} days`,
+              codTable: el.cod,
+              color: el.cod ? 'green' : 'error'
+            }
+          })
+          let temp2 = [...zones.value].map(el => {
+            if(![...detailMarketplace.value.partnerServiceZones].some(x => {return (el.id === x.zone_id)})) {
+              return {
+                countryTable: el.country,
+                zoneTable: el.zoneName,
+                slaTable: '',
+                codTable: false,
+                color: 'error'
+              }
+            }
+          })
+          temp2 = temp2.filter(y => y)
+          function compare( a: any, b: any ) {
+            return b.codTable - a.codTable
+          }
+          const output = [...temp1, ...temp2].sort(compare)
+          let filtered = output
+          if(selectedZone.value) {
+            filtered = output.filter(el => el?.countryTable === selectedZone.value)
+          }
+            // console.log({temp2}, [...temp1, ...temp2])
+          return filtered
+        }
+      }
     )
+    console.log(partnerServiceZones)
     const detailGalleries = computed(
       () => storeDetailMarketplace.state.marketplaces.marketplaces.galleries
     )
     console.log({detailGalleries, detailMarketplace})
-    const zones = ref([]) as Ref<Zone[]>
+    // const zones = ref([]) as Ref<Zone[]>
 
     const detailProfileHeader = reactive([
       {
@@ -333,9 +379,6 @@ export default defineComponent({
           el
       )
     })
-    const selectedZone = reactive({
-      value: '',
-    })
     const method = reactive({
       opt: 'add',
     })
@@ -381,28 +424,30 @@ interface Header {
   sortable?: boolean
 }
 const pagination = ref({
-  ...storeApplications.state.applications.pagination,
+  // ...storeApplications.state.applications.pagination,
+  page: 1,
+  itemsPerPage: 1000,
 })
 const headers = [
   {
     text: 'Country',
-    value: 'country',
+    value: 'countryTable',
     sortable: false,
   },
   {
     text: 'Zone',
-    value: 'zone',
+    value: 'zoneTable',
     sortable: false,
   },
   {
     text: 'SLA',
-    value: 'sla',
+    value: 'slaTable',
     sortable: false,
     // width: 150,
   },
   {
     text: 'COD',
-    value: 'cod',
+    value: 'codTable',
     sortable: false,
     // width: 150,
   },
@@ -476,7 +521,7 @@ const headers = [
     const { $fetchState, fetch } = useFetch(async () => {
       await fetchDetail(id.value)
       await fetchServiceZoneOnce()
-      zones.value = [...storeFilters.state.filters.zones]
+      // zones.value = [...storeFilters.state.filters.zones]
       // detailGalleries.value = [...storeDetailMarketplace.state.marketplaces.marketplaces.galleries]
     })
 
@@ -513,7 +558,8 @@ const headers = [
       detailProfileHeaderComputed,
       // TABLE ZONE COD SLA
       headers,
-      pagination
+      pagination,
+      partnerServiceZones
     }
   },
   head: {},

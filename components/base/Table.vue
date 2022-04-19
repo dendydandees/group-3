@@ -124,6 +124,41 @@
         </v-btn>
       </div>
     </template>
+    <!-- START DETAIL MARKETPLACE -->
+    <template #[`item.zoneTable`]="{ item }">
+      <div
+        :class="
+          item.slaTable
+          ?
+          `green--text font-weight-bold`
+          :
+          `error--text font-weight-bold`
+
+        "
+      >
+        {{ item.zoneTable }}
+      </div>
+    </template>
+    <template #[`item.codTable`]="{ item }">
+      <div
+        :class="
+          item.codTable
+          ?
+          `green--text font-weight-bold`
+          :
+          `error--text font-weight-bold`
+        "
+      >
+        {{
+          item.slaTable
+          ? item.codTable
+            ? 'Yes'
+            : 'No'
+          : ''
+        }}
+      </div>
+    </template>
+    <!-- END DETAIL MARKETPLACE -->
   </v-data-table>
 </template>
 

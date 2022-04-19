@@ -206,16 +206,56 @@
                 >
                   {{ selected.zoneIndex && selected.zoneIndex.name }}
                 </div>
-                <LcontrolDropdownCustom
-                  v-model="selected.partnerID"
-                  :label="`${
-                    isCustoms() ? 'Port' : 'Zone'
-                  } Default Network Partner`"
-                  :placeholder="'Default Partner'"
-                  :data="marketplaces"
-                  :disabled-drop="$fetchState.pending"
-                  :item-show="{ text: 'name', value: 'id' }"
-                />
+                <div>
+                  <LcontrolDropdownCustom
+                    v-model="selected.partnerID"
+                    :label="`${
+                      isCustoms() ? 'Port' : 'Zone'
+                    } Default Network Partner`"
+                    :placeholder="'Default Partner'"
+                    :data="marketplaces"
+                    :disabled-drop="$fetchState.pending"
+                    :item-show="{ text: 'name', value: 'id' }"
+                  />
+                  <div
+                    class="primary--text"
+                    style="font-size: 12px;margin-top: 5px;justify-content: end;display: flex;"
+                  >
+                    <span
+                      v-if="true"
+                    >
+                      Partner not available for COD service
+                    </span>
+                    <span
+                      v-else
+                    >
+                      Partner available for COD service
+                    </span>
+                  </div>
+                  <div
+                    v-if="!CODpartnerSelected.status"
+                    class="primary--text btn-COD"
+                    style="cursor: pointer"
+                    @click="handleCOD"
+                  >
+                    + Add COD Default Network Partner
+                  </div>
+                  <div
+                    v-if="CODpartnerSelected.status"
+                    class="d-flex mt-2"
+                  >
+                    <LcontrolDropdownCustom
+                      v-model="CODpartnerSelected.partnerID"
+                      :label="`COD Default Network Partner`"
+                      :placeholder="'COD Default Partner'"
+                      :data="marketplaces"
+                      :disabled-drop="$fetchState.pending"
+                      :item-show="{ text: 'name', value: 'id' }"
+                      :is-delete="true"
+                      @delete="handleCOD"
+                    />
+                  </div>
+                </div>
               </div>
               <v-btn
                 color="primary darken-1 white--text"
@@ -279,6 +319,11 @@ export default defineComponent({
     })
     const lControlsCust = ref([]) as Ref<RuleGroup[] | []>
     const zonesCust = ref([]) as Ref<any>
+
+    const CODpartnerSelected = ref({
+      status: false,
+      partnerID: ''
+    })
 
     const selected = ref({
       countryIndex: null as { index: number; value: string } | null,
@@ -676,6 +721,13 @@ export default defineComponent({
       return selected.value.serviceIndex?.value === 'CUSTOMS'
     }
 
+    function handleCOD () {
+      CODpartnerSelected.value.status = !CODpartnerSelected.value.status
+      if(!CODpartnerSelected.value.status) {
+        CODpartnerSelected.value.partnerID = ''
+      }
+    }
+
     onUnmounted(() => {
       // DELETE SERVICE ON VUEX
     })
@@ -860,6 +912,8 @@ export default defineComponent({
       btnAction,
       handleBob,
       isCustoms,
+      CODpartnerSelected,
+      handleCOD
     }
   },
   head: {},
@@ -1044,6 +1098,13 @@ export default defineComponent({
           height: 100%;
         }
       }
+    }
+  }
+  .btn-COD {
+    margin-top: 10px;
+    transition: all .3s;
+    &:hover {
+      opacity: .8;
     }
   }
 }
