@@ -1,7 +1,25 @@
 <template>
   <div class="dropdown-custom">
-    <div v-if="label" class="h-5 text-break font-weight-medium pb-1">
-      {{ label }}
+    <div v-if="label" class="h-5 text-break font-weight-medium pb-1 d-flex align-center">
+      <div>
+        {{ label }}
+      </div>
+      <v-tooltip
+        v-if="isDelete"
+        bottom
+      >
+        <template #activator="{ on, attrs }">
+          <NuxtImg
+            src="/images/qMark.svg"
+            preload
+            :height="18"
+            class="ml-2"
+            v-bind="attrs"
+            v-on="on"
+          />
+        </template>
+        <span>COD default Network Partner allocation will allow all COD orders will automatically be allocated to this specific NP</span>
+      </v-tooltip>
     </div>
     <!-- {{JSON.stringify(data)}} -->
     <div

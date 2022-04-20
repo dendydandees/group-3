@@ -161,7 +161,7 @@
     <div class="bottom-row">
       <div class="title-filter primary--text display-1 mb-7">Coverage Area</div>
       <div class="btn-filter-map d-flex align-center">
-        <v-select
+        <!-- <v-select
           v-model="selectedZone.value"
           :items="zones"
           item-text="country"
@@ -174,7 +174,7 @@
           clearable
           class="custom-select mr-3"
           :full-width="true"
-        />
+        /> -->
         <!-- <v-select
           :items="[]"
           label="Select Port"
@@ -290,7 +290,10 @@ export default defineComponent({
             }
           })
           let temp2 = [...zones.value].map(el => {
-            if(![...detailMarketplace.value.partnerServiceZones].some(x => {return (el.id === x.zone_id)})) {
+            if(
+              ![...detailMarketplace.value.partnerServiceZones].some(x => {return (el.id === x.zone_id)}) &&
+              temp1.some(y => y.countryTable === el.country)
+            ) {
               return {
                 countryTable: el.country,
                 zoneTable: el.zoneName,
@@ -302,7 +305,7 @@ export default defineComponent({
           })
           temp2 = temp2.filter(y => y)
           function compare( a: any, b: any ) {
-            return b.codTable - a.codTable
+            return a.countryTable.localeCompare(b.countryTable) || b.codTable - a.codTable
           }
           const output = [...temp1, ...temp2].sort(compare)
           let filtered = output

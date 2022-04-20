@@ -21,6 +21,7 @@ interface GetMarketplaces {
   };
   isLControl: Boolean;
   isConnected?: Boolean;
+  isCOD?: Boolean;
 }
 
 const filter = {
@@ -36,6 +37,7 @@ export const state = () => ({
   marketplacesAll: [] as Marketplace[] | [],
   marketplaces: [] as Marketplace[] | [],
   marketplacesLControl: [] as Marketplace[] | [],
+  marketplacesCOD: [] as Marketplace[] | [],
   marketplacesConnected: [] as Marketplace[] | [],
   loadedLControl: false as Boolean,
   meta: {
@@ -58,6 +60,8 @@ export const mutations: MutationTree<RootStateMarketplaces> = {
     (state.marketplaces = value),
   SET_MARKETPLACES_LCONTROL: (state, value: Marketplace[] | []) =>
     (state.marketplacesLControl = value),
+  SET_MARKETPLACES_COD: (state, value: Marketplace[] | []) =>
+    (state.marketplacesCOD = value),
   SET_MARKETPLACES_CONNECTED: (state, value: Marketplace[] | []) =>
     (state.marketplacesConnected = value),
   SET_LOADED_LCONTROL: (state, value: Boolean) =>
@@ -100,7 +104,7 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
   },
   async getMarketplaces(
     { commit, state },
-    { params, isLControl }: GetMarketplaces
+    { params, isLControl, isCOD }: GetMarketplaces
   ) {
     let serviceParams = 'service=';
     if (params && params?.service.length > 0) {
@@ -113,7 +117,7 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
     const uri = params
       ? `?page=${ params.page ?? '' }&perPage=${ params.perPage ?? '' }&search=${ params.search ?? ''
       }&country=${ params.country ?? '' }&${ serviceParams ?? '' }&zone=${ params.zone ?? ''
-      }&port=${ params.port ?? '' }`
+      }&port=${ params.port ?? '' }&cod=${ isCOD ?? '' }`
       : '';
     try {
       const response = await this?.$axios?.$get(`/api/clients/partners${ uri }`);
@@ -140,7 +144,7 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
       return error;
     }
   },
-  async getMarketplacesConnected({ commit }, { params }: GetMarketplaces) {
+  async getMarketplacesConnected({ commit }, { params, isCOD }: GetMarketplaces) {
     let serviceParams = 'service=';
     if (params && params?.service.length > 0) {
       serviceParams = params.service
@@ -152,7 +156,7 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
     const uri = params
       ? `?connection=connected&page=${ params.page ?? '' }&perPage=${ params.perPage ?? ''
       }&search=${ params.search ?? '' }&country=${ params.country ?? '' }&${ serviceParams ?? ''
-      }&zone=${ params.zone ?? '' }`
+      }&zone=${ params.zone ?? '' }&port=${ params.port ?? '' }&cod=${ isCOD ?? '' }`
       : '';
     try {
       const response = await this?.$axios?.$get(`/api/clients/partners${ uri }`);
@@ -165,7 +169,12 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
         totalPage,
         totalCount,
       };
-      commit('SET_MARKETPLACES_CONNECTED', data);
+      if (!isCOD) {
+        commit('SET_MARKETPLACES_CONNECTED', data);
+      }
+      if (isCOD) {
+        commit('SET_MARKETPLACES_COD', data);
+      }
       // commit('SET_META', meta)
 
       return response;

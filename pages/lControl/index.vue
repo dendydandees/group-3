@@ -218,22 +218,24 @@
                     :item-show="{ text: 'name', value: 'id' }"
                   />
                   <div
+                    v-if="selected.partnerID"
                     class="primary--text"
                     style="font-size: 12px;margin-top: 5px;justify-content: end;display: flex;"
                   >
                     <span
-                      v-if="true"
-                    >
-                      Partner not available for COD service
-                    </span>
-                    <span
-                      v-else
+                      v-if="handleInfoCOD(selected.partnerID)"
                     >
                       Partner available for COD service
                     </span>
+                    <span
+                      v-else
+                      class="error--text"
+                    >
+                      Partner not available for COD service
+                    </span>
                   </div>
                   <div
-                    v-if="!CODpartnerSelected.status"
+                    v-if="!CODpartnerSelected.status && selected.serviceIndex.value === 'LAST_MILE'"
                     class="primary--text btn-COD"
                     style="cursor: pointer"
                     @click="handleCOD"
@@ -241,14 +243,14 @@
                     + Add COD Default Network Partner
                   </div>
                   <div
-                    v-if="CODpartnerSelected.status"
+                    v-if="CODpartnerSelected.status && selected.serviceIndex.value === 'LAST_MILE'"
                     class="d-flex mt-2"
                   >
                     <LcontrolDropdownCustom
                       v-model="CODpartnerSelected.partnerID"
                       :label="`COD Default Network Partner`"
                       :placeholder="'COD Default Partner'"
-                      :data="marketplaces"
+                      :data="marketplacesCOD"
                       :disabled-drop="$fetchState.pending"
                       :item-show="{ text: 'name', value: 'id' }"
                       :is-delete="true"
@@ -311,6 +313,9 @@ export default defineComponent({
     )
     const marketplaces = computed(
       () => storeMarketplaces.state.marketplaces.marketplaces.marketplaces
+    )
+    const marketplacesCOD = computed(
+      () => storeMarketplaces.state.marketplaces.marketplaces.marketplacesCOD
     )
     const lControls = computed(() => {
       return computeLControls(
@@ -426,6 +431,7 @@ export default defineComponent({
       service?: string
       zone?: string
       isLControl?: Boolean
+      isCOD?: Boolean
     }) => {
       let dataParams = {
         page: 1,
@@ -451,10 +457,11 @@ export default defineComponent({
 
       try {
         $fetchState.pending = true
-
+        let routePath = 'getMarketplaces'
+        if(params.isCOD) routePath = 'getMarketplacesConnected'
         await storeFilters.dispatch(
-          'marketplaces/marketplaces/getMarketplaces',
-          { params: dataParams, isLControl: params.isLControl }
+          `marketplaces/marketplaces/${routePath}`,
+          { params: dataParams, isLControl: params.isLControl, isCOD: params.isCOD }
         )
       } catch (error) {
         return error
@@ -530,6 +537,14 @@ export default defineComponent({
             service: selected.value.serviceIndex?.value,
             zone: selected.value.zoneIndex.value,
           })
+          if (selected.value.serviceIndex?.value === 'LAST_MILE') {
+            await fetchMarketplace({
+              country: selected.value.countryIndex?.value,
+              service: selected.value.serviceIndex?.value,
+              zone: selected.value.zoneIndex.value,
+              isCOD: true
+            })
+          }
           selected.value.partnerID = data.data.partnerID
           selected.value.ruleGroupID = data.data.ruleGroupID
           selected.value.rules = data.data.rules
@@ -665,6 +680,11 @@ export default defineComponent({
       ]
     })
 
+
+    const handleInfoCOD = (partnerID: string) => {
+      return marketplacesCOD.value.some(x => x.id === partnerID)
+    }
+
     const btnAction = async () => {
       try {
         // const actionRG = addRuleGroup
@@ -787,6 +807,8 @@ export default defineComponent({
       ],
       () => {
         selected.value.partnerID = ''
+        CODpartnerSelected.value.status = false
+        CODpartnerSelected.value.partnerID = ''
       },
       { deep: true }
     )
@@ -913,7 +935,9 @@ export default defineComponent({
       handleBob,
       isCustoms,
       CODpartnerSelected,
-      handleCOD
+      handleCOD,
+      marketplacesCOD,
+      handleInfoCOD
     }
   },
   head: {},
