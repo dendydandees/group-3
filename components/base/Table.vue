@@ -143,15 +143,8 @@
       <div
         :class="
           item.slaTable
-<<<<<<< HEAD
             ? `green--text font-weight-bold`
             : `error--text font-weight-bold`
-=======
-          ?
-          `green--text font-weight-bold`
-          :
-          `error--text font-weight-bold`
->>>>>>> 2cdfc2c ([STASH]: commit stash)
         "
         style="font-size: 0.975rem !important;"
       >
