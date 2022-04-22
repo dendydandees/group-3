@@ -132,6 +132,13 @@
       </div>
     </template>
     <!-- START DETAIL MARKETPLACE -->
+    <template #[`item.countryTable`]="{ item }">
+      <div
+        style="font-size: 0.975rem !important;"
+      >
+        {{ item.countryTable }}
+      </div>
+    </template>
     <template #[`item.zoneTable`]="{ item }">
       <div
         :class="
@@ -139,6 +146,7 @@
             ? `green--text font-weight-bold`
             : `error--text font-weight-bold`
         "
+        style="font-size: 0.975rem !important;"
       >
         {{ item.zoneTable }}
       </div>
@@ -150,8 +158,16 @@
             ? `green--text font-weight-bold`
             : `error--text font-weight-bold`
         "
+        style="font-size: 0.975rem !important;"
       >
         {{ item.slaTable ? (item.codTable ? 'Yes' : 'No') : '' }}
+      </div>
+    </template>
+    <template #[`item.slaTable`]="{ item }">
+      <div
+        style="font-size: 0.975rem !important;"
+      >
+        {{ item.slaTable }}
       </div>
     </template>
     <!-- END DETAIL MARKETPLACE -->
