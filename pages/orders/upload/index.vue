@@ -18,8 +18,8 @@
       <template v-for="({ text, icon }, index) in stepList">
         <v-btn
           :key="text"
-          :color="isActive(index) ? 'white' : 'primary'"
-          :class="[isActive(index) ? 'primary--text' : 'white--text']"
+          :color="isActive(index) ? 'primary' : 'white'"
+          :class="[isActive(index) ? 'white--text' : 'primary--text']"
           class="custom-tab mx-2"
           @click="doChangeWindow(index)"
         >

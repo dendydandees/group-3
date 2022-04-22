@@ -23,6 +23,7 @@
       <v-pagination
         v-model="pagination.page"
         :length="meta.totalPage"
+        :total-visible="7"
         :disabled="loading"
         circle
       />

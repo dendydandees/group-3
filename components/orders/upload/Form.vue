@@ -147,6 +147,7 @@ export default defineComponent({
 
         if (formEmpty) throw new Error('error')
         if (!isValid) return
+        // set data for domestic
         if (props.step === 0) {
           data = data.map((item) => ({
             ...item,

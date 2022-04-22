@@ -30,7 +30,7 @@ import FilePondPluginFileEncode from 'filepond-plugin-file-encode'
 
 // Interfaces and types
 import { ErrorFilePond } from '../base/FilePond/Image.vue'
-import { Order, OrderItem } from '~/types/orders'
+import { OrderItem, OrderUpload } from '~/types/orders'
 import { VuexModuleApplications } from '~/types/applications'
 
 // Create component file pond
@@ -85,6 +85,13 @@ export default defineComponent({
       checkValidity: true,
     })
 
+    const handleBeforeAddFile = () => {
+      storeApplications.commit('applications/RESET_ALERT')
+      emit('changeLoading')
+    }
+    const handleRemoveFile = (_error: ErrorFilePond, _file: any) => {
+      emit('input', [])
+    }
     const formatKey = (data: {}) => {
       const newObject = {} as any
 
@@ -106,9 +113,8 @@ export default defineComponent({
 
       return newObject
     }
-    const handleBeforeAddFile = () => {
-      storeApplications.commit('applications/RESET_ALERT')
-      emit('changeLoading')
+    const formatServiceType = (data: boolean | string): boolean => {
+      return typeof data === 'boolean' ? data : data === 'yes'
     }
     const handleAddFile = (error: ErrorFilePond, { file }: { file: File }) => {
       try {
@@ -136,7 +142,7 @@ export default defineComponent({
             ]
           const worksheetItems = workbook.Sheets['Order Items']
           // convert to json format
-          let orders = utils.sheet_to_json(worksheetOrders) as Order[]
+          let orders = utils.sheet_to_json(worksheetOrders) as OrderUpload[]
           let orderItems = utils.sheet_to_json(worksheetItems) as OrderItem[]
 
           // error if file upload not same with example file
@@ -166,16 +172,34 @@ export default defineComponent({
               .filter((item) => order.orderCode === item.orderCode)
               .map((order) => ({
                 ...order,
-                productCode: order.productCode.toString(),
-              }))
+                productCode: order?.productCode?.toString() || '',
+              })) as OrderItem[]
+            // format cod value and currency
+            const isCOD = order?.paymentType === 'cod'
+            const codValue = isCOD
+              ? parseFloat(order.codValue as unknown as string) || 0
+              : 0
+            const codCurrency = isCOD ? order.codCurrency : ''
+            // format service type
+            const firstMile = formatServiceType(order.firstMile) || false
+            const lastMile = formatServiceType(order.lastMile) || false
+            const freightForwarder =
+              formatServiceType(order.freightForwarder) || false
+            const customs = formatServiceType(order.customBrokerages) || false
 
             return {
               ...order,
               items,
-              uploadType: props.step === 0 ? 'domestic' : 'crossBorder',
-              consigneePostal: order.consigneePostal.toString(),
-              senderPostal: order?.senderPostal?.toString(),
-              codValue: parseFloat(order.codValue as unknown as string),
+              consigneePostal: order?.consigneePostal?.toString() || '',
+              consigneeNumber: order?.consigneeNumber?.toString() || '',
+              senderPostal: order?.senderPostal?.toString() || '',
+              senderContactNumber: order?.senderContactNumber?.toString() || '',
+              codValue,
+              codCurrency,
+              firstMile,
+              lastMile,
+              freightForwarder,
+              customs,
             }
           })
 
@@ -186,9 +210,6 @@ export default defineComponent({
       } finally {
         emit('changeLoading')
       }
-    }
-    const handleRemoveFile = (_error: ErrorFilePond, _file: any) => {
-      emit('input', [])
     }
 
     return {
