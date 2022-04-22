@@ -73,6 +73,13 @@
       </div>
     </template>
 
+    <!-- status cell -->
+    <template #[`item.status`]="{ item: { latestUpdate } }">
+      <div class="text--secondary">
+        {{ latestUpdate ? latestUpdate.comments : '' }}
+      </div>
+    </template>
+
     <!-- origin cell -->
     <template #[`item.origin`]="{ item }">
       <div class="text--secondary">
@@ -129,11 +136,8 @@
       <div
         :class="
           item.slaTable
-          ?
-          `green--text font-weight-bold`
-          :
-          `error--text font-weight-bold`
-
+            ? `green--text font-weight-bold`
+            : `error--text font-weight-bold`
         "
       >
         {{ item.zoneTable }}
@@ -143,19 +147,11 @@
       <div
         :class="
           item.codTable
-          ?
-          `green--text font-weight-bold`
-          :
-          `error--text font-weight-bold`
+            ? `green--text font-weight-bold`
+            : `error--text font-weight-bold`
         "
       >
-        {{
-          item.slaTable
-          ? item.codTable
-            ? 'Yes'
-            : 'No'
-          : ''
-        }}
+        {{ item.slaTable ? (item.codTable ? 'Yes' : 'No') : '' }}
       </div>
     </template>
     <!-- END DETAIL MARKETPLACE -->
@@ -163,11 +159,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, PropType, useRoute } from '@nuxtjs/composition-api'
+import {
+  defineComponent,
+  computed,
+  PropType,
+  useRoute,
+} from '@nuxtjs/composition-api'
 import { FilterDetails, Pagination } from '~/types/applications'
 import { Order } from '~/types/orders'
 
-import { IncomingOrder, OrderAllocation } from '~/types/partnerPortals/incomingOrders'
+import {
+  IncomingOrder,
+  OrderAllocation,
+} from '~/types/partnerPortals/incomingOrders'
 
 export default defineComponent({
   name: 'BaseTable',
@@ -217,9 +221,11 @@ export default defineComponent({
       emit('doSelectAll', data)
     }
 
-    const validateSelect = (item: Order | IncomingOrder ) => {
-      if(route.value.name === 'partner-portals-id-incoming-orders') {
-        return !(item as IncomingOrder).orderAllocations.some((el: OrderAllocation) => el.externalTrackingNumber)
+    const validateSelect = (item: Order | IncomingOrder) => {
+      if (route.value.name === 'partner-portals-id-incoming-orders') {
+        return !(item as IncomingOrder).orderAllocations.some(
+          (el: OrderAllocation) => el.externalTrackingNumber
+        )
       } else if (route.value.name === 'orders') {
         return !item.labelPath
       } else {
@@ -231,7 +237,7 @@ export default defineComponent({
       selected,
       fetch,
       doSelectAll,
-      validateSelect
+      validateSelect,
     }
   },
 })

@@ -4,6 +4,17 @@ export interface VuexModuleOrders {
   orders: RootStateOrders
 }
 
+export interface LatestUpdate {
+  id: string
+  status: string
+  updateTimestamp: Date
+  comments: string
+  podReceiverContact: string
+  podReceiverName: string
+  podURI: string
+  rawPayload: string
+}
+
 export interface Order {
   id: string
   orderCode: string
@@ -50,6 +61,7 @@ export interface Order {
   senderPortId?: string
   codCurrency?: string
   codValue?: number
+  latestUpdate: LatestUpdate
 }
 
 export interface OrderItem {

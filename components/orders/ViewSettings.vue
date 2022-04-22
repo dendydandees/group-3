@@ -38,6 +38,16 @@
                 v-model="selectedViews"
                 on-icon="mdi-checkbox-marked-circle"
                 off-icon="mdi-checkbox-blank-circle-outline"
+                label="Status"
+                value="status"
+              />
+            </v-list-item>
+
+            <v-list-item>
+              <v-checkbox
+                v-model="selectedViews"
+                on-icon="mdi-checkbox-marked-circle"
+                off-icon="mdi-checkbox-blank-circle-outline"
                 label="Origin"
                 value="origin"
               />
