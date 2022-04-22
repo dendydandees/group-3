@@ -354,10 +354,16 @@ export default defineComponent({
 
     const CODpartnerSelected = ref({
       status: false,
+<<<<<<< HEAD
       partnerID: '',
       idRule: ''
     }) as Ref<{status: boolean, partnerID: string, idRule: string | unknown}>
     const rulesComp = ref([]) as Ref<RulePayload[] | []>
+=======
+      partnerID: ''
+    })
+    const rulesComp = ref([])
+>>>>>>> 2cdfc2c ([STASH]: commit stash)
 
     const selected = ref({
       countryIndex: null as { index: number; value: string } | null,
@@ -613,6 +619,7 @@ export default defineComponent({
     }
     // const rulesPayload = ref([])
     const rulesPayload = computed(() => {
+<<<<<<< HEAD
       // let RG = [...lControlsCust.value]
       // // let RG = [...storeLControls.state.lControls.lControls.lControls]
       // if(selected.value.countryIndex?.value) {
@@ -693,12 +700,17 @@ export default defineComponent({
       ([newLControl, countryValue, serviceValue, partnerDefault, CODpartner, newRGID, newDialogDelete]) => {
       // let RG = [...lControlsCust.value]
       let RG = [...storeLControls.state.lControls.lControls.lControls]
+=======
+      let RG = [...lControlsCust.value]
+      // let RG = [...storeLControls.state.lControls.lControls.lControls]
+>>>>>>> 2cdfc2c ([STASH]: commit stash)
       if(selected.value.countryIndex?.value) {
         RG = RG.filter(el => el.countryCode === selected.value.countryIndex?.value)
       }
       if(selected.value.serviceIndex?.value) {
         RG = RG.filter(el => el.serviceType === selected.value.serviceIndex?.value)
       }
+<<<<<<< HEAD
       console.log('store after filter', {RG})
       let rules = [] as any
       // let rules = rulesComp.value as any
@@ -721,11 +733,22 @@ export default defineComponent({
               : null,
             }
           })
+=======
+      let rules = [] as any
+      // let rules = rulesComp.value as any
+      console.log('RGGGGGGG', {RG}, {store: storeLControls.state.lControls.lControls.lControls}, RG[0], RG[0].Rules)
+      if(RG[0] && RG[0].Rules) {
+        rules = [...RG[0].Rules].map(el => {
+>>>>>>> 2cdfc2c ([STASH]: commit stash)
           return {
             id: el.ruleGroupID,
             idRule: el.id ,
             data: {
+<<<<<<< HEAD
               partnerID: el.partnerID,
+=======
+              partnerID: selected.value.partnerID,
+>>>>>>> 2cdfc2c ([STASH]: commit stash)
               priority: el.priority,
               definitions: el.definitions && el.definitions.length > 0
               ? el.definitions.map(x => {
@@ -738,7 +761,10 @@ export default defineComponent({
             }
           }
         })
+<<<<<<< HEAD
         console.log('COD after fetch post', rules)
+=======
+>>>>>>> 2cdfc2c ([STASH]: commit stash)
       }
       const temp =
         {
@@ -765,10 +791,14 @@ export default defineComponent({
           rules[indexCOD].data.partnerID = partnerDefault
       }
       console.log({RG}, {rules}, !checkDefinition({data: [...rules].map(y => y.data), type: 'RULE_TYPE_ZONE'}))
+<<<<<<< HEAD
       if(
         CODpartnerSelected.value.partnerID
         && !checkDefinition({data: [...rules].map(y => y.data), type: 'RULE_TYPE_IS_COD'})
       ) {
+=======
+      if(CODpartnerSelected.value.partnerID && !checkDefinition({data: [...rules].map(y => y.data), type: 'RULE_TYPE_IS_COD'})) {
+>>>>>>> 2cdfc2c ([STASH]: commit stash)
         const cod = {
           id: selected.value.ruleGroupID,
           data: {
@@ -789,6 +819,7 @@ export default defineComponent({
           // console.log('COD', rules.findIndex((el: any) => el.data.definitions.some((x: any) => x.type === 'RULE_TYPE_IS_COD')))
           // console.log('COD', checkDefinition({data: [...rules].map(y => y.data), type: 'RULE_TYPE_IS_COD', isFilter: true}), rules)
       }
+<<<<<<< HEAD
         console.log({CODpartner, rules})
         rulesComp.value = rules
       },
@@ -796,6 +827,13 @@ export default defineComponent({
     )
 
     console.log({rulesPayload, rulesComp, CODpartnerSelected})
+=======
+      return rules
+      // return RG
+    }) as any
+
+    console.log({rulesPayload})
+>>>>>>> 2cdfc2c ([STASH]: commit stash)
     const addRules = async (
       // {isCOD} : {isCOD?: Boolean}
       data: any
@@ -990,6 +1028,7 @@ export default defineComponent({
         const params = CODpartnerSelected.value.partnerID
         ? {isCOD: !!CODpartnerSelected.value.partnerID}
         : {}
+<<<<<<< HEAD
         // console.log(rulesComp.value)
         // if(!selected.value.isUpdate) {
           await Promise.all(rulesComp.value.map(async (el: any) => {
@@ -1011,6 +1050,17 @@ export default defineComponent({
           //   }
           //   // await actionR(el)
           // });
+=======
+        // if(!selected.value.isUpdate) {
+          await rulesPayload.value.forEach(async (el: any) => {
+            if(el.idRule) {
+              await updateRules(el)
+            } else {
+              await addRules(el)
+            }
+            // await actionR(el)
+          });
+>>>>>>> 2cdfc2c ([STASH]: commit stash)
         // }
         console.log('ini btn add', {rulesPayload})
         // await actionR(params)
