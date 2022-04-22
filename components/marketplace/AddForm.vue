@@ -3,7 +3,7 @@
     <v-dialog v-model="dialogComp" max-width="258" @click:outside="toggle()">
       <v-card class="rounded-xl pa-6 add-form-marketplace">
         <v-alert v-if="error" rounded="xl" type="error">
-          {{error}}
+          {{ error }}
         </v-alert>
         <div class="header d-flex align-center mb-3">
           <v-img

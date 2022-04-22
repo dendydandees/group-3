@@ -2,12 +2,12 @@
   <v-card-text class="px-6">
     <v-row>
       <v-col cols="12" md="12" class="px-2 py-4">
-      <ValidationProvider
-        v-slot="{ errors }"
-        slim
-        name="New Status"
-        rules="required"
-        tag="div"
+        <ValidationProvider
+          v-slot="{ errors }"
+          slim
+          name="New Status"
+          rules="required"
+          tag="div"
         >
           <v-autocomplete
             v-model="selected.status"
@@ -34,47 +34,47 @@
     <v-row>
       <!-- created from  -->
       <v-col cols="12" md="8" class="px-2 py-4">
-          <v-menu
-            v-model="menuUpdateDate"
-            :close-on-content-click="false"
-            transition="scale-transition"
-            offset-y
-            min-width="auto"
-          >
-            <template #activator="{ on, attrs }">
-              <ValidationProvider
-                v-slot="{ errors }"
-                slim
-                name="Update Date"
-                rules="required"
-                tag="div"
-              >
-                <v-text-field
-                  :error-messages="errors"
-                  :value="date.updateDate"
-                  v-bind="attrs"
-                  readonly
-                  clearable
-                  single-line
-                  outlined
-                  rounded
-                  dense
-                  hide-details
-                  label="Update Date"
-                  placeholder="Enter your update date..."
-                  class="input-filter elevation-1"
-                  v-on="on"
-                  @click:clear="selected.updateDate = ''"
-                />
-              </ValidationProvider>
-            </template>
+        <v-menu
+          v-model="menuUpdateDate"
+          :close-on-content-click="false"
+          transition="scale-transition"
+          offset-y
+          min-width="auto"
+        >
+          <template #activator="{ on, attrs }">
+            <ValidationProvider
+              v-slot="{ errors }"
+              slim
+              name="Update Date"
+              rules="required"
+              tag="div"
+            >
+              <v-text-field
+                :error-messages="errors"
+                :value="date.updateDate"
+                v-bind="attrs"
+                readonly
+                clearable
+                single-line
+                outlined
+                rounded
+                dense
+                hide-details
+                label="Update Date"
+                placeholder="Enter your update date..."
+                class="input-filter elevation-1"
+                v-on="on"
+                @click:clear="selected.updateDate = ''"
+              />
+            </ValidationProvider>
+          </template>
 
-            <v-date-picker
-              v-model="selected.updateDate"
-              show-adjacent-months
-              @input="menuUpdateDate = false"
-            />
-          </v-menu>
+          <v-date-picker
+            v-model="selected.updateDate"
+            show-adjacent-months
+            @input="menuUpdateDate = false"
+          />
+        </v-menu>
       </v-col>
       <v-col cols="12" md="4" class="px-2 py-4">
         <v-menu
@@ -126,16 +126,23 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, PropType, useStore, useContext, ref, Ref, useFetch,watch } from '@nuxtjs/composition-api'
-import { ValidationProvider } from 'vee-validate'
 import {
-  VuexModuleFilters,
-  Statuses,
-} from '~/types/filters'
+  defineComponent,
+  computed,
+  PropType,
+  useStore,
+  useContext,
+  ref,
+  Ref,
+  useFetch,
+  watch,
+} from '@nuxtjs/composition-api'
+import { ValidationProvider } from 'vee-validate'
+import { VuexModuleFilters, Statuses } from '~/types/filters'
 
 interface StatusUpdate {
   status: string
-  updateDate: string,
+  updateDate: string
   updateTime: string
 }
 
@@ -150,7 +157,7 @@ export default defineComponent({
     },
     isOpen: {
       type: Boolean,
-      default: false
+      default: false,
     },
   },
   setup(props, { emit }) {
@@ -186,9 +193,8 @@ export default defineComponent({
       statuses: null,
     })
 
-
     // manage statuses
-    function formatStatuses()  {
+    function formatStatuses() {
       const status = [...storeFilter.state.filters.statuses].sort(
         (itemA, itemB) => {
           const nameA = (itemA.ServiceType as string).toUpperCase()
@@ -218,11 +224,10 @@ export default defineComponent({
       return status
     }
 
-
     watch(
       () => [props.isOpen],
       ([newIsOpen]) => {
-        if(newIsOpen) {
+        if (newIsOpen) {
           storeFilter.dispatch('filters/getStatuses')
         } else {
           selected.value.status = ''
@@ -233,14 +238,13 @@ export default defineComponent({
       { deep: true }
     )
 
-
     return {
       selected,
       dataStatuses,
       search,
       date,
       menuUpdateTime,
-      menuUpdateDate
+      menuUpdateDate,
     }
   },
 })

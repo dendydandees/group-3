@@ -45,7 +45,6 @@
               v-model="selectedViews"
               :loading="$fetchState.pending"
             />
-
           </div>
         </template>
       </OrdersRightOptions>
@@ -95,13 +94,13 @@
     <BaseModalForm
       v-model="dialog.form"
       :dialog-settings="dialogSettings"
-
       @doSubmit="updateStatus"
     >
       <template #modalFields>
         <OrdersUpdateStatusContent
-        v-model="selectedUpdate"
-        :is-open="dialog.form" />
+          v-model="selectedUpdate"
+          :is-open="dialog.form"
+        />
       </template>
     </BaseModalForm>
 
@@ -110,7 +109,6 @@
       v-model="dialog.delete"
       :dialog-settings="dialogSettings"
       @doSubmit="deleteStatus"
-
     >
       <template #modalFields>
         <OrdersDeleteStatusContent
@@ -139,17 +137,18 @@ import {
 } from '@nuxtjs/composition-api'
 import { filterOrderInit } from '~/store/partnerPortals/incomingOrders'
 // Interface and types
-import { FilterDetails, ModalConfirm, VuexModuleApplications, Alert } from '~/types/applications'
-import { Order } from '~/types/orders'
+import {
+  FilterDetails,
+  ModalConfirm,
+  VuexModuleApplications,
+  Alert,
+} from '~/types/applications'
 import {
   IncomingOrder,
   OrderAllocation,
   VuexModuleIncomingOrders,
 } from '~/types/partnerPortals/incomingOrders'
-import {
-  VuexModuleFilters,
-  Statuses,
-} from '~/types/filters'
+import { VuexModuleFilters, Statuses } from '~/types/filters'
 
 interface Header {
   text: string
@@ -170,6 +169,12 @@ const initHeaders = [
     text: 'Service',
     value: 'serviceType',
     sortable: false,
+  },
+  {
+    text: 'Status',
+    value: 'status',
+    sortable: false,
+    width: 200,
   },
   {
     text: 'Origin',
@@ -205,7 +210,7 @@ export default defineComponent({
   name: 'OrdersIncomingPages',
   middleware: 'partner',
   setup() {
-    const { app, $dateFns } = useContext()
+    const { app } = useContext()
     const route = useRoute()
     const router = useRouter()
     // manage store
@@ -226,13 +231,11 @@ export default defineComponent({
       ...storeIncomingOrders.state.partnerPortals.incomingOrders.filterOrders,
     })
 
-
-
     // manage modal
     const selectedUpdate = ref({
       status: '',
       updateDate: '',
-      updateTime: ''
+      updateTime: '',
     })
     const dialog = ref({
       confirm: false,
@@ -254,13 +257,12 @@ export default defineComponent({
       return incomingOrders.value.some((order) => order.labelPath)
     })
     const isExternalTrackingExist = computed(() => {
-      return  incomingOrders.value.some((order: IncomingOrder) => {
-        return order.orderAllocations.some((el: OrderAllocation) => el.externalTrackingNumber)
-
-        })
+      return incomingOrders.value.some((order: IncomingOrder) => {
+        return order.orderAllocations.some(
+          (el: OrderAllocation) => el.externalTrackingNumber
+        )
+      })
     })
-
-    console.log(isExternalTrackingExist.value)
 
     // manage table
     const headers = ref(initHeaders) as Ref<Header[]>
@@ -268,6 +270,7 @@ export default defineComponent({
       'orderCode',
       'batchId',
       'serviceType',
+      'status',
       'origin',
       'originPort',
       'destination',
@@ -275,16 +278,15 @@ export default defineComponent({
       'creationDate',
       'actions',
     ])
-    const selectAllToggle = ({ items }: { items: IncomingOrder[]; value: boolean }) => {
+    const selectAllToggle = () => {
       if (selectedOrders.value.length === 0) {
-        // const selectedItems = items.filter((item) => {
-
-        //   return item.labelPath
-        // })
-        const selectedItems = incomingOrders.value.filter((order: IncomingOrder) => {
-        return order.orderAllocations.some((el: OrderAllocation) => el.externalTrackingNumber)
-
-        })
+        const selectedItems = incomingOrders.value.filter(
+          (order: IncomingOrder) => {
+            return order.orderAllocations.some(
+              (el: OrderAllocation) => el.externalTrackingNumber
+            )
+          }
+        )
 
         return (selectedOrders.value = [...selectedItems])
       } else {
@@ -293,8 +295,8 @@ export default defineComponent({
     }
 
     // update status
-    const toggleUpdate = (params: {isDelete?: boolean}) => {
-      if(params?.isDelete) {
+    const toggleUpdate = (params: { isDelete?: boolean }) => {
+      if (params?.isDelete) {
         dialogSettings.value = {
           loading: false,
           title: 'Delete Status',
@@ -317,27 +319,25 @@ export default defineComponent({
       }
     }
 
-    function setTime (data: number) {
+    function setTime(data: number) {
       let decimalTime = data
-      if(decimalTime < 0) decimalTime = decimalTime * -1
-      decimalTime = decimalTime * 60 * 60;
-      let hours = Math.floor((decimalTime / (60 * 60))) as any
-      decimalTime = decimalTime - (hours * 60 * 60)
-      let minutes = Math.floor((decimalTime / 60)) as any
-      decimalTime = decimalTime - (minutes * 60)
-      if(hours < 10)
-      {
-        hours = "0" + hours;
+      if (decimalTime < 0) decimalTime = decimalTime * -1
+      decimalTime = decimalTime * 60 * 60
+      let hours = Math.floor(decimalTime / (60 * 60)) as any
+      decimalTime = decimalTime - hours * 60 * 60
+      let minutes = Math.floor(decimalTime / 60) as any
+      decimalTime = decimalTime - minutes * 60
+      if (hours < 10) {
+        hours = '0' + hours
       }
-      if(minutes < 10)
-      {
-        minutes = "0" + minutes;
+      if (minutes < 10) {
+        minutes = '0' + minutes
       }
-      return "" + hours + ":" + minutes
+      return '' + hours + ':' + minutes
     }
     function setGMT(data: number) {
       const temp = setTime(data)
-      if(data > 0) {
+      if (data > 0) {
         return `+${temp}`
       } else {
         return `-${temp}`
@@ -345,7 +345,7 @@ export default defineComponent({
     }
     function setStatusRemarks(data: string, type: string) {
       let status = [...storeFilter.state.filters.statuses] as Statuses[]
-      status = status.filter((el:Statuses) => el.Status === data)
+      status = status.filter((el: Statuses) => el.Status === data)
       switch (type) {
         case 'remarks':
           return status[0]?.Remarks ?? ''
@@ -356,10 +356,10 @@ export default defineComponent({
       }
     }
 
-    function setAlert (value: Alert) {
+    function setAlert(value: Alert) {
       storeApplications.commit('applications/SET_ALERT', value)
     }
-    function resetAlert () {
+    function resetAlert() {
       storeApplications.commit('applications/RESET_ALERT')
     }
     async function updateStatus() {
@@ -367,26 +367,32 @@ export default defineComponent({
       resetAlert()
 
       try {
-        const arrStringIDs = [...selectedOrders.value].map((el:IncomingOrder) => {
-          return el.id
-        })
-        const gmt = setGMT(new Date().getTimezoneOffset()/-60)
+        const arrStringIDs = [...selectedOrders.value].map(
+          (el: IncomingOrder) => {
+            return el.id
+          }
+        )
+        const gmt = setGMT(new Date().getTimezoneOffset() / -60)
         const dateToISO = `${selectedUpdate.value.updateDate}T${selectedUpdate.value.updateTime}:00${gmt}`
         const payload = {
           orderIDs: arrStringIDs,
           status: selectedUpdate.value.status,
           timestamp: dateToISO,
-          service_type: setStatusRemarks(selectedUpdate.value.status, 'service'),
+          service_type: setStatusRemarks(
+            selectedUpdate.value.status,
+            'service'
+          ),
           remarks: setStatusRemarks(selectedUpdate.value.status, 'remarks'),
         }
 
-        console.log({payload})
-
         $fetchState.pending = true
 
-        const res = await storeIncomingOrders.dispatch('partnerPortals/incomingOrders/updateStatus', payload)
+        const res = await storeIncomingOrders.dispatch(
+          'partnerPortals/incomingOrders/updateStatus',
+          payload
+        )
 
-        if(res?.response && res?.response?.status !== 200) {
+        if (res?.response && res?.response?.status !== 200) {
           throw res?.response?.data?.error
         }
         dialog.value.form = false
@@ -402,7 +408,6 @@ export default defineComponent({
       }
     }
     function deleteStatus() {
-      console.log('submit delete', selectedOrders.value)
       dialog.value.delete = false
       selectedOrders.value = []
     }
@@ -544,7 +549,7 @@ export default defineComponent({
       selectedUpdate,
       updateStatus,
       deleteStatus,
-      isExternalTrackingExist
+      isExternalTrackingExist,
     }
   },
   head: {},

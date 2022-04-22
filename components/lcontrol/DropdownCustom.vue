@@ -1,13 +1,13 @@
 <template>
   <div class="dropdown-custom">
-    <div v-if="label" class="h-5 text-break font-weight-medium pb-1 d-flex align-center">
+    <div
+      v-if="label"
+      class="h-5 text-break font-weight-medium pb-1 d-flex align-center"
+    >
       <div>
         {{ label }}
       </div>
-      <v-tooltip
-        v-if="isDelete"
-        bottom
-      >
+      <v-tooltip v-if="isDelete" bottom>
         <template #activator="{ on, attrs }">
           <NuxtImg
             src="/images/qMark.svg"
@@ -18,13 +18,14 @@
             v-on="on"
           />
         </template>
-        <span>COD default Network Partner allocation will allow all COD orders will automatically be allocated to this specific NP</span>
+        <span
+          >COD default Network Partner allocation will allow all COD orders will
+          automatically be allocated to this specific NP</span
+        >
       </v-tooltip>
     </div>
     <!-- {{JSON.stringify(data)}} -->
-    <div
-      class="d-flex align-center"
-    >
+    <div class="d-flex align-center">
       <v-select
         v-model="selectedComp"
         :label="title"
@@ -52,7 +53,6 @@
       >
         <v-icon>mdi-trash-can</v-icon>
       </v-btn>
-
     </div>
   </div>
 </template>
@@ -148,7 +148,7 @@ export default defineComponent({
     return {
       toggle,
       selectedComp,
-      actionDelete
+      actionDelete,
     }
   },
 })

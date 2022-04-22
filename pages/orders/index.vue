@@ -158,6 +158,12 @@ const initHeaders = [
     sortable: false,
   },
   {
+    text: 'Status',
+    value: 'status',
+    sortable: false,
+    width: 200,
+  },
+  {
     text: 'Origin',
     value: 'origin',
     sortable: false,
@@ -231,6 +237,7 @@ export default defineComponent({
       'orderCode',
       'batchId',
       'serviceType',
+      'status',
       'origin',
       'originPort',
       'destination',
