@@ -218,38 +218,32 @@
                     :item-show="{ text: 'name', value: 'id' }"
                   />
                   <div
-                    v-if="selected.partnerID"
+                    v-if="selected.partnerID && selected.serviceIndex.value === 'LAST_MILE' "
                     class="primary--text"
-                    style="
-                      font-size: 12px;
-                      margin-top: 5px;
-                      justify-content: end;
-                      display: flex;
-                    "
+                    style="font-size: 12px;margin-top: 5px;justify-content: end;display: flex;"
                   >
-                    <span v-if="handleInfoCOD(selected.partnerID)">
+                    <span
+                      v-if="handleInfoCOD(selected.partnerID)"
+                    >
                       Partner available for COD service
                     </span>
-                    <span v-else class="error--text">
+                    <span
+                      v-else
+                      class="error--text"
+                    >
                       Partner not available for COD service
                     </span>
                   </div>
                   <div
-                    v-if="
-                      !CODpartnerSelected.status &&
-                      selected.serviceIndex.value === 'LAST_MILE'
-                    "
-                    class="primary--text btn-COD"
+                    v-if="!CODpartnerSelected.status && selected.serviceIndex.value === 'LAST_MILE'"
+                    :class="`primary--text btn-COD ${ selected.partnerID ? '' : 'disabled'}`"
                     style="cursor: pointer"
                     @click="handleCOD"
                   >
                     + Add COD Default Network Partner
                   </div>
                   <div
-                    v-if="
-                      CODpartnerSelected.status &&
-                      selected.serviceIndex.value === 'LAST_MILE'
-                    "
+                    v-if="CODpartnerSelected.status && selected.serviceIndex.value === 'LAST_MILE'"
                     class="d-flex mt-2"
                   >
                     <LcontrolDropdownCustom
@@ -260,7 +254,7 @@
                       :disabled-drop="$fetchState.pending"
                       :item-show="{ text: 'name', value: 'id' }"
                       :is-delete="true"
-                      @delete="handleCOD"
+                      @delete="handleDeleteRule({isCOD: true})"
                     />
                   </div>
                 </div>
@@ -279,6 +273,11 @@
         </div>
       </div>
     </v-card>
+    <BaseModalConfirm
+      v-model="dialog.deleteRule"
+      :dialog-settings="dialogSettings"
+      @doSubmit="deleteRules({idRule: CODpartnerSelected.idRule})"
+    />
   </section>
 </template>
 
@@ -302,6 +301,17 @@ import {
   RuleGroup,
 } from '~/types/lControl/lControl'
 import { VuexModuleMarketplaces } from '~/types/marketplace/marketplace'
+import { ModalConfirm } from '~/types/applications'
+
+export interface RulePayload {
+  data: {
+    definitions: Definition[]
+    partnerID: string
+    priority: number
+  }
+  id?: string
+  idRule?: string
+}
 
 export default defineComponent({
   name: 'LControl',
@@ -328,13 +338,26 @@ export default defineComponent({
         storeLControls.state.lControls.lControls.lControls
       )
     })
+    const dialog = ref({
+      deleteRule: false,
+    })
+    const dialogSettings = ref({
+      loading: false,
+      title: 'Are you sure you want to delete this COD?',
+      content: '',
+      cancelText: 'Cancel',
+      submitText: 'Delete',
+      submitColor: 'red white--text',
+    }) as Ref<ModalConfirm>
     const lControlsCust = ref([]) as Ref<RuleGroup[] | []>
     const zonesCust = ref([]) as Ref<any>
 
     const CODpartnerSelected = ref({
       status: false,
       partnerID: '',
-    })
+      idRule: ''
+    }) as Ref<{status: boolean, partnerID: string, idRule: string | unknown}>
+    const rulesComp = ref([]) as Ref<RulePayload[] | []>
 
     const selected = ref({
       countryIndex: null as { index: number; value: string } | null,
@@ -464,12 +487,11 @@ export default defineComponent({
       try {
         $fetchState.pending = true
         let routePath = 'getMarketplaces'
-        if (params.isCOD) routePath = 'getMarketplacesConnected'
-        await storeFilters.dispatch(`marketplaces/marketplaces/${routePath}`, {
-          params: dataParams,
-          isLControl: params.isLControl,
-          isCOD: params.isCOD,
-        })
+        if(params.isCOD) routePath = 'getMarketplacesConnected'
+        await storeFilters.dispatch(
+          `marketplaces/marketplaces/${routePath}`,
+          { params: dataParams, isLControl: params.isLControl, isCOD: params.isCOD }
+        )
       } catch (error) {
         return error
       } finally {
@@ -549,35 +571,262 @@ export default defineComponent({
               country: selected.value.countryIndex?.value,
               service: selected.value.serviceIndex?.value,
               zone: selected.value.zoneIndex.value,
-              isCOD: true,
+              isCOD: true
             })
           }
+          console.log('update',  {data})
           selected.value.partnerID = data.data.partnerID
           selected.value.ruleGroupID = data.data.ruleGroupID
           selected.value.rules = data.data.rules
           selected.value.ruleID = data.data.ruleID
           selected.value.priority = data.data.priority
           selected.value.isUpdate = !!data.data.partnerID
+
+          // COD
+          // if(selected.value.rules.some((x: Rule) =>x.definitions && x.definitions.some(y => y.type === 'RULE_TYPE_US_COD')) ) {
+
+          // }
+          if(checkDefinition({data: selected.value.rules, type: 'RULE_TYPE_IS_COD'}))  {
+            const dataCOD = checkDefinition({data: selected.value.rules, type: 'RULE_TYPE_IS_COD', isFilter: true}) as Rule
+            // console.log({dataCOD})
+            CODpartnerSelected.value.partnerID = dataCOD.partnerID
+            CODpartnerSelected.value.status = true
+          }
           break
         default:
           break
       }
     }
-    const addRules = async () => {
-      try {
-        const payload = {
+    function checkDefinition({data, type, isFilter}: {data: Rule[], type: string, isFilter?: boolean}) {
+      if(isFilter) {
+      return data.filter((x: Rule) =>x.definitions && x.definitions.some(y => y.type === type))[0] ?? {}
+      } else {
+        return data.some((x: Rule) =>{
+          // console.log(x)
+          return x.definitions && x.definitions.some(y => {
+            // console.log(y.type, type)
+            return y.type === type
+            }
+          )
+        })
+      }
+    }
+    // const rulesPayload = ref([])
+    const rulesPayload = computed(() => {
+      // let RG = [...lControlsCust.value]
+      // // let RG = [...storeLControls.state.lControls.lControls.lControls]
+      // if(selected.value.countryIndex?.value) {
+      //   RG = RG.filter(el => el.countryCode === selected.value.countryIndex?.value)
+      // }
+      // if(selected.value.serviceIndex?.value) {
+      //   RG = RG.filter(el => el.serviceType === selected.value.serviceIndex?.value)
+      // }
+      // console.log('store after filter', {RG})
+      // let rules = [] as any
+      // // let rules = rulesComp.value as any
+      // console.log('RGGGGGGG', {RG}, {store: storeLControls.state.lControls.lControls.lControls}, RG[0], RG[0].Rules)
+      // if(RG[0] && RG[0].Rules) {
+      //   rules = [...RG[0].Rules].map(el => {
+      //     return {
+      //       id: el.ruleGroupID,
+      //       idRule: el.id ,
+      //       data: {
+      //         partnerID: selected.value.partnerID,
+      //         priority: el.priority,
+      //         definitions: el.definitions && el.definitions.length > 0
+      //         ? el.definitions.map(x => {
+      //             return {
+      //               type: x.type,
+      //               value: x.value,
+      //             }
+      //           })
+      //         : null,
+      //       }
+      //     }
+      //   })
+      // }
+      // const temp =
+      //   {
+      //     id: selected.value.ruleGroupID,
+      //     data: {
+      //       partnerID: selected.value.partnerID,
+      //       priority: rules.length + 1,
+      //       definitions: [
+      //         {
+      //           type: 'RULE_TYPE_ZONE',
+      //           value: selected.value.zoneIndex?.value,
+      //         },
+      //       ],
+      //     }
+      //   }
+      // if(
+      //   // !rules.some((el: any) => el.definitions && el.definitions.includes((x: Definition) => x.type === 'RULE_TYPE_ZONE'))
+      //   // !checkDefinition({data: rules, type: 'RULE_TYPE_ZONE', isFilter: true})
+      //   !checkDefinition({data: [...rules].map(y => y.data), type: 'RULE_TYPE_ZONE'})
+      // ) {
+      //   rules = [...rules, temp]
+      // }
+      // console.log({RG}, {rules}, !checkDefinition({data: [...rules].map(y => y.data), type: 'RULE_TYPE_ZONE'}))
+      // if(CODpartnerSelected.value.partnerID && !checkDefinition({data: [...rules].map(y => y.data), type: 'RULE_TYPE_IS_COD'})) {
+      //   const cod = {
+      //     id: selected.value.ruleGroupID,
+      //     data: {
+      //       partnerID: CODpartnerSelected.value.partnerID,
+      //       priority: (rules.length + 1),
+      //       definitions: [
+      //         {
+      //           type: 'RULE_TYPE_IS_COD',
+      //           value: selected.value.zoneIndex?.value,
+      //         },
+      //       ],
+      //     }
+      //   }
+      //   rules = [...rules, cod]
+      // }
+      // return rules
+      // // return RG
+    return []
+    }) as any
+
+    watch(
+      () => [storeLControls.state.lControls.lControls.lControls, selected.value.countryIndex?.value, selected.value.serviceIndex?.value, selected.value.partnerID, CODpartnerSelected.value.partnerID, selected.value.ruleGroupID, dialog.value.deleteRule],
+      ([newLControl, countryValue, serviceValue, partnerDefault, CODpartner, newRGID, newDialogDelete]) => {
+      // let RG = [...lControlsCust.value]
+      let RG = [...storeLControls.state.lControls.lControls.lControls]
+      if(selected.value.countryIndex?.value) {
+        RG = RG.filter(el => el.countryCode === selected.value.countryIndex?.value)
+      }
+      if(selected.value.serviceIndex?.value) {
+        RG = RG.filter(el => el.serviceType === selected.value.serviceIndex?.value)
+      }
+      console.log('store after filter', {RG})
+      let rules = [] as any
+      // let rules = rulesComp.value as any
+      // console.log('RGGGGGGG', {RG}, {store: storeLControls.state.lControls.lControls.lControls}, RG[0], RG[0].Rules)
+      if(RG[0] && RG[0].Rules && RG[0].Rules.length > 0) {
+        rules = [...RG[0].Rules].map(el => {
+          console.log('COD after fetch post', el.partnerID, {
+            id: el.ruleGroupID,
+            idRule: el.id ,
+            data: {
+              partnerID: el.partnerID,
+              priority: el.priority,
+              definitions: el.definitions && el.definitions.length > 0
+              ? el.definitions.map(x => {
+                  return {
+                    type: x.type,
+                    value: x.value,
+                  }
+                })
+              : null,
+            }
+          })
+          return {
+            id: el.ruleGroupID,
+            idRule: el.id ,
+            data: {
+              partnerID: el.partnerID,
+              priority: el.priority,
+              definitions: el.definitions && el.definitions.length > 0
+              ? el.definitions.map(x => {
+                  return {
+                    type: x.type,
+                    value: x.value,
+                  }
+                })
+              : null,
+            }
+          }
+        })
+        console.log('COD after fetch post', rules)
+      }
+      const temp =
+        {
           id: selected.value.ruleGroupID,
           data: {
             partnerID: selected.value.partnerID,
-            priority: selected.value.rules.length + 1,
+            priority: rules.length + 1,
             definitions: [
               {
                 type: 'RULE_TYPE_ZONE',
                 value: selected.value.zoneIndex?.value,
               },
             ],
-          },
+          }
         }
+      if(
+        // !rules.some((el: any) => el.definitions && el.definitions.includes((x: Definition) => x.type === 'RULE_TYPE_ZONE'))
+        // !checkDefinition({data: rules, type: 'RULE_TYPE_ZONE', isFilter: true})
+        !checkDefinition({data: [...rules].map(y => y.data), type: 'RULE_TYPE_ZONE'})
+      ) {
+        rules = [...rules, temp]
+      } else if(checkDefinition({data: [...rules].map(y => y.data), type: 'RULE_TYPE_ZONE'})) {
+          const indexCOD = rules.findIndex((el: any) => el.data.definitions.some((x: any) => x.type === 'RULE_TYPE_ZONE'))
+          rules[indexCOD].data.partnerID = partnerDefault
+      }
+      console.log({RG}, {rules}, !checkDefinition({data: [...rules].map(y => y.data), type: 'RULE_TYPE_ZONE'}))
+      if(
+        CODpartnerSelected.value.partnerID
+        && !checkDefinition({data: [...rules].map(y => y.data), type: 'RULE_TYPE_IS_COD'})
+      ) {
+        const cod = {
+          id: selected.value.ruleGroupID,
+          data: {
+            partnerID: CODpartnerSelected.value.partnerID,
+            priority: (rules.length + 1),
+            definitions: [
+              {
+                type: 'RULE_TYPE_IS_COD',
+                value: selected.value.zoneIndex?.value,
+              },
+            ],
+          }
+        }
+        rules = [...rules, cod]
+      } else if(checkDefinition({data: [...rules].map(y => y.data), type: 'RULE_TYPE_IS_COD'})) {
+          const indexCOD = rules.findIndex((el: any) => el.data.definitions.some((x: any) => x.type === 'RULE_TYPE_IS_COD'))
+          rules[indexCOD].data.partnerID = CODpartner
+          // console.log('COD', rules.findIndex((el: any) => el.data.definitions.some((x: any) => x.type === 'RULE_TYPE_IS_COD')))
+          // console.log('COD', checkDefinition({data: [...rules].map(y => y.data), type: 'RULE_TYPE_IS_COD', isFilter: true}), rules)
+      }
+        console.log({CODpartner, rules})
+        rulesComp.value = rules
+      },
+      { deep: true }
+    )
+
+    console.log({rulesPayload, rulesComp, CODpartnerSelected})
+    const addRules = async (
+      // {isCOD} : {isCOD?: Boolean}
+      data: any
+    ) => {
+      try {
+        // let definitionsPayload = [
+        //   {
+        //     type: 'RULE_TYPE_ZONE',
+        //     value: selected.value.zoneIndex?.value,
+        //   },
+        // ] as Definition[]
+        // let partnerIDpayload = selected.value.partnerID
+        // if(isCOD) {
+        //   definitionsPayload = [
+        //     {
+        //       type: 'RULE_TYPE_IS_COD',
+        //       value: 'tes',
+        //     },
+        //   ]
+        //   partnerIDpayload = CODpartnerSelected.value.partnerID
+        // }
+        // const payload = {
+        //   id: selected.value.ruleGroupID,
+        //   data: {
+        //     partnerID: partnerIDpayload,
+        //     priority: selected.value.rules.length + 1,
+        //     definitions: definitionsPayload,
+        //   },
+        // }
+        const payload = data
+        // console.log(payload)
 
         $fetchState.pending = true
 
@@ -588,15 +837,26 @@ export default defineComponent({
         $fetchState.pending = false
       }
     }
-    const updateRules = async () => {
+    const updateRules = async (
+      data: any
+    ) => {
       try {
+        // const payload = {
+        //   id: selected.value.ruleID,
+        //   data: {
+        //     partnerID: selected.value.partnerID,
+        //     priority: selected.value.priority,
+        //   },
+        // }
         const payload = {
-          id: selected.value.ruleID,
+          id: data.idRule,
           data: {
-            partnerID: selected.value.partnerID,
-            priority: selected.value.priority,
+            partnerID: data.data.partnerID ,
+            priority: data.data.priority,
           },
         }
+        // delete data.definitions
+        // const payload = data
 
         $fetchState.pending = true
 
@@ -687,8 +947,32 @@ export default defineComponent({
       ]
     })
 
+
+    const deleteRules = async ({idRule} : {idRule?: string}) => {
+      try {
+        dialogSettings.value.loading = true
+
+        $fetchState.pending = true
+
+        // console.log('delete',{idRule})
+
+        await storeLControls.dispatch('lControls/lControls/deleteRules', {
+          ruleID: idRule,
+        })
+        await fetchRuleGroups()
+        CODpartnerSelected.value.idRule = ''
+        CODpartnerSelected.value.partnerID = ''
+        CODpartnerSelected.value.status = false
+      } catch (error) {
+        return error
+      } finally {
+        dialogSettings.value.loading = false
+        dialog.value.deleteRule = false
+        $fetchState.pending = false
+      }
+    }
     const handleInfoCOD = (partnerID: string) => {
-      return marketplacesCOD.value.some((x) => x.id === partnerID)
+      return marketplacesCOD.value.some(x => x.id === partnerID)
     }
 
     const btnAction = async () => {
@@ -703,7 +987,33 @@ export default defineComponent({
         if (!selected.value.ruleGroupID) {
           await addRuleGroup()
         }
-        await actionR()
+        const params = CODpartnerSelected.value.partnerID
+        ? {isCOD: !!CODpartnerSelected.value.partnerID}
+        : {}
+        // console.log(rulesComp.value)
+        // if(!selected.value.isUpdate) {
+          await Promise.all(rulesComp.value.map(async (el: any) => {
+            try {
+              if(el.idRule) {
+                await updateRules(el)
+              } else {
+                await addRules(el)
+              }
+            } catch (error) {
+              console.log('error'+ error);
+            }
+          }))
+          // await rulesPayload.value.forEach(async (el: any) => {
+          //   if(el.idRule) {
+          //     await updateRules(el)
+          //   } else {
+          //     await addRules(el)
+          //   }
+          //   // await actionR(el)
+          // });
+        // }
+        console.log('ini btn add', {rulesPayload})
+        // await actionR(params)
         await fetchRuleGroups()
       } catch (error) {
         return error
@@ -747,11 +1057,36 @@ export default defineComponent({
       return selected.value.serviceIndex?.value === 'CUSTOMS'
     }
 
-    function handleCOD() {
+    function handleCOD () {
       CODpartnerSelected.value.status = !CODpartnerSelected.value.status
-      if (!CODpartnerSelected.value.status) {
-        CODpartnerSelected.value.partnerID = ''
+      // if(!CODpartnerSelected.value.status) {
+      //   CODpartnerSelected.value.partnerID = ''
+      // }
+    }
+    function handleDeleteRule ({isCOD}: {isCOD?: Boolean}) {
+      // if(rulesComp.value.some((el: RulePayload) => !el.idRule)) {
+      //   CODpartnerSelected.value.status = false
+      //   CODpartnerSelected.value.partnerID = ''
+      //   }
+      if(
+        isCOD
+        // && rulesComp.value.some((el: RulePayload) => el.idRule)
+      ) {
+        const indexCOD = rulesComp.value.findIndex((el: RulePayload) => el.data.definitions.some((x: Definition) => x.type === 'RULE_TYPE_IS_COD'))
+        const idRule = rulesComp.value[indexCOD]?.idRule
+        if(indexCOD === -1 || rulesComp.value.some((el: RulePayload) => !el.idRule)) {
+            CODpartnerSelected.value.status = false
+            CODpartnerSelected.value.partnerID = ''
+          } else {
+          dialog.value.deleteRule = true
+
+        }
+        CODpartnerSelected.value.idRule = idRule
+        console.log({indexCOD, idRule, rulesComp})
       }
+      // if(!CODpartnerSelected.value.status) {
+      //   CODpartnerSelected.value.partnerID = ''
+      // }
     }
 
     onUnmounted(() => {
@@ -815,6 +1150,7 @@ export default defineComponent({
         selected.value.partnerID = ''
         CODpartnerSelected.value.status = false
         CODpartnerSelected.value.partnerID = ''
+        CODpartnerSelected.value.idRule = ''
       },
       { deep: true }
     )
@@ -877,6 +1213,9 @@ export default defineComponent({
                 serviceType = d.serviceType
                 if (d.Rules && d.Rules.length > 0) {
                   rules = d.Rules
+                  // const indexZone = d.Rules.findIndex((el: Rule) => el.definitions.some((x: Definition) => x.type === 'RULE_TYPE_ZONE'))
+                  // partnerID = d.Rules[indexZone].partnerID
+                  // partnerName = findNamePartner(partnerID)
                   d.Rules.forEach((c: Rule) => {
                     definitions = [...c.definitions].filter(
                       (e: Definition) => !e.type.includes('ZONE')
@@ -884,8 +1223,12 @@ export default defineComponent({
                     if (c.definitions && c.definitions.length > 0) {
                       c.definitions.forEach((e: Definition) => {
                         if (e.value === el.id) {
-                          partnerID = c.partnerID
-                          partnerName = findNamePartner(c.partnerID)
+                          const indexZone = d.Rules.findIndex((el: Rule) => el.definitions.some((x: Definition) => x.type === 'RULE_TYPE_ZONE'))
+                          // console.log('c.partnerID' , c.partnerID, e.type)
+                          partnerID = d.Rules[indexZone]?.partnerID
+                          partnerName = findNamePartner(partnerID)
+                          // partnerID = c.partnerID
+                          // partnerName = findNamePartner(c.partnerID)
                           priority = c.priority
                           ruleID = e.ruleID
                         }
@@ -912,7 +1255,7 @@ export default defineComponent({
           } else {
             zonesCust.value = computeZone
           }
-          console.log({ computeZone, zonesCust: zonesCust.value })
+          console.log({computeZone, zonesCust: zonesCust.value})
         }
       },
       { deep: true }
@@ -944,6 +1287,11 @@ export default defineComponent({
       handleCOD,
       marketplacesCOD,
       handleInfoCOD,
+      rulesPayload,
+      dialog,
+      dialogSettings,
+      deleteRules,
+      handleDeleteRule
     }
   },
   head: {},
@@ -1132,10 +1480,17 @@ export default defineComponent({
   }
   .btn-COD {
     margin-top: 10px;
-    transition: all 0.3s;
+    transition: all .3s;
     &:hover {
-      opacity: 0.8;
+      opacity: .8;
     }
+  }
+  .disabled {
+    &.btn-COD {
+      cursor: not-allowed
+    }
+    opacity: .5;
+    pointer-events: none;
   }
 }
 </style>
