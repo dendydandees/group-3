@@ -11,7 +11,9 @@
           <v-img
             :aspect-ratio="100 / 100"
             class="rounded-circle"
-            :src="`data:image/png;base64,${detailMarketplace.logo ? detailMarketplace.logo : ''}`"
+            :src="`data:image/png;base64,${
+              detailMarketplace.logo ? detailMarketplace.logo : ''
+            }`"
           >
           </v-img>
         </v-card>
@@ -196,11 +198,7 @@
           Download SLA
         </v-btn>
       </div>
-      <v-row
-        v-if="partnerServiceZones"
-        align="center"
-        class="mt-2"
-      >
+      <v-row v-if="partnerServiceZones" align="center" class="mt-2">
         <v-col cols="12">
           <BaseTable
             item-key="id"
@@ -209,7 +207,7 @@
             :options="pagination"
             :loading="$fetchState.pending"
           />
-            <!-- @fetch="fetchIncomingOrders" -->
+          <!-- @fetch="fetchIncomingOrders" -->
         </v-col>
       </v-row>
     </div>
@@ -271,57 +269,70 @@ export default defineComponent({
     const selectedZone = reactive({
       value: '',
     })
-    const zones =computed(
-      () => storeFilters.state.filters.zones
-    )
+    const zones = computed(() => storeFilters.state.filters.zones)
     const detailMarketplace = computed(
       () => storeDetailMarketplace.state.marketplaces.marketplaces.detail
     ) as any
-    const partnerServiceZones = computed(
-      () => {
-        if(detailMarketplace.value && detailMarketplace.value.partnerServiceZones && detailMarketplace.value.partnerServiceZones.length > 0 && zones.value && zones.value.length > 0) {
-          const temp1 = [...detailMarketplace.value.partnerServiceZones].map(el => {
+    const partnerServiceZones = computed(() => {
+      if (
+        detailMarketplace.value &&
+        detailMarketplace.value.partnerServiceZones &&
+        detailMarketplace.value.partnerServiceZones.length > 0 &&
+        zones.value &&
+        zones.value.length > 0
+      ) {
+        const temp1 = [...detailMarketplace.value.partnerServiceZones].map(
+          (el) => {
             return {
               countryTable: el.zone_country,
-              zoneTable: [...zones.value].filter(x => x.id === el.zone_id)[0]?.zoneName ?? '',
-              slaTable:`${el.sla_from}-${el.sla_to} days`,
+              zoneTable:
+                [...zones.value].filter((x) => x.id === el.zone_id)[0]
+                  ?.zoneName ?? '',
+              slaTable: `${el.sla_from}-${el.sla_to} days`,
               codTable: el.cod,
-              color: el.cod ? 'green' : 'error'
+              color: el.cod ? 'green' : 'error',
             }
-          })
-          let temp2 = [...zones.value].map(el => {
-            if(
-              ![...detailMarketplace.value.partnerServiceZones].some(x => {return (el.id === x.zone_id)}) &&
-              temp1.some(y => y.countryTable === el.country)
-            ) {
-              return {
-                countryTable: el.country,
-                zoneTable: el.zoneName,
-                slaTable: '',
-                codTable: false,
-                color: 'error'
-              }
+          }
+        )
+        let temp2 = [...zones.value].map((el) => {
+          if (
+            ![...detailMarketplace.value.partnerServiceZones].some((x) => {
+              return el.id === x.zone_id
+            }) &&
+            temp1.some((y) => y.countryTable === el.country)
+          ) {
+            return {
+              countryTable: el.country,
+              zoneTable: el.zoneName,
+              slaTable: '',
+              codTable: false,
+              color: 'error',
             }
-          })
-          temp2 = temp2.filter(y => y)
-          function compare( a: any, b: any ) {
-            return a.countryTable.localeCompare(b.countryTable) || b.codTable - a.codTable
           }
-          const output = [...temp1, ...temp2].sort(compare)
-          let filtered = output
-          if(selectedZone.value) {
-            filtered = output.filter(el => el?.countryTable === selectedZone.value)
-          }
-            // console.log({temp2}, [...temp1, ...temp2])
-          return filtered
+        })
+        temp2 = temp2.filter((y) => y)
+        function compare(a: any, b: any) {
+          return (
+            a.countryTable.localeCompare(b.countryTable) ||
+            b.codTable - a.codTable
+          )
         }
+        const output = [...temp1, ...temp2].sort(compare)
+        let filtered = output
+        if (selectedZone.value) {
+          filtered = output.filter(
+            (el) => el?.countryTable === selectedZone.value
+          )
+        }
+        // console.log({temp2}, [...temp1, ...temp2])
+        return filtered
       }
-    )
+    })
     console.log(partnerServiceZones)
     const detailGalleries = computed(
       () => storeDetailMarketplace.state.marketplaces.marketplaces.galleries
     )
-    console.log({detailGalleries, detailMarketplace})
+    console.log({ detailGalleries, detailMarketplace })
     // const zones = ref([]) as Ref<Zone[]>
 
     const detailProfileHeader = reactive([
@@ -420,42 +431,42 @@ export default defineComponent({
       showImg(index)
     }
 
-// START TABLE ZONE COD SLA
-interface Header {
-  text: string
-  value: string
-  sortable?: boolean
-}
-const pagination = ref({
-  // ...storeApplications.state.applications.pagination,
-  page: 1,
-  itemsPerPage: 1000,
-})
-const headers = [
-  {
-    text: 'Country',
-    value: 'countryTable',
-    sortable: false,
-  },
-  {
-    text: 'Zone',
-    value: 'zoneTable',
-    sortable: false,
-  },
-  {
-    text: 'SLA',
-    value: 'slaTable',
-    sortable: false,
-    // width: 150,
-  },
-  {
-    text: 'COD',
-    value: 'codTable',
-    sortable: false,
-    // width: 150,
-  },
-] as Header[]
-// END TABLE ZONE COD SLA
+    // START TABLE ZONE COD SLA
+    interface Header {
+      text: string
+      value: string
+      sortable?: boolean
+    }
+    const pagination = ref({
+      // ...storeApplications.state.applications.pagination,
+      page: 1,
+      itemsPerPage: 1000,
+    })
+    const headers = [
+      {
+        text: 'Country',
+        value: 'countryTable',
+        sortable: false,
+      },
+      {
+        text: 'Zone',
+        value: 'zoneTable',
+        sortable: false,
+      },
+      {
+        text: 'SLA',
+        value: 'slaTable',
+        sortable: false,
+        // width: 150,
+      },
+      {
+        text: 'COD',
+        value: 'codTable',
+        sortable: false,
+        // width: 150,
+      },
+    ] as Header[]
+    // END TABLE ZONE COD SLA
 
     const imagesLightBox = (data: { src: string }[]) => {
       if (data && data.length > 0) {
@@ -562,7 +573,7 @@ const headers = [
       // TABLE ZONE COD SLA
       headers,
       pagination,
-      partnerServiceZones
+      partnerServiceZones,
     }
   },
   head: {},

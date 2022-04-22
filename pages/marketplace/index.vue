@@ -169,7 +169,11 @@
           <div class="container-your-partner">
             <div class="wrapper-your-partner">
               <v-row>
-                <v-col v-for="(x, i) in marketplacesConnected" :key="i" cols="4">
+                <v-col
+                  v-for="(x, i) in marketplacesConnected"
+                  :key="i"
+                  cols="4"
+                >
                   <v-tooltip bottom>
                     <template #activator="{ on, attrs }">
                       <v-img
@@ -182,9 +186,8 @@
                         <!-- src="https://cdn.vuetifyjs.com/images/cards/cooking.png" -->
                       </v-img>
                     </template>
-                    <span>{{x.name}}</span>
+                    <span>{{ x.name }}</span>
                   </v-tooltip>
-
                 </v-col>
               </v-row>
             </div>
@@ -412,7 +415,8 @@ export default defineComponent({
       () => storeMarketplaces.state.marketplaces.marketplaces.marketplaces
     )
     const marketplacesConnected = computed(
-      () => storeMarketplaces.state.marketplaces.marketplaces.marketplacesConnected
+      () =>
+        storeMarketplaces.state.marketplaces.marketplaces.marketplacesConnected
     )
     const meta = computed(
       () => storeMarketplaces.state.marketplaces.marketplaces.meta
@@ -472,7 +476,7 @@ export default defineComponent({
           'marketplaces/marketplaces/addConnection',
           { id }
         )
-        if(res?.error) throw res?.error
+        if (res?.error) throw res?.error
         dialog.status = false
         fetch()
       } catch (error: any) {
@@ -581,17 +585,13 @@ export default defineComponent({
       }
     }
     const { $fetchState, fetch } = useFetch(async () => {
-      await fetchMarketplace(
-        {
-          ...filter.value,
-          ...pagination.value
-        }
-      )
-      await fetchMarketplaceConnected(
-        {
-          ...filter.value,
-        }
-      )
+      await fetchMarketplace({
+        ...filter.value,
+        ...pagination.value,
+      })
+      await fetchMarketplaceConnected({
+        ...filter.value,
+      })
       await fetchCountryCodes()
       await fetchServiceZoneOnce()
       // zones.value =  [ ...storeFilters.state.filters.zones]
@@ -601,11 +601,13 @@ export default defineComponent({
     const locationMapping = (partnerServiceZones: PartnerServiceZone[]) => {
       if (partnerServiceZones && partnerServiceZones.length > 0) {
         const temp = [] as string[]
-        partnerServiceZones.forEach((el:{id: string, zone_country: string}) => {
-          if(!temp.includes(el.zone_country)) {
-            temp.push(el.zone_country)
+        partnerServiceZones.forEach(
+          (el: { id: string; zone_country: string }) => {
+            if (!temp.includes(el.zone_country)) {
+              temp.push(el.zone_country)
+            }
           }
-        })
+        )
         return temp.join(', ')
       } else {
         return ''
@@ -724,7 +726,7 @@ export default defineComponent({
       countryCodes,
       ports,
       marketplacesConnected,
-      errorAdd
+      errorAdd,
     }
   },
   head: {},

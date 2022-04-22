@@ -220,22 +220,25 @@
                   <div
                     v-if="selected.partnerID"
                     class="primary--text"
-                    style="font-size: 12px;margin-top: 5px;justify-content: end;display: flex;"
+                    style="
+                      font-size: 12px;
+                      margin-top: 5px;
+                      justify-content: end;
+                      display: flex;
+                    "
                   >
-                    <span
-                      v-if="handleInfoCOD(selected.partnerID)"
-                    >
+                    <span v-if="handleInfoCOD(selected.partnerID)">
                       Partner available for COD service
                     </span>
-                    <span
-                      v-else
-                      class="error--text"
-                    >
+                    <span v-else class="error--text">
                       Partner not available for COD service
                     </span>
                   </div>
                   <div
-                    v-if="!CODpartnerSelected.status && selected.serviceIndex.value === 'LAST_MILE'"
+                    v-if="
+                      !CODpartnerSelected.status &&
+                      selected.serviceIndex.value === 'LAST_MILE'
+                    "
                     class="primary--text btn-COD"
                     style="cursor: pointer"
                     @click="handleCOD"
@@ -243,7 +246,10 @@
                     + Add COD Default Network Partner
                   </div>
                   <div
-                    v-if="CODpartnerSelected.status && selected.serviceIndex.value === 'LAST_MILE'"
+                    v-if="
+                      CODpartnerSelected.status &&
+                      selected.serviceIndex.value === 'LAST_MILE'
+                    "
                     class="d-flex mt-2"
                   >
                     <LcontrolDropdownCustom
@@ -327,7 +333,7 @@ export default defineComponent({
 
     const CODpartnerSelected = ref({
       status: false,
-      partnerID: ''
+      partnerID: '',
     })
 
     const selected = ref({
@@ -458,11 +464,12 @@ export default defineComponent({
       try {
         $fetchState.pending = true
         let routePath = 'getMarketplaces'
-        if(params.isCOD) routePath = 'getMarketplacesConnected'
-        await storeFilters.dispatch(
-          `marketplaces/marketplaces/${routePath}`,
-          { params: dataParams, isLControl: params.isLControl, isCOD: params.isCOD }
-        )
+        if (params.isCOD) routePath = 'getMarketplacesConnected'
+        await storeFilters.dispatch(`marketplaces/marketplaces/${routePath}`, {
+          params: dataParams,
+          isLControl: params.isLControl,
+          isCOD: params.isCOD,
+        })
       } catch (error) {
         return error
       } finally {
@@ -542,7 +549,7 @@ export default defineComponent({
               country: selected.value.countryIndex?.value,
               service: selected.value.serviceIndex?.value,
               zone: selected.value.zoneIndex.value,
-              isCOD: true
+              isCOD: true,
             })
           }
           selected.value.partnerID = data.data.partnerID
@@ -680,9 +687,8 @@ export default defineComponent({
       ]
     })
 
-
     const handleInfoCOD = (partnerID: string) => {
-      return marketplacesCOD.value.some(x => x.id === partnerID)
+      return marketplacesCOD.value.some((x) => x.id === partnerID)
     }
 
     const btnAction = async () => {
@@ -741,9 +747,9 @@ export default defineComponent({
       return selected.value.serviceIndex?.value === 'CUSTOMS'
     }
 
-    function handleCOD () {
+    function handleCOD() {
       CODpartnerSelected.value.status = !CODpartnerSelected.value.status
-      if(!CODpartnerSelected.value.status) {
+      if (!CODpartnerSelected.value.status) {
         CODpartnerSelected.value.partnerID = ''
       }
     }
@@ -906,7 +912,7 @@ export default defineComponent({
           } else {
             zonesCust.value = computeZone
           }
-          console.log({computeZone, zonesCust: zonesCust.value})
+          console.log({ computeZone, zonesCust: zonesCust.value })
         }
       },
       { deep: true }
@@ -937,7 +943,7 @@ export default defineComponent({
       CODpartnerSelected,
       handleCOD,
       marketplacesCOD,
-      handleInfoCOD
+      handleInfoCOD,
     }
   },
   head: {},
@@ -1126,9 +1132,9 @@ export default defineComponent({
   }
   .btn-COD {
     margin-top: 10px;
-    transition: all .3s;
+    transition: all 0.3s;
     &:hover {
-      opacity: .8;
+      opacity: 0.8;
     }
   }
 }
