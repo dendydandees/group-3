@@ -574,7 +574,6 @@ export default defineComponent({
               isCOD: true
             })
           }
-          console.log('update',  {data})
           selected.value.partnerID = data.data.partnerID
           selected.value.ruleGroupID = data.data.ruleGroupID
           selected.value.rules = data.data.rules
@@ -588,7 +587,7 @@ export default defineComponent({
           // }
           if(checkDefinition({data: selected.value.rules, type: 'RULE_TYPE_IS_COD'}))  {
             const dataCOD = checkDefinition({data: selected.value.rules, type: 'RULE_TYPE_IS_COD', isFilter: true}) as Rule
-            // console.log({dataCOD})
+
             CODpartnerSelected.value.partnerID = dataCOD.partnerID
             CODpartnerSelected.value.status = true
           }
@@ -602,92 +601,16 @@ export default defineComponent({
       return data.filter((x: Rule) =>x.definitions && x.definitions.some(y => y.type === type))[0] ?? {}
       } else {
         return data.some((x: Rule) =>{
-          // console.log(x)
+
           return x.definitions && x.definitions.some(y => {
-            // console.log(y.type, type)
+
             return y.type === type
             }
           )
         })
       }
     }
-    // const rulesPayload = ref([])
-    const rulesPayload = computed(() => {
-      // let RG = [...lControlsCust.value]
-      // // let RG = [...storeLControls.state.lControls.lControls.lControls]
-      // if(selected.value.countryIndex?.value) {
-      //   RG = RG.filter(el => el.countryCode === selected.value.countryIndex?.value)
-      // }
-      // if(selected.value.serviceIndex?.value) {
-      //   RG = RG.filter(el => el.serviceType === selected.value.serviceIndex?.value)
-      // }
-      // console.log('store after filter', {RG})
-      // let rules = [] as any
-      // // let rules = rulesComp.value as any
-      // console.log('RGGGGGGG', {RG}, {store: storeLControls.state.lControls.lControls.lControls}, RG[0], RG[0].Rules)
-      // if(RG[0] && RG[0].Rules) {
-      //   rules = [...RG[0].Rules].map(el => {
-      //     return {
-      //       id: el.ruleGroupID,
-      //       idRule: el.id ,
-      //       data: {
-      //         partnerID: selected.value.partnerID,
-      //         priority: el.priority,
-      //         definitions: el.definitions && el.definitions.length > 0
-      //         ? el.definitions.map(x => {
-      //             return {
-      //               type: x.type,
-      //               value: x.value,
-      //             }
-      //           })
-      //         : null,
-      //       }
-      //     }
-      //   })
-      // }
-      // const temp =
-      //   {
-      //     id: selected.value.ruleGroupID,
-      //     data: {
-      //       partnerID: selected.value.partnerID,
-      //       priority: rules.length + 1,
-      //       definitions: [
-      //         {
-      //           type: 'RULE_TYPE_ZONE',
-      //           value: selected.value.zoneIndex?.value,
-      //         },
-      //       ],
-      //     }
-      //   }
-      // if(
-      //   // !rules.some((el: any) => el.definitions && el.definitions.includes((x: Definition) => x.type === 'RULE_TYPE_ZONE'))
-      //   // !checkDefinition({data: rules, type: 'RULE_TYPE_ZONE', isFilter: true})
-      //   !checkDefinition({data: [...rules].map(y => y.data), type: 'RULE_TYPE_ZONE'})
-      // ) {
-      //   rules = [...rules, temp]
-      // }
-      // console.log({RG}, {rules}, !checkDefinition({data: [...rules].map(y => y.data), type: 'RULE_TYPE_ZONE'}))
-      // if(CODpartnerSelected.value.partnerID && !checkDefinition({data: [...rules].map(y => y.data), type: 'RULE_TYPE_IS_COD'})) {
-      //   const cod = {
-      //     id: selected.value.ruleGroupID,
-      //     data: {
-      //       partnerID: CODpartnerSelected.value.partnerID,
-      //       priority: (rules.length + 1),
-      //       definitions: [
-      //         {
-      //           type: 'RULE_TYPE_IS_COD',
-      //           value: selected.value.zoneIndex?.value,
-      //         },
-      //       ],
-      //     }
-      //   }
-      //   rules = [...rules, cod]
-      // }
-      // return rules
-      // // return RG
-    return []
-    }) as any
-
+    // LOGIC FETCH DATA
     watch(
       () => [storeLControls.state.lControls.lControls.lControls, selected.value.countryIndex?.value, selected.value.serviceIndex?.value, selected.value.partnerID, CODpartnerSelected.value.partnerID, selected.value.ruleGroupID, dialog.value.deleteRule],
       ([newLControl, countryValue, serviceValue, partnerDefault, CODpartner, newRGID, newDialogDelete]) => {
@@ -699,28 +622,16 @@ export default defineComponent({
       if(selected.value.serviceIndex?.value) {
         RG = RG.filter(el => el.serviceType === selected.value.serviceIndex?.value)
       }
-      console.log('store after filter', {RG})
+      if(selected.value.zoneIndex?.value) {
+        RG = RG.filter(el => el.Rules.some(x => x.definitions.some(y => y.value === selected.value.zoneIndex?.value)))
+      }
+
+
       let rules = [] as any
       // let rules = rulesComp.value as any
-      // console.log('RGGGGGGG', {RG}, {store: storeLControls.state.lControls.lControls.lControls}, RG[0], RG[0].Rules)
+
       if(RG[0] && RG[0].Rules && RG[0].Rules.length > 0) {
         rules = [...RG[0].Rules].map(el => {
-          console.log('COD after fetch post', el.partnerID, {
-            id: el.ruleGroupID,
-            idRule: el.id ,
-            data: {
-              partnerID: el.partnerID,
-              priority: el.priority,
-              definitions: el.definitions && el.definitions.length > 0
-              ? el.definitions.map(x => {
-                  return {
-                    type: x.type,
-                    value: x.value,
-                  }
-                })
-              : null,
-            }
-          })
           return {
             id: el.ruleGroupID,
             idRule: el.id ,
@@ -738,7 +649,6 @@ export default defineComponent({
             }
           }
         })
-        console.log('COD after fetch post', rules)
       }
       const temp =
         {
@@ -764,7 +674,7 @@ export default defineComponent({
           const indexCOD = rules.findIndex((el: any) => el.data.definitions.some((x: any) => x.type === 'RULE_TYPE_ZONE'))
           rules[indexCOD].data.partnerID = partnerDefault
       }
-      console.log({RG}, {rules}, !checkDefinition({data: [...rules].map(y => y.data), type: 'RULE_TYPE_ZONE'}))
+
       if(
         CODpartnerSelected.value.partnerID
         && !checkDefinition({data: [...rules].map(y => y.data), type: 'RULE_TYPE_IS_COD'})
@@ -786,16 +696,15 @@ export default defineComponent({
       } else if(checkDefinition({data: [...rules].map(y => y.data), type: 'RULE_TYPE_IS_COD'})) {
           const indexCOD = rules.findIndex((el: any) => el.data.definitions.some((x: any) => x.type === 'RULE_TYPE_IS_COD'))
           rules[indexCOD].data.partnerID = CODpartner
-          // console.log('COD', rules.findIndex((el: any) => el.data.definitions.some((x: any) => x.type === 'RULE_TYPE_IS_COD')))
-          // console.log('COD', checkDefinition({data: [...rules].map(y => y.data), type: 'RULE_TYPE_IS_COD', isFilter: true}), rules)
       }
-        console.log({CODpartner, rules})
+
+        console.log({rules, RG})
         rulesComp.value = rules
       },
       { deep: true }
     )
 
-    console.log({rulesPayload, rulesComp, CODpartnerSelected})
+
     const addRules = async (
       // {isCOD} : {isCOD?: Boolean}
       data: any
@@ -826,7 +735,7 @@ export default defineComponent({
         //   },
         // }
         const payload = data
-        // console.log(payload)
+
 
         $fetchState.pending = true
 
@@ -954,7 +863,6 @@ export default defineComponent({
 
         $fetchState.pending = true
 
-        // console.log('delete',{idRule})
 
         await storeLControls.dispatch('lControls/lControls/deleteRules', {
           ruleID: idRule,
@@ -990,11 +898,11 @@ export default defineComponent({
         const params = CODpartnerSelected.value.partnerID
         ? {isCOD: !!CODpartnerSelected.value.partnerID}
         : {}
-        // console.log(rulesComp.value)
+
         // if(!selected.value.isUpdate) {
           await Promise.all(rulesComp.value.map(async (el: any) => {
             try {
-              if(el.idRule) {
+              if(el.idRule && selected.value.isUpdate) {
                 await updateRules(el)
               } else {
                 await addRules(el)
@@ -1003,16 +911,7 @@ export default defineComponent({
               console.log('error'+ error);
             }
           }))
-          // await rulesPayload.value.forEach(async (el: any) => {
-          //   if(el.idRule) {
-          //     await updateRules(el)
-          //   } else {
-          //     await addRules(el)
-          //   }
-          //   // await actionR(el)
-          // });
         // }
-        console.log('ini btn add', {rulesPayload})
         // await actionR(params)
         await fetchRuleGroups()
       } catch (error) {
@@ -1044,11 +943,6 @@ export default defineComponent({
 
     function findNamePartner(id: string) {
       if (marketplacesAll.value && marketplacesAll.value.length > 0) {
-        // console.log(
-        //   marketplacesAll.value,
-        //   marketplacesAll.value.filter((x) => x.id === id)[0]?.name,
-        //   id
-        // )
         return marketplacesAll.value.filter((x) => x.id === id)[0]?.name
       }
     }
@@ -1082,7 +976,7 @@ export default defineComponent({
 
         }
         CODpartnerSelected.value.idRule = idRule
-        console.log({indexCOD, idRule, rulesComp})
+
       }
       // if(!CODpartnerSelected.value.status) {
       //   CODpartnerSelected.value.partnerID = ''
@@ -1151,6 +1045,7 @@ export default defineComponent({
         CODpartnerSelected.value.status = false
         CODpartnerSelected.value.partnerID = ''
         CODpartnerSelected.value.idRule = ''
+        rulesComp.value = []
       },
       { deep: true }
     )
@@ -1255,7 +1150,7 @@ export default defineComponent({
           } else {
             zonesCust.value = computeZone
           }
-          console.log({computeZone, zonesCust: zonesCust.value})
+
         }
       },
       { deep: true }
@@ -1264,7 +1159,7 @@ export default defineComponent({
     watch(
       selected,
       () => {
-        // console.log(newSelected)
+
       },
       { deep: true }
     )
@@ -1287,7 +1182,7 @@ export default defineComponent({
       handleCOD,
       marketplacesCOD,
       handleInfoCOD,
-      rulesPayload,
+
       dialog,
       dialogSettings,
       deleteRules,
