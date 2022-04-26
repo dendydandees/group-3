@@ -192,8 +192,10 @@ export default defineComponent({
               items,
               consigneePostal: order?.consigneePostal?.toString() || '',
               consigneeNumber: order?.consigneeNumber?.toString() || '',
+              consigneeTaxId: order?.consigneeTaxId?.toString() || '',
               senderPostal: order?.senderPostal?.toString() || '',
               senderContactNumber: order?.senderContactNumber?.toString() || '',
+              incoterm: order.shipmentNcoterm,
               codValue,
               codCurrency,
               firstMile,
@@ -208,7 +210,9 @@ export default defineComponent({
       } catch (error) {
         return error
       } finally {
-        emit('changeLoading')
+        setTimeout(() => {
+          emit('changeLoading')
+        }, 1000)
       }
     }
 

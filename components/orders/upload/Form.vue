@@ -1,11 +1,11 @@
 <template>
   <article>
     <v-card-text class="pa-8">
-      <v-expand-transition>
+      <v-scroll-y-transition hide-on-leave>
         <v-alert v-if="alert.isShow" :type="alert.type" rounded="xl">
           {{ alert.message }}
         </v-alert>
-      </v-expand-transition>
+      </v-scroll-y-transition>
 
       <ValidationObserver
         ref="additionalObserver"
