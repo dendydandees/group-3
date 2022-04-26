@@ -29,6 +29,7 @@ export interface Order {
   consigneeState: string
   consigneeProvince: string
   consigneeEmail: string
+  consigneeTaxId: string
   length: number
   width: number
   height: number
@@ -141,4 +142,6 @@ export interface OrderUpload extends Order {
   customs: boolean
   customBrokerages: boolean
   shipmentIncoterm: string
+  shipmentNcoterm: string
+  uploadType: string
 }
