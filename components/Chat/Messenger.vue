@@ -109,18 +109,22 @@ export default  defineComponent ({
         'sendBird/sendBird/connect',
         '002'
       )
-      .then(async () => {
-        console.log("PSR");
+      .then(async (res) => {
+        console.log("PSR", res);
+        // if (true) {
         if (route.params.recipient) {
           try {
             const currentUser = sb.currentUser.userId;
+
             const chat = await storeSendBird.dispatch(
               'sendBird/sendBird/startChat',
               [
                 currentUser,
                 `${route.params.recipient}`,
+                `005`,
               ]
             )
+
             newChat.value = chat;
             selectedChat.value = chat;
           } catch (err) {

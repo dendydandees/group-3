@@ -1,20 +1,21 @@
 // Interfaces
 import { MutationTree, ActionTree } from 'vuex';
 import SendBird from 'sendbird';
-// import SendbirdChat from '@sendbird/chat';
-// import { OpenChannelModule } from '@sendbird/chat/openChannel';
+import SendbirdChat from '@sendbird/chat';
+import { OpenChannelModule } from '@sendbird/chat/openChannel';
 // import { GroupChannelModule } from '@sendbird/chat/groupChannel';
 
-
-const appId = "";
-export const sb = new SendBird({ appId });
+const appId = 'BCCB0A15-889C-4508-BCD6-7C70DB6CFD23';
+export const sb = new SendBird({ appId, localCacheEnabled: true });
 // export const sb = SendbirdChat.init({
 //   appId,
 //   modules: [
 //     new OpenChannelModule(),
-//     new GroupChannelModule()
+//     // new GroupChannelModule()
 //   ],
 // });
+
+console.log({ sb, appId, env: process.env });
 
 
 
@@ -67,11 +68,46 @@ export const actions: ActionTree<RootStateSendBird, RootStateSendBird> = {
     return new Promise((resolve, reject) => {
       // The boolean argument below directs the app to look for an existing chat between
       // the two users. Creates a new chat if no match is found
-
       sb.GroupChannel.createChannelWithUserIds(
         userIds, true, function (channel: any, error: any) {
           if (error) reject(new Error(`Channel creation Failed: ${ error }`));
           resolve(channel);
+        });
+    });
+  },
+
+  createChannel(_store) {
+    return new Promise((resolve, reject) => {
+      // The boolean argument below directs the app to look for an existing chat between
+      // the two users. Creates a new chat if no match is found
+      sb.OpenChannel.createChannel(
+        function (openChannel: any, error: any) {
+          console.log({ openChannel });
+          if (error) reject(new Error(`Channel creation Failed: ${ error }`));
+          resolve(openChannel);
+        });
+    });
+  },
+
+  getChannel(_store, channelUrl) {
+    return new Promise((resolve, reject) => {
+      // The boolean argument below directs the app to look for an existing chat between
+      // the two users. Creates a new chat if no match is found
+      sb.OpenChannel.getChannel(
+        channelUrl, function (openChannel: any, error: any) {
+          if (error) reject(new Error(`Get Channel Failed: ${ error }`));
+          console.log('getChannel', openChannel);
+          resolve(openChannel);
+          openChannel.enter(function (response: any, error: any) {
+            console.log({ enterResponse: response });
+            if (error) {
+              reject(new Error(`Channel creation Failed: ${ error }`));
+            }
+
+            // resolve(response);
+            // The current user successfully enters the open channel,
+            // and can chat with other users in the channel by using APIs.
+          });
         });
     });
   },
@@ -113,11 +149,13 @@ export const actions: ActionTree<RootStateSendBird, RootStateSendBird> = {
   getChatList(_store) {
     return new Promise((resolve, reject) => {
       const channelListQuery = sb.GroupChannel.createMyGroupChannelListQuery();
+      console.log({ channelListQuery });
       channelListQuery.includeEmpty = true;
       channelListQuery.order = 'latest_last_message';
 
       if (channelListQuery.hasNext) {
         channelListQuery.next(function (channelList: any, error: any) {
+          console.log({ channelList });
           if (error) reject(new Error(`Could not get list: ${ error }`));
           resolve(channelList);
         });

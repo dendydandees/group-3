@@ -42,7 +42,8 @@ export default defineComponent({
     const selectedId = ref(null)
     function getList() {
         storeSendBird.dispatch(
-          'sendBird/sendBird/connect'
+          'sendBird/sendBird/connect',
+          '002'
         )
         .then(async (res)=> {
         const list = await storeSendBird.dispatch(
@@ -54,10 +55,10 @@ export default defineComponent({
     function getRecipient(chat: any) {
       const currentUser = sb.currentUser
       const {members} = chat
-      const [recipient] = members.filter((user: any) => user.userId !== currentUser.userId)
+      const [recipient] =  members.filter((user: any) => user?.userId !== currentUser?.userId)
       return {
-        name: recipient.metaData.fullName,
-        avatar: recipient.metaData.avatar || null // could have a default picture for every profile
+        name: recipient?.metaData?.fullName,
+        avatar: recipient?.metaData?.avatar || null // could have a default picture for every profile
       }
     }
     function getLastMessage(chat: any) {
@@ -83,7 +84,7 @@ export default defineComponent({
 
       const currentClicked = document.getElementById(channel.url) as any
       selectedId.value = channel.url
-      currentClicked.style.background = '#E0E0E0'
+      if(currentClicked) currentClicked.style.background = '#E0E0E0'
       emit('selectChat', channel);
     }
     watch(
