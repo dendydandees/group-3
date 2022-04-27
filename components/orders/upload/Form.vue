@@ -2,8 +2,21 @@
   <article>
     <v-card-text class="pa-8">
       <v-scroll-y-transition hide-on-leave>
-        <v-alert v-if="alert.isShow" :type="alert.type" rounded="xl">
-          {{ alert.message }}
+        <v-alert
+          v-if="alert.isShow"
+          :type="alert.type"
+          rounded="xl"
+          :icon="typeof alert.message === 'string'"
+        >
+          <template v-if="typeof alert.message === 'string'">
+            {{ alert.message }}
+          </template>
+
+          <template v-else>
+            <ul v-for="(item, index) in alert.message" :key="index">
+              <li>{{ item }}</li>
+            </ul>
+          </template>
         </v-alert>
       </v-scroll-y-transition>
 
@@ -79,6 +92,13 @@ export interface Select {
   country: string
 }
 
+interface ErrorUpload {
+  data: {
+    error: string
+    ErrorDetails: { field: string; reason: string; note: string }[]
+  }
+}
+
 export default defineComponent({
   name: 'UploadForm',
   components: {
@@ -135,7 +155,7 @@ export default defineComponent({
       } finally {
         setTimeout(() => {
           loading.value = false
-        }, 500)
+        }, 1000)
       }
     }
     const doSubmitForm = async () => {
@@ -176,11 +196,23 @@ export default defineComponent({
         })
         setTimeout(() => {
           router.push('/orders')
-        }, 1500)
-      } catch (error) {
-        const message =
-          (error as any)?.data?.error ??
-          `Order upload data invalid, The data contained in the file you uploaded is incorrect. Please add data according to the existing sample file!`
+        }, 2000)
+      } catch (error: any) {
+        const {
+          data: { error: normalError = '', ErrorDetails: listError = [] } = {},
+        } = error as ErrorUpload
+        let message =
+          `Order upload data invalid, The data contained in the file you uploaded is incorrect. Please add data according to the existing sample file!` as
+            | string
+            | string[]
+
+        if (normalError) {
+          message = normalError
+        }
+
+        if (listError && listError.length > 0) {
+          message = listError.map((item) => item.note)
+        }
 
         storeApplications.commit('applications/SET_ALERT', {
           isShow: true,
@@ -190,7 +222,7 @@ export default defineComponent({
       } finally {
         setTimeout(() => {
           loading.value = false
-        }, 500)
+        }, 1000)
       }
     }
 

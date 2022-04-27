@@ -105,7 +105,6 @@
         alert.message.includes('Order') &&
         alert.type === 'success'
       "
-      :timeout="2000"
       rounded="pill"
       right
       bottom
