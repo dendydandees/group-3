@@ -9,13 +9,15 @@ import {
   FilterOrders,
   BatchOrders,
   FilterBatch,
+  OrderDomestic,
+  OrderCrossBorder,
 } from '~/types/orders'
 
 interface ParamsGetOrder extends Meta, FilterOrders {}
 interface ParamsGetBatch extends Meta, FilterBatch {}
 interface UploadOrders extends Order {
   type: string
-  data: OrderItem[]
+  data: OrderDomestic[] | OrderCrossBorder[]
 }
 interface ParamsGetSelectedLabels {
   orderIds: string[]

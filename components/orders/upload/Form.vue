@@ -69,7 +69,11 @@ import { ValidationObserver } from 'vee-validate'
 
 // interfaces and types
 import { VForm, VuexModuleApplications } from '~/types/applications'
-import { OrderUpload, VuexModuleOrders } from '~/types/orders'
+import {
+  OrderCrossBorder,
+  OrderDomestic,
+  VuexModuleOrders,
+} from '~/types/orders'
 
 export interface Select {
   country: string
@@ -113,7 +117,7 @@ export default defineComponent({
 
     // manage upload
     const loading = ref(false)
-    const form = ref([]) as Ref<OrderUpload[]>
+    const form = ref([]) as Ref<OrderDomestic[] | OrderCrossBorder[]>
     const filePond = ref(null) as Ref<any>
     const uploadType = computed(() =>
       props.step === 0 ? 'domestic' : 'crossBorder'
@@ -149,11 +153,13 @@ export default defineComponent({
         if (!isValid) return
         // set data for domestic
         if (props.step === 0) {
-          data = data.map((item) => ({
+          const dataDomestic = data as OrderDomestic[]
+
+          data = dataDomestic.map((item) => ({
             ...item,
             consigneeCountry: select.value.country,
             senderCountry: select.value.country,
-          })) as OrderUpload[]
+          }))
         }
 
         const response = await storeOfOrders.dispatch('orders/uploadOrders', {

@@ -65,6 +65,14 @@ export interface Order {
   latestUpdate: LatestUpdate
 }
 
+export interface BatchOrders {
+  id: string
+  createdAt: Date
+  updatedAt: Date
+  clientId: string
+  totalOrder: number
+}
+
 export interface OrderItem {
   id: string
   orderId: string
@@ -122,20 +130,20 @@ export interface FilterOrders {
   status: string
 }
 
-export interface BatchOrders {
-  id: string
-  createdAt: Date
-  updatedAt: Date
-  clientId: string
-  totalOrder: number
-}
-
 export interface FilterBatch {
   batchId: string
 }
 
-export interface OrderUpload extends Order {
+interface OrderUpload extends Order {
   items: OrderItem[]
+}
+
+export interface OrderDomestic extends OrderUpload {
+  dropoffId: string
+  pickup: boolean
+}
+
+export interface OrderCrossBorder extends OrderUpload {
   firstMile: boolean
   lastMile: boolean
   freightForwarder: boolean
@@ -143,5 +151,7 @@ export interface OrderUpload extends Order {
   customBrokerages: boolean
   shipmentIncoterm: string
   shipmentNcoterm: string
-  uploadType: string
+  incoterm: string
+  lmLControlBypass: string
+  lmPartnerCode: string
 }

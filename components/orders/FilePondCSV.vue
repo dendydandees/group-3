@@ -30,7 +30,7 @@ import FilePondPluginFileEncode from 'filepond-plugin-file-encode'
 
 // Interfaces and types
 import { ErrorFilePond } from '../base/FilePond/Image.vue'
-import { OrderItem, OrderUpload } from '~/types/orders'
+import { OrderCrossBorder, OrderDomestic, OrderItem } from '~/types/orders'
 import { VuexModuleApplications } from '~/types/applications'
 
 // Create component file pond
@@ -92,6 +92,7 @@ export default defineComponent({
     const handleRemoveFile = (_error: ErrorFilePond, _file: any) => {
       emit('input', [])
     }
+    // formatting key of form data
     const formatKey = (data: {}) => {
       const newObject = {} as any
 
@@ -100,6 +101,10 @@ export default defineComponent({
 
         if (key.includes('*')) {
           formatKey = formatKey.replaceAll(/[*]/g, '')
+        }
+
+        if (key.includes('-')) {
+          formatKey = formatKey.replaceAll(/[-]/g, ' ')
         }
 
         if (key.match(/\s/g)) {
@@ -113,6 +118,7 @@ export default defineComponent({
 
       return newObject
     }
+    // formatting service type data
     const formatServiceType = (data: boolean | string): boolean => {
       return typeof data === 'boolean' ? data : data === 'yes'
     }
@@ -142,7 +148,9 @@ export default defineComponent({
             ]
           const worksheetItems = workbook.Sheets['Order Items']
           // convert to json format
-          let orders = utils.sheet_to_json(worksheetOrders) as OrderUpload[]
+          let orders = utils.sheet_to_json(worksheetOrders) as
+            | OrderDomestic[]
+            | OrderCrossBorder[]
           let orderItems = utils.sheet_to_json(worksheetItems) as OrderItem[]
 
           // error if file upload not same with example file
@@ -157,14 +165,12 @@ export default defineComponent({
           }
 
           // format keys data
-          orders = orders.map((data) => formatKey(data))
-          orderItems = orderItems.map((data) => formatKey(data))
-
-          // filter excel data notes
-          orders = orders.filter((data) => !Object.keys(data).includes('note'))
-          orderItems = orderItems.filter(
-            (data) => typeof data.productCode !== 'string'
-          )
+          orders = orders
+            .map((data) => formatKey(data))
+            .filter((data) => !Object.keys(data).includes('note'))
+          orderItems = orderItems
+            .map((data) => formatKey(data))
+            .filter((data) => typeof data.productCode !== 'string')
 
           // merge orders and order items
           const batchOrders = orders.map((order) => {
@@ -180,29 +186,48 @@ export default defineComponent({
               ? parseFloat(order.codValue as unknown as string) || 0
               : 0
             const codCurrency = isCOD ? order.codCurrency : ''
-            // format service type
-            const firstMile = formatServiceType(order.firstMile) || false
-            const lastMile = formatServiceType(order.lastMile) || false
-            const freightForwarder =
-              formatServiceType(order.freightForwarder) || false
-            const customs = formatServiceType(order.customBrokerages) || false
-
-            return {
+            // format return
+            let data: OrderDomestic | OrderCrossBorder = {
               ...order,
               items,
-              consigneePostal: order?.consigneePostal?.toString() || '',
-              consigneeNumber: order?.consigneeNumber?.toString() || '',
-              consigneeTaxId: order?.consigneeTaxId?.toString() || '',
-              senderPostal: order?.senderPostal?.toString() || '',
-              senderContactNumber: order?.senderContactNumber?.toString() || '',
-              incoterm: order.shipmentNcoterm,
               codValue,
               codCurrency,
-              firstMile,
-              lastMile,
-              freightForwarder,
-              customs,
+              consigneePostal: order?.consigneePostal?.toString() ?? '',
+              consigneeNumber: order?.consigneeNumber?.toString() ?? '',
+              consigneeTaxId: order?.consigneeTaxId?.toString() ?? '',
+              senderPostal: order?.senderPostal?.toString() ?? '',
+              senderContactNumber: order?.senderContactNumber?.toString() ?? '',
             }
+
+            // format for domestic
+            if (props.step === 0) {
+              const itemDomestic = order as OrderDomestic
+
+              data = {
+                ...data,
+                pickup: formatServiceType(itemDomestic.pickup) || false,
+              }
+            }
+
+            // format for cross border
+            if (props.step === 1) {
+              const itemCrossBorder = order as OrderCrossBorder
+
+              data = {
+                ...data,
+                firstMile:
+                  formatServiceType(itemCrossBorder.firstMile) || false,
+                lastMile: formatServiceType(itemCrossBorder.lastMile) || false,
+                freightForwarder:
+                  formatServiceType(itemCrossBorder.freightForwarder) || false,
+                customs:
+                  formatServiceType(itemCrossBorder.customBrokerages) || false,
+                incoterm: itemCrossBorder?.shipmentNcoterm ?? '',
+                lmPartnerCode: itemCrossBorder?.lmLControlBypass ?? '',
+              }
+            }
+
+            return data
           })
 
           emit('input', batchOrders)
