@@ -2,8 +2,21 @@
   <article>
     <v-card-text class="pa-8">
       <v-scroll-y-transition hide-on-leave>
-        <v-alert v-if="alert.isShow" :type="alert.type" rounded="xl">
-          {{ alert.message }}
+        <v-alert
+          v-if="alert.isShow"
+          :type="alert.type"
+          rounded="xl"
+          :icon="typeof alert.message === 'string'"
+        >
+          <template v-if="typeof alert.message === 'string'">
+            {{ alert.message }}
+          </template>
+
+          <template v-else>
+            <ul v-for="(item, index) in alert.message" :key="index">
+              <li>{{ item }}</li>
+            </ul>
+          </template>
         </v-alert>
       </v-scroll-y-transition>
 
@@ -69,10 +82,21 @@ import { ValidationObserver } from 'vee-validate'
 
 // interfaces and types
 import { VForm, VuexModuleApplications } from '~/types/applications'
-import { OrderUpload, VuexModuleOrders } from '~/types/orders'
+import {
+  OrderCrossBorder,
+  OrderDomestic,
+  VuexModuleOrders,
+} from '~/types/orders'
 
 export interface Select {
   country: string
+}
+
+interface ErrorUpload {
+  data: {
+    error: string
+    ErrorDetails: { field: string; reason: string; note: string }[]
+  }
 }
 
 export default defineComponent({
@@ -113,7 +137,7 @@ export default defineComponent({
 
     // manage upload
     const loading = ref(false)
-    const form = ref([]) as Ref<OrderUpload[]>
+    const form = ref([]) as Ref<OrderDomestic[] | OrderCrossBorder[]>
     const filePond = ref(null) as Ref<any>
     const uploadType = computed(() =>
       props.step === 0 ? 'domestic' : 'crossBorder'
@@ -131,7 +155,7 @@ export default defineComponent({
       } finally {
         setTimeout(() => {
           loading.value = false
-        }, 500)
+        }, 1000)
       }
     }
     const doSubmitForm = async () => {
@@ -149,11 +173,13 @@ export default defineComponent({
         if (!isValid) return
         // set data for domestic
         if (props.step === 0) {
-          data = data.map((item) => ({
+          const dataDomestic = data as OrderDomestic[]
+
+          data = dataDomestic.map((item) => ({
             ...item,
             consigneeCountry: select.value.country,
             senderCountry: select.value.country,
-          })) as OrderUpload[]
+          }))
         }
 
         const response = await storeOfOrders.dispatch('orders/uploadOrders', {
@@ -170,11 +196,23 @@ export default defineComponent({
         })
         setTimeout(() => {
           router.push('/orders')
-        }, 1500)
-      } catch (error) {
-        const message =
-          (error as any)?.data?.error ??
-          `Order upload data invalid, The data contained in the file you uploaded is incorrect. Please add data according to the existing sample file!`
+        }, 2000)
+      } catch (error: any) {
+        const {
+          data: { error: normalError = '', ErrorDetails: listError = [] } = {},
+        } = error as ErrorUpload
+        let message =
+          `Order upload data invalid, The data contained in the file you uploaded is incorrect. Please add data according to the existing sample file!` as
+            | string
+            | string[]
+
+        if (normalError) {
+          message = normalError
+        }
+
+        if (listError && listError.length > 0) {
+          message = listError.map((item) => item.note)
+        }
 
         storeApplications.commit('applications/SET_ALERT', {
           isShow: true,
@@ -184,7 +222,7 @@ export default defineComponent({
       } finally {
         setTimeout(() => {
           loading.value = false
-        }, 500)
+        }, 1000)
       }
     }
 
