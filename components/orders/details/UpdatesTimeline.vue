@@ -15,15 +15,12 @@
       <v-card-text v-if="!fetchState.pending" class="body-1 pa-6">
         <v-timeline dense>
           <template
-            v-for="(
-              {
-                id,
-                serviceType,
-                partnerName,
-                externalTracking: { partnerUpdates },
-              },
-              indexAllocation
-            ) in orderAllocationUpdates"
+            v-for="{
+              id,
+              serviceType,
+              partnerName,
+              externalTracking: { partnerUpdates },
+            } in orderAllocationUpdates"
           >
             <v-timeline-item
               v-for="(
@@ -59,13 +56,7 @@
                 </v-col>
 
                 <v-col
-                  v-if="
-                    isShowServiceType(
-                      indexAllocation,
-                      indexUpdates,
-                      partnerUpdates
-                    )
-                  "
+                  v-if="isShowServiceType(indexUpdates)"
                   cols="8"
                   class="text-right py-0"
                 >
@@ -103,14 +94,8 @@ import {
   useStore,
 } from '@nuxtjs/composition-api'
 // types
-import {
-  PartnerUpdates as OrderUpdates,
-  VuexModuleOrders,
-} from '~/types/orders'
-import {
-  PartnerUpdates as IncomingUpdates,
-  VuexModuleIncomingOrders,
-} from '~/types/partnerPortals/incomingOrders'
+import { VuexModuleOrders } from '~/types/orders'
+import { VuexModuleIncomingOrders } from '~/types/partnerPortals/incomingOrders'
 
 export default defineComponent({
   props: {
@@ -136,21 +121,11 @@ export default defineComponent({
     })
 
     // manage partner by
-    const isShowServiceType = (
-      indexAllocation: number,
-      indexUpdates: number,
-      dataPartner: OrderUpdates[] | IncomingUpdates[]
-    ) => {
-      const isOnlyOnePartner = dataPartner.length === 1
-      const isOnlyOneUpdate = orderAllocationUpdates.value.length === 1
-
+    const isShowServiceType = (indexUpdates: number) => {
       if (route.value.name === 'partner-portals-id-incoming-orders-orderId')
         return false
-      if (isOnlyOnePartner) return true
-      if (isOnlyOneUpdate && indexUpdates === 0) return true
-      if (!isOnlyOneUpdate && indexAllocation !== indexUpdates) return true
 
-      return false
+      return indexUpdates === 0
     }
 
     return {
@@ -186,7 +161,7 @@ export default defineComponent({
   .v-application--is-ltr,
   .v-timeline--dense:not(.v-timeline--reverse):before {
     left: calc(9.6rem - 1px) !important;
-    height: calc(85%);
+    height: calc(100%);
     margin-top: 8px;
   }
 
