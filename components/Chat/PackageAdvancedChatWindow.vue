@@ -1,16 +1,10 @@
 <template>
-  <!-- <div>
-    <pre id="chat">
-      {{ messagesLines }}
-    </pre>
-    <input v-model="msgInput" type="text" />
-    <button @click="sendMessage">Send</button>
-  </div> -->
   <ChatWindow
     :current-user-id="USER_ID"
     :room-id="roomId"
     :rooms="rooms"
     :messages="messagesLines"
+    :messages-loaded="messageOptions.messagesLoaded"
     :show-files="false"
     :show-emojis="false"
     :show-audio="false"
@@ -22,7 +16,7 @@
     @fetch-more-rooms="fetchMoreRooms"
     @fetch-messages="fetchMessages"
   >
-    <!-- [roomsLoaded]="true"
+    <!--
     [messagesLoaded]="messagesLoaded"
     [showFiles]="true"
     [showEmojis]="true"
@@ -30,6 +24,10 @@
     [showFooter]="true"
     (fetch-messages)="fetchMessages($event.detail[0])"
     (send-message)="sendMessage($event.detail[0])" -->
+
+    <!-- <template #message="{ message }">
+      tes
+    </template> -->
   </ChatWindow>
 </template>
 
@@ -42,11 +40,13 @@ import {
   watch,
   ref,
   Ref,
+  useContext,
   onUnmounted,
 } from '@nuxtjs/composition-api'
 import { PropType } from 'vue';
 import ChatWindow from 'vue-advanced-chat'
 import SendBird from 'sendbird';
+import { v4 as uuidv4 } from 'uuid'
 import {sb} from '~/store/sendBird/sendBird';
 import { VuexModuleSendBird } from '~/types/sendBird/sendBird'
 import 'vue-advanced-chat/dist/vue-advanced-chat.css'
@@ -58,89 +58,53 @@ export default defineComponent ({
   props: {
   },
   setup(props, { emit }) {
+    const {$dateFns } = useContext()
     const storeSendBird = useStore<VuexModuleSendBird>()
     const rooms = ref([]) as any
+    const roomsChannel = ref([]) as any
+    const selectedRoomChannel = ref({}) as any
     const roomId = ref('') as any
     const roomOptions = ref({
       roomsLoaded: false
     }) as any
+    const messageOptions = ref({
+      messagesLoaded: false
+    }) as any
     const messageAll = ref([]) as any
     const msgInput = ref('')
     const recipient = ref(null) as any
+    const listQuery = ref({}) as any
     const messages = ref([] as any)
     const USER_ID = 'abcxyz'
-    const CHAN_URL = 'sendbird_open_channel_7003_10ec006caac2d0a76bb3d39abf05a4c392eb57f9'
+    const CHAN_URL = [
+      'sendbird_open_channel_7003_10ec006caac2d0a76bb3d39abf05a4c392eb57f9',
+      'sendbird_open_channel_7003_7908f2fc5d059a1906f5f5bf19934bfeb5932e44'
+    ]
     let chan: SendBird.OpenChannel
+
 
     useFetch(async () => {
       sb.connect(USER_ID, function(user, error){
-        console.log({user, error})
       })
-      chan = await sb.OpenChannel.getChannel(CHAN_URL)
       fetchRooms()
-      // rooms.value = parsingRooms([chan])
-
-      console.log({chan})
-
-      const enterResp = await chan.enter()
-      console.log({enterResp})
-
-
-      // PREVIOUE MESSAGES
-      // const listQuery = chan.createPreviousMessageListQuery();
-      // listQuery.load(function(messageList, error) {
-      //     if (error) {
-      //       console.log({messageList,error})
-      //     }
-      //     messages.value = parsingMessages(messageList)
-      //       console.log({messageList})
-      // })
-
-
-      // const msg = new sb.UserMessageParams()
-      // // msg.message = 'Hello world'
-      // const msgResp = chan.sendUserMessage(msg, (msg, err) => {
-      //   console.log({msg, err})
-      // })
-      // console.log({msgResp})
-
-      // RECEIVES NEW MESSAGES
-      // const channelHandler = new sb.ChannelHandler();
-      // channelHandler.onMessageReceived = function(channel, message) {
-      //   // messages.value.push((message as any))
-      //   // messages in on a per-channel basis
-      //   // chanMesssages[channel.id].push({})
-      //   messages.value = [...messages.value, ...parsingMessages([message])]
-
-      //   console.log({channel, message})
-      // };
-      // sb.addChannelHandler('ABC123', channelHandler);
-
-
     })
 
     const sendMessage = async ({ content, roomId, files, replyMessage }: any) => {
-      console.log({content})
-      // alert(content)
-      // this also needs to be added to the messageLog
       const msg = new sb.UserMessageParams()
       msg.message = content
-      const msgResp = chan.sendUserMessage(msg, (msg, err) => {
 
+      const msgResp = selectedRoomChannel.value.sendUserMessage(msg, (msg: any, err: any) => {
         messages.value = [...messages.value, ...parsingMessages([msg])]
-        console.log({msg, err})
         msgInput.value = ''
       })
-      console.log({msgResp})
     }
 
     const messagesLines = computed(() => {
-      console.log(messages.value)
       return messages.value
     })
 
     function parsingRooms (data: any) {
-      return data.map((x: any) => {
+      return data.map((x: any, i: number) => {
         return  {
           roomId: x.url,
           roomName: x.name,
@@ -174,16 +138,22 @@ export default defineComponent ({
     }
 
     function parsingMessages (data: any) {
-      return data.map((x: any, i: number) => {
+      return data.map((x: any) => {
         return {
           _id: x.messageId,
-          indexId: i,
+          indexId: x.messageId,
           content: x.message,
           senderId: x._sender.userId,
           username: x._sender.nickname,
           avatar: '',
-          date: '',
-          timestamp: '',
+          date: $dateFns.format(
+            new Date(x.createdAt),
+            'dd MMMM'
+          ),
+          timestamp: $dateFns.format(
+            new Date(x.createdAt),
+            'HH:mm'
+          ),
           // system: false,
           // saved: true,
           // distributed: true,
@@ -234,9 +204,25 @@ export default defineComponent ({
 
     async function fetchMoreRooms() {
       roomOptions.value.roomsLoaded = true
-      chan = await sb.OpenChannel.getChannel(CHAN_URL)
-      rooms.value = parsingRooms([chan])
-      roomOptions.value.roomsLoaded = false
+      const roomsTemp = [] as any
+      await Promise.all(CHAN_URL.map(async (el: any) => {
+        try {
+          const room = await sb.OpenChannel.getChannel(el)
+          roomsTemp.push(room)
+        } catch (error) {
+          console.log('error'+ error);
+        }
+      }))
+
+      await Promise.all(roomsTemp.map(async (el: any) => {
+        try {
+          await  el.enter()
+        } catch (error) {
+          console.log('error'+ error);
+        }
+      }))
+      rooms.value = parsingRooms(roomsTemp)
+      roomsChannel.value = roomsTemp
     }
     function resetRooms() {
       roomOptions.value.roomsLoaded = false
@@ -247,37 +233,40 @@ export default defineComponent ({
       resetRooms()
 			fetchMoreRooms()
     }
+    function resetMessages() {
+			messages.value = []
+			messageOptions.value.messagesLoaded = false
+		}
 
     function fetchMessages({ room, options = {} }: any) {
+      const roomChannel = [...roomsChannel.value].filter((x:any) => x.url === room.roomId)[0]
       if (options.reset) {
-				// resetMessages()
-        console.log('fetchMessage', {room, options})
+				resetMessages()
 				roomId.value = room.roomId
-        // chan.enter().then()
+        listQuery.value = roomChannel.createPreviousMessageListQuery();
 			}
-      const listQuery = chan.createPreviousMessageListQuery();
-      listQuery.load(function(messageList, error) {
+
+      selectedRoomChannel.value = roomChannel
+      const LIMIT = 30
+      listQuery.value.limit = LIMIT
+      listQuery.value.load(function(messageList: any, error: any) {
           if (error) {
             console.log({messageList,error})
               // Handle error.
           }
-          // messages.value = messageList.map((el: any) => el.message)
-          //   console.log({messageList})
-          // messages.value = messageList
-          messages.value = parsingMessages(messageList)
-            console.log({messageList})
+          if (messageList.length === 0 || messageList.length < LIMIT) {
+						setTimeout(() => (messageOptions.value.messagesLoaded = true), 0)
+					}
+
+          if (options.reset) messages.value = []
+          messages.value = [...parsingMessages(messageList), ...messages.value]
       })
 
       const channelHandler = new sb.ChannelHandler();
       channelHandler.onMessageReceived = function(channel, message) {
-        // messages.value.push((message as any))
-        // messages in on a per-channel basis
-        // chanMesssages[channel.id].push({})
         messages.value = [...messages.value, ...parsingMessages([message])]
-
-        console.log({channel, message})
       };
-      sb.addChannelHandler('ABC123', channelHandler);
+      sb.addChannelHandler(uuidv4(), channelHandler);
     }
 
     return {
@@ -291,7 +280,8 @@ export default defineComponent ({
       fetchMoreRooms,
       roomOptions,
       fetchMessages,
-      roomId
+      roomId,
+      messageOptions
     }
   }
 })

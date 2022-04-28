@@ -11,6 +11,36 @@
 
     <v-main class="base">
       <Nuxt class="main-content" />
+      <v-menu
+        v-model="menu"
+        :close-on-content-click="false"
+        offset-x
+        :nudge-width="200"
+      >
+        <template #activator="{ on, attrs }">
+          <v-btn
+            :key="'mdi-pencil'"
+            :color="'primary'"
+            fab
+            large
+            dark
+            bottom
+            fixed
+            right
+            class="v-btn--example"
+            v-bind="attrs"
+            v-on="on"
+          >
+            <v-icon>{{'mdi-message-text' }}</v-icon>
+          </v-btn>
+        </template>
+
+        <v-card
+          width="800px"
+        >
+          <ChatPackageAdvancedChatWindow />
+        </v-card>
+      </v-menu>
 
       <BaseNavigationFooter />
     </v-main>
@@ -29,6 +59,7 @@ export default defineComponent({
     // handle sidenav
     const drawer = ref(!context.$vuetify.breakpoint.mobile) as Ref<boolean>
     const mini = ref(false) as Ref<boolean>
+    const menu = ref(false) as Ref<boolean>
     const doShowSideNav = () => {
       const isMobile = context.$vuetify.breakpoint.smAndDown
 
@@ -43,6 +74,7 @@ export default defineComponent({
     return {
       drawer,
       mini,
+      menu,
       doShowSideNav,
       hideMiniSideNav,
     }
