@@ -222,7 +222,7 @@ export default defineComponent({
                   formatServiceType(itemCrossBorder.freightForwarder) || false,
                 customs:
                   formatServiceType(itemCrossBorder.customBrokerages) || false,
-                incoterm: itemCrossBorder?.shipmentNcoterm ?? '',
+                incoterm: itemCrossBorder?.shipmentIncoterm ?? '',
                 lmPartnerCode: itemCrossBorder?.lmLControlBypass ?? '',
               }
             }

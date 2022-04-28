@@ -150,7 +150,6 @@ export interface OrderCrossBorder extends OrderUpload {
   customs: boolean
   customBrokerages: boolean
   shipmentIncoterm: string
-  shipmentNcoterm: string
   incoterm: string
   lmLControlBypass: string
   lmPartnerCode: string
