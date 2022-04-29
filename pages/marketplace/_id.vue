@@ -82,9 +82,11 @@
           </div>
         </div>
         <v-btn
-          color="white darken-1 primary--text"
+          :disabled="!isRatesAvailable"
+          color="white darken-1"
           rounded
-          class="my-13 btn-rate-sheet custom-btn-primary"
+          :class="`my-13 btn-rate-sheet custom-btn-primary`"
+          @click="handleDownloadNP"
         >
           Download Rate Sheet
         </v-btn>
@@ -266,6 +268,7 @@ export default defineComponent({
     const storeDetailMarketplace = useStore<VuexModuleMarketplaces>()
     const storeApplications = useStore<VuexModuleApplications>()
     const storeFilters = useStore<VuexModuleFilters>()
+    const isRatesAvailable = ref(false) as Ref<Boolean>
     const selectedZone = reactive({
       value: '',
     })
@@ -531,13 +534,47 @@ export default defineComponent({
         $fetchState.pending = false
       }
     }
+    const getRatesAvailable = async (id: String) => {
+      try {
+        $fetchState.pending = true
+
+        const {IsAvailable} = await storeDetailMarketplace.dispatch(
+          'marketplaces/marketplaces/getRatesAvailable',
+          { partnerID: id }
+        )
+        isRatesAvailable.value = IsAvailable
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+    const getRatesDownload = async (id: String) => {
+      try {
+        $fetchState.pending = true
+
+        const res = await storeDetailMarketplace.dispatch(
+          'marketplaces/marketplaces/getRatesDownload',
+          { partnerID: id, name: detailMarketplace.value.name + ' rates' }
+        )
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
     // fetch
     const { $fetchState, fetch } = useFetch(async () => {
       await fetchDetail(id.value)
       await fetchServiceZoneOnce()
+      await getRatesAvailable(id.value)
       // zones.value = [...storeFilters.state.filters.zones]
       // detailGalleries.value = [...storeDetailMarketplace.state.marketplaces.marketplaces.galleries]
     })
+
+    function handleDownloadNP() {
+      getRatesDownload(id.value)
+    }
 
     const convertDetailData = (data: string | number | boolean) => {
       switch (data) {
@@ -574,6 +611,8 @@ export default defineComponent({
       headers,
       pagination,
       partnerServiceZones,
+      isRatesAvailable,
+      handleDownloadNP
     }
   },
   head: {},
@@ -627,9 +666,13 @@ export default defineComponent({
 }
 .custom-btn-primary {
   transition: all 0.3s;
+  color: $primary !important;
   &:hover {
     background: $primary !important;
     color: white !important;
+  }
+  &.disabled {
+    opacity: .5;
   }
 }
 .profile-text {
