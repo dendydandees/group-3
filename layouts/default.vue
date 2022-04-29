@@ -11,7 +11,7 @@
 
     <v-main class="base">
       <Nuxt class="main-content" />
-      <!-- <v-menu
+      <v-menu
         v-model="menu"
         :close-on-content-click="false"
         offset-x
@@ -40,7 +40,7 @@
         >
           <ChatPackageAdvancedChatWindow />
         </v-card>
-      </v-menu> -->
+      </v-menu>
 
       <BaseNavigationFooter />
     </v-main>

@@ -1,34 +1,77 @@
 <template>
-  <ChatWindow
-    :current-user-id="USER_ID"
-    :room-id="roomId"
-    :rooms="rooms"
-    :messages="messagesLines"
-    :messages-loaded="messageOptions.messagesLoaded"
-    :show-files="false"
-    :show-emojis="false"
-    :show-audio="false"
-    :show-reaction-emojis="false"
-    :show-add-room="false"
-    :message-actions="[]"
-    :rooms-loaded="roomOptions.roomsLoaded"
-    @send-message="sendMessage"
-    @fetch-more-rooms="fetchMoreRooms"
-    @fetch-messages="fetchMessages"
+  <div
+    class="chat-container-all"
   >
-    <!--
-    [messagesLoaded]="messagesLoaded"
-    [showFiles]="true"
-    [showEmojis]="true"
-    [showReactionEmojis]="true"
-    [showFooter]="true"
-    (fetch-messages)="fetchMessages($event.detail[0])"
-    (send-message)="sendMessage($event.detail[0])" -->
+    <ChatWindow
+      :current-user-id="USER_ID"
+      :room-id="roomId"
+      :rooms="rooms"
+      :messages="messagesLines"
+      :messages-loaded="messageOptions.messagesLoaded"
+      :show-files="false"
+      :show-emojis="false"
+      :show-audio="false"
+      :show-reaction-emojis="false"
+      :show-add-room="false"
+      :message-actions="[]"
+      :rooms-loaded="roomOptions.roomsLoaded"
+      @send-message="sendMessage"
+      @fetch-more-rooms="fetchMoreRooms"
+      @fetch-messages="fetchMessages"
+    >
+      <!-- <template #room-header-info="{ room, typingUsers, userStatus }">
+        <div
+          style="font-size: 22px; font-weight: 900"
+        >
+          {{room.roomName}}
+        </div>
+      </template>
+      <template #room-header-avatar="{ room }">
+        <div/>
+      </template> -->
+      <!-- <template #message="{ message }">
+        <v-card
+          :class="`
+            custom-card-chat mb-1 ${message.senderId === USER_ID ? 'white--text pa-2' : `ml-8 py-2 px-6   ${!checkMessage(message) ? 'mt-8' : ''}`}
+          `"
+          min-width="140px"
+          :color="message.senderId === USER_ID ? 'primary' : ''"
+          style="border-radius: 12px;"
+          elevation="1"
+        >
+        {{message}}
+          <v-img
+            v-if="(message.senderId !== USER_ID) && !checkMessage(message)"
+            :aspect-ratio="30 / 30"
+            height="40"
+            width="40"
+            class="rounded-circle primary avatar-custom"
+          />
+          <div
+            v-if="(message.senderId !== USER_ID) && !checkMessage(message)"
+            class="user-custom"
+          >
+            {{message.username}}
+          </div>
+          <div
+            style="
+              font-size: 14px;
+            "
+          >
+            {{message.content}}
+          </div>
+          <div
+            v-if="!checkMessage(message, 'last')"
+            class="timestamp-custom"
 
-    <!-- <template #message="{ message }">
-      tes
-    </template> -->
-  </ChatWindow>
+          >
+              {{message.timestamp}}
+          </div>
+        </v-card>
+      </template> -->
+    </ChatWindow>
+
+  </div>
 </template>
 
 <script  lang="ts">
@@ -47,7 +90,7 @@ import { PropType } from 'vue';
 import ChatWindow from 'vue-advanced-chat'
 import SendBird from 'sendbird';
 import { v4 as uuidv4 } from 'uuid'
-import {sb} from '~/store/sendBird/sendBird';
+// import {sb} from '~/store/sendBird/sendBird';
 import { VuexModuleSendBird } from '~/types/sendBird/sendBird'
 import 'vue-advanced-chat/dist/vue-advanced-chat.css'
 
@@ -58,7 +101,8 @@ export default defineComponent ({
   props: {
   },
   setup(props, { emit }) {
-    const {$dateFns } = useContext()
+    const {$dateFns, $config } = useContext()
+    const sb = new SendBird({ appId: $config.sendBirdKey, localCacheEnabled: true });
     const storeSendBird = useStore<VuexModuleSendBird>()
     const rooms = ref([]) as any
     const roomsChannel = ref([]) as any
@@ -87,6 +131,9 @@ export default defineComponent ({
       sb.connect(USER_ID, function(user, error){
       })
       fetchRooms()
+      // getDataUrl('https://file-ap-5.sendbird.com/211d804a39684bca94b5ddbef0b614b8.png').then(base64 => {
+      //   console.log(base64)
+      // })
     })
 
     const sendMessage = async ({ content, roomId, files, replyMessage }: any) => {
@@ -100,6 +147,7 @@ export default defineComponent ({
     }
 
     const messagesLines = computed(() => {
+      // console.log(messages.value)
       return messages.value
     })
 
@@ -138,11 +186,11 @@ export default defineComponent ({
     }
 
     function parsingMessages (data: any) {
-      return data.map((x: any) => {
-        return {
+      return data.map( (x: any, i: number) => {
+        return  {
           _id: x.messageId,
           indexId: x.messageId,
-          content: x.message,
+          content: x.message ?? '',
           senderId: x._sender.userId,
           username: x._sender.nickname,
           avatar: '',
@@ -162,18 +210,20 @@ export default defineComponent ({
           // failure: true,
           // disableActions: false,
           // disableReactions: false,
-          // files: [
-          //   {
-          //     name: 'My File',
-          //     size: 67351,
-          //     type: 'png',
-          //     audio: true,
-          //     duration: 14.4,
-          //     url: 'https://firebasestorage.googleapis.com/...',
-          //     preview: 'data:image/png;base64,iVBORw0KGgoAA...',
-          //     progress: 88
-          //   }
-          // ],
+          files: x.plainUrl
+          ?[
+            {
+              name: x.name,
+              size: x.size,
+              type: x.type,
+              // audio: true,
+              // duration: 14.4,
+              url: x.plainUrl,
+              preview: x.plainUrl,
+              // progress: 100
+            }
+          ]
+          : [],
           // reactions: {
           //   😁: [
           //     1234, // USER_ID
@@ -221,6 +271,7 @@ export default defineComponent ({
           console.log('error'+ error);
         }
       }))
+
       rooms.value = parsingRooms(roomsTemp)
       roomsChannel.value = roomsTemp
     }
@@ -251,10 +302,10 @@ export default defineComponent ({
       listQuery.value.limit = LIMIT
       listQuery.value.load(function(messageList: any, error: any) {
           if (error) {
-            console.log({messageList,error})
+            console.log({error})
               // Handle error.
           }
-          if (messageList.length === 0 || messageList.length < LIMIT) {
+          if ((messageList.length === 0 || messageList.length < LIMIT)) {
 						setTimeout(() => (messageOptions.value.messagesLoaded = true), 0)
 					}
 
@@ -264,9 +315,78 @@ export default defineComponent ({
 
       const channelHandler = new sb.ChannelHandler();
       channelHandler.onMessageReceived = function(channel, message) {
-        messages.value = [...messages.value, ...parsingMessages([message])]
+        // FILTERED DUPLICATED MESSAGE
+        const filteredArr = [...messages.value, ...parsingMessages([message])].reduce((acc, current) => {
+          const x = acc.find((item: any) => item.indexId === current.indexId);
+          if (!x) {
+            return acc.concat([current]);
+          } else {
+            return acc;
+          }
+        }, []);
+        messages.value = filteredArr
       };
       sb.addChannelHandler(uuidv4(), channelHandler);
+    }
+
+    function checkMessage(data: any, type?: string) {
+      let temp = false
+      const customArray = [...messagesLines.value].filter((x: any) => data.senderId === x.senderId)
+      const index = customArray.findIndex((x: any) => data.indexId === x.indexId)
+      switch (type) {
+        case 'last':
+          if(
+            customArray &&
+            customArray.length > 0 &&
+            customArray[index + 1]
+          ) {
+
+            temp = data.timestamp === customArray[index + 1].timestamp
+          } else if(
+            !customArray[index -1] &&
+            !customArray[index +1]
+          ) {
+            temp = false
+          }
+
+          break;
+
+        default:
+          if(
+            customArray &&
+            customArray.length > 0 &&
+            customArray[index -1]
+          ) {
+
+            temp = data.timestamp === customArray[index -1].timestamp
+          } else if(
+            !customArray[index -1] &&
+            !customArray[index +1]
+          ) {
+            temp = false
+          }
+          break;
+      }
+
+      return temp
+    }
+
+    async function getDataUrl(imageUrl: string) {
+      const headers = new Headers();
+      const authToken = $config.sendBirdToken
+      headers.set('Api-Token', `${authToken}`);
+      const res = await fetch(imageUrl, {headers});
+      const blob = await res.blob();
+      return new Promise((resolve, reject) => {
+        const reader  = new FileReader();
+        reader.addEventListener("load", function () {
+            resolve(reader.result);
+        }, false);
+        reader.onerror = (error) => {
+          return reject(error);
+        };
+        reader.readAsDataURL(blob);
+      })
     }
 
     return {
@@ -281,8 +401,43 @@ export default defineComponent ({
       roomOptions,
       fetchMessages,
       roomId,
-      messageOptions
+      messageOptions,
+      checkMessage
     }
   }
 })
 </script>
+<style lang="scss">
+  .chat-container-all {
+    .avatar-custom {
+      position: absolute;
+      left: 0;
+      top: 0;
+      transform: translateX(-50%) translateY(-50%);
+    }
+    .user-custom {
+      position: absolute;
+      left: 25px;
+      top: -5px;
+      transform:  translateY(-100%);
+      color: grey;
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .timestamp-custom {
+        font-size: 8px;
+        justify-content: right;
+        display: flex;
+        position: absolute;
+        color: grey;
+        right: 5px;
+        bottom: -2px;
+        transform: translateY(100%);
+    }
+    .custom-card-chat {
+      box-shadow: 0px 2px 1px -1px rgb(0 0 0 / 9%), 0px 1px 5px 0px rgb(0 0 0 / 10%), 0px 1px 12px 0px rgb(0 0 0 / 8%) !important;
+
+
+    }
+  }
+</style>

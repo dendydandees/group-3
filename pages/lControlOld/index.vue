@@ -1,6 +1,6 @@
 <template>
   <section class="pa-4 pa-md-10 py-8 marketplace">
-    <ChatPackageAdvancedChatWindow />
+    <!-- <ChatPackageAdvancedChatWindow /> -->
     <BaseHeadlinePageCustom title="L-Control" subtitle="Automate your process">
     </BaseHeadlinePageCustom>
     <v-row align="center">
