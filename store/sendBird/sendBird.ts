@@ -5,7 +5,7 @@ import SendbirdChat from '@sendbird/chat';
 import { OpenChannelModule } from '@sendbird/chat/openChannel';
 // import { GroupChannelModule } from '@sendbird/chat/groupChannel';
 
-// export const sb = new SendBird({ appId, localCacheEnabled: true });
+export const sb = new SendBird({ appId: '', localCacheEnabled: true });
 // export const sb = SendbirdChat.init({
 //   appId,
 //   modules: [
