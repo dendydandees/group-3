@@ -128,8 +128,8 @@ export default defineComponent({
       });
       const duplicateKeys = Object.keys(temp).filter((key) => temp[key] > 1);
       return duplicateKeys.length > 0 
-      ? func(false, (data as []).filter(() => duplicateKeys.lastIndexOf(temp["orderCode"]) !== -1))
-      : func(true, data)
+      ? func(true, (data as []).filter((item) => duplicateKeys.lastIndexOf(item["orderCode"]) !== -1))
+      : func(false, data)
     }
     // create message for duplicate order codes
     const messageDuplicateOrderCodes = (o: Orders) =>  {
@@ -141,10 +141,10 @@ export default defineComponent({
                }
                message += ", " + k.orderCode
            }
-           return message
+           return message += " is duplicate!"
     } 
     // handle error duplicate order codes
-    const throwErrorIfDuplicateOrderCodes = (store: Store<VuexModuleApplications>, o: Orders) => storeApplications.commit('applications/SET_ALERT', {
+    const throwErrorIfDuplicateOrderCodes = (store: Store<VuexModuleApplications>, o: Orders) => store.commit('applications/SET_ALERT', {
               isShow: true,
               type: 'error',
               message: messageDuplicateOrderCodes(o),
