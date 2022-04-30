@@ -143,11 +143,11 @@ export default defineComponent({
            }
            return message += " is duplicate!"
     } 
-    // handle error duplicate order codes
-    const throwErrorIfDuplicateOrderCodes = (store: Store<VuexModuleApplications>, o: Orders) => store.commit('applications/SET_ALERT', {
+    // alert error
+    const throwErrorAlert = (store: Store<VuexModuleApplications>, message: string) => store.commit('applications/SET_ALERT', {
               isShow: true,
               type: 'error',
-              message: messageDuplicateOrderCodes(o),
+              message,
      })
     // formatting service type data
     const formatServiceType = (data: boolean | string): boolean => {
@@ -198,7 +198,7 @@ export default defineComponent({
           orders = checkDuplicateOrderCodes(orders
             .map((data) => formatKey(data))
             .filter((data) => !Object.keys(data).includes('note')), (isDuplicate, o) => isDuplicate 
-            ? (emit('input',[]), throwErrorIfDuplicateOrderCodes(storeApplications, o)) 
+            ? (emit('input',[]), throwErrorAlert(storeApplications, messageDuplicateOrderCodes(o))) 
             : o) as OrderDomestic[] | OrderCrossBorder[] 
           orderItems = orderItems
             .map((data) => formatKey(data))
