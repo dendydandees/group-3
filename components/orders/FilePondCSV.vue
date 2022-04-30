@@ -29,6 +29,7 @@ import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size'
 import FilePondPluginFileEncode from 'filepond-plugin-file-encode'
 
 // Interfaces and types
+import { Store } from "vuex";
 import { ErrorFilePond } from '../base/FilePond/Image.vue'
 import { OrderCrossBorder, OrderDomestic, OrderItem } from '~/types/orders'
 import { VuexModuleApplications } from '~/types/applications'
@@ -118,6 +119,36 @@ export default defineComponent({
 
       return newObject
     }
+    // find duplicate order code
+    type Orders = OrderCrossBorder[] | OrderDomestic[]
+    const checkDuplicateOrderCodes = (data: Orders,func: (duplicate: boolean, o: Orders) => Orders|void) => {
+       const temp: Record<string, any> = {}
+       data.forEach((item) => {
+          temp[item["orderCode"]] = typeof temp[item["orderCode"]] === "undefined" ? 1 : temp[item["orderCode"]] + 1;
+      });
+      const duplicateKeys = Object.keys(temp).filter((key) => temp[key] > 1);
+      return duplicateKeys.length > 0 
+      ? func(true, (data as []).filter((item) => duplicateKeys.lastIndexOf(item["orderCode"]) !== -1))
+      : func(false, data)
+    }
+    // create message for duplicate order codes
+    const messageDuplicateOrderCodes = (o: Orders) =>  {
+           let message = "Order code " 
+           for (const [i, k] of o.entries()) {
+               if (i === 0) {
+                message += k.orderCode;
+                continue;
+               }
+               message += ", " + k.orderCode
+           }
+           return message += " is duplicate!"
+    } 
+    // handle error duplicate order codes
+    const throwErrorIfDuplicateOrderCodes = (store: Store<VuexModuleApplications>, o: Orders) => store.commit('applications/SET_ALERT', {
+              isShow: true,
+              type: 'error',
+              message: messageDuplicateOrderCodes(o),
+     })
     // formatting service type data
     const formatServiceType = (data: boolean | string): boolean => {
       return typeof data === 'boolean' ? data : data === 'yes'
@@ -163,11 +194,12 @@ export default defineComponent({
               message: `Order upload data invalid, The data contained in the file you uploaded is incorrect. Please add data according to the existing sample file!`,
             })
           }
-
           // format keys data
-          orders = orders
+          orders = checkDuplicateOrderCodes(orders
             .map((data) => formatKey(data))
-            .filter((data) => !Object.keys(data).includes('note'))
+            .filter((data) => !Object.keys(data).includes('note')), (isDuplicate, o) => isDuplicate 
+            ? (emit('input',[]), throwErrorIfDuplicateOrderCodes(storeApplications, o)) 
+            : o) as OrderDomestic[] | OrderCrossBorder[] 
           orderItems = orderItems
             .map((data) => formatKey(data))
             .filter((data) => typeof data.productCode !== 'string')
