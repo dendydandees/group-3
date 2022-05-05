@@ -6,6 +6,7 @@
           {{ error }}
         </v-alert>
         <div class="header d-flex align-center mb-3">
+          <!-- {{data}} -->
           <v-img
             :width="53"
             :height="53"
@@ -13,8 +14,9 @@
             :max-height="53"
             :min-width="53"
             :max-width="53"
-            class="rounded-circle mr-4"
-            src="https://cdn.vuetifyjs.com/images/cards/cooking.png"
+            class="rounded-circle mr-4 white"
+            :src="data.logo"
+            contain
           />
           <div class="header-text" style="font-size: 24px">
             {{ data.name }}
@@ -87,10 +89,13 @@
                   lineHeight: '14px',
                 }"
               >
-                <span v-for="(x, i) in data.partnerServiceZones" :key="i">
-                  {{ x.zone_country
-                  }}{{ data.partnerServiceZones.length - 1 !== i ? ', ' : '' }}
+                <span>
+                  {{locationMapping(data.partnerServiceZones)}}
                 </span>
+                <!-- <span v-for="(x, i) in data.partnerServiceZones" :key="i">
+                  {{ x.zone_country}}
+                  {{ data.partnerServiceZones.length - 1 !== i ? ', ' : '' }}
+                </span> -->
               </div>
             </div>
           </div>
@@ -160,7 +165,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, PropType } from '@nuxtjs/composition-api'
-import { Marketplace } from '~/types/marketplace/marketplace'
+import { Marketplace, PartnerServiceZone } from '~/types/marketplace/marketplace'
 
 // interface FeedbackMessage {
 //   alert: boolean
@@ -199,6 +204,21 @@ export default defineComponent({
     const addConnection = () => {
       emit('add')
     }
+    const locationMapping = (partnerServiceZones: PartnerServiceZone[]) => {
+      if (partnerServiceZones && partnerServiceZones.length > 0) {
+        const temp = [] as string[]
+        partnerServiceZones.forEach(
+          (el: { id: string; zone_country: string }) => {
+            if (!temp.includes(el.zone_country)) {
+              temp.push(el.zone_country)
+            }
+          }
+        )
+        return temp.join(', ')
+      } else {
+        return ''
+      }
+    }
 
     // watch(dialogComp, (newDialogComp) => {
     //   console.log({ newDialogComp })
@@ -208,6 +228,7 @@ export default defineComponent({
       toggle,
       dialogComp,
       addConnection,
+      locationMapping
     }
   },
 })

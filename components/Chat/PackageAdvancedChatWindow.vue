@@ -146,8 +146,7 @@ export default defineComponent ({
     const stylesCustom = {
       // message: {
       //   backgroundMe: '#1961e4',
-      //   colorSystem: 'white'
-      // }
+      // },
     }
 
 
@@ -300,7 +299,8 @@ export default defineComponent ({
       const roomsTemp = [] as any
       await Promise.all(CHAN_URL.map(async (el: any) => {
         try {
-          const room = await sb.OpenChannel.getChannel(el)
+          const room = await sb.OpenChannel.getChannel(el) as any
+
           roomsTemp.push(room)
         } catch (error) {
           console.log('error'+ error);

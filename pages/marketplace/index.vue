@@ -176,15 +176,20 @@
                 >
                   <v-tooltip bottom>
                     <template #activator="{ on, attrs }">
-                      <v-img
-                        :aspect-ratio="156 / 156"
-                        class="rounded-circle blue"
-                        :src="`data:image/png;base64,${x.logo}`"
-                        v-bind="attrs"
-                        v-on="on"
-                      >
-                        <!-- src="https://cdn.vuetifyjs.com/images/cards/cooking.png" -->
-                      </v-img>
+                      <v-hover v-slot="{ hover }">
+                          <v-img
+                            :aspect-ratio="156 / 156"
+                            class="rounded-circle"
+                            :src="`data:image/png;base64,${x.logo}`"
+                            v-bind="attrs"
+                            contain
+                            :style="`${hover ? 'cursor:pointer; opacity: .9;' : ''} border: 1px solid #1961e4;`"
+                            v-on="on"
+                            @click="changePage(x.id)"
+                          >
+                            <!-- src="https://cdn.vuetifyjs.com/images/cards/cooking.png" -->
+                          </v-img>
+                      </v-hover>
                     </template>
                     <span>{{ x.name }}</span>
                   </v-tooltip>
