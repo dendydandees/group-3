@@ -14,10 +14,13 @@
       :show-reaction-emojis="false"
       :show-add-room="false"
       :message-actions="[]"
+      :accepted-files="'image/png, image/jpeg, application/pdf, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/csv'"
       :rooms-loaded="roomOptions.roomsLoaded"
+      :styles="stylesCustom"
       @send-message="sendMessage"
       @fetch-more-rooms="fetchMoreRooms"
       @fetch-messages="fetchMessages"
+      @open-file="openFile"
     >
       <!-- <template #room-header-info="{ room, typingUsers, userStatus }">
         <div
@@ -57,12 +60,27 @@
               font-size: 14px;
             "
           >
-            {{message.content}}
+            <v-img
+              v-if="message.files && message.files[0] && ((message.files[0].type === 'image/png') || (message.files[0].type === 'image/jpeg'))"
+              width="auto"
+              height="150"
+              class="rounded-lg d-flex justify-center"
+              :src="message.files[0].url"
+            />
+            <div
+              v-else-if="message.files && message.files[0] && ((message.files[0].type !== 'image/png') && (message.files[0].type !== 'image/jpeg'))"
+            >
+              download
+              {{message.files[0].url}}
+            </div>
+            <span
+            >
+              {{message.content}}
+            </span>
           </div>
           <div
             v-if="!checkMessage(message, 'last')"
             class="timestamp-custom"
-
           >
               {{message.timestamp}}
           </div>
@@ -125,6 +143,13 @@ export default defineComponent ({
     ]
     let chan: SendBird.OpenChannel
 
+    const stylesCustom = {
+      // message: {
+      //   backgroundMe: '#1961e4',
+      //   colorSystem: 'white'
+      // }
+    }
+
 
     useFetch(async () => {
       sb.connect(USER_ID, function(user, error){
@@ -136,15 +161,16 @@ export default defineComponent ({
     })
 
     const sendMessage = async ({ content, roomId, files, replyMessage }: any) => {
-      console.log({content, roomId, files, replyMessage})
+      // console.log({files})
       const msg = new sb.UserMessageParams()
       msg.message = content ?? ''
+
       if(files && files.length > 0) {
         // msg.data = files[0].toString()
         const msgFile = new sb.FileMessageParams();
-        const fileConvert = new File([files[0].blob], files[0].name, files[0].blob)
+        const fileConvert = new File([files[0].blob], `${files[0].name}.${files[0].extension}`, files[0].blob)
         msgFile.file = fileConvert
-        msgFile.fileName = files[0].name;
+        msgFile.fileName = `${files[0].name}.${files[0].extension}`;
         msgFile.fileSize = files[0].size;
         // console.log({fileConvert})
         const msgResp = selectedRoomChannel.value.sendFileMessage(msgFile, (msg: any, err: any) => {
@@ -152,7 +178,8 @@ export default defineComponent ({
           messages.value = [...messages.value, ...parsingMessages([msg])]
           msgInput.value = ''
         })
-      } else {
+      }
+      if(content) {
         const msgResp = selectedRoomChannel.value.sendUserMessage(msg, (msg: any, err: any) => {
           messages.value = [...messages.value, ...parsingMessages([msg])]
           msgInput.value = ''
@@ -326,7 +353,7 @@ export default defineComponent ({
 					}
 
           if (options.reset) messages.value = []
-
+          console.log({messageList})
           messages.value = [...parsingMessages(messageList), ...messages.value]
       })
 
@@ -388,6 +415,11 @@ export default defineComponent ({
       return temp
     }
 
+    function openFile({ message, file }: { message: any, file: any }) {
+      // console.log('openFile', {message, file})
+      window.open(file?.file?.preview,'_self');
+    }
+
     async function getDataUrl(imageUrl: string) {
       const headers = new Headers();
       const authToken = $config.sendBirdToken
@@ -419,7 +451,9 @@ export default defineComponent ({
       fetchMessages,
       roomId,
       messageOptions,
-      checkMessage
+      checkMessage,
+      openFile,
+      stylesCustom
     }
   }
 })
@@ -465,18 +499,6 @@ export default defineComponent ({
       .vac-svg-button {
         display: none !important;
       }
-      /* div{
-        .vac-room-file-container {
-          display: none;
-
-        }
-      } */
-      /* div:nth-child(1) {
-        visibility: visible
-      }
-      div:nth-child(2) {
-        visibility: hidden !important;
-      } */
     }
     .vac-media-preview {
       width: 100% !important;

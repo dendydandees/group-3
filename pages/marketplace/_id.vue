@@ -3,10 +3,11 @@
     <div class="top-row d-flex align-center mb-9">
       <div class="d-flex align-center mr-8">
         <v-card
-          color="primary"
+          color="transparent"
           width="100px"
           height="100px"
           class="rounded-circle mr-4"
+
         >
           <v-img
             :aspect-ratio="100 / 100"
@@ -14,6 +15,8 @@
             :src="`data:image/png;base64,${
               detailMarketplace.logo ? detailMarketplace.logo : ''
             }`"
+            contain
+            style="border: 3px solid #1961e4"
           >
           </v-img>
         </v-card>
@@ -56,7 +59,7 @@
         </v-btn>
       </div>
     </div>
-    <v-row class="middle-row d-flex align-start mb-16">
+    <v-row class="middle-row d-flex align-start">
       <v-col class="rate d-flex flex-column align-center" cols="3">
         <div class="text-star-wrapper">
           <div
@@ -162,7 +165,27 @@
         </div>
       </v-col>
     </v-row>
-    <div class="bottom-row">
+    <v-row
+      v-if="detailMarketplace.companyBrief"
+      class="mt-8"
+    >
+      <v-col
+        cols="12"
+        md="12"
+      >
+        <div
+          class="font-weight-bold mb-2 title"
+        >
+          Company Brief
+        </div>
+        <div
+          style="text-align: justify"
+        >
+          {{detailMarketplace.companyBrief}}
+        </div>
+      </v-col>
+    </v-row>
+    <div class="bottom-row  mt-16">
       <div class="title-filter primary--text display-1 mb-7">Coverage Area</div>
       <div class="btn-filter-map d-flex align-center">
         <!-- <v-select
@@ -339,10 +362,10 @@ export default defineComponent({
     // const zones = ref([]) as Ref<Zone[]>
 
     const detailProfileHeader = reactive([
-      {
-        name: 'Company Brief',
-        value: 'companyBrief',
-      },
+      // {
+      //   name: 'Company Brief',
+      //   value: 'companyBrief',
+      // },
       // {
       //   name: 'Contact Person',
       //   value: 'contactPerson',
