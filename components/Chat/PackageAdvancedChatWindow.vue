@@ -8,7 +8,7 @@
       :rooms="rooms"
       :messages="messagesLines"
       :messages-loaded="messageOptions.messagesLoaded"
-      :show-files="false"
+      :show-files="true"
       :show-emojis="false"
       :show-audio="false"
       :show-reaction-emojis="false"
@@ -39,7 +39,6 @@
           style="border-radius: 12px;"
           elevation="1"
         >
-        {{message}}
           <v-img
             v-if="(message.senderId !== USER_ID) && !checkMessage(message)"
             :aspect-ratio="30 / 30"
@@ -137,13 +136,30 @@ export default defineComponent ({
     })
 
     const sendMessage = async ({ content, roomId, files, replyMessage }: any) => {
+      console.log({content, roomId, files, replyMessage})
       const msg = new sb.UserMessageParams()
-      msg.message = content
+      msg.message = content ?? ''
+      if(files && files.length > 0) {
+        // msg.data = files[0].toString()
+        const msgFile = new sb.FileMessageParams();
+        const fileConvert = new File([files[0].blob], files[0].name, files[0].blob)
+        msgFile.file = fileConvert
+        msgFile.fileName = files[0].name;
+        msgFile.fileSize = files[0].size;
+        // console.log({fileConvert})
+        const msgResp = selectedRoomChannel.value.sendFileMessage(msgFile, (msg: any, err: any) => {
+          // console.log({msg, err})
+          messages.value = [...messages.value, ...parsingMessages([msg])]
+          msgInput.value = ''
+        })
+      } else {
+        const msgResp = selectedRoomChannel.value.sendUserMessage(msg, (msg: any, err: any) => {
+          messages.value = [...messages.value, ...parsingMessages([msg])]
+          msgInput.value = ''
+        })
 
-      const msgResp = selectedRoomChannel.value.sendUserMessage(msg, (msg: any, err: any) => {
-        messages.value = [...messages.value, ...parsingMessages([msg])]
-        msgInput.value = ''
-      })
+      }
+
     }
 
     const messagesLines = computed(() => {
@@ -218,8 +234,8 @@ export default defineComponent ({
               type: x.type,
               // audio: true,
               // duration: 14.4,
-              url: x.plainUrl,
-              preview: x.plainUrl,
+              url: x.url,
+              preview: x.url,
               // progress: 100
             }
           ]
@@ -310,11 +326,12 @@ export default defineComponent ({
 					}
 
           if (options.reset) messages.value = []
+
           messages.value = [...parsingMessages(messageList), ...messages.value]
       })
 
       const channelHandler = new sb.ChannelHandler();
-      channelHandler.onMessageReceived = function(channel, message) {
+      channelHandler.onMessageReceived = function(channel, message: any) {
         // FILTERED DUPLICATED MESSAGE
         const filteredArr = [...messages.value, ...parsingMessages([message])].reduce((acc, current) => {
           const x = acc.find((item: any) => item.indexId === current.indexId);
@@ -436,8 +453,33 @@ export default defineComponent ({
     }
     .custom-card-chat {
       box-shadow: 0px 2px 1px -1px rgb(0 0 0 / 9%), 0px 1px 5px 0px rgb(0 0 0 / 10%), 0px 1px 12px 0px rgb(0 0 0 / 8%) !important;
+    }
+    .vac-files-box{
+      div:not(:nth-child(1)) {
+        .vac-room-file-container {
+          display: none !important;
 
 
+        }
+      }
+      .vac-svg-button {
+        display: none !important;
+      }
+      /* div{
+        .vac-room-file-container {
+          display: none;
+
+        }
+      } */
+      /* div:nth-child(1) {
+        visibility: visible
+      }
+      div:nth-child(2) {
+        visibility: hidden !important;
+      } */
+    }
+    .vac-media-preview {
+      width: 100% !important;
     }
   }
 </style>
