@@ -88,7 +88,7 @@
           :disabled="!isRatesAvailable"
           color="white darken-1"
           rounded
-          :class="`my-13 btn-rate-sheet custom-btn-primary`"
+          :class="`mt-13 btn-rate-sheet custom-btn-primary`"
           @click="handleDownloadNP"
         >
           Download Rate Sheet
@@ -183,6 +183,7 @@
         >
           {{detailMarketplace.companyBrief}}
         </div>
+        <NuxtImg class="mt-3" src="/images/logo-detail.svg" width="290" preload />
       </v-col>
     </v-row>
     <div class="bottom-row  mt-16">
