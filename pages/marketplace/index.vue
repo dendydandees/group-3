@@ -1,22 +1,24 @@
 <template>
   <section class="pa-4 pa-md-10 py-8 marketplace">
-    <BaseHeadlinePageCustom
+    <BaseHeadlinePage
       title="Marketplace"
       subtitle="Find and connect with our best vendors"
-    >
-    </BaseHeadlinePageCustom>
+    />
+
     <v-row class="mt-6">
-      <v-col cols="7" class="pa-0">
+      <v-col cols="7">
         <BaseSearchFieldCustom v-model="filter.search" class="mb-14" />
+
         <div
           v-if="
             !filter.search && !filter.country && filter.service.length === 0
           "
         >
-          <h1 class="headline font-weight-bold mb-2 text-capitalize">
+          <h1 class="title mb-2 text-capitalize">
             Featured Network <br />
             Partners
           </h1>
+
           <carousel-3d
             :perspective="0"
             :space="200"
@@ -48,6 +50,7 @@
                   <v-col class="text-h4 white--text pa-0">
                     {{ slide.name }}
                   </v-col>
+
                   <v-col
                     v-if="slide.partnerServiceTypes.length > 0"
                     cols="6"
@@ -74,21 +77,22 @@
           </carousel-3d>
         </div>
       </v-col>
-      <v-col class="pa-0 ml-15" style="max-width: calc(100% - 711px)">
+
+      <v-col class="ml-15" style="max-width: calc(100% - 711px)">
         <v-card class="pa-4 d-flex" elevation="3">
           <v-card-text>
             <v-row>
               <v-col class="pa-0" cols="12" md="2">
                 <div
-                  class="d-flex align-center primary--text"
+                  class="d-flex align-center primary--text font-weight-bold"
                   style="height: 40px"
                 >
                   Filter
                 </div>
               </v-col>
+
               <v-col cols="12" md="10" class="pa-0">
                 <v-row>
-                  <!-- class="d-flex align-center justify-space-between mb-4" -->
                   <v-col cols="12" md="6">
                     <v-select
                       v-model="selectedZone.value"
@@ -124,6 +128,7 @@
                     </v-select>
                   </v-col>
                 </v-row>
+
                 <div class="mt-2">
                   <v-col
                     v-if="serviceTypes && serviceTypes.length > 0"
@@ -162,7 +167,7 @@
             !filter.search && !filter.country && filter.service.length === 0
           "
         >
-          <h1 class="headline font-weight-bold mb-6 mt-16 text-capitalize">
+          <h1 class="title mb-6 mt-16 text-capitalize">
             Your Network <br />
             Partners
           </h1>
@@ -177,18 +182,20 @@
                   <v-tooltip bottom>
                     <template #activator="{ on, attrs }">
                       <v-hover v-slot="{ hover }">
-                          <v-img
-                            :aspect-ratio="156 / 156"
-                            class="rounded-circle"
-                            :src="`data:image/png;base64,${x.logo}`"
-                            v-bind="attrs"
-                            contain
-                            :style="`${hover ? 'cursor:pointer; opacity: .9;' : ''} border: 1px solid #1961e4;`"
-                            v-on="on"
-                            @click="changePage(x.id)"
-                          >
-                            <!-- src="https://cdn.vuetifyjs.com/images/cards/cooking.png" -->
-                          </v-img>
+                        <v-img
+                          :aspect-ratio="156 / 156"
+                          class="rounded-circle"
+                          :src="`data:image/png;base64,${x.logo}`"
+                          v-bind="attrs"
+                          contain
+                          :style="`${
+                            hover ? 'cursor:pointer; opacity: .9;' : ''
+                          } border: 1px solid #1961e4;`"
+                          v-on="on"
+                          @click="changePage(x.id)"
+                        >
+                          <!-- src="https://cdn.vuetifyjs.com/images/cards/cooking.png" -->
+                        </v-img>
                       </v-hover>
                     </template>
                     <span>{{ x.name }}</span>
@@ -203,11 +210,12 @@
         </div>
       </v-col>
     </v-row>
+
     <v-row>
       <v-col>
         <h1
           v-if="!filter.search && !filter.country && !filter.service"
-          class="headline font-weight-bold mb-2 text-capitalize"
+          class="title mb-2 text-capitalize"
         >
           Network Partners in<br />
           your area
@@ -273,19 +281,12 @@
                       >
                         {{ partner.name }}
                       </v-col>
+
                       <v-col
                         v-if="partner.partnerServiceZones"
                         class="body-2 white--text aling-center d-flex pa-0 ml-3"
                         cols="4"
                       >
-                        <!-- <v-icon
-                          v-if="partner.partnerServiceTypes.length > 0"
-                          small
-                          color="white"
-                          class="mr-1"
-                        >
-                          mdi-pin
-                        </v-icon> -->
                         <NuxtImg
                           v-if="partner.partnerServiceTypes.length > 0"
                           src="/images/mapLocation.svg"
@@ -485,7 +486,6 @@ export default defineComponent({
         dialog.status = false
         fetch()
       } catch (error: any) {
-        console.log(error)
         errorAdd.value = error
         return error
       } finally {
