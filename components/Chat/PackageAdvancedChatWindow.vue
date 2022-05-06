@@ -137,9 +137,15 @@ export default defineComponent ({
     const listQuery = ref({}) as any
     const messages = ref([] as any)
     const USER_ID = 'abcxyz'
+    const channelHandler = new sb.ChannelHandler() as any
+    // const USER_ID = 'rafi-group123'
+    // const CHAN_URL = [
+    //   'sendbird_open_channel_7003_10ec006caac2d0a76bb3d39abf05a4c392eb57f9',
+    //   'sendbird_open_channel_7003_7908f2fc5d059a1906f5f5bf19934bfeb5932e44'
+    // ]
     const CHAN_URL = [
-      'sendbird_open_channel_7003_10ec006caac2d0a76bb3d39abf05a4c392eb57f9',
-      'sendbird_open_channel_7003_7908f2fc5d059a1906f5f5bf19934bfeb5932e44'
+      'sendbird_group_channel_361080858_8545db5fdcb5c3afc10e18403292fe13718b95cd',
+      'sendbird_group_channel_361072896_4fccc8e9c932b9c07187f6d53d16ec3867575e3c'
     ]
     let chan: SendBird.OpenChannel
 
@@ -154,9 +160,7 @@ export default defineComponent ({
       sb.connect(USER_ID, function(user, error){
       })
       fetchRooms()
-      // getDataUrl('https://file-ap-5.sendbird.com/211d804a39684bca94b5ddbef0b614b8.png').then(base64 => {
-      //   console.log(base64)
-      // })
+
     })
 
     const sendMessage = async ({ content, roomId, files, replyMessage }: any) => {
@@ -164,7 +168,7 @@ export default defineComponent ({
       const msg = new sb.UserMessageParams()
       msg.message = content ?? ''
 
-      if(files && files.length > 0) {
+      if(selectedRoomChannel.value && files && files.length > 0) {
         // msg.data = files[0].toString()
         const msgFile = new sb.FileMessageParams();
         const fileConvert = new File([files[0].blob], `${files[0].name}.${files[0].extension}`, files[0].blob)
@@ -178,7 +182,7 @@ export default defineComponent ({
           msgInput.value = ''
         })
       }
-      if(content) {
+      if(selectedRoomChannel.value && content) {
         const msgResp = selectedRoomChannel.value.sendUserMessage(msg, (msg: any, err: any) => {
           messages.value = [...messages.value, ...parsingMessages([msg])]
           msgInput.value = ''
@@ -194,24 +198,50 @@ export default defineComponent ({
     })
 
     function parsingRooms (data: any) {
-      return data.map((x: any, i: number) => {
-        return  {
-          roomId: x.url,
-          roomName: x.name,
-          avatar: x.coverUrl,
-          // unreadCount: 4,
+
+      return data.map( (x: any, i: number) => {
+        const lastMessage = x.lastMessage
+        console.log({lastMessage})
+        let lastMessageCust = {
+          content: lastMessage?.message,
+          senderId: lastMessage?._sender?.userId,
+          username: lastMessage?._sender?.nickname,
+          timestamp: $dateFns.format(
+            new Date(lastMessage?.createdAt),
+            'HH:mm'
+          ),
+          // saved: true,
+          // distributed: false,
+          // seen: false,
+          // new: true
+        }
+        if(lastMessage && lastMessage?.messageType === 'file') {
+          lastMessageCust = {
+            ...lastMessageCust,
+            content: lastMessage?.url
+          }
+        }
+        return {
+          roomId: x?.url,
+          roomName: x?.name,
+          avatar: x?.coverUrl,
+          unreadCount: x?.unreadMessageCount,
           // index: 3,
-          // lastMessage: {
-          //   content: 'Last message received',
-          //   senderId: 1234,
-          //   username: 'John Doe',
-          //   timestamp: '10:20',
-          //   saved: true,
-          //   distributed: false,
-          //   seen: false,
-          //   new: true
+          lastMessage: lastMessageCust,
+          // {
+          //   content: lastMessage?.message,
+          //   senderId: lastMessage?._sender?.userId,
+          //   username: lastMessage?._sender?.nickname,
+          //   timestamp: $dateFns.format(
+          //     new Date(lastMessage?.createdAt),
+          //     'HH:mm'
+          //   ),
+          //   // saved: true,
+          //   // distributed: false,
+          //   // seen: false,
+          //   // new: true
           // },
-          users: x.operators.map((y: any) => {
+          users: x?.members.map((y: any) => {
             return {
               _id: y.userId,
               username: y.nickname,
@@ -228,92 +258,105 @@ export default defineComponent ({
     }
 
     function parsingMessages (data: any) {
-      return data.map( (x: any, i: number) => {
-        return  {
-          _id: x.messageId,
-          indexId: x.messageId,
-          content: x.message ?? '',
-          senderId: x._sender.userId,
-          username: x._sender.nickname,
-          avatar: '',
-          date: $dateFns.format(
-            new Date(x.createdAt),
-            'dd MMMM'
-          ),
-          timestamp: $dateFns.format(
-            new Date(x.createdAt),
-            'HH:mm'
-          ),
-          // system: false,
-          // saved: true,
-          // distributed: true,
-          // seen: true,
-          // deleted: false,
-          // failure: true,
-          // disableActions: false,
-          // disableReactions: false,
-          files: x.plainUrl
-          ?[
-            {
-              name: x.name,
-              size: x.size,
-              type: x.type,
-              // audio: true,
-              // duration: 14.4,
-              url: x.url,
-              preview: x.url,
-              // progress: 100
-            }
-          ]
-          : [],
-          // reactions: {
-          //   😁: [
-          //     1234, // USER_ID
-          //     4321
-          //   ],
-          //   🥰: [
-          //     1234
-          //   ]
-          // },
-          // replyMessage: {
-          //   content: 'Reply Message',
-          //   senderId: 4321,
-          //   files: [
-          //     {
-          //       name: 'My Replied File',
-          //       size: 67351,
-          //       type: 'png',
-          //       audio: true,
-          //       duration: 14.4,
-          //       url: 'https://firebasestorage.googleapis.com/...',
-          //       preview: 'data:image/png;base64,iVBORw0KGgoAA...'
-          //     }
-          //   ]
-          // }
-        }
-      })
+      if(data && data.length > 0) {
+        return data.map( (x: any, i: number) => {
+          return  {
+            _id: x?.messageId,
+            indexId: x?.messageId,
+            content: x?.message ?? '',
+            senderId: x?._sender.userId,
+            username: x?._sender.nickname,
+            avatar: '',
+            date: $dateFns.format(
+              new Date(x?.createdAt),
+              'dd MMMM'
+            ),
+            timestamp: $dateFns.format(
+              new Date(x?.createdAt),
+              'HH:mm'
+            ),
+            // system: false,
+            // saved: true,
+            // distributed: true,
+            // seen: true,
+            // deleted: false,
+            // failure: true,
+            // disableActions: false,
+            // disableReactions: false,
+            files: x?.plainUrl
+            ?[
+              {
+                name: x?.name,
+                size: x?.size,
+                type: x?.type,
+                // audio: true,
+                // duration: 14.4,
+                url: x?.url,
+                preview: x?.url,
+                // progress: 100
+              }
+            ]
+            : [],
+            // reactions: {
+            //   😁: [
+            //     1234, // USER_ID
+            //     4321
+            //   ],
+            //   🥰: [
+            //     1234
+            //   ]
+            // },
+            // replyMessage: {
+            //   content: 'Reply Message',
+            //   senderId: 4321,
+            //   files: [
+            //     {
+            //       name: 'My Replied File',
+            //       size: 67351,
+            //       type: 'png',
+            //       audio: true,
+            //       duration: 14.4,
+            //       url: 'https://firebasestorage.googleapis.com/...',
+            //       preview: 'data:image/png;base64,iVBORw0KGgoAA...'
+            //     }
+            //   ]
+            // }
+          }
+        })
+
+      } else {
+        return []
+      }
     }
+
+
 
     async function fetchMoreRooms() {
       roomOptions.value.roomsLoaded = true
-      const roomsTemp = [] as any
-      await Promise.all(CHAN_URL.map(async (el: any) => {
+      // const roomsTemp = [] as any
+      const roomsTemp =  await Promise.all(CHAN_URL.map(async (el: any) => {
         try {
-          const room = await sb.OpenChannel.getChannel(el) as any
+          // const room = await sb.OpenChannel.getChannel(el) as any
+          const room = await sb.GroupChannel.getChannel(el) as any
+          room.markAsDelivered();
+          // console.log({room, lastMessage})
+          // console.log({lastMessage})
+          return room
 
-          roomsTemp.push(room)
+          // roomsTemp.push(room)
         } catch (error) {
           console.log('error'+ error);
         }
       }))
 
-      await Promise.all(roomsTemp.map(async (el: any) => {
-        try {
-          await  el.enter()
-        } catch (error) {
-          console.log('error'+ error);
-        }
-      }))
+      // await Promise.all(roomsTemp.map(async (el: any) => {
+      //   try {
+      //     // await  el.enter()
+      //     await  el.join()
+      //   } catch (error) {
+      //     console.log('error'+ error);
+      //   }
+      // }))
 
       rooms.value = parsingRooms(roomsTemp)
       roomsChannel.value = roomsTemp
@@ -329,18 +372,103 @@ export default defineComponent ({
     }
     function resetMessages() {
 			messages.value = []
+      // selectedRoomChannel.value = {}
 			messageOptions.value.messagesLoaded = false
 		}
 
+    const onlyOnceMarkRead = ref(false) as Ref<Boolean>
+
+    watch(
+      () => ([messages.value,selectedRoomChannel.value , roomId.value]),
+      ([newMessage, newRooms, newRoomId]) => {
+
+        if((newRooms.url === newRoomId) && (newRooms.unreadMessageCount !== 0) && !onlyOnceMarkRead.value) {
+          onlyOnceMarkRead.value = true
+          newRooms.markAsRead()
+          .then(() => {
+            rooms.value = rooms.value.map((x: any) => {
+              if(x.roomId === newRooms.url) {
+                return {
+                  ...x,
+                  unreadCount: 0
+                }
+              } else {
+                return x
+              }
+            })
+            roomsChannel.value = roomsChannel.value.map((x: any) => {
+              if(x.url === newRooms.url) {
+                return {
+                  ...x,
+                  unreadMessageCount: 0
+                }
+              } else {
+                return x
+              }
+            })
+            onlyOnceMarkRead.value = false
+          })
+          .catch((err: any) => {console.log('ERR', err)})
+        }
+      },
+      { deep: true }
+    )
+
     function fetchMessages({ room, options = {} }: any) {
       const roomChannel = [...roomsChannel.value].filter((x:any) => x.url === room.roomId)[0]
-      if (options.reset) {
+      selectedRoomChannel.value = roomChannel
+      if (options.reset && roomChannel) {
 				resetMessages()
 				roomId.value = room.roomId
         listQuery.value = roomChannel.createPreviousMessageListQuery();
 			}
 
-      selectedRoomChannel.value = roomChannel
+
+      channelHandler.onDeliveryReceiptUpdated = function(channel: any) {
+          rooms.value = rooms.value.map((x: any) => {
+            if(x.roomId === channel.url) {
+
+              const lastMessage = channel.lastMessage
+              const unreadCount = channel.unreadMessageCount ? channel.unreadMessageCount + 1  : channel.unreadMessageCount
+
+              let lastMessageCust = {
+                content: lastMessage?.message,
+                senderId: lastMessage?._sender?.userId,
+                username: lastMessage?._sender?.nickname,
+                timestamp: $dateFns.format(
+                  new Date(lastMessage?.createdAt),
+                  'HH:mm'
+                ),
+                // saved: true,
+                // distributed: false,
+                // seen: false,
+                // new: true
+              }
+              if(lastMessage && lastMessage?.messageType === 'file') {
+                lastMessageCust = {
+                  ...lastMessageCust,
+                  content: lastMessage?.url
+                }
+              }
+              return {
+                ...x,
+                unreadCount,
+                lastMessage: lastMessageCust,
+              }
+            } else {
+              return x
+            }
+          })
+          roomsChannel.value = roomsChannel.value.map((x: any) => {
+            if(x.url === channel.url) {
+              return channel
+            } else {
+              return x
+            }
+          })
+      }
+
+
       const LIMIT = 30
       listQuery.value.limit = LIMIT
       listQuery.value.load(function(messageList: any, error: any) {
@@ -348,28 +476,32 @@ export default defineComponent ({
             console.log({error})
               // Handle error.
           }
-          if ((messageList.length === 0 || messageList.length < LIMIT)) {
+          if (messageList && (messageList.length === 0 || messageList.length < LIMIT)) {
 						setTimeout(() => (messageOptions.value.messagesLoaded = true), 0)
 					}
-
-          if (options.reset) messages.value = []
           console.log({messageList})
+          if (options.reset) messages.value = []
           messages.value = [...parsingMessages(messageList), ...messages.value]
       })
 
-      const channelHandler = new sb.ChannelHandler();
-      channelHandler.onMessageReceived = function(channel, message: any) {
+      channelHandler.onMessageReceived = function(channel: any, message: any) {
         // FILTERED DUPLICATED MESSAGE
-        const filteredArr = [...messages.value, ...parsingMessages([message])].reduce((acc, current) => {
-          const x = acc.find((item: any) => item.indexId === current.indexId);
-          if (!x) {
-            return acc.concat([current]);
-          } else {
-            return acc;
-          }
-        }, []);
-        messages.value = filteredArr
+        if (selectedRoomChannel.value.url === channel.url) {
+          const filteredArr = [...messages.value, ...parsingMessages([message])].reduce((acc, current) => {
+            const x = acc.find((item: any) => item.indexId === current.indexId);
+            if (!x) {
+              return acc.concat([current]);
+            } else {
+              return acc;
+            }
+          }, []);
+          messages.value = filteredArr
+        }
       };
+
+      // if(selectedRoomChannel.value?.unreadMessageCount) {
+      //   selectedRoomChannel.value.markAsRead()
+      // }
       sb.addChannelHandler(uuidv4(), channelHandler);
     }
 
