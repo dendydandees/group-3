@@ -54,9 +54,9 @@
               : detailMarketplace.status
           }}
         </v-btn>
-        <v-btn color="white darken-1 red--text " rounded class="custom-btn-red">
+        <!-- <v-btn color="white darken-1 red--text " rounded class="custom-btn-red">
           Add to Compare
-        </v-btn>
+        </v-btn> -->
       </div>
     </div>
     <v-row class="middle-row d-flex align-start">
@@ -93,7 +93,7 @@
         >
           Download Rate Sheet
         </v-btn>
-        <NuxtImg src="/images/logo-detail.svg" width="290" preload />
+        <!-- <NuxtImg src="/images/logo-detail.svg" width="290" preload /> -->
       </v-col>
       <v-col class="detailed-info" cols="5">
         <!-- <v-row
@@ -186,32 +186,8 @@
       </v-col>
     </v-row>
     <div class="bottom-row  mt-16">
-      <div class="title-filter primary--text display-1 mb-7">Coverage Area</div>
-      <div class="btn-filter-map d-flex align-center">
-        <!-- <v-select
-          v-model="selectedZone.value"
-          :items="zones"
-          item-text="country"
-          item-value="country"
-          label="Select Country"
-          outlined
-          rounded
-          dense
-          color="primary"
-          clearable
-          class="custom-select mr-3"
-          :full-width="true"
-        /> -->
-        <!-- <v-select
-          :items="[]"
-          label="Select Port"
-          outlined
-          rounded
-          dense
-          color="primary"
-          clearable
-          class="custom-select mr-3"
-        /> -->
+      <div class="title-filter primary--text display-1 mb-2">Coverage Area</div>
+      <!-- <div class="btn-filter-map d-flex align-center">
         <v-btn
           color="white darken-1 red--text"
           rounded
@@ -222,8 +198,8 @@
         <v-btn color="white darken-1 red--text" rounded class="custom-btn-red">
           Download SLA
         </v-btn>
-      </div>
-      <v-row v-if="partnerServiceZones" align="center" class="mt-2">
+      </div> -->
+      <v-row v-if="partnerServiceZones" align="center" class="mt-0">
         <v-col cols="12">
           <BaseTable
             item-key="id"
