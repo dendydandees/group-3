@@ -211,7 +211,9 @@ export default defineComponent({
         }
 
         if (listError && listError.length > 0) {
-          message = listError.map((item) => item.note)
+          message = listError
+            .filter((item) => item.note)
+            .map((item) => item.note)
         }
 
         storeApplications.commit('applications/SET_ALERT', {
