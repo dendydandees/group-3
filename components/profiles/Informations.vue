@@ -6,7 +6,13 @@
           <v-row align="center">
             <v-col cols="12" md="auto">
               <v-avatar size="56" color="secondary">
-                <v-icon dark x-large>mdi-account-circle</v-icon>
+                <v-icon dark x-large>
+                  {{
+                    $vuetify.breakpoint.mobile
+                      ? 'mdi-account-circle'
+                      : '$profile'
+                  }}
+                </v-icon>
               </v-avatar>
             </v-col>
 

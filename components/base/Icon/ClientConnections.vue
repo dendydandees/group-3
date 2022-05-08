@@ -8,19 +8,6 @@
     height="47.257"
     viewBox="0 0 50.675 47.257"
   >
-    <defs>
-      <clipPath id="clip-path">
-        <rect
-          id="Rectangle_165"
-          data-name="Rectangle 165"
-          width="50.675"
-          height="47.257"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1"
-        />
-      </clipPath>
-    </defs>
     <g id="Group_256" data-name="Group 256" transform="translate(0 0)">
       <g id="Group_255" data-name="Group 255" clip-path="url(#clip-path)">
         <path

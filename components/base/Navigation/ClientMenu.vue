@@ -47,6 +47,7 @@ export default defineComponent({
   },
   setup(_props, { emit }) {
     const clientMenu = ref([
+      { title: 'Dashboard', icon: '$dashboard', to: '/dashboard' },
       { title: 'Orders', icon: '$order', to: '/orders' },
       { title: 'Marketplace', icon: '$marketplace', to: '/marketplace' },
       { title: 'L-Control', icon: '$lControl', to: '/lControl' },
