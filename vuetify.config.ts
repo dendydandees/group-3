@@ -7,6 +7,7 @@ import Profile from '@/components/base/Icon/Profile.vue'
 import Freight from '@/components/base/Icon/Freight.vue'
 import LControl from '@/components/base/Icon/LControl.vue'
 import Domestic from '@/components/base/Icon/Domestic.vue'
+import Dashboard from '@/components/base/Icon/Dashboard.vue'
 
 export default {
   rtl: false,
@@ -39,6 +40,7 @@ export default {
       freight: { component: Freight },
       lControl: { component: LControl },
       domestic: { component: Domestic },
+      dashboard: { component: Dashboard },
     },
   },
 }

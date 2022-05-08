@@ -18,7 +18,7 @@
       </template>
     </BaseHeadlinePage>
 
-    <v-row align="center" justify="end">
+    <v-row align="center">
       <!-- Left options -->
       <OrdersLeftOptions
         :is-on-list-view="isOnListView"
