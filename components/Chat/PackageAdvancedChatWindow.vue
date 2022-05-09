@@ -141,6 +141,7 @@ export default defineComponent ({
     const listQuery = ref({}) as any
     const messages = ref([] as any)
     const USER_ID = 'abcxyz'
+    // const USER_ID = '30551dfc-8f59-467c-9032-868483202a0f'
     const USER_ID_CHAT = computed(
       () => storeChat.state.sendbird.chatUser)
     const channelHandler = new sb.ChannelHandler() as any
@@ -156,6 +157,7 @@ export default defineComponent ({
     const CHAN_URL = [
       'sendbird_group_channel_361080858_8545db5fdcb5c3afc10e18403292fe13718b95cd',
       'sendbird_group_channel_361072896_4fccc8e9c932b9c07187f6d53d16ec3867575e3c'
+      // 'eef7ccd7-e17b-400c-9ca8-f62f9b3a26d4'
     ]
     let chan: SendBird.OpenChannel
 
@@ -210,7 +212,8 @@ export default defineComponent ({
       return data.map( (x: any, i: number) => {
           const lastMessage = x?.lastMessage
 
-          let lastMessageCust = {
+          let lastMessageCust = lastMessage
+          ? {
             content: lastMessage?.message,
             senderId: lastMessage?._sender?.userId,
             username: lastMessage?._sender?.nickname,
@@ -223,7 +226,9 @@ export default defineComponent ({
             // seen: false,
             // new: true
           }
-          if(lastMessage && lastMessage?.messageType === 'file') {
+          :
+          null
+          if(lastMessageCust && lastMessage && lastMessage?.messageType === 'file') {
             lastMessageCust = {
               ...lastMessageCust,
               content: lastMessage?.url
@@ -360,6 +365,7 @@ export default defineComponent ({
     function fetchRooms() {
       resetRooms()
 			fetchMoreRooms()
+
     }
     function resetMessages() {
 			messages.value = []
@@ -405,22 +411,15 @@ export default defineComponent ({
       { deep: true }
     )
 
-    function fetchMessages({ room, options = {} }: any) {
-      const roomChannel = [...roomsChannel.value].filter((x:any) => x.url === room.roomId)[0]
-      selectedRoomChannel.value = roomChannel
-      if (options.reset && roomChannel) {
-				resetMessages()
-				roomId.value = room.roomId
-        listQuery.value = roomChannel.createPreviousMessageListQuery();
-			}
-
-
+    function deliveryReceiptUpdated() {
       channelHandler.onDeliveryReceiptUpdated = function(channel: any) {
+          // console.log('this is chennel delivery', {channel})
           rooms.value = rooms.value.map((x: any) => {
             if(x.roomId === channel.url) {
 
               const lastMessage = channel.lastMessage
               const unreadCount = channel.unreadMessageCount ? channel.unreadMessageCount + 1  : channel.unreadMessageCount
+              console.log({lastMessage: lastMessage?.message, unreadCount})
 
               let lastMessageCust = {
                 content: lastMessage?.message,
@@ -458,6 +457,18 @@ export default defineComponent ({
             }
           })
       }
+    }
+
+    function fetchMessages({ room, options = {} }: any) {
+      const roomChannel = [...roomsChannel.value].filter((x:any) => x.url === room.roomId)[0]
+      selectedRoomChannel.value = roomChannel
+      if (options.reset && roomChannel) {
+				resetMessages()
+				roomId.value = room.roomId
+        listQuery.value = roomChannel.createPreviousMessageListQuery();
+			}
+
+
 
 
       const LIMIT = 30
@@ -489,6 +500,7 @@ export default defineComponent ({
           messages.value = filteredArr
         }
       };
+      deliveryReceiptUpdated()
 
       sb.addChannelHandler(uuidv4(), channelHandler);
     }

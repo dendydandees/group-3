@@ -281,9 +281,10 @@
                         {{ partner.name }}
                       </v-col>
 
+                        <!-- v-if="partner.partnerServiceZones" -->
                       <v-col
-                        v-if="partner.partnerServiceZones"
-                        class="body-2 white--text aling-center d-flex pa-0 ml-3"
+                        v-if="false"
+                        class="body-2 white--text align-center d-flex pa-0 ml-3"
                         cols="4"
                       >
                         <NuxtImg

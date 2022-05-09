@@ -11,7 +11,36 @@
 
     <v-main class="base">
       <Nuxt class="main-content" />
-      <!-- <v-me -->
+      <!-- <v-menu
+        v-model="menu"
+        :close-on-content-click="false"
+        offset-x
+        :nudge-width="200"
+      >
+        <template #activator="{ on, attrs }">
+          <v-btn
+            :key="'mdi-pencil'"
+            :color="'primary'"
+            fab
+            large
+            dark
+            bottom
+            fixed
+            right
+            class="v-btn--example"
+            v-bind="attrs"
+            v-on="on"
+          >
+            <v-icon>{{'mdi-message-text' }}</v-icon>
+          </v-btn>
+        </template>
+
+        <v-card
+          width="800px"
+        >
+          <ChatPackageAdvancedChatWindow />
+        </v-card>
+      </v-menu> -->
 
       <BaseNavigationFooter />
     </v-main>
@@ -36,6 +65,7 @@ export default defineComponent({
     const storeChat = useStore<VuexModuleChat>()
     const sb = new SendBird({ appId: $config.sendBirdKey, localCacheEnabled: true });
     const USER_ID = 'abcxyz'
+    // const USER_ID = '30551dfc-8f59-467c-9032-868483202a0f'
     const countChat = ref(0) as Ref<Number>
     const USER_ID_CHAT = computed(
       () => storeChat.state.sendbird.chatUser)
@@ -95,7 +125,7 @@ export default defineComponent({
       menu,
       doShowSideNav,
       hideMiniSideNav,
-      countChat
+      countChat,
     }
   },
 })
