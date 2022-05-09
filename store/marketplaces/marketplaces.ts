@@ -23,6 +23,7 @@ interface GetMarketplaces {
   isLControl: Boolean;
   isConnected?: Boolean;
   isCOD?: Boolean;
+  isChat?: Boolean;
 }
 
 const filter = {
@@ -40,6 +41,7 @@ export const state = () => ({
   marketplacesLControl: [] as Marketplace[] | [],
   marketplacesCOD: [] as Marketplace[] | [],
   marketplacesConnected: [] as Marketplace[] | [],
+  marketplacesChat: [] as Marketplace[] | [],
   loadedLControl: false as Boolean,
   meta: {
     page: 1,
@@ -65,6 +67,8 @@ export const mutations: MutationTree<RootStateMarketplaces> = {
     (state.marketplacesCOD = value),
   SET_MARKETPLACES_CONNECTED: (state, value: Marketplace[] | []) =>
     (state.marketplacesConnected = value),
+  SET_MARKETPLACES_CHAT: (state, value: Marketplace[] | []) =>
+    (state.marketplacesChat = value),
   SET_LOADED_LCONTROL: (state, value: Boolean) =>
     (state.loadedLControl = value),
   SET_META: (state, value: Meta) => (state.meta = value),
@@ -146,11 +150,11 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
     }
   },
   async getMarketplacesConnected(
-    { commit },
-    { params, isCOD }: GetMarketplaces
+    { commit, dispatch },
+    { params, isCOD, isChat }: GetMarketplaces
   ) {
     let serviceParams = 'service=';
-    if (params && params?.service.length > 0) {
+    if (params && params?.service && params?.service.length > 0) {
       serviceParams = params.service
         .map((el) => {
           return `service=${ el }`;
@@ -174,7 +178,27 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
         totalPage,
         totalCount,
       };
-      if (!isCOD) {
+      if (isChat && !isCOD) {
+        let listChannel = await Promise.all(data.map(async (el: any) => {
+          try {
+            const channel = await dispatch(
+              'sendbird/getChatChannel',
+              el.id,
+              { root: true }
+            );
+            return {
+              name: el.name,
+              channel_url: channel?.channel_url ?? '',
+              logo: el.logo ? ('data:image/png;base64,' + el.logo) : ''
+            };
+          } catch (error) {
+            console.log('error' + error);
+          }
+        }));
+        listChannel = listChannel.filter((x: any) => x.channel_url);
+        commit('SET_MARKETPLACES_CHAT', listChannel);
+      }
+      if (!isChat && !isCOD) {
         commit('SET_MARKETPLACES_CONNECTED', data);
       }
       if (isCOD) {
@@ -184,6 +208,7 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
 
       return response;
     } catch (error) {
+      console.log(error);
       return error;
     }
   },
