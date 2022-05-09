@@ -75,7 +75,7 @@ export default defineComponent({
       )
       sb.connect(USER_ID, function(user, error){
       })
-      await fetchMarketplaceConnected()
+      // await fetchMarketplaceConnected()
       // sb.getTotalUnreadMessageCount(function(count, error) {
       //     if (error) {
       //         // Handle error.
