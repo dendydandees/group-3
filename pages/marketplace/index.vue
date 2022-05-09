@@ -275,8 +275,7 @@
                       class="pa-4 d-flex align-center justify-space-between primary"
                     >
                       <v-col
-                        class="white--text pa-0"
-                        style="font-size: 33px"
+                        class="white--text pa-0 title"
                         :cols="!partner.partnerServiceZones ? 12 : 0"
                       >
                         {{ partner.name }}
@@ -288,13 +287,14 @@
                         cols="4"
                       >
                         <NuxtImg
-                          v-if="partner.partnerServiceTypes.length > 0"
+                          v-if="partner.partnerServiceZones.length > 0"
                           src="/images/mapLocation.svg"
                           preload
                           height="22.69"
                           class="mr-2"
                         />
-                        <div style="word-break: break-word; font-size: 10px">
+                        <div
+                          style="word-break: break-word; font-size: 10px">
                           {{ locationMapping(partner.partnerServiceZones) }}
                         </div>
                       </v-col>

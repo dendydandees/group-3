@@ -110,6 +110,10 @@ import { v4 as uuidv4 } from 'uuid'
 // import {sb} from '~/store/sendBird/sendBird';
 import { VuexModuleSendBird } from '~/types/sendBird/sendBird'
 import 'vue-advanced-chat/dist/vue-advanced-chat.css'
+import {
+  VuexModuleMarketplaces
+} from '~/types/marketplace/marketplace'
+import { VuexModuleChat, ChatUser } from '~/types/sendbird'
 
 export default defineComponent ({
   components: {
@@ -137,12 +141,18 @@ export default defineComponent ({
     const listQuery = ref({}) as any
     const messages = ref([] as any)
     const USER_ID = 'abcxyz'
+    const USER_ID_CHAT = computed(
+      () => storeChat.state.sendbird.chatUser)
     const channelHandler = new sb.ChannelHandler() as any
-    // const USER_ID = 'rafi-group123'
-    // const CHAN_URL = [
-    //   'sendbird_open_channel_7003_10ec006caac2d0a76bb3d39abf05a4c392eb57f9',
-    //   'sendbird_open_channel_7003_7908f2fc5d059a1906f5f5bf19934bfeb5932e44'
-    // ]
+    // store manage
+    const storeChat = useStore<VuexModuleChat>()
+    const storeMarketplaces = useStore<VuexModuleMarketplaces>()
+    const marketplacesConnected = computed(
+      () =>{
+        const data = storeMarketplaces.state.marketplaces.marketplaces.marketplacesChat
+        return data
+    })
+    console.log({marketplacesConnected})
     const CHAN_URL = [
       'sendbird_group_channel_361080858_8545db5fdcb5c3afc10e18403292fe13718b95cd',
       'sendbird_group_channel_361072896_4fccc8e9c932b9c07187f6d53d16ec3867575e3c'
@@ -156,11 +166,10 @@ export default defineComponent ({
     }
 
 
-    useFetch(async () => {
-      sb.connect(USER_ID, function(user, error){
-      })
-      fetchRooms()
-
+    const { $fetchState, fetch } = useFetch(async () => {
+      // sb.connect(USER_ID, function(user, error){
+      // })
+      await fetchRooms()
     })
 
     const sendMessage = async ({ content, roomId, files, replyMessage }: any) => {
@@ -193,67 +202,53 @@ export default defineComponent ({
     }
 
     const messagesLines = computed(() => {
-      // console.log(messages.value)
       return messages.value
     })
 
     function parsingRooms (data: any) {
 
       return data.map( (x: any, i: number) => {
-        const lastMessage = x.lastMessage
-        console.log({lastMessage})
-        let lastMessageCust = {
-          content: lastMessage?.message,
-          senderId: lastMessage?._sender?.userId,
-          username: lastMessage?._sender?.nickname,
-          timestamp: $dateFns.format(
-            new Date(lastMessage?.createdAt),
-            'HH:mm'
-          ),
-          // saved: true,
-          // distributed: false,
-          // seen: false,
-          // new: true
-        }
-        if(lastMessage && lastMessage?.messageType === 'file') {
-          lastMessageCust = {
-            ...lastMessageCust,
-            content: lastMessage?.url
+          const lastMessage = x?.lastMessage
+
+          let lastMessageCust = {
+            content: lastMessage?.message,
+            senderId: lastMessage?._sender?.userId,
+            username: lastMessage?._sender?.nickname,
+            timestamp: $dateFns.format(
+              new Date(lastMessage?.createdAt),
+              'HH:mm'
+            ),
+            // saved: true,
+            // distributed: false,
+            // seen: false,
+            // new: true
           }
-        }
-        return {
-          roomId: x?.url,
-          roomName: x?.name,
-          avatar: x?.coverUrl,
-          unreadCount: x?.unreadMessageCount,
-          // index: 3,
-          lastMessage: lastMessageCust,
-          // {
-          //   content: lastMessage?.message,
-          //   senderId: lastMessage?._sender?.userId,
-          //   username: lastMessage?._sender?.nickname,
-          //   timestamp: $dateFns.format(
-          //     new Date(lastMessage?.createdAt),
-          //     'HH:mm'
-          //   ),
-          //   // saved: true,
-          //   // distributed: false,
-          //   // seen: false,
-          //   // new: true
-          // },
-          users: x?.members.map((y: any) => {
-            return {
-              _id: y.userId,
-              username: y.nickname,
-              avatar: '',
-              // status: {
-              //   state: 'online',
-              //   lastChanged: 'today, 14:30'
-              // }
+          if(lastMessage && lastMessage?.messageType === 'file') {
+            lastMessageCust = {
+              ...lastMessageCust,
+              content: lastMessage?.url
             }
-          })
-          // typingUsers: [ 4321 ]
-        }
+          }
+          return {
+            roomId: x?.url,
+            roomName: x?.name,
+            avatar: x?.coverUrl,
+            unreadCount: x?.unreadMessageCount,
+            // index: 3,
+            lastMessage: lastMessageCust,
+            users: x?.members.map((y: any) => {
+              return {
+                _id: y.userId,
+                username: y.nickname,
+                avatar: '',
+                // status: {
+                //   state: 'online',
+                //   lastChanged: 'today, 14:30'
+                // }
+              }
+            })
+            // typingUsers: [ 4321 ]
+          }
       })
     }
 
@@ -297,15 +292,6 @@ export default defineComponent ({
               }
             ]
             : [],
-            // reactions: {
-            //   😁: [
-            //     1234, // USER_ID
-            //     4321
-            //   ],
-            //   🥰: [
-            //     1234
-            //   ]
-            // },
             // replyMessage: {
             //   content: 'Reply Message',
             //   senderId: 4321,
@@ -333,14 +319,10 @@ export default defineComponent ({
 
     async function fetchMoreRooms() {
       roomOptions.value.roomsLoaded = true
-      // const roomsTemp = [] as any
       const roomsTemp =  await Promise.all(CHAN_URL.map(async (el: any) => {
         try {
-          // const room = await sb.OpenChannel.getChannel(el) as any
           const room = await sb.GroupChannel.getChannel(el) as any
           room.markAsDelivered();
-          // console.log({room, lastMessage})
-          // console.log({lastMessage})
           return room
 
           // roomsTemp.push(room)
@@ -349,14 +331,23 @@ export default defineComponent ({
         }
       }))
 
-      // await Promise.all(roomsTemp.map(async (el: any) => {
+
+      // const roomsTest =  await Promise.all(marketplacesConnected.value.map(async (el: any) => {
       //   try {
-      //     // await  el.enter()
-      //     await  el.join()
+      //     if(el?.channel_url) {
+
+      //       const room = await sb.GroupChannel.getChannel(el?.channel_url) as any
+      //       room.markAsDelivered();
+      //       console.log({room})
+      //       return room
+      //     }
+
+      //     // roomsTemp.push(room)
       //   } catch (error) {
       //     console.log('error'+ error);
       //   }
       // }))
+      // console.log({roomsTest})
 
       rooms.value = parsingRooms(roomsTemp)
       roomsChannel.value = roomsTemp
@@ -499,9 +490,6 @@ export default defineComponent ({
         }
       };
 
-      // if(selectedRoomChannel.value?.unreadMessageCount) {
-      //   selectedRoomChannel.value.markAsRead()
-      // }
       sb.addChannelHandler(uuidv4(), channelHandler);
     }
 
@@ -548,26 +536,7 @@ export default defineComponent ({
     }
 
     function openFile({ message, file }: { message: any, file: any }) {
-      // console.log('openFile', {message, file})
       window.open(file?.file?.preview,'_self');
-    }
-
-    async function getDataUrl(imageUrl: string) {
-      const headers = new Headers();
-      const authToken = $config.sendBirdToken
-      headers.set('Api-Token', `${authToken}`);
-      const res = await fetch(imageUrl, {headers});
-      const blob = await res.blob();
-      return new Promise((resolve, reject) => {
-        const reader  = new FileReader();
-        reader.addEventListener("load", function () {
-            resolve(reader.result);
-        }, false);
-        reader.onerror = (error) => {
-          return reject(error);
-        };
-        reader.readAsDataURL(blob);
-      })
     }
 
     return {
