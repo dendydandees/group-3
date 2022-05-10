@@ -41,6 +41,7 @@ export const state = () => ({
   marketplacesLControl: [] as Marketplace[] | [],
   marketplacesCOD: [] as Marketplace[] | [],
   marketplacesConnected: [] as Marketplace[] | [],
+  marketplacesConnectedLength: 0 as number,
   marketplacesChat: [] as Marketplace[] | [],
   loadedLControl: false as Boolean,
   meta: {
@@ -69,6 +70,8 @@ export const mutations: MutationTree<RootStateMarketplaces> = {
     (state.marketplacesConnected = value),
   SET_MARKETPLACES_CHAT: (state, value: Marketplace[] | []) =>
     (state.marketplacesChat = value),
+  SET_MARKETPLACES_CONNECTED_LENGTH: (state, value: number) =>
+    (state.marketplacesConnectedLength = value),
   SET_LOADED_LCONTROL: (state, value: Boolean) =>
     (state.loadedLControl = value),
   SET_META: (state, value: Meta) => (state.meta = value),
@@ -196,7 +199,16 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
           }
         }));
         listChannel = listChannel.filter((x: any) => x.channel_url);
-        commit('SET_MARKETPLACES_CHAT', listChannel);
+
+        const incomingChats = await dispatch(
+          'sendbird/getChatIncoming',
+          {},
+          { root: true }
+        );
+        let allArr = listChannel;
+        if (incomingChats) allArr = listChannel.concat(incomingChats);
+        commit('SET_MARKETPLACES_CONNECTED_LENGTH', data.length);
+        commit('SET_MARKETPLACES_CHAT', allArr);
       }
       if (!isChat && !isCOD) {
         commit('SET_MARKETPLACES_CONNECTED', data);
