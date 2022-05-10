@@ -11,7 +11,7 @@
 
     <v-main class="base">
       <Nuxt class="main-content" />
-      <!-- <v-menu
+      <v-menu
         v-model="menu"
         :close-on-content-click="false"
         offset-x
@@ -40,7 +40,7 @@
         >
           <ChatPackageAdvancedChatWindow />
         </v-card>
-      </v-menu> -->
+      </v-menu>
 
       <BaseNavigationFooter />
     </v-main>
@@ -48,7 +48,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, useContext, ref, Ref, useFetch,useStore, computed } from '@nuxtjs/composition-api'
+import { defineComponent, useContext, ref, Ref, useFetch,useStore, computed, watch } from '@nuxtjs/composition-api'
 import SendBird from 'sendbird';
 import {
   VuexModuleMarketplaces
@@ -69,13 +69,26 @@ export default defineComponent({
     const countChat = ref(0) as Ref<Number>
     const USER_ID_CHAT = computed(
       () => storeChat.state.sendbird.chatUser)
+
+    watch(
+      () => [USER_ID_CHAT],
+      ([newUserID]) => {
+        console.log({newUserID})
+        if(newUserID.value && newUserID.value?.user_id) {
+
+          sb.connect(newUserID.value?.user_id, function(user, error){
+          })
+        }
+      },
+      { deep: true }
+    )
     const { $fetchState, fetch } = useFetch(async () => {
       await storeChat.dispatch(
         'sendbird/getUserChat'
       )
-      sb.connect(USER_ID, function(user, error){
-      })
-      // await fetchMarketplaceConnected()
+      // sb.connect(USER_ID, function(user, error){
+      // })
+      await fetchMarketplaceConnected()
       // sb.getTotalUnreadMessageCount(function(count, error) {
       //     if (error) {
       //         // Handle error.
