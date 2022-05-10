@@ -11,7 +11,7 @@
 
     <v-main class="base">
       <Nuxt class="main-content" />
-      <v-menu
+      <!-- <v-menu
         v-model="menu"
         :close-on-content-click="false"
         offset-x
@@ -40,7 +40,7 @@
         >
           <ChatPackageAdvancedChatWindow />
         </v-card>
-      </v-menu>
+      </v-menu> -->
 
       <BaseNavigationFooter />
     </v-main>
@@ -83,12 +83,12 @@ export default defineComponent({
       { deep: true }
     )
     const { $fetchState, fetch } = useFetch(async () => {
-      await storeChat.dispatch(
-        'sendbird/getUserChat'
-      )
+      // await storeChat.dispatch(
+      //   'sendbird/getUserChat'
+      // )
       // sb.connect(USER_ID, function(user, error){
       // })
-      await fetchMarketplaceConnected()
+      // await fetchMarketplaceConnected()
       // sb.getTotalUnreadMessageCount(function(count, error) {
       //     if (error) {
       //         // Handle error.
