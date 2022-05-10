@@ -11,11 +11,12 @@
 
     <v-main class="base">
       <Nuxt class="main-content" />
-      <!-- <v-menu
+      <v-menu
         v-model="menu"
         :close-on-content-click="false"
         offset-x
         :nudge-width="200"
+        :disabled="!isThereRoom"
       >
         <template #activator="{ on, attrs }">
           <v-btn
@@ -29,6 +30,7 @@
             right
             class="v-btn--example"
             v-bind="attrs"
+            :loading="!isThereRoom"
             v-on="on"
           >
             <v-icon>{{'mdi-message-text' }}</v-icon>
@@ -40,7 +42,7 @@
         >
           <ChatPackageAdvancedChatWindow />
         </v-card>
-      </v-menu> -->
+      </v-menu>
 
       <BaseNavigationFooter />
     </v-main>
@@ -69,11 +71,23 @@ export default defineComponent({
     const countChat = ref(0) as Ref<Number>
     const USER_ID_CHAT = computed(
       () => storeChat.state.sendbird.chatUser)
+    const marketplacesConnected = computed(
+      () =>{
+        const data = storeMarketplaces.state.marketplaces.marketplaces.marketplacesChat
+        return data
+    })
+    const isThereRoom = computed(
+      () =>{
+        if(marketplacesConnected.value && marketplacesConnected.value.length > 0) {
+          return true
+        } else {
+          return false
+        }
+    })
 
     watch(
       () => [USER_ID_CHAT],
       ([newUserID]) => {
-        console.log({newUserID})
         if(newUserID.value && newUserID.value?.user_id) {
 
           sb.connect(newUserID.value?.user_id, function(user, error){
@@ -83,12 +97,12 @@ export default defineComponent({
       { deep: true }
     )
     const { $fetchState, fetch } = useFetch(async () => {
-      // await storeChat.dispatch(
-      //   'sendbird/getUserChat'
-      // )
+      await storeChat.dispatch(
+        'sendbird/getUserChat'
+      )
+      await fetchMarketplaceConnected()
       // sb.connect(USER_ID, function(user, error){
       // })
-      // await fetchMarketplaceConnected()
       // sb.getTotalUnreadMessageCount(function(count, error) {
       //     if (error) {
       //         // Handle error.
@@ -101,6 +115,7 @@ export default defineComponent({
     const drawer = ref(!context.$vuetify.breakpoint.mobile) as Ref<boolean>
     const mini = ref(false) as Ref<boolean>
     const menu = ref(false) as Ref<boolean>
+    // const roomList = ref(null) as Ref<any>
     const doShowSideNav = () => {
       const isMobile = context.$vuetify.breakpoint.smAndDown
 
@@ -131,7 +146,6 @@ export default defineComponent({
       }
     }
 
-
     return {
       drawer,
       mini,
@@ -139,6 +153,8 @@ export default defineComponent({
       doShowSideNav,
       hideMiniSideNav,
       countChat,
+      USER_ID,
+      isThereRoom
     }
   },
 })

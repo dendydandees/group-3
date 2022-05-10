@@ -7,7 +7,8 @@ import {
 
 export const state = () => ({
   chatUser: {} as ChatUser,
-  chatChannel: {} as ChatChannel
+  chatChannel: {} as ChatChannel,
+  chatChannelIncoming: [] as ChatChannel[]
 });
 
 export type RootStateChat = ReturnType<typeof state>;
@@ -17,6 +18,8 @@ export const mutations: MutationTree<RootStateChat> = {
     (state.chatUser = value),
   SET_CHANNEL: (state, value: ChatChannel) =>
     (state.chatChannel = value),
+  SET_CHANNEL_INCOMING: (state, value: ChatChannel[]) =>
+    (state.chatChannelIncoming = value),
 };
 
 export const actions: ActionTree<RootStateChat, RootStateChat> = {
@@ -33,10 +36,31 @@ export const actions: ActionTree<RootStateChat, RootStateChat> = {
   },
   async getChatChannel({ commit }, partnerID: string) {
     try {
-      console.log(partnerID);
+      // console.log(partnerID);
       const response = await this.$axios.$get(`/api/clients/chat/channel/${ partnerID }`,);
 
       commit('SET_CHANNEL', response);
+
+      return response;
+    } catch (error) {
+      return error;
+    }
+  },
+  async getChatIncoming({ commit }) {
+    try {
+      const response = await this.$axios.$get(`/api/clients/chat/channel/incoming`);
+
+      let custRes = response;
+      if (response && response.length > 0) {
+        custRes = [...response].map((x: ChatChannel) => {
+          return {
+            ...x,
+            logo: ''
+          };
+        });
+      }
+
+      commit('SET_CHANNEL_INCOMING', custRes);
 
       return response;
     } catch (error) {

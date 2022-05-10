@@ -3,6 +3,7 @@
     class="chat-container-all"
   >
     <ChatWindow
+      ref="chatRef"
       :current-user-id="USER_ID"
       :room-id="roomId"
       :rooms="rooms"
@@ -102,6 +103,7 @@ import {
   Ref,
   useContext,
   onUnmounted,
+  onMounted,
 } from '@nuxtjs/composition-api'
 import { PropType } from 'vue';
 import ChatWindow from 'vue-advanced-chat'
@@ -125,6 +127,7 @@ export default defineComponent ({
     const {$dateFns, $config } = useContext()
     const sb = new SendBird({ appId: $config.sendBirdKey, localCacheEnabled: true });
     const storeSendBird = useStore<VuexModuleSendBird>()
+    const chatRef = ref(null) as Ref<any>
     const rooms = ref([]) as any
     const roomsChannel = ref([]) as any
     const selectedRoomChannel = ref({}) as any
@@ -140,8 +143,8 @@ export default defineComponent ({
     const recipient = ref(null) as any
     const listQuery = ref({}) as any
     const messages = ref([] as any)
-    const USER_ID_temp = 'abcxyz'
-    // const USER_ID = '30551dfc-8f59-467c-9032-868483202a0f'
+    // const USER_ID = 'abcxyz'
+
     const USER_ID = computed(
       () => storeChat.state.sendbird.chatUser?.user_id)
     const channelHandler = new sb.ChannelHandler() as any
@@ -153,7 +156,11 @@ export default defineComponent ({
         const data = storeMarketplaces.state.marketplaces.marketplaces.marketplacesChat
         return data
     })
-    console.log({marketplacesConnected})
+    const marketplacesConnectedIndex = computed(
+      () =>{
+        const data = storeMarketplaces.state.marketplaces.marketplaces.marketplacesConnectedLength
+        return data
+    })
     const CHAN_URL = [
       'sendbird_group_channel_361080858_8545db5fdcb5c3afc10e18403292fe13718b95cd',
       'sendbird_group_channel_361072896_4fccc8e9c932b9c07187f6d53d16ec3867575e3c'
@@ -167,6 +174,28 @@ export default defineComponent ({
       // },
     }
 
+    onMounted(() => {
+      (document.getElementById('rooms-list') as any).insertAdjacentHTML( 'afterbegin',
+        '<div class="message-header-custom">' +
+            'Messages' +
+        '</div>'
+      );
+      const d2 = (document.getElementById('rooms-list') as any)
+        setTimeout(() => {
+          const child = document.createElement('div')
+          child.innerHTML = 'Incoming Messages';
+          child.className = 'message-header-custom'
+          d2.insertBefore(child, d2.children[marketplacesConnectedIndex.value + 1]);
+
+          if(((marketplacesConnected.value && marketplacesConnected.value.length) - marketplacesConnectedIndex.value) === 0) {
+            const noChild = document.createElement('div')
+            noChild.innerHTML = 'No Messages';
+            noChild.className = 'message-header-no-messages'
+            d2.insertBefore(noChild, d2.children[marketplacesConnectedIndex.value + 2]);
+          }
+        }, 500)
+
+    });
 
     const { $fetchState, fetch } = useFetch(async () => {
       // sb.connect(USER_ID, function(user, error){
@@ -343,7 +372,7 @@ export default defineComponent ({
 
             const room = await sb.GroupChannel.getChannel(el?.channel_url) as any
             room.markAsDelivered();
-            console.log({room})
+
             return room
           }
 
@@ -352,7 +381,7 @@ export default defineComponent ({
           console.log('error'+ error);
         }
       }))
-      console.log({roomsTest})
+
       rooms.value = parsingRooms(roomsTest)
       roomsChannel.value = roomsTest
       // rooms.value = parsingRooms(roomsTemp)
@@ -420,7 +449,7 @@ export default defineComponent ({
 
               const lastMessage = channel.lastMessage
               const unreadCount = channel.unreadMessageCount ? channel.unreadMessageCount + 1  : channel.unreadMessageCount
-              console.log({lastMessage: lastMessage?.message, unreadCount})
+
 
               let lastMessageCust = {
                 content: lastMessage?.message,
@@ -482,7 +511,7 @@ export default defineComponent ({
           if (messageList && (messageList.length === 0 || messageList.length < LIMIT)) {
 						setTimeout(() => (messageOptions.value.messagesLoaded = true), 0)
 					}
-          console.log({messageList})
+
           if (options.reset) messages.value = []
           messages.value = [...parsingMessages(messageList), ...messages.value]
       })
@@ -552,6 +581,7 @@ export default defineComponent ({
       window.open(file?.file?.preview,'_self');
     }
 
+
     return {
       sendMessage,
       msgInput,
@@ -567,12 +597,14 @@ export default defineComponent ({
       messageOptions,
       checkMessage,
       openFile,
-      stylesCustom
+      stylesCustom,
+      chatRef
     }
   }
 })
 </script>
 <style lang="scss">
+@import '~/assets/scss/color.module.scss';
   .chat-container-all {
     .avatar-custom {
       position: absolute;
@@ -617,5 +649,20 @@ export default defineComponent ({
     .vac-media-preview {
       width: 100% !important;
     }
+    .message-header-custom, .message-header-no-messages {
+      padding: 7.5px 0px 7.5px 14px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: auto;
+      /* border-bottom: 1px solid rgba(128, 128, 128, 0.218); */
+    }
+
+    .message-header-no-messages {
+      color: grey;
+      text-align: center;
+      margin: 20px 0;
+      font-size: 12px;
+    }
+
   }
 </style>
