@@ -140,10 +140,10 @@ export default defineComponent ({
     const recipient = ref(null) as any
     const listQuery = ref({}) as any
     const messages = ref([] as any)
-    const USER_ID = 'abcxyz'
+    const USER_ID_temp = 'abcxyz'
     // const USER_ID = '30551dfc-8f59-467c-9032-868483202a0f'
-    const USER_ID_CHAT = computed(
-      () => storeChat.state.sendbird.chatUser)
+    const USER_ID = computed(
+      () => storeChat.state.sendbird.chatUser?.user_id)
     const channelHandler = new sb.ChannelHandler() as any
     // store manage
     const storeChat = useStore<VuexModuleChat>()
@@ -324,38 +324,39 @@ export default defineComponent ({
 
     async function fetchMoreRooms() {
       roomOptions.value.roomsLoaded = true
-      const roomsTemp =  await Promise.all(CHAN_URL.map(async (el: any) => {
-        try {
-          const room = await sb.GroupChannel.getChannel(el) as any
-          room.markAsDelivered();
-          return room
-
-          // roomsTemp.push(room)
-        } catch (error) {
-          console.log('error'+ error);
-        }
-      }))
-
-
-      // const roomsTest =  await Promise.all(marketplacesConnected.value.map(async (el: any) => {
+      // const roomsTemp =  await Promise.all(CHAN_URL.map(async (el: any) => {
       //   try {
-      //     if(el?.channel_url) {
-
-      //       const room = await sb.GroupChannel.getChannel(el?.channel_url) as any
-      //       room.markAsDelivered();
-      //       console.log({room})
-      //       return room
-      //     }
+      //     const room = await sb.GroupChannel.getChannel(el) as any
+      //     room.markAsDelivered();
+      //     return room
 
       //     // roomsTemp.push(room)
       //   } catch (error) {
       //     console.log('error'+ error);
       //   }
       // }))
-      // console.log({roomsTest})
 
-      rooms.value = parsingRooms(roomsTemp)
-      roomsChannel.value = roomsTemp
+
+      const roomsTest =  await Promise.all(marketplacesConnected.value.map(async (el: any) => {
+        try {
+          if(el?.channel_url) {
+
+            const room = await sb.GroupChannel.getChannel(el?.channel_url) as any
+            room.markAsDelivered();
+            console.log({room})
+            return room
+          }
+
+          // roomsTemp.push(room)
+        } catch (error) {
+          console.log('error'+ error);
+        }
+      }))
+      console.log({roomsTest})
+      rooms.value = parsingRooms(roomsTest)
+      roomsChannel.value = roomsTest
+      // rooms.value = parsingRooms(roomsTemp)
+      // roomsChannel.value = roomsTemp
     }
     function resetRooms() {
       roomOptions.value.roomsLoaded = false
