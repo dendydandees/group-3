@@ -11,4 +11,5 @@ export interface ChatUser {
 export interface ChatChannel {
   name: string;
   channel_url: string;
+  logo?: string;
 }
