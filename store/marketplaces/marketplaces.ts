@@ -43,6 +43,7 @@ export const state = () => ({
   marketplacesConnected: [] as Marketplace[] | [],
   marketplacesConnectedLength: 0 as number,
   marketplacesChat: [] as Marketplace[] | [],
+  incomingChat: [] as Marketplace[] | [],
   loadedLControl: false as Boolean,
   meta: {
     page: 1,
@@ -70,6 +71,8 @@ export const mutations: MutationTree<RootStateMarketplaces> = {
     (state.marketplacesConnected = value),
   SET_MARKETPLACES_CHAT: (state, value: Marketplace[] | []) =>
     (state.marketplacesChat = value),
+  SET_INCOMING_CHAT: (state, value: Marketplace[] | []) =>
+    (state.incomingChat = value),
   SET_MARKETPLACES_CONNECTED_LENGTH: (state, value: number) =>
     (state.marketplacesConnectedLength = value),
   SET_LOADED_LCONTROL: (state, value: Boolean) =>
@@ -205,11 +208,13 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
           {},
           { root: true }
         );
-        let allArr = listChannel;
-        if (incomingChats) allArr = listChannel.concat(incomingChats);
+        const allArr = listChannel;
+        // if (incomingChats) allArr = listChannel.concat(incomingChats);
+        console.log({ incomingChats });
 
         commit('SET_MARKETPLACES_CONNECTED_LENGTH', data.length);
         commit('SET_MARKETPLACES_CHAT', allArr);
+        commit('SET_INCOMING_CHAT', incomingChats);
       }
       if (!isChat && !isCOD) {
         commit('SET_MARKETPLACES_CONNECTED', data);

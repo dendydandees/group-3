@@ -238,7 +238,7 @@
                 class="rounded-xl d-flex flex-column justify-space-between card-partner-custom"
                 width="100%"
                 height="245px"
-                color="primary"
+                color="white"
                 :disabled="$fetchState.pending"
                 @click="changePage(partner.id)"
               >
@@ -247,13 +247,15 @@
                   height="100%"
                   width="100%"
                   class="align-end"
-                  :src="
+                  :src="`data:image/png;base64,${partner.logo}`"
+                  contain
+                >
+                  <!-- :src="
                     partner.partnerGallery[0]
                       ? partner.partnerGallery[0].path
                       : null
-                  "
-                >
-                  <v-col class="pa-0 wrapper-service" cols="7">
+                  " -->
+                  <!-- <v-col class="pa-0 wrapper-service" cols="7">
                     <div>
                       <v-chip
                         v-for="(mile, i) in partner.partnerServiceTypes"
@@ -265,6 +267,24 @@
                       >
                         {{ $customUtils.setServiceType(mile.name) }}
                       </v-chip>
+                    </div>
+                  </v-col> -->
+                  <v-col
+                    class="body-2 white--text align-center  d-flex pa-0 wrapper-service"
+                    cols="7"
+                  >
+                    <NuxtImg
+                      v-if="partner.partnerServiceZones.length > 0"
+                      src="/images/mapLocation.svg"
+                      preload
+                      height="22.69"
+                      class="mr-2"
+                    />
+                    <div
+                      class="primary--text"
+                      style="word-break: break-word; font-size: 10px"
+                    >
+                      {{ locationMapping(partner.partnerServiceZones) }}
                     </div>
                   </v-col>
                   <div>
@@ -282,7 +302,7 @@
                       </v-col>
 
                         <!-- v-if="partner.partnerServiceZones" -->
-                      <v-col
+                      <!-- <v-col
                         v-if="false"
                         class="body-2 white--text align-center d-flex pa-0 ml-3"
                         cols="4"
@@ -298,7 +318,7 @@
                           style="word-break: break-word; font-size: 10px">
                           {{ locationMapping(partner.partnerServiceZones) }}
                         </div>
-                      </v-col>
+                      </v-col> -->
                     </div>
                   </div>
                   <v-btn
