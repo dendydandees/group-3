@@ -268,6 +268,7 @@ export default defineComponent ({
           return {
             roomId: x?.url,
             roomName: chatChannel[i] && chatChannel[i].name ? chatChannel[i].name : x?.name,
+            // roomName:  x?.name,
             avatar: chatChannel[i] && chatChannel[i].logo ? chatChannel[i].logo : x?.coverUrl,
             unreadCount: x?.unreadMessageCount,
             // index: 3,
@@ -295,8 +296,8 @@ export default defineComponent ({
             _id: x?.messageId,
             indexId: x?.messageId,
             content: x?.message ?? '',
-            senderId: x?._sender.userId,
-            username: x?._sender.nickname,
+            senderId: x?._sender?.userId ?? '',
+            username: x?._sender?.nickname,
             avatar: '',
             date: $dateFns.format(
               new Date(x?.createdAt),
@@ -494,8 +495,8 @@ export default defineComponent ({
     function fetchMessages({ room, options = {} }: any) {
       const roomChannel = [...roomsChannel.value].filter((x:any) => x.url === room.roomId)[0]
       selectedRoomChannel.value = roomChannel
-      if (options.reset && roomChannel) {
-        console.log({roomChannel})
+      if (options.reset && roomChannel && roomChannel.createPreviousMessageListQuery) {
+        // console.log({roomChannel})
 				resetMessages()
 				roomId.value = room.roomId
         listQuery.value = roomChannel.createPreviousMessageListQuery();
@@ -503,21 +504,23 @@ export default defineComponent ({
 
 
 
+      if(listQuery.value) {
+        const LIMIT = 30
+        listQuery.value.limit = LIMIT
+        listQuery.value.load(function(messageList: any, error: any) {
+            if (error) {
+              console.log({error})
+                // Handle error.
+            }
+            if (messageList && (messageList.length === 0 || messageList.length < LIMIT)) {
+              setTimeout(() => (messageOptions.value.messagesLoaded = true), 0)
+            }
 
-      const LIMIT = 30
-      listQuery.value.limit = LIMIT
-      listQuery.value.load(function(messageList: any, error: any) {
-          if (error) {
-            console.log({error})
-              // Handle error.
-          }
-          if (messageList && (messageList.length === 0 || messageList.length < LIMIT)) {
-						setTimeout(() => (messageOptions.value.messagesLoaded = true), 0)
-					}
+            if (options.reset) messages.value = []
+            messages.value = [...parsingMessages(messageList), ...messages.value]
+        })
 
-          if (options.reset) messages.value = []
-          messages.value = [...parsingMessages(messageList), ...messages.value]
-      })
+      }
 
       channelHandler.onMessageReceived = function(channel: any, message: any) {
         // FILTERED DUPLICATED MESSAGE

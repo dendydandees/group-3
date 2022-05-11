@@ -12,4 +12,5 @@ export interface ChatChannel {
   name: string;
   channel_url: string;
   logo?: string;
+  client_name: string;
 }

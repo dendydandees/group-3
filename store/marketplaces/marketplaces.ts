@@ -207,6 +207,7 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
         );
         let allArr = listChannel;
         if (incomingChats) allArr = listChannel.concat(incomingChats);
+
         commit('SET_MARKETPLACES_CONNECTED_LENGTH', data.length);
         commit('SET_MARKETPLACES_CHAT', allArr);
       }
