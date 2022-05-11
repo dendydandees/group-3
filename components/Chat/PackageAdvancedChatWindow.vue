@@ -113,9 +113,10 @@ import { v4 as uuidv4 } from 'uuid'
 import { VuexModuleSendBird } from '~/types/sendBird/sendBird'
 import 'vue-advanced-chat/dist/vue-advanced-chat.css'
 import {
+  Marketplace,
   VuexModuleMarketplaces
 } from '~/types/marketplace/marketplace'
-import { VuexModuleChat, ChatUser } from '~/types/sendbird'
+import { VuexModuleChat, ChatUser, ChatChannel } from '~/types/sendbird'
 
 export default defineComponent ({
   components: {
@@ -155,7 +156,7 @@ export default defineComponent ({
       () =>{
         const data = storeMarketplaces.state.marketplaces.marketplaces.marketplacesChat
         return data
-    })
+    }) as Ref<ChatChannel[]>
     const marketplacesConnectedIndex = computed(
       () =>{
         const data = storeMarketplaces.state.marketplaces.marketplaces.marketplacesConnectedLength
@@ -182,6 +183,7 @@ export default defineComponent ({
       );
       const d2 = (document.getElementById('rooms-list') as any)
         setTimeout(() => {
+          // console.log(chatRef.value)
           const child = document.createElement('div')
           child.innerHTML = 'Incoming Messages';
           child.className = 'message-header-custom'
@@ -236,7 +238,7 @@ export default defineComponent ({
       return messages.value
     })
 
-    function parsingRooms (data: any) {
+    function parsingRooms (data: any, chatChannel: ChatChannel[]) {
 
       return data.map( (x: any, i: number) => {
           const lastMessage = x?.lastMessage
@@ -265,8 +267,8 @@ export default defineComponent ({
           }
           return {
             roomId: x?.url,
-            roomName: x?.name,
-            avatar: x?.coverUrl,
+            roomName: chatChannel[i] && chatChannel[i].name ? chatChannel[i].name : x?.name,
+            avatar: chatChannel[i] && chatChannel[i].logo ? chatChannel[i].logo : x?.coverUrl,
             unreadCount: x?.unreadMessageCount,
             // index: 3,
             lastMessage: lastMessageCust,
@@ -372,7 +374,7 @@ export default defineComponent ({
 
             const room = await sb.GroupChannel.getChannel(el?.channel_url) as any
             room.markAsDelivered();
-
+            console.log(el , {...room, coverUrl: el?.logo ? el.logo : room.coverUrl})
             return room
           }
 
@@ -382,7 +384,7 @@ export default defineComponent ({
         }
       }))
 
-      rooms.value = parsingRooms(roomsTest)
+      rooms.value = parsingRooms(roomsTest, marketplacesConnected.value)
       roomsChannel.value = roomsTest
       // rooms.value = parsingRooms(roomsTemp)
       // roomsChannel.value = roomsTemp
@@ -493,6 +495,7 @@ export default defineComponent ({
       const roomChannel = [...roomsChannel.value].filter((x:any) => x.url === room.roomId)[0]
       selectedRoomChannel.value = roomChannel
       if (options.reset && roomChannel) {
+        console.log({roomChannel})
 				resetMessages()
 				roomId.value = room.roomId
         listQuery.value = roomChannel.createPreviousMessageListQuery();

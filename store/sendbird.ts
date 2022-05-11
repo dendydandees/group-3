@@ -60,6 +60,8 @@ export const actions: ActionTree<RootStateChat, RootStateChat> = {
         });
       }
 
+      console.log({ custRes });
+
       commit('SET_CHANNEL_INCOMING', custRes);
 
       return response;
