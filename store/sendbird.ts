@@ -55,16 +55,17 @@ export const actions: ActionTree<RootStateChat, RootStateChat> = {
         custRes = [...response].map((x: ChatChannel) => {
           return {
             ...x,
-            logo: ''
+            logo: x.logo ?? '',
+            name: x.client_name
           };
         });
       }
 
-      console.log({ custRes });
+
 
       commit('SET_CHANNEL_INCOMING', custRes);
 
-      return response;
+      return custRes;
     } catch (error) {
       return error;
     }
