@@ -288,9 +288,9 @@
                     </div>
                   </v-col>
                   <div>
-                    <div class="gradation-custom">
-                      <!-- this is for gradation -->
-                    </div>
+                    <!-- this is for gradation -->
+                    <!-- <div class="gradation-custom">
+                    </div> -->
                     <div
                       class="pa-4 d-flex align-center justify-space-between primary"
                     >
