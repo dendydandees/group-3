@@ -16,6 +16,7 @@
         :close-on-content-click="false"
         offset-x
         :nudge-width="200"
+        :nudge-top="580"
         :disabled="!isThereRoom"
       >
         <template #activator="{ on, attrs }">
@@ -37,10 +38,40 @@
           </v-btn>
         </template>
 
-        <v-card
+        <!-- <v-card
           width="800px"
         >
           <ChatPackageAdvancedChatWindow />
+        </v-card> -->
+        <v-card
+        >
+          <v-tabs
+            v-model="tab"
+            background-color="transparent"
+            color="basil"
+            grow
+          >
+            <v-tab
+              v-for="(item, i) in items"
+              :key="i"
+            >
+              {{ item.name }}
+            </v-tab>
+          </v-tabs>
+          <v-tabs-items v-model="tab">
+            <v-tab-item
+              v-for="(item, i) in items"
+              :key="i"
+            >
+              <v-card
+                width="800px"
+              >
+                <ChatPackageAdvancedChatWindow
+                  :is-incoming="item.isIncoming"
+                />
+              </v-card>
+            </v-tab-item>
+          </v-tabs-items>
         </v-card>
       </v-menu>
 
@@ -66,6 +97,17 @@ export default defineComponent({
     const storeMarketplaces = useStore<VuexModuleMarketplaces>()
     const storeChat = useStore<VuexModuleChat>()
     const sb = new SendBird({ appId: $config.sendBirdKey, localCacheEnabled: true });
+    const tab = ref(null) as any
+    const items = ref([
+      {
+        name:'Messages',
+        isIncoming: false
+      },
+      {
+        name:'Incoming Messages',
+        isIncoming: true
+      }
+    ]) as any
     const USER_ID = 'abcxyz'
     // const USER_ID = '30551dfc-8f59-467c-9032-868483202a0f'
     const countChat = ref(0) as Ref<Number>
@@ -154,7 +196,9 @@ export default defineComponent({
       hideMiniSideNav,
       countChat,
       USER_ID,
-      isThereRoom
+      isThereRoom,
+      tab,
+      items
     }
   },
 })

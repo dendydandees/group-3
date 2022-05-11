@@ -23,6 +23,11 @@
       @fetch-messages="fetchMessages"
       @open-file="openFile"
     >
+      <!-- <template #rooms-list-search="{  }">
+        <v-text-field
+          v-model="search"
+        />
+      </template> -->
       <!-- <template #room-header-info="{ room, typingUsers, userStatus }">
         <div
           style="font-size: 22px; font-weight: 900"
@@ -104,8 +109,9 @@ import {
   useContext,
   onUnmounted,
   onMounted,
+  PropType
 } from '@nuxtjs/composition-api'
-import { PropType } from 'vue';
+// import { PropType } from 'vue';
 import ChatWindow from 'vue-advanced-chat'
 import SendBird from 'sendbird';
 import { v4 as uuidv4 } from 'uuid'
@@ -123,6 +129,10 @@ export default defineComponent ({
     ChatWindow
   },
   props: {
+    isIncoming: {
+      type: Boolean as PropType<Boolean>,
+      default: false
+    }
   },
   setup(props, { emit }) {
     const {$dateFns, $config } = useContext()
@@ -130,6 +140,7 @@ export default defineComponent ({
     const storeSendBird = useStore<VuexModuleSendBird>()
     const chatRef = ref(null) as Ref<any>
     const rooms = ref([]) as any
+    const roomsOri = ref([]) as any
     const roomsChannel = ref([]) as any
     const selectedRoomChannel = ref({}) as any
     const roomId = ref('') as any
@@ -152,11 +163,18 @@ export default defineComponent ({
     // store manage
     const storeChat = useStore<VuexModuleChat>()
     const storeMarketplaces = useStore<VuexModuleMarketplaces>()
+    const search = ref('') as any
     const marketplacesConnected = computed(
       () =>{
-        const data = storeMarketplaces.state.marketplaces.marketplaces.marketplacesChat
+
+        let data = storeMarketplaces.state.marketplaces.marketplaces.marketplacesChat
+        if(props.isIncoming) {
+          data = storeMarketplaces.state.marketplaces.marketplaces.incomingChat
+
+        }
         return data
     }) as Ref<ChatChannel[]>
+
     const marketplacesConnectedIndex = computed(
       () =>{
         const data = storeMarketplaces.state.marketplaces.marketplaces.marketplacesConnectedLength
@@ -174,30 +192,54 @@ export default defineComponent ({
       //   backgroundMe: '#1961e4',
       // },
     }
+    // watch(
+    //   () => ([search]),
+    //   ([newSearch]) => {
+    //     console.log('a')
 
-    onMounted(() => {
-      (document.getElementById('rooms-list') as any).insertAdjacentHTML( 'afterbegin',
-        '<div class="message-header-custom">' +
-            'Messages' +
-        '</div>'
-      );
-      const d2 = (document.getElementById('rooms-list') as any)
-        setTimeout(() => {
-          // console.log(chatRef.value)
-          const child = document.createElement('div')
-          child.innerHTML = 'Incoming Messages';
-          child.className = 'message-header-custom'
-          d2.insertBefore(child, d2.children[marketplacesConnectedIndex.value + 1]);
+    //     if(newSearch.value) {
+    //       rooms.value = roomsOri.value.filter((x: any) =>  x.roomName.toLowerCase() === newSearch.value.toLowerCase())
+    //       console.log(rooms.value, newSearch.value)
+    //     }
+    //     // setTimeout(() => {
+    //     //   // console.log(newRoomList.value?.$el?.children[0]?.children[0]?.children[0])
+    //     //   const roomList = newRoomList.value?.$el?.children[0]?.children[0]?.children[1]
+    //     //   console.log({roomList})
+    //     // }, 500)
+    //   },
+    //   { deep: true }
+    // )
 
-          if(((marketplacesConnected.value && marketplacesConnected.value.length) - marketplacesConnectedIndex.value) === 0) {
-            const noChild = document.createElement('div')
-            noChild.innerHTML = 'No Messages';
-            noChild.className = 'message-header-no-messages'
-            d2.insertBefore(noChild, d2.children[marketplacesConnectedIndex.value + 2]);
-          }
-        }, 500)
+    // onMounted(() => {
+    //   (document.getElementById('rooms-list') as any).insertAdjacentHTML( 'afterbegin',
+    //     '<div ref="messageHeader" class="message-header-custom">' +
+    //         'Messages' +
+    //     '</div>'
+    //   );
+    //   const d2 = (document.getElementById('rooms-list') as any)
+    //     setTimeout(() => {
+    //       // console.log({d2, chatRef: chatRef.value})
+    //       const child = document.createElement('div')
+    //       child.innerHTML = 'Incoming Messages';
+    //       child.className = 'message-header-custom'
+    //       d2.insertBefore(child, d2.children[marketplacesConnectedIndex.value + 1]);
 
-    });
+
+    //       if(((marketplacesConnected.value && marketplacesConnected.value.length) - marketplacesConnectedIndex.value) === 0) {
+    //         const noChild = document.createElement('div')
+    //         noChild.innerHTML = 'No Messages';
+    //         noChild.className = 'message-header-no-messages'
+    //         d2.insertBefore(noChild, d2.children[marketplacesConnectedIndex.value + 2]);
+    //       }
+    //       if( marketplacesConnectedIndex.value === 0) {
+    //         const noParent = document.createElement('div')
+    //         noParent.innerHTML = 'No Messages';
+    //         noParent.className = 'message-header-no-messages'
+    //         d2.insertBefore(noParent, d2.children[marketplacesConnectedIndex.value + 1]);
+    //       }
+    //     }, 500)
+
+    // });
 
     const { $fetchState, fetch } = useFetch(async () => {
       // sb.connect(USER_ID, function(user, error){
@@ -368,27 +410,30 @@ export default defineComponent ({
       //   }
       // }))
 
+      if(marketplacesConnected.value && marketplacesConnected.value.length > 0) {
+        const roomsTest =  await Promise.all(marketplacesConnected.value.map(async (el: any) => {
+          try {
+            if(el?.channel_url) {
 
-      const roomsTest =  await Promise.all(marketplacesConnected.value.map(async (el: any) => {
-        try {
-          if(el?.channel_url) {
+              const room = await sb.GroupChannel.getChannel(el?.channel_url) as any
+              room.markAsDelivered();
 
-            const room = await sb.GroupChannel.getChannel(el?.channel_url) as any
-            room.markAsDelivered();
-            console.log(el , {...room, coverUrl: el?.logo ? el.logo : room.coverUrl})
-            return room
+              return room
+            }
+
+            // roomsTemp.push(room)
+          } catch (error) {
+            console.log('error'+ error);
           }
+        }))
 
-          // roomsTemp.push(room)
-        } catch (error) {
-          console.log('error'+ error);
-        }
-      }))
+        roomsOri.value = parsingRooms(roomsTest, marketplacesConnected.value)
+        rooms.value = parsingRooms(roomsTest, marketplacesConnected.value)
+        roomsChannel.value = roomsTest
+        // rooms.value = parsingRooms(roomsTemp)
+        // roomsChannel.value = roomsTemp
 
-      rooms.value = parsingRooms(roomsTest, marketplacesConnected.value)
-      roomsChannel.value = roomsTest
-      // rooms.value = parsingRooms(roomsTemp)
-      // roomsChannel.value = roomsTemp
+      }
     }
     function resetRooms() {
       roomOptions.value.roomsLoaded = false
@@ -604,7 +649,8 @@ export default defineComponent ({
       checkMessage,
       openFile,
       stylesCustom,
-      chatRef
+      chatRef,
+      search
     }
   }
 })
