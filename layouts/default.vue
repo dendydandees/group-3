@@ -124,9 +124,17 @@ export default defineComponent({
         const data = storeMarketplaces.state.marketplaces.marketplaces.marketplacesChat
         return data
     })
+    const marketplacesConnectedIncoming = computed(
+      () =>{
+        const data = storeMarketplaces.state.marketplaces.marketplaces.incomingChat
+        return data
+    })
     const isThereRoom = computed(
       () =>{
-        if(marketplacesConnected.value && marketplacesConnected.value.length > 0) {
+        if(
+          (marketplacesConnected.value && marketplacesConnected.value.length > 0) ||
+          (marketplacesConnectedIncoming.value && marketplacesConnectedIncoming.value.length > 0)
+        ) {
           return true
         } else {
           return false

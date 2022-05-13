@@ -133,10 +133,6 @@ export default defineComponent ({
       type: Boolean as PropType<Boolean>,
       default: false
     },
-    // channelHandler: {
-    //   type: Object as PropType<any>,
-    //   required: true
-    // },
     isOpen: {
       type: Boolean as PropType<Boolean>,
       default: false
@@ -163,12 +159,11 @@ export default defineComponent ({
     const recipient = ref(null) as any
     const listQuery = ref({}) as any
     const messages = ref([] as any)
-    // const USER_ID = 'abcxyz'
 
     const USER_ID = computed(
       () => storeChat.state.sendbird.chatUser?.user_id)
     const channelHandler = new sb.ChannelHandler() as any
-    // const channelHandler = props.channelHandler as any
+
     // store manage
     const storeChat = useStore<VuexModuleChat>()
     const storeMarketplaces = useStore<VuexModuleMarketplaces>()
@@ -197,90 +192,31 @@ export default defineComponent ({
     let chan: SendBird.OpenChannel
 
     const stylesCustom = {
-      // message: {
-      //   backgroundMe: '#1961e4',
-      // },
     }
-    // watch(
-    //   () => ([search]),
-    //   ([newSearch]) => {
-    //     console.log('a')
-
-    //     if(newSearch.value) {
-    //       rooms.value = roomsOri.value.filter((x: any) =>  x.roomName.toLowerCase() === newSearch.value.toLowerCase())
-    //       console.log(rooms.value, newSearch.value)
-    //     }
-    //     // setTimeout(() => {
-    //     //   // console.log(newRoomList.value?.$el?.children[0]?.children[0]?.children[0])
-    //     //   const roomList = newRoomList.value?.$el?.children[0]?.children[0]?.children[1]
-    //     //   console.log({roomList})
-    //     // }, 500)
-    //   },
-    //   { deep: true }
-    // )
-
-    // onMounted(() => {
-    //   (document.getElementById('rooms-list') as any).insertAdjacentHTML( 'afterbegin',
-    //     '<div ref="messageHeader" class="message-header-custom">' +
-    //         'Messages' +
-    //     '</div>'
-    //   );
-    //   const d2 = (document.getElementById('rooms-list') as any)
-    //     setTimeout(() => {
-    //       // console.log({d2, chatRef: chatRef.value})
-    //       const child = document.createElement('div')
-    //       child.innerHTML = 'Incoming Messages';
-    //       child.className = 'message-header-custom'
-    //       d2.insertBefore(child, d2.children[marketplacesConnectedIndex.value + 1]);
-
-
-    //       if(((marketplacesConnected.value && marketplacesConnected.value.length) - marketplacesConnectedIndex.value) === 0) {
-    //         const noChild = document.createElement('div')
-    //         noChild.innerHTML = 'No Messages';
-    //         noChild.className = 'message-header-no-messages'
-    //         d2.insertBefore(noChild, d2.children[marketplacesConnectedIndex.value + 2]);
-    //       }
-    //       if( marketplacesConnectedIndex.value === 0) {
-    //         const noParent = document.createElement('div')
-    //         noParent.innerHTML = 'No Messages';
-    //         noParent.className = 'message-header-no-messages'
-    //         d2.insertBefore(noParent, d2.children[marketplacesConnectedIndex.value + 1]);
-    //       }
-    //     }, 500)
-
-    // });
 
     const { $fetchState, fetch } = useFetch(async () => {
-      // sb.connect(USER_ID, function(user, error){
-      // })
       await fetchRooms()
     })
 
     const sendMessage = async ({ content, roomId, files, replyMessage }: any) => {
-      // console.log({files})
       const msg = new sb.UserMessageParams()
       msg.message = content ?? ''
 
       if(selectedRoomChannel.value && files && files.length > 0) {
-        // msg.data = files[0].toString()
         const msgFile = new sb.FileMessageParams();
         const fileConvert = new File([files[0].blob], `${files[0].name}.${files[0].extension}`, files[0].blob)
         msgFile.file = fileConvert
         msgFile.fileName = `${files[0].name}.${files[0].extension}`;
         msgFile.fileSize = files[0].size;
-        // console.log({fileConvert})
 
 
         const msgResp = selectedRoomChannel.value.sendFileMessage(msgFile, (msg: any, err: any) => {
-          // console.log({msg, err})
-          // deliveryReceiptUpdated()
           messages.value = [...messages.value, ...parsingMessages([msg])]
           msgInput.value = ''
         })
       }
       if(selectedRoomChannel.value && content) {
         const msgResp = selectedRoomChannel.value.sendUserMessage(msg, (msg: any, err: any) => {
-          // deliveryReceiptUpdated()
           messages.value = [...messages.value, ...parsingMessages([msg])]
           msgInput.value = ''
         })
@@ -324,7 +260,6 @@ export default defineComponent ({
           return {
             roomId: x?.url,
             roomName: chatChannel[i] && chatChannel[i].name ? chatChannel[i].name : x?.name,
-            // roomName:  x?.name,
             avatar: chatChannel[i] && chatChannel[i].logo ? chatChannel[i].logo : x?.coverUrl,
             unreadCount: x?.unreadMessageCount,
             // index: 3,
@@ -435,7 +370,6 @@ export default defineComponent ({
               return room
             }
 
-            // roomsTemp.push(room)
           } catch (error) {
             console.log('error'+ error);
           }
@@ -444,9 +378,6 @@ export default defineComponent ({
         roomsOri.value = parsingRooms(roomsTest, marketplacesConnected.value)
         rooms.value = parsingRooms(roomsTest, marketplacesConnected.value)
         roomsChannel.value = roomsTest
-        // rooms.value = parsingRooms(roomsTemp)
-        // roomsChannel.value = roomsTemp
-
       }
     }
     function resetRooms() {
@@ -466,7 +397,6 @@ export default defineComponent ({
 		}
 
     const onlyOnceMarkRead = ref(false) as Ref<Boolean>
-    const onlyOnceNotif = ref(false) as Ref<Boolean>
 
     watch(
       () => ([messages.value,selectedRoomChannel.value , roomId.value, props.isOpen]),
@@ -510,74 +440,7 @@ export default defineComponent ({
     )
 
     function deliveryReceiptUpdated() {
-      // channelHandler.onDeliveryReceiptUpdated = function(channel: any) {
-      //   if(!onlyOnceNotif.value) {
-      //     onlyOnceNotif.value = true
-      //     if(roomsChannel.value && roomsChannel.value.length > 0) {
-      //       roomsChannel.value.forEach((x: any) => {
-      //         console.log({lastMessage: x?.lastMessage?.message})
-      //       })
-      //     }
-      //   }
-      // }
-
-
-      // channelHandler.onDeliveryReceiptUpdated = async function(channel: any) {
-      // // channelHandler.onDeliveryReceiptUpdated = async function(channel: any) {
-      //   if(
-      //     roomsChannel.value && roomsChannel.value.length > 0
-      //     && !onlyOnceNotif.value
-      //   ) {
-      //     onlyOnceNotif.value = true
-      //     const testRoom2 = await Promise.all(roomsChannel.value.map(async (x: any, i: number) => {
-      //       try {
-      //         if(x && x.refresh) {
-      //           const response = await x.refresh()
-      //           const lastMessage = response?.lastMessage
-      //           const unreadCount = response.unreadMessageCount
-      //           const index = rooms.value.findIndex((y: any) => response.url === y.roomId)
-      //           let lastMessageCust = {
-      //             content: lastMessage?.message ?? '',
-      //             senderId: lastMessage?._sender?.userId ?? '',
-      //             username: lastMessage?._sender?.nickname ?? '',
-      //             timestamp: lastMessage?.createdAt
-      //             ? $dateFns.format(
-      //               new Date(lastMessage?.createdAt),
-      //               'HH:mm'
-      //             )
-      //             : '',
-      //           }
-      //           if(lastMessage && lastMessage?.messageType === 'file') {
-      //             lastMessageCust = {
-      //               ...lastMessageCust,
-      //               content: lastMessage?.url
-      //             }
-      //           }
-      //           // console.log({message: response?.lastMessage?.message, response, room: rooms.value[index], lastMessageCust})
-      //           return  {
-      //             ...rooms.value[index],
-      //             lastMessage: lastMessageCust,
-      //             unreadCount
-      //           }
-      //         } else {
-      //           return rooms.value[i]
-      //         }
-      //       } catch (error) {
-      //         console.log('error'+ error);
-      //       }
-      //     }))
-      //     onlyOnceNotif.value = false
-      //     // console.log({testRoom2})
-      //     if(testRoom2 && testRoom2.length > 0 && !testRoom2.some(x => !x)) rooms.value = testRoom2
-      //     // rooms.value = testRoom2
-      //   }
-      // }
-        // console.log({channelHandler})
-        // channelHandler.onChannelChanged = function(e: any) {
-        //   console.log({e})
-        // }
         channelHandler.onChannelChanged = function(channel: any) {
-          // console.log('this is chennel delivery', {channel: channel.name,lastMessage: channel?.lastMessage?.message})
           rooms.value = rooms.value.map((x: any, i: number) => {
             if(x.roomId === channel.url) {
 
@@ -672,12 +535,6 @@ export default defineComponent ({
         }
       };
       deliveryReceiptUpdated()
-
-      // selectedRoomChannel.value.refresh(function(response: any, error: any) {
-      //   if (error) console.log(error)
-      //   console.log({response})
-      //   deliveryReceiptUpdated()
-      // })
       sb.addChannelHandler(uuidv4(), channelHandler);
     }
 
