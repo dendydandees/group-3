@@ -26,16 +26,20 @@
           </div>
           <v-chip-group
             v-if="
-              detailMarketplace.serviceType &&
-              detailMarketplace.serviceType.length > 0
+              detailMarketplace.partnerServiceTypes &&
+              detailMarketplace.partnerServiceTypes.length > 0
             "
+
           >
             <v-chip
               v-for="(mile, i) in detailMarketplace.partnerServiceTypes"
               :key="i"
               small
+              :color="$customUtils.setColorServiceType(mile.name)"
+              :ripple="false"
+              style="cursor: auto"
             >
-              {{ mile.name }}
+              {{ $customUtils.setServiceType(mile.name) }}
             </v-chip>
           </v-chip-group>
         </div>
