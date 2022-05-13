@@ -24,7 +24,7 @@
       </v-col>
 
       <v-col cols="auto">
-        <v-btn text href="#"> FAQ </v-btn>
+        <v-btn text href="https://luwjistik.document360.io/docs" target="_blank"> FAQ </v-btn>
       </v-col>
     </v-col>
 

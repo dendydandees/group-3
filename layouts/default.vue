@@ -29,20 +29,22 @@
             bottom
             fixed
             right
-            class="v-btn--example"
+            class="v-btn--example btn-notif"
             v-bind="attrs"
             :loading="!isThereRoom"
             v-on="on"
           >
-            <v-icon>{{'mdi-message-text' }}</v-icon>
+            <v-badge
+              color="red"
+              :content="countChat"
+              :value="countChat"
+              overlap
+
+            >
+              <v-icon>{{'mdi-message-text' }}</v-icon>
+            </v-badge>
           </v-btn>
         </template>
-
-        <!-- <v-card
-          width="800px"
-        >
-          <ChatPackageAdvancedChatWindow />
-        </v-card> -->
         <v-card
         >
           <v-tabs
@@ -68,6 +70,7 @@
               >
                 <ChatPackageAdvancedChatWindow
                   :is-incoming="item.isIncoming"
+                  :is-open="menu"
                 />
               </v-card>
             </v-tab-item>
@@ -83,6 +86,7 @@
 <script lang="ts">
 import { defineComponent, useContext, ref, Ref, useFetch,useStore, computed, watch } from '@nuxtjs/composition-api'
 import SendBird from 'sendbird';
+import { v4 as uuidv4 } from 'uuid'
 import {
   VuexModuleMarketplaces
 } from '~/types/marketplace/marketplace'
@@ -98,6 +102,8 @@ export default defineComponent({
     const storeChat = useStore<VuexModuleChat>()
     const sb = new SendBird({ appId: $config.sendBirdKey, localCacheEnabled: true });
     const tab = ref(null) as any
+
+    const userEventHandler = new sb.UserEventHandler();
     const items = ref([
       {
         name:'Messages',
@@ -143,21 +149,20 @@ export default defineComponent({
         'sendbird/getUserChat'
       )
       await fetchMarketplaceConnected()
-      // sb.connect(USER_ID, function(user, error){
-      // })
-      // sb.getTotalUnreadMessageCount(function(count, error) {
-      //     if (error) {
-      //         // Handle error.
-      //     }
-      //     countChat.value = count
-      // });
+      const count = await sb.getTotalUnreadMessageCount();
+      // const count = await sb.getTotalUnreadChannelCount();
+      countChat.value = count
+      userEventHandler.onTotalUnreadMessageCountUpdated = function(totalCount, countByCustomTypes) {
+        countChat.value = totalCount
+      };
+
+      sb.addUserEventHandler(uuidv4(), userEventHandler);
     })
 
     // handle sidenav
     const drawer = ref(!context.$vuetify.breakpoint.mobile) as Ref<boolean>
     const mini = ref(false) as Ref<boolean>
     const menu = ref(false) as Ref<boolean>
-    // const roomList = ref(null) as Ref<any>
     const doShowSideNav = () => {
       const isMobile = context.$vuetify.breakpoint.smAndDown
 
@@ -198,7 +203,8 @@ export default defineComponent({
       USER_ID,
       isThereRoom,
       tab,
-      items
+      items,
+
     }
   },
 })
@@ -212,6 +218,18 @@ export default defineComponent({
 @media only screen and (min-width: 1024px) {
   .main-content {
     margin-bottom: 20rem;
+  }
+  .btn-notif {
+    .notif-count {
+      position: absolute;
+      right: 5px;
+      top: -5px;
+      background: red;
+      z-index: 1;
+      font-size: 8px;
+      padding: 2px;
+      border-radius: 5px;
+    }
   }
 }
 </style>
