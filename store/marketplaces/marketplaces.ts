@@ -256,6 +256,7 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
         });
       }
       if (response?.partnerServiceTypes) {
+        // console.log({ partnerServiceTypes: response?.partnerServiceTypes });
         response.partnerServiceTypes = response.partnerServiceTypes.filter(
           (el: any) => el.name
         );

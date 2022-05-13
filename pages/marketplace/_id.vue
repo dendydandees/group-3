@@ -276,6 +276,7 @@ export default defineComponent({
     const detailMarketplace = computed(
       () => storeDetailMarketplace.state.marketplaces.marketplaces.detail
     ) as any
+    // console.log({detailMarketplace})
     const partnerServiceZones = computed(() => {
       if (
         detailMarketplace.value &&
