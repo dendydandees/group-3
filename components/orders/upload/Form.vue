@@ -166,11 +166,10 @@ export default defineComponent({
       let data = form.value
 
       try {
-        storeApplications.commit('applications/RESET_ALERT')
-        loading.value = true
-
         if (formEmpty) throw new Error('error')
         if (!isValid) return
+        loading.value = true
+
         // set data for domestic
         if (props.step === 0) {
           const dataDomestic = data as OrderDomestic[]
@@ -202,18 +201,20 @@ export default defineComponent({
           data: { error: normalError = '', ErrorDetails: listError = [] } = {},
         } = error as ErrorUpload
         let message =
-          `Order upload data invalid, The data contained in the file you uploaded is incorrect. Please add data according to the existing sample file!` as
+          alert.value.message ||
+          ('Order upload data invalid, The data contained in the file you uploaded is incorrect. Please add data according to the existing sample file!' as
             | string
-            | string[]
+            | string[])
 
         if (normalError) {
           message = normalError
         }
 
         if (listError && listError.length > 0) {
-          message = listError
-            .filter((item) => item.note)
-            .map((item) => item.note)
+          message = [
+            ...listError.filter((item) => item.note).map((item) => item.note),
+            ...alert.value.message,
+          ]
         }
 
         storeApplications.commit('applications/SET_ALERT', {

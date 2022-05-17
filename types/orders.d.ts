@@ -82,7 +82,7 @@ export interface OrderItem {
   productCode: string
   sku: string
   category: string
-  price: string
+  price: number
   currency: string
 }
 
