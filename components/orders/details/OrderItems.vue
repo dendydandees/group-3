@@ -90,7 +90,8 @@ export default defineComponent({
         orderItems.value && orderItems.value.length > 0 ? orderItems.value : []
       const totalPrice = orderItemsTemp.reduce(
         (previous: number, current: OrderItem) => {
-          const total = previous + parseFloat(current.price)
+          const total =
+            previous + parseFloat(current.price as unknown as string)
 
           return total
         },
