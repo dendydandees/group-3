@@ -29,7 +29,6 @@ import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size'
 import FilePondPluginFileEncode from 'filepond-plugin-file-encode'
 
 // Interfaces and types
-import { Store } from "vuex";
 import { ErrorFilePond } from '../base/FilePond/Image.vue'
 import { OrderCrossBorder, OrderDomestic, OrderItem } from '~/types/orders'
 import { VuexModuleApplications } from '~/types/applications'
@@ -40,6 +39,8 @@ const FilePond = vueFilePond(
   FilePondPluginFileValidateSize,
   FilePondPluginFileEncode
 )
+
+type Orders = OrderCrossBorder | OrderDomestic
 
 export default defineComponent({
   components: {
@@ -85,73 +86,17 @@ export default defineComponent({
       allowMultiple: false,
       checkValidity: true,
     })
+    const errorMessages = ref([]) as Ref<string[]>
 
     const handleBeforeAddFile = () => {
+      errorMessages.value = []
       storeApplications.commit('applications/RESET_ALERT')
       emit('changeLoading')
     }
     const handleRemoveFile = (_error: ErrorFilePond, _file: any) => {
+      errorMessages.value = []
+      storeApplications.commit('applications/RESET_ALERT')
       emit('input', [])
-    }
-    // formatting key of form data
-    const formatKey = (data: {}) => {
-      const newObject = {} as any
-
-      for (const [key, value] of Object.entries(data)) {
-        let formatKey = key.toLowerCase()
-
-        if (key.includes('*')) {
-          formatKey = formatKey.replaceAll(/[*]/g, '')
-        }
-
-        if (key.includes('-')) {
-          formatKey = formatKey.replaceAll(/[-]/g, ' ')
-        }
-
-        if (key.match(/\s/g)) {
-          formatKey = formatKey.replace(/\s./g, (s) =>
-            s.slice(-1).toUpperCase()
-          )
-        }
-
-        newObject[formatKey] = value
-      }
-
-      return newObject
-    }
-    // find duplicate order code
-    type Orders = OrderCrossBorder[] | OrderDomestic[]
-    const checkDuplicateOrderCodes = (data: Orders,func: (duplicate: boolean, o: Orders) => Orders|void) => {
-       const temp: Record<string, any> = {}
-       data.forEach((item) => {
-          temp[item["orderCode"]] = typeof temp[item["orderCode"]] === "undefined" ? 1 : temp[item["orderCode"]] + 1;
-      });
-      const duplicateKeys = Object.keys(temp).filter((key) => temp[key] > 1);
-      return duplicateKeys.length > 0 
-      ? func(true, (data as []).filter((item) => duplicateKeys.lastIndexOf(item["orderCode"]) !== -1))
-      : func(false, data)
-    }
-    // create message for duplicate order codes
-    const messageDuplicateOrderCodes = (o: Orders) =>  {
-           let message = "Order code " 
-           for (const [i, k] of o.entries()) {
-               if (i === 0) {
-                message += k.orderCode;
-                continue;
-               }
-               message += ", " + k.orderCode
-           }
-           return message += " is duplicate!"
-    } 
-    // alert error
-    const throwErrorAlert = (store: Store<VuexModuleApplications>, message: string) => store.commit('applications/SET_ALERT', {
-              isShow: true,
-              type: 'error',
-              message,
-     })
-    // formatting service type data
-    const formatServiceType = (data: boolean | string): boolean => {
-      return typeof data === 'boolean' ? data : data === 'yes'
     }
     const handleAddFile = (error: ErrorFilePond, { file }: { file: File }) => {
       try {
@@ -179,9 +124,7 @@ export default defineComponent({
             ]
           const worksheetItems = workbook.Sheets['Order Items']
           // convert to json format
-          let orders = utils.sheet_to_json(worksheetOrders) as
-            | OrderDomestic[]
-            | OrderCrossBorder[]
+          let orders = utils.sheet_to_json(worksheetOrders) as Orders[]
           let orderItems = utils.sheet_to_json(worksheetItems) as OrderItem[]
 
           // error if file upload not same with example file
@@ -195,11 +138,170 @@ export default defineComponent({
             })
           }
           // format keys data
-          orders = checkDuplicateOrderCodes(orders
-            .map((data) => formatKey(data))
-            .filter((data) => !Object.keys(data).includes('note')), (isDuplicate, o) => isDuplicate 
-            ? (emit('input',[]), throwErrorAlert(storeApplications, messageDuplicateOrderCodes(o))) 
-            : o) as OrderDomestic[] | OrderCrossBorder[] 
+          const formatKey = (data: {}) => {
+            const newObject = {} as any
+
+            for (const [key, value] of Object.entries(data)) {
+              let formatKey = key.toLowerCase()
+
+              if (key.includes('*')) {
+                formatKey = formatKey.replaceAll(/[*]/g, '')
+              }
+
+              if (key.includes('-')) {
+                formatKey = formatKey.replaceAll(/[-]/g, ' ')
+              }
+
+              if (key.match(/\s/g)) {
+                formatKey = formatKey.replace(/\s./g, (s) =>
+                  s.slice(-1).toUpperCase()
+                )
+              }
+
+              newObject[formatKey] = value
+            }
+
+            return newObject
+          }
+          // formatting service type data
+          const formatServiceType = (data: boolean | string): boolean => {
+            return typeof data === 'boolean' ? data : data === 'yes'
+          }
+          // formatting duplicate order codes
+          const checkDuplicateOrderCodes = (
+            data: Orders[],
+            func: (duplicate: boolean, o: Orders[]) => Orders[] | void
+          ) => {
+            const temp: Record<string, any> = {}
+
+            data.forEach((item) => {
+              temp[item.orderCode] =
+                typeof temp[item.orderCode] === 'undefined'
+                  ? 1
+                  : temp[item.orderCode] + 1
+            })
+            const duplicateKeys = Object.keys(temp).filter(
+              (key) => temp[key] > 1
+            )
+
+            return duplicateKeys.length > 0
+              ? func(
+                  true,
+                  (data as []).filter(
+                    (item: { orderCode: string }) =>
+                      duplicateKeys.lastIndexOf(item.orderCode) !== -1
+                  )
+                )
+              : func(false, data)
+          }
+          const messageDuplicateOrderCodes = (o: Orders[]) => {
+            let message = 'Order code '
+
+            for (const [i, k] of o.entries()) {
+              if (i === 0) {
+                message += k.orderCode
+                continue
+              }
+              message += ', ' + k.orderCode
+            }
+
+            return (message += ' is duplicate!')
+          }
+          // show error messages
+          const checkError = (order: Orders, items: OrderItem[]) => {
+            if (!order.orderCode) {
+              errorMessages.value.push(`Order code cannot be empty!`)
+
+              return
+            }
+
+            if (items.length === 0) {
+              errorMessages.value.push(
+                `Order items on ${order.orderCode} is empty!`
+              )
+            }
+
+            const isRequired = (
+              key: string,
+              data: any,
+              onOrderItems = false
+            ) => {
+              if (!(data as any)[key]) {
+                errorMessages.value.push(
+                  `${key.charAt(0).toUpperCase() + key.slice(1)} ${
+                    onOrderItems ? 'order item' : ''
+                  } on ${order.orderCode}  is required!`
+                )
+              }
+            }
+            const isNotNumber = (
+              key: string,
+              data: any,
+              onOrderItems = false
+            ) => {
+              if (typeof (data as any)[key] === 'string') {
+                errorMessages.value.push(
+                  `${key.charAt(0).toUpperCase() + key.slice(1)} ${
+                    onOrderItems ? 'order item' : ''
+                  } on ${order.orderCode} must be number!`
+                )
+              }
+            }
+
+            const cellMustBeNumber = ['width', 'height', 'weight', 'length']
+            const cellMustBeRequired = [
+              'consigneeName',
+              'consigneeNumber',
+              'consigneeEmail',
+              'consigneeAddress',
+              'consigneePostal',
+              'consigneeCity',
+              'consigneeProvince',
+              'destinationPort',
+              'length',
+              'width',
+              'height',
+              'weight',
+              'paymentType',
+              'shipmentIncoterm',
+              'senderCountry',
+              'senderCity',
+            ]
+            const orderItemsRequired = [
+              'description',
+              'quantity',
+              'category',
+              'price',
+              'currency',
+            ]
+            const orderItemsNumber = ['quantity', 'price']
+
+            // check is number
+            cellMustBeNumber.forEach((item) => isNotNumber(item, order))
+            // check is required
+            cellMustBeRequired.forEach((item) => isRequired(item, order))
+
+            items.forEach((item) => {
+              // check order item is number
+              orderItemsNumber.forEach((key) => isNotNumber(key, item, true))
+              // check order item is required
+              orderItemsRequired.forEach((key) => isRequired(key, item, true))
+            })
+          }
+          orders = checkDuplicateOrderCodes(
+            orders
+              .map((data) => formatKey(data))
+              .filter((data) => !Object.keys(data).includes('note')),
+            (isDuplicate, o) =>
+              isDuplicate
+                ? (emit('input', []),
+                  storeApplications.commit('applications/SET_ALERT', {
+                    isShow: true,
+                    type: 'error',
+                    message: messageDuplicateOrderCodes(o),
+                  }))
+                : o
+          ) as Orders[]
           orderItems = orderItems
             .map((data) => formatKey(data))
             .filter((data) => typeof data.productCode !== 'string')
@@ -211,6 +313,8 @@ export default defineComponent({
               .map((order) => ({
                 ...order,
                 productCode: order?.productCode?.toString() || '',
+                quantity: parseFloat(order.quantity as unknown as string) || 0,
+                price: parseFloat(order.price as unknown as string) || 0,
               })) as OrderItem[]
             // format cod value and currency
             const isCOD = order?.paymentType === 'cod'
@@ -219,11 +323,15 @@ export default defineComponent({
               : 0
             const codCurrency = isCOD ? order.codCurrency : ''
             // format return
-            let data: OrderDomestic | OrderCrossBorder = {
+            let data: Orders = {
               ...order,
               items,
               codValue,
               codCurrency,
+              length: parseFloat(order.length as unknown as string) || 0,
+              width: parseFloat(order.width as unknown as string) || 0,
+              height: parseFloat(order.height as unknown as string) || 0,
+              weight: parseFloat(order.weight as unknown as string) || 0,
               consigneePostal: order?.consigneePostal?.toString() ?? '',
               consigneeNumber: order?.consigneeNumber?.toString() ?? '',
               consigneeTaxId: order?.consigneeTaxId?.toString() ?? '',
@@ -231,7 +339,7 @@ export default defineComponent({
               senderContactNumber: order?.senderContactNumber?.toString() ?? '',
             }
 
-            // format for domestic
+            // for domestic
             if (props.step === 0) {
               const itemDomestic = order as OrderDomestic
 
@@ -241,7 +349,7 @@ export default defineComponent({
               }
             }
 
-            // format for cross border
+            // for cross border
             if (props.step === 1) {
               const itemCrossBorder = order as OrderCrossBorder
 
@@ -259,8 +367,19 @@ export default defineComponent({
               }
             }
 
+            // format error message
+            checkError(order, items)
+
             return data
           })
+
+          if (errorMessages.value.length !== 0) {
+            storeApplications.commit('applications/SET_ALERT', {
+              isShow: true,
+              type: 'error',
+              message: errorMessages.value,
+            })
+          }
 
           emit('input', batchOrders)
         }
