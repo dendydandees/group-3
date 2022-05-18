@@ -52,7 +52,7 @@
         v-if="item.batchCode"
         text
         color="primary"
-        @click="$emit('doGetBatchDetails', item.batchCode)"
+        @click="$emit('doGetBatchDetails', item)"
       >
         {{ item.batchCode }}
       </v-btn>

@@ -587,7 +587,7 @@ export default defineComponent({
           selected.value.totalRulesPerZone = data.data.totalRulesPerZone
           selected.value.rules = data.data.rules
           selected.value.ruleID = data.data.ruleID
-          selected.value.priority = data.data.priority
+          // selected.value.priority = data.data.priority
           selected.value.isUpdate = !!data.data.partnerID
 
           if(checkDefinition({data: [...selected.value.rules].map(y => y.data), type: 'RULE_TYPE_IS_COD'}))  {
@@ -625,7 +625,8 @@ export default defineComponent({
         selected.value.ruleGroupID,
         dialog.value.deleteRule,
         selected.value.rules,
-        selected.value.totalRulesPerZone
+        selected.value.totalRulesPerZone,
+        selected.value.priority
       ],
       ([
         newLControl,
@@ -636,17 +637,19 @@ export default defineComponent({
         newRGID,
         newDialogDelete,
         newRules,
-        newTotalRules
+        newTotalRules,
+        newPriority
       ]) => {
 
       let rules = [...newRules] as any
       const totalRules = newTotalRules as number
+      const priorityTemp = newPriority ?? 0
       const temp =
         {
           id: selected.value.ruleGroupID,
           data: {
             partnerID: selected.value.partnerID,
-            priority: totalRules + 1,
+            priority: priorityTemp + 1,
             definitions: [
               {
                 type: 'RULE_TYPE_ZONE',
@@ -672,7 +675,7 @@ export default defineComponent({
           id: selected.value.ruleGroupID,
           data: {
             partnerID: CODpartnerSelected.value.partnerID,
-            priority: (totalRules + 1),
+            priority: (priorityTemp + 1),
             definitions: [
               {
                 type: 'RULE_TYPE_IS_COD',
@@ -1063,6 +1066,16 @@ export default defineComponent({
                 return filter
               } )[0]
             }
+            selected.value.priority = temp.map((d: RuleGroup) => {
+
+                const filter = d.Rules && [...d.Rules].sort((a, b) => b.priority - a.priority)[0]
+                return filter?.priority
+            })[0]
+            ? temp.map((d: RuleGroup) => {
+                const filter = d.Rules && [...d.Rules].sort((a, b) => b.priority - a.priority)[0]
+                return filter?.priority
+              })[0]
+            : 0
             if (temp && temp.length > 0) {
               temp.forEach((d: RuleGroup) => {
                 ruleGroupID = d.id
@@ -1072,6 +1085,9 @@ export default defineComponent({
 
 
                 if (ObjRulesByZone[el.id].rules && ObjRulesByZone[el.id].rules.length > 0) {
+                  // selected.value.priority = Math.max(...ObjRulesByZone[el.id].rules.map((o: any) => o.priority))
+                  // const highestPriority = [...ObjRulesByZone[el.id].rules].sort((a, b) => b.priority - a.priority)
+                  // console.log({priority: Math.max(...ObjRulesByZone[el.id].rules.map((o: any) => o.priority)), highestPriority})
                   ObjRulesByZone[el.id].rules && ObjRulesByZone[el.id].rules.forEach((c: Rule) => {
                     if (c.definitions && c.definitions.length > 0) {
                       c.definitions.forEach((e: Definition) => {
