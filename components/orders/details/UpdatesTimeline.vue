@@ -45,7 +45,10 @@
               <v-row justify="space-between" align="start">
                 <v-col cols="4">
                   <div>
-                    <h4 class="body-1 ma-0 font-weight-bold text--primary">
+                    <h4
+                      class="body-1 ma-0 font-weight-bold text--primary"
+                      style="white-space: nowrap"
+                    >
                       {{ status }}
                     </h4>
 
