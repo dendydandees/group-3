@@ -1,6 +1,6 @@
 // Interfaces
-import { MutationTree, ActionTree } from 'vuex'
-import { Meta } from '~/types/applications'
+import { MutationTree, ActionTree } from 'vuex';
+import { Meta } from '~/types/applications';
 import {
   OrderDetails,
   Order,
@@ -11,16 +11,17 @@ import {
   FilterBatch,
   OrderDomestic,
   OrderCrossBorder,
-} from '~/types/orders'
+  NodeCalculator
+} from '~/types/orders';
 
-interface ParamsGetOrder extends Meta, FilterOrders {}
-interface ParamsGetBatch extends Meta, FilterBatch {}
+interface ParamsGetOrder extends Meta, FilterOrders { }
+interface ParamsGetBatch extends Meta, FilterBatch { }
 interface UploadOrders extends Order {
-  type: string
-  data: OrderDomestic[] | OrderCrossBorder[]
+  type: string;
+  data: OrderDomestic[] | OrderCrossBorder[];
 }
 interface ParamsGetSelectedLabels {
-  orderIds: string[]
+  orderIds: string[];
 }
 
 export const filterOrderInit = {
@@ -34,11 +35,11 @@ export const filterOrderInit = {
   originPortId: '',
   destinationPortId: '',
   status: '',
-} as FilterOrders
+} as FilterOrders;
 
 export const filterBatchInit = {
   batchId: '',
-} as FilterBatch
+} as FilterBatch;
 
 export const state = () => ({
   orders: [] as Order[],
@@ -46,6 +47,7 @@ export const state = () => ({
     order: {} as Order,
     orderItems: [] as OrderItem[],
     orderAllocationUpdates: [] as OrderAllocationUpdate[],
+    nodeCalc: {} as NodeCalculator
   } as OrderDetails,
   batchOrders: [] as BatchOrders[],
   meta: {
@@ -55,9 +57,9 @@ export const state = () => ({
   } as Meta,
   filterOrder: filterOrderInit as FilterOrders,
   filterBatch: filterBatchInit as FilterBatch,
-})
+});
 
-export type RootStateOrders = ReturnType<typeof state>
+export type RootStateOrders = ReturnType<typeof state>;
 
 export const mutations: MutationTree<RootStateOrders> = {
   SET_ORDERS: (state, value: Order[]) => (state.orders = value),
@@ -71,51 +73,51 @@ export const mutations: MutationTree<RootStateOrders> = {
   RESET_FILTER_ORDERS: (state) => (state.filterOrder = filterOrderInit),
   SET_FILTER_BATCH: (state, value: FilterOrders) => (state.filterBatch = value),
   RESET_FILTER_BATCH: (state) => (state.filterBatch = filterBatchInit),
-}
+};
 
 export const actions: ActionTree<RootStateOrders, RootStateOrders> = {
-  async getOrders({ commit }, { params }: { params: ParamsGetOrder }) {
+  async getOrders({ commit }, { params }: { params: ParamsGetOrder; }) {
     try {
       const response = await this?.$axios?.$get('/api/clients/orders', {
         params,
-      })
-      const { data, page, totalPage, totalCount } = response
+      });
+      const { data, page, totalPage, totalCount } = response;
 
-      if (!data) throw response
+      if (!data) throw response;
 
       const meta = {
         page,
         totalPage,
         totalCount,
-      }
+      };
 
-      commit('SET_ORDERS', data)
-      commit('SET_META', meta)
+      commit('SET_ORDERS', data);
+      commit('SET_META', meta);
 
-      return response
+      return response;
     } catch (error) {
-      return error
+      return error;
     }
   },
-  async getBatchOrders({ commit }, { params }: { params: ParamsGetBatch }) {
+  async getBatchOrders({ commit }, { params }: { params: ParamsGetBatch; }) {
     try {
       const response = await this.$axios.$get('/api/clients/orders/batch', {
         params,
-      })
-      const { data, page, totalPage, totalCount } = response
+      });
+      const { data, page, totalPage, totalCount } = response;
 
-      if (!data) throw response
+      if (!data) throw response;
 
       const meta = {
         page,
         totalPage,
         totalCount,
-      }
+      };
 
-      commit('SET_BATCH_ORDERS', data)
-      commit('SET_META', meta)
+      commit('SET_BATCH_ORDERS', data);
+      commit('SET_META', meta);
     } catch (error) {
-      return error
+      return error;
     }
   },
   async getOrderDetails({ commit }, id: string) {
@@ -126,47 +128,55 @@ export const actions: ActionTree<RootStateOrders, RootStateOrders> = {
             orderId: id,
           },
         }),
-        this.$axios.$get(`/api/clients/orders/${id}/items`),
-        this.$axios.$get(`/api/clients/orders/${id}/updates`),
-      ]
-      const [responseOrderDetails, responseOrderItems, responseOrderUpdates] =
-        await Promise.all(request)
+        this.$axios.$get(`/api/clients/orders/${ id }/items`),
+        this.$axios.$get(`/api/clients/orders/${ id }/updates`),
+        this.$axios.$get(
+          `api/clients/node-calculators`
+        )
+      ];
+      const [
+        responseOrderDetails,
+        responseOrderItems,
+        responseOrderUpdates,
+        responseNodeCalculator
+      ] =
+        await Promise.all(request);
       const data = {
         order: responseOrderDetails?.data[0] ?? {},
         orderItems: responseOrderItems?.orderItems ?? [],
         orderAllocationUpdates: responseOrderUpdates?.allocationUpdates ?? [],
-      }
+        nodeCalc: responseNodeCalculator ?? {}
+      };
+      commit('SET_ORDER_DETAILS', data);
 
-      commit('SET_ORDER_DETAILS', data)
-
-      return data
+      return data;
     } catch (error) {
-      return error
+      return error;
     }
   },
   async uploadOrders(_store, { data, type }: UploadOrders) {
     try {
       const response = await this.$axios.$post(
-        `/api/clients/orders/batch/${type}`,
+        `/api/clients/orders/batch/${ type }`,
         data
-      )
+      );
 
-      return response
+      return response;
     } catch (error) {
-      return error
+      return error;
     }
   },
-  async getSelectedLabels(_store, { data }: { data: ParamsGetSelectedLabels }) {
+  async getSelectedLabels(_store, { data }: { data: ParamsGetSelectedLabels; }) {
     try {
       const response = await this.$axios.$post(
         `api/clients/orders/labels`,
         data,
         { responseType: 'blob' }
-      )
+      );
 
-      return response
+      return response;
     } catch (error) {
-      return error
+      return error;
     }
   },
-}
+};

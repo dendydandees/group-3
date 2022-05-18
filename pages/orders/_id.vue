@@ -58,6 +58,12 @@
         <OrderItems :fetch-state="$fetchState" />
       </v-col>
     </v-row>
+    <!-- Node Calculator items -->
+    <v-row no-gutters align="center" class="mt-6">
+      <v-col cols="12" class="white pa-3 elevation-2 rounded-xl">
+        <CalculatorOrderItems :fetch-state="$fetchState" />
+      </v-col>
+    </v-row>
   </section>
 </template>
 
@@ -80,6 +86,7 @@ import ConsigneeDetails from '~/components/orders/details/ConsigneeDetails.vue'
 import PickupDetails from '~/components/orders/details/PickupDetails.vue'
 import SenderDetails from '~/components/orders/details/SenderDetails.vue'
 import OrderItems from '~/components/orders/details/OrderItems.vue'
+import CalculatorOrderItems from '~/components/orders/details/CalculatorOrderItems.vue'
 import UpdatesTimeline from '~/components/orders/details/UpdatesTimeline.vue'
 import { Breadcrumbs } from '~/types/applications'
 
@@ -92,6 +99,7 @@ export default defineComponent({
     SenderDetails,
     OrderItems,
     UpdatesTimeline,
+    CalculatorOrderItems
   },
   layout: 'default',
   setup() {

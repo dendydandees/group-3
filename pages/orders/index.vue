@@ -80,15 +80,17 @@
             @fetch="fetchOrders"
             @doSelectAll="selectAllToggle"
             @doGetDetails="doGetDetails"
-            @doGetBatchDetails="doGetBatchDetails"
+            @doGetBatchDetails="goToBatchView"
           />
+            <!-- @doGetBatchDetails="doGetBatchDetails" -->
+
         </v-col>
       </v-row>
 
       <!-- List data for batch -->
-      <v-row v-else align="center" class="my-4">
+      <!-- <v-row v-else align="center" class="my-4">
         <OrdersBatchList @doGetBatchDetails="doGetBatchDetails" />
-      </v-row>
+      </v-row> -->
     </v-fade-transition>
 
     <!-- Pagination universal (order and batch view) -->
@@ -278,6 +280,16 @@ export default defineComponent({
         fetchDebounced()
       }, 500)
     }
+    const goToBatchView = (item: any) => {
+      localStorage.setItem('batch.data', JSON.stringify(item))
+      router.push({
+        name: `orders-batch-batchId`,
+        params: {
+          batchId: item.batchCode,
+          item
+        }
+      })
+    }
     const doDownloadSelectedLabel = async () => {
       if (selectedOrders.value.length === 0) return
 
@@ -433,6 +445,7 @@ export default defineComponent({
       selectAllToggle,
       doGetDetails,
       doGetBatchDetails,
+      goToBatchView,
       doDownloadSelectedLabel,
       // manage filter order
       isShowFilter,
