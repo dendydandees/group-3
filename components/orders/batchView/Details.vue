@@ -7,6 +7,7 @@
       >
         <OrdersBatchViewTable
           :data-table="dataTable"
+          :is-service="true"
         />
       </v-col>
       <v-divider
@@ -35,6 +36,7 @@ import {
   useRouter,
   onMounted,
   watch,
+  PropType
 } from '@nuxtjs/composition-api'
 import { ValidationObserver } from 'vee-validate'
 
@@ -57,6 +59,20 @@ interface ErrorUpload {
   }
 }
 
+export interface ParseNodeCalc {
+  orderCode: String
+  "id": String
+  "fmCost": Number
+  "lmCost": Number
+  "ccCost": Number
+  "bobCost": Number
+  "codCost": Number
+  "total": Number
+  "dnt": Number
+  "adminFee": Number
+  "currency": String
+}
+
 export default defineComponent({
   name: 'DetailsTab',
   components: {
@@ -67,6 +83,10 @@ export default defineComponent({
       type: Number,
       required: true,
     },
+    nodeCalculators: {
+      type: Array as PropType<ParseNodeCalc[]>,
+      required: true,
+    },
   },
   setup(props) {
     const router = useRouter()
@@ -75,25 +95,46 @@ export default defineComponent({
     const storeApplications = useStore<VuexModuleApplications>()
     const storeOfOrders = useStore<VuexModuleOrders>()
     const alert = computed(() => storeApplications.state.applications.alert)
+    const parseService = computed(() => {
+      const temp =[
+        {
+          name: 'First Mile',
+          value: setTotal('fmCost')
+        },
+        {
+          name: 'Customs',
+          value: setTotal('ccCost')
+        },
+        {
+          name: 'BOB',
+          value: setTotal('bobCost')
+        },
+        {
+          name: 'COD',
+          value: setTotal('codCost')
+        },
+      ]
+      return temp
+    })
+    const parseCustom = computed(() => {
+      const temp =[
+        {
+          name: 'D&T',
+          value: setTotal('dnt')
+        },
+        {
+          name: 'Admin Fee',
+          value: setTotal('adminFee')
+        },
+      ]
+      return temp
+    })
 
 
     // manage summary table
 
     const dataTable = ref({
-      content: [
-        {
-          name: 'hei Yogurt',
-          calories: 159,
-        },
-        {
-          name: 'Ice cream sandwich',
-          calories: 237,
-        },
-        {
-          name: 'Eclair',
-          calories: 262,
-        },
-      ],
+      content: parseService.value,
       headers: [
         {
           text: 'Services',
@@ -101,22 +142,13 @@ export default defineComponent({
           sortable: false,
           value: 'name',
         },
-        { text: '', value: 'calories' },
+        { text: '', value: 'value' },
       ],
     })
 
 
     const dataTable2 = ref({
-      content: [
-        {
-          name: 'hei Yogurt',
-          calories: 159,
-        },
-        {
-          name: 'Ice cream sandwich',
-          calories: 237,
-        }
-      ],
+      content: parseCustom.value,
       headers: [
         {
           text: 'Customs',
@@ -124,7 +156,7 @@ export default defineComponent({
           sortable: false,
           value: 'name',
         },
-        { text: '', value: 'calories' },
+        { text: '', value: 'value' },
       ],
     })
 
@@ -144,6 +176,12 @@ export default defineComponent({
         // return {color:'#1961e4', fontWeight: 700}
         return 'color: #1961e4; font-weight: 700'
       }
+
+    }
+    function setTotal(key: string) {
+      return props.nodeCalculators.reduce( function(a: Number | unknown, b: any){
+          return a + b[key];
+        }, 0)
 
     }
 

@@ -67,6 +67,8 @@ export const mutations: MutationTree<RootStateOrders> = {
     (state.orderDetails = value),
   SET_BATCH_ORDERS: (state, value: BatchOrders[]) =>
     (state.batchOrders = value),
+  SET_NODE_CALCULATORS: (state, value: NodeCalculator) =>
+    (state.orderDetails.nodeCalc = value),
   SET_META: (state, value: Meta) => (state.meta = value),
   SET_FILTER_ORDERS: (state, value: FilterOrders) =>
     (state.filterOrder = value),
@@ -174,6 +176,17 @@ export const actions: ActionTree<RootStateOrders, RootStateOrders> = {
         { responseType: 'blob' }
       );
 
+      return response;
+    } catch (error) {
+      return error;
+    }
+  },
+  async getNodeCalculators({ commit }) {
+    try {
+      const response = await this.$axios.$get(
+        `api/clients/node-calculators`
+      );
+      commit('SET_NODE_CALCULATORS', response);
       return response;
     } catch (error) {
       return error;

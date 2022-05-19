@@ -4,13 +4,19 @@
   >
     <v-data-table
       hide-default-footer
-      :headers="dataTable.headers"
-      :items="dataTable.content"
+      :headers="dataTableComp.headers"
+      :items="dataTableComp.content"
       item-key="name"
       disable-sort
     >
-      <template #body.append>
-        <tr>
+
+      <template #[`item.value`]="{ item }">
+        {{ setPrice(item.value) }}
+      </template>
+      <template #body.append="{items}">
+        <tr
+          v-if="items.length"
+        >
           <td
             class="font-weight-bold"
           >
@@ -19,7 +25,7 @@
           <td
             class="font-weight-bold error--text"
           >
-            USD 0.00
+            {{setTotal()}}
           </td>
         </tr>
       </template>
@@ -61,10 +67,39 @@ export default defineComponent({
       type: Object,
       required: true,
     },
+    isService: {
+      type: Boolean,
+      default: false,
+    },
   },
   setup(props) {
+    const dataTableComp = computed(() => {
+      if(props.isService) {
+        return {
+          ...props.dataTable,
+          content: [...props.dataTable.content].filter((x: any) => x.value)
+        }
+      } else {
+        return props.dataTable
+      }
+    })
+
+
+    function setPrice(price: string) {
+      return parseFloat(price).toFixed(2)
+    }
+    function setTotal() {
+      return setPrice(
+        props.dataTable.content.reduce( function(a: Number | unknown, b: any){
+          return a + b.value;
+        }, 0)
+      )
+    }
 
     return {
+      setTotal,
+      setPrice,
+      dataTableComp
     }
   },
 })

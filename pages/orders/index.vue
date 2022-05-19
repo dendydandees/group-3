@@ -266,13 +266,13 @@ export default defineComponent({
     const doGetDetails = (data: Order) => {
       router.push(`/orders/${data.id}`)
     }
-    const doGetBatchDetails = (id: string) => {
+    const doGetBatchDetails = (item: any) => {
       orderView.value = 0
       isShowFilter.value = true
       setTimeout(() => {
         filterOrder.value = {
           ...filterOrder.value,
-          batchId: id,
+          batchId: item.batchCode,
         }
       }, 100)
       setTimeout(() => {
