@@ -21,6 +21,9 @@
     <template #[`item.codCost`]="{ item }">
       {{ item.currency }} {{ setPrice(item.codCost) }}
     </template>
+    <template #[`item.total`]="{ item }">
+      {{ item.currency }} {{ setPrice(item.total) }}
+    </template>
     <template #[`item.dnt`]="{ item }">
       {{ item.currency }} {{ setPrice(item.dnt) }}
     </template>
@@ -70,6 +73,7 @@ export default defineComponent({
           "ccCost": Number(dataNodeCalc.ccCost),
           "bobCost": Number(dataNodeCalc.bobCost),
           "codCost": Number(dataNodeCalc.codCost),
+          "total": Number(dataNodeCalc.fmCost) + Number(dataNodeCalc.lmCost) + Number(dataNodeCalc.ccCost) + Number(dataNodeCalc.bobCost) + Number(dataNodeCalc.codCost),
           "dnt": Number(dataNodeCalc.dutiesFee) + Number(dataNodeCalc.taxFee),
           "adminFee": Number(dataNodeCalc.fmTransmissionFee) + Number(dataNodeCalc.lmTransmissionFee) + Number(dataNodeCalc.ccTransmissionFee) + Number(dataNodeCalc.bobTransmissionFee),
           "currency": dataNodeCalc.currency
@@ -90,7 +94,7 @@ export default defineComponent({
     watch(
       [nodeCalc],
       ([newNode]) => {
-        const headerTemp = []
+        let headerTemp = [] as any
         let objNewNode = {}
         if(newNode && newNode[0]) objNewNode = newNode[0]
         const objEntries = Object.entries(objNewNode)
@@ -154,18 +158,21 @@ export default defineComponent({
               break;
           }
         })
-        headerTemp.push(
+        headerTemp = [
+          ...headerTemp,
+          {
+            text: 'Total',
+            value: 'total',
+          },
           {
             text: 'D&T',
             value: 'dnt',
-          }
-        )
-        headerTemp.push(
+          },
           {
             text: 'Admin Fee',
             value: 'adminFee',
           }
-        )
+        ]
         tableSettings.headers = headerTemp
       },
       { deep: true }
@@ -174,29 +181,12 @@ export default defineComponent({
     const setPrice = (price: string) => {
       return parseFloat(price).toFixed(2)
     }
-    const setTotal = () => {
-      const orderItemsTemp =
-        nodeCalc.value && nodeCalc.value.length > 0 ? nodeCalc.value : []
-      const totalPrice = orderItemsTemp.reduce(
-        (previous: number, current: OrderItem) => {
-          const total =
-            previous + parseFloat(current.price as unknown as string)
-
-          return total
-        },
-        0
-      )
-      const currency =
-        orderItemsTemp.length !== 0 ? orderItemsTemp[0].currency : ''
-
-      return `${currency} ${totalPrice.toFixed(2)}`
-    }
 
     return {
       nodeCalc,
       tableSettings,
       setPrice,
-      setTotal,
+
     }
   },
 })
