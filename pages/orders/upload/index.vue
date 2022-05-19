@@ -15,16 +15,17 @@
     />
 
     <v-sheet color="transparent" width="100%" class="mx-10">
-      <template v-for="({ text, icon }, index) in stepList">
+      <template v-for="({ text, icon, disabled }, index) in stepList">
         <v-btn
           :key="text"
           :color="isActive(index) ? 'primary' : 'white'"
           :class="[isActive(index) ? 'white--text' : 'primary--text']"
+          :disabled="disabled"
           class="custom-tab mx-2"
           @click="doChangeWindow(index)"
         >
           <v-icon left dark size="28"> {{ icon }} </v-icon>
-          {{ text }}
+          {{ disabled ? `${text} (Coming Soon)` : text }}
         </v-btn>
       </template>
     </v-sheet>
@@ -63,6 +64,7 @@ export default defineComponent({
       {
         text: 'Domestic',
         icon: '$domestic',
+        disabled: true,
       },
       {
         text: 'Cross border',
