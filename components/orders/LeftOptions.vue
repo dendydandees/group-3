@@ -5,6 +5,18 @@
       :disabled="selectedOrders.length === 0 || loading"
       outlined
       color="primary"
+      class="mr-2"
+      @click="$emit('doExportOrders')"
+    >
+      Export Orders
+    </v-btn>
+
+    <v-btn
+      v-if="isOnListView"
+      :disabled="selectedOrders.length === 0 || loading"
+      outlined
+      color="primary"
+      class="mr-2"
       @click="$emit('doDownloadSelectedLabel')"
     >
       Download Labels
@@ -15,7 +27,7 @@
       :outlined="isShowFilter"
       :disabled="loading"
       color="primary"
-      :class="[isOnListView ? 'mx-2' : '']"
+      :class="[isOnListView ? 'mr-2' : '']"
       @click="$emit('doShowFilter')"
     >
       Filter

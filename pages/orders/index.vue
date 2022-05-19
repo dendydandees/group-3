@@ -26,6 +26,7 @@
         :loading="$fetchState.pending"
         :is-show-filter="isShowFilter"
         @doDownloadSelectedLabel="doDownloadSelectedLabel"
+        @doExportOrders="doExportOrders"
         @doShowFilter="isShowFilter = !isShowFilter"
       />
 
@@ -82,15 +83,13 @@
             @doGetDetails="doGetDetails"
             @doGetBatchDetails="goToBatchView"
           />
-            <!-- @doGetBatchDetails="doGetBatchDetails" -->
-
         </v-col>
       </v-row>
 
       <!-- List data for batch -->
-      <!-- <v-row v-else align="center" class="my-4">
+      <v-row v-else align="center" class="my-4">
         <OrdersBatchList @doGetBatchDetails="doGetBatchDetails" />
-      </v-row> -->
+      </v-row>
     </v-fade-transition>
 
     <!-- Pagination universal (order and batch view) -->
@@ -286,8 +285,8 @@ export default defineComponent({
         name: `orders-batch-batchId`,
         params: {
           batchId: item.batchCode,
-          item
-        }
+          item,
+        },
       })
     }
     const doDownloadSelectedLabel = async () => {
@@ -305,6 +304,14 @@ export default defineComponent({
       )}.pdf`
 
       saveAs(response, fileName)
+    }
+    const doExportOrders = () => {
+      if (selectedOrders.value.length === 0) return
+
+      const selectedLabels = {
+        orderIds: selectedOrders.value.map((order) => order.id),
+      }
+      console.log(selectedLabels)
     }
 
     // manage filter order
@@ -447,6 +454,7 @@ export default defineComponent({
       doGetBatchDetails,
       goToBatchView,
       doDownloadSelectedLabel,
+      doExportOrders,
       // manage filter order
       isShowFilter,
       doResetFilter,
