@@ -96,11 +96,17 @@
     >
       <v-window v-model="step">
         <v-window-item :value="0">
-          <OrdersBatchViewSummary :step="step" />
+          <OrdersBatchViewDetails
+            :step="step"
+            :node-calculators="nodeCalculators"
+          />
         </v-window-item>
 
         <v-window-item :value="1">
-          <OrdersBatchViewDetails :step="step" />
+          <OrdersBatchViewSummary
+            :step="step"
+            :node-calculators="nodeCalculators"
+          />
         </v-window-item>
       </v-window>
     </v-card>
@@ -197,14 +203,82 @@ import {
   useRoute,
   ref,
   computed,
-  onUnmounted
+  onUnmounted,
+  useStore,
+  useContext,
+  useFetch
 } from '@nuxtjs/composition-api'
+import { Order, VuexModuleOrders } from '~/types/orders'
+import { FilterDetails } from '~/types/applications'
+
+export interface ParseNodeCalc {
+  orderCode: String
+  "id": String
+  "fmCost": Number
+  "lmCost": Number
+  "ccCost": Number
+  "bobCost": Number
+  "codCost": Number
+  "total": Number
+  "dnt": Number
+  "adminFee": Number
+  "currency": String
+}
 
 export default defineComponent({
   name: 'BatchPage',
   setup() {
     const router = useRouter()
     const route = useRoute()
+    const pagination = ref( {
+      page: 1,
+      itemsPerPage: 1000000,
+      sortBy: [''],
+      sortDesc: [true],
+    })
+    const { $dateFns, app } = useContext()
+    const storeOrders = useStore<VuexModuleOrders>()
+    const meta = computed(() => storeOrders.state.orders.meta)
+
+    const ordersCode = computed(() => {
+      const data = storeOrders.state.orders.orders
+      let parsingData = [] as {id: string, orderCode: string}[] | []
+      if(data && data.length > 0) {
+        parsingData = [...data].map((x: Order) => {
+          return {
+            id: x.id,
+            orderCode: x.orderCode
+          }
+        })
+      }
+      return parsingData
+    })
+    const nodeCalculators = computed(() => {
+      const data = storeOrders.state.orders.orderDetails.nodeCalc
+      let parsingData = [] as any
+      if(ordersCode.value && ordersCode.value.length > 0) {
+        parsingData = [...ordersCode.value].map((x: {id: string, orderCode: string}) => {
+          const batch = data[x.id]
+          return {
+            orderCode: x.orderCode,
+            "id": batch.id,
+            "fmCost": Number(batch.fmCost),
+            "lmCost": Number(batch.lmCost),
+            "ccCost": Number(batch.ccCost),
+            "bobCost": Number(batch.bobCost),
+            "codCost": Number(batch.codCost),
+            "total": Number(batch.fmCost) + Number(batch.lmCost) + Number(batch.ccCost) + Number(batch.bobCost) + Number(batch.codCost),
+            "dnt": Number(batch.dutiesFee) + Number(batch.taxFee),
+            "adminFee": Number(batch.fmTransmissionFee) + Number(batch.lmTransmissionFee) + Number(batch.ccTransmissionFee) + Number(batch.bobTransmissionFee),
+            "currency": batch.currency
+          }
+        })
+      }
+      parsingData = [...parsingData].filter((y: ParseNodeCalc) => {
+        return y.fmCost || y.ccCost || y.lmCost || y.bobCost || y.codCost
+      })
+      return parsingData
+    })
 
     const itemDetail = computed(() => {
       let data = route.value?.params?.item
@@ -249,16 +323,55 @@ export default defineComponent({
       step.value = data
     }
     // manage title
-    const currentTitle = computed(() =>
-      step.value === 0 ? 'Domestic' : 'Cross Border'
-    )
     useMeta(() => ({
-      title: `Client Portal | Upload ${currentTitle.value} Orders`,
+      title: `Client Portal | Batch Orders View`,
     }))
 
     const doBackTo = () => {
       router.go(-1)
     }
+
+    const fetchOrders = async (params: FilterDetails) => {
+      const { page, itemsPerPage } = params
+      const perPage = itemsPerPage !== -1 ? itemsPerPage : meta.value.totalCount
+      let dataParams = {
+        page,
+        perPage,
+      } as Object
+      dataParams = app.$customUtils.setURLParams({
+          ...dataParams,
+          batchId: route.value?.params?.batchId
+        })
+
+      try {
+        $fetchState.pending = true
+        const url = 'orders/getOrders'
+
+        await storeOrders.dispatch(url, { params: dataParams })
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+
+    const getNodeCalculators = async () => {
+      try {
+        $fetchState.pending = true
+        const url = 'orders/getNodeCalculators'
+
+        await storeOrders.dispatch(url)
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+
+    const { $fetchState, fetch } = useFetch(async () => {
+      await getNodeCalculators()
+      await fetchOrders(pagination.value)
+    })
 
     return {
       step,
@@ -269,7 +382,9 @@ export default defineComponent({
       transferCost,
       selectedTransferCost,
       batchId,
-      itemDetail
+      itemDetail,
+      ordersCode,
+      nodeCalculators
     }
   },
   head: {},

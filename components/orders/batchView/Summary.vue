@@ -2,62 +2,130 @@
   <article class="summary-tab pa-8">
     <v-data-table
       hide-default-footer
-      :headers="dataTable.headers"
-      :items="dataTable.desserts"
-      item-key="name"
+      :headers="headersComp"
+      :items="nodeCalculators"
+      item-key="orderCode"
+      :items-per-page="1000000"
       :search="dataTable.search"
       disable-sort
     >
-      <template #item="{ item }">
-        <tr >
-            <td
-              v-for="(col,key) in item"
-              :key="key"
-              :style="`${showBorder(key)}`"
-            >
-              <!-- :style="{borderLeft: '1px solid blue'}" -->
-                {{ col }}
-            </td>
-        </tr>
-      </template>
-      <!-- <template #item.iron="{ item }">
+      <!-- <template #item.orderCode="{ item }">
         <div
-          :style="'border-right: 1px solid'"
+          class="primary--text font-weight-bold"
         >
-          {{item.iron}}
+          {{item.orderCode}}
         </div>
+      </template>
+      <template #[`item.fmCost`]="{ item }">
+        {{ item.currency }} {{ setPrice(item.fmCost) }}
+      </template>
+      <template #[`item.ccCost`]="{ item }">
+        {{ item.currency }} {{ setPrice(item.ccCost) }}
+      </template>
+      <template #[`item.lmCost`]="{ item }">
+        {{ item.currency }} {{ setPrice(item.lmCost) }}
+      </template>
+      <template #[`item.bobCost`]="{ item }">
+        {{ item.currency }} {{ setPrice(item.bobCost) }}
+      </template>
+      <template #[`item.codCost`]="{ item }">
+        {{ item.currency }} {{ setPrice(item.codCost) }}
+      </template>
+      <template #[`item.total`]="{ item }">
+        {{ item.currency }} {{ setPrice(item.total) }}
+      </template>
+      <template #[`item.dnt`]="{ item }">
+        {{ item.currency }} {{ setPrice(item.dnt) }}
+      </template>
+      <template #[`item.adminFee`]="{ item }">
+        {{ item.currency }} {{ setPrice(item.adminFee) }}
       </template> -->
-      <template #body.append>
-        <tr>
-          <td></td>
-          <td>
-            USD 0.00
-          </td>
-          <td>
-            USD 0.00
-          </td>
-          <td>
-            USD 0.00
-          </td>
-          <td>
-            USD 0.00
-          </td>
+      <template #body="{items, headers}">
+        <tr
+          v-for="(x, i) in items"
+          :key="i"
+        >
           <td
-            class="error--text font-weight-bold"
-            :style="{borderRight:'1px dashed red'}"
+            v-for="(y, index) in headers"
+            :key="index"
+            :class="
+              (y.value === 'orderCode' &&'primary--text font-weight-bold') + ' td-custom'
+            "
+            :style="
+              y.value === 'total' && {borderRight:'1px dashed red'}
+            "
           >
-            USD 0.00
+            {{x[y.value]}}
           </td>
+        </tr>
+        <tr
+          v-if="items && items.length > 0"
+        >
           <td
-            class="error--text font-weight-bold"
+            v-for="(x, i) in headers"
+            :key="i"
+            :style="
+              x.value === 'total' && {borderRight:'1px dashed red'}
+            "
+            class="td-custom"
           >
-            USD 0.00
+            <span
+              v-if="x.value === 'orderCode' "
+            >
+
+            </span>
+            <span
+              v-else
+              :class="
+                x.value === 'total' || x.value === 'dnt'
+                ? 'error--text font-weight-bold'
+                : ''
+              "
+            >
+              {{setTotal(x.value)}}
+            </span>
           </td>
-          <td>
-            USD 0.00
+        </tr>
+        <tr
+          v-else
+        >
+          <td
+            :colspan="headers.length"
+            class="font-weight-bold grey--text td-custom"
+            :style="'text-align: center'"
+          >
+            No Data
+
           </td>
         </tr>
       </template>
+      <!-- <template #body.append="{headers}">
+        <tr>
+          <td
+            v-for="(x, i) in headers"
+            :key="i"
+            :style="
+              x.value === 'total' && {borderRight:'1px dashed red'}
+            "
+          >
+            <span
+              v-if="x.value === 'orderCode' "
+            >
+
+            </span>
+            <span
+              v-else
+              :class="
+                x.value === 'total' || x.value === 'dnt'
+                ? 'error--text font-weight-bold'
+                : ''
+              "
+            >
+              {{setTotal(x.value)}}
+            </span>
+          </td>
+        </tr>
+      </template> -->
     </v-data-table>
   </article>
 </template>
@@ -72,12 +140,15 @@ import {
   useRouter,
   onMounted,
   watch,
+  PropType
 } from '@nuxtjs/composition-api'
 import { ValidationObserver } from 'vee-validate'
 
 // interfaces and types
 import { VForm, VuexModuleApplications } from '~/types/applications'
 import {
+  NodeCalculator,
+  Order,
   OrderCrossBorder,
   OrderDomestic,
   VuexModuleOrders,
@@ -94,6 +165,20 @@ interface ErrorUpload {
   }
 }
 
+export interface ParseNodeCalc {
+  orderCode: String
+  "id": String
+  "fmCost": Number
+  "lmCost": Number
+  "ccCost": Number
+  "bobCost": Number
+  "codCost": Number
+  "total": Number
+  "dnt": Number
+  "adminFee": Number
+  "currency": String
+}
+
 export default defineComponent({
   name: 'SummaryTab',
   components: {
@@ -104,119 +189,113 @@ export default defineComponent({
       type: Number,
       required: true,
     },
+    nodeCalculators: {
+      type: Array as PropType<ParseNodeCalc[]>,
+      required: true,
+    },
   },
   setup(props) {
     const router = useRouter()
 
     // manage store
     const storeApplications = useStore<VuexModuleApplications>()
-    const storeOfOrders = useStore<VuexModuleOrders>()
     const alert = computed(() => storeApplications.state.applications.alert)
+    const headersComp = computed(() => {
+      let objKeysComp = [] as String[]
+      if(props.nodeCalculators[0]) objKeysComp = Object.keys(props.nodeCalculators[0])
+
+        let headerTemp = [] as any
+
+        objKeysComp.forEach((x: any) => {
+          switch (x) {
+            case 'orderCode':
+              headerTemp.push(
+                {
+                  text: 'ORDER ID',
+                  align: 'start',
+                  sortable: false,
+                  value: 'orderCode',
+                }
+              )
+              break;
+            case 'fmCost':
+              if(setTotal(x, true)) {
+                headerTemp.push(
+                  {
+                    text: 'First Mile',
+                    value: 'fmCost',
+                  }
+                )
+              }
+              break;
+            case 'ccCost':
+              if(setTotal(x, true)) {
+                headerTemp.push(
+                  {
+                    text: 'Customs',
+                    value: 'ccCost',
+                  }
+                )
+              }
+              break;
+            case 'lmCost':
+              if(setTotal(x, true)) {
+                headerTemp.push(
+                  {
+                    text: 'Last Mile',
+                    value: 'lmCost',
+                  }
+                )
+              }
+              break;
+            case 'bobCost':
+              if(setTotal(x, true)) {
+                headerTemp.push(
+                  {
+                    text: 'BOB',
+                    value: 'bobCost',
+                  }
+                )
+              }
+              break;
+            case 'codCost':
+              if(setTotal(x, true)) {
+                headerTemp.push(
+                  {
+                    text: 'COD',
+                    value: 'codCost',
+                  }
+                )
+              }
+              break;
+
+            default:
+              break;
+          }
+        })
+        headerTemp = [
+          ...headerTemp,
+          {
+            text: 'Total',
+            value: 'total',
+          },
+          {
+            text: 'D&T',
+            value: 'dnt',
+          },
+          {
+            text: 'Admin Fee',
+            value: 'adminFee',
+          }
+        ]
+      return headerTemp
+    })
 
 
     // manage summary table
 
     const dataTable = ref({
       search: '',
-      calories: '',
-      desserts: [
-        {
-          name: 'Tesss Yogurt',
-          calories: 159,
-          fat: 6.0,
-          carbs: 24,
-          protein: 4.0,
-          iron: '1%',
-          tes: 1
-        },
-        {
-          name: 'Ice cream sandwich',
-          calories: 237,
-          fat: 9.0,
-          carbs: 37,
-          protein: 4.3,
-          iron: '1%',
-        },
-        {
-          name: 'Eclair',
-          calories: 262,
-          fat: 16.0,
-          carbs: 23,
-          protein: 6.0,
-          iron: '7%',
-        },
-        {
-          name: 'Cupcake',
-          calories: 305,
-          fat: 3.7,
-          carbs: 67,
-          protein: 4.3,
-          iron: '8%',
-        },
-        {
-          name: 'Gingerbread',
-          calories: 356,
-          fat: 16.0,
-          carbs: 49,
-          protein: 3.9,
-          iron: '16%',
-        },
-        {
-          name: 'Jelly bean',
-          calories: 375,
-          fat: 0.0,
-          carbs: 94,
-          protein: 0.0,
-          iron: '0%',
-        },
-        {
-          name: 'Lollipop',
-          calories: 392,
-          fat: 0.2,
-          carbs: 98,
-          protein: 0,
-          iron: '2%',
-        },
-        {
-          name: 'Honeycomb',
-          calories: 408,
-          fat: 3.2,
-          carbs: 87,
-          protein: 6.5,
-          iron: '45%',
-        },
-        {
-          name: 'Donut',
-          calories: 452,
-          fat: 25.0,
-          carbs: 51,
-          protein: 4.9,
-          iron: '22%',
-        },
-        {
-          name: 'KitKat',
-          calories: 518,
-          fat: 26.0,
-          carbs: 65,
-          protein: 7,
-          iron: '6%',
-        },
-      ],
-      headers: [
-        {
-          text: 'ORDER ID',
-          align: 'start',
-          sortable: false,
-          value: 'name',
-        },
-        { text: 'FIRST MILE', value: 'calories' },
-        { text: 'FREIGHT', value: 'fat' },
-        { text: 'CUSTOMS', value: 'carbs' },
-        { text: 'LAST MILE', value: 'protein' },
-        { text: 'TOTAL', value: 'iron' },
-        { text: 'D&T', value: 'tes' },
-        { text: 'ADMIN FEE', value: 'tes2' },
-      ],
     })
 
 
@@ -226,21 +305,40 @@ export default defineComponent({
     })
 
     const showBorder = (item: any) => {
-      if (item === "iron") {
+      if (item === "codCost") {
 
         // return {borderRight:'1px dashed red'}
         return 'border-right: 1px dashed red'
       }
-      if(item === 'name') {
+      if(item === 'orderCode') {
         // return {color:'#1961e4', fontWeight: 700}
         return 'color: #1961e4; font-weight: 700'
       }
 
     }
+    const setPrice = (price: string) => {
+      return parseFloat(price).toFixed(2)
+    }
+    function setTotal(key: string, isNotSetPrice?: Boolean) {
+      const total = props.nodeCalculators.reduce( function(a: Number | unknown, b: any){
+          return a + b[key];
+        }, 0)
+      if(isNotSetPrice) {
+        return total
+      } else {
+        return setPrice(
+          total
+        )
+      }
+    }
 
     return {
       dataTable,
-      showBorder
+      headersComp,
+      // nodeCalculators,
+      setPrice,
+      showBorder,
+      setTotal
     }
   },
 })
@@ -249,7 +347,13 @@ export default defineComponent({
 <style lang="scss">
 @import '~/assets/scss/color.module.scss';
   .summary-tab {
-    thead th:nth-child(6) {
+    th[aria-label="Total"] {
+      border-right: 1px dashed red
+    }
+    thead th {
+      white-space: nowrap;
+    }
+    tbody td:nth-child(7) {
       border-right: 1px dashed red
     }
     .theme--light.v-data-table > .v-data-table__wrapper > table > thead > tr:last-child > th {
@@ -257,6 +361,12 @@ export default defineComponent({
     }
     .theme--light.v-data-table > .v-data-table__wrapper > table > tbody > tr > td {
       border-bottom: hidden !important;
+    }
+    .td-custom {
+      font-size: 0.875rem;
+      height: 48px;
+      padding: 0 16px;
+      transition: height 0.2s  cubic-bezier(0.4, 0, 0.6, 1);text-align: start
     }
 
   }
