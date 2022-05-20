@@ -1,12 +1,9 @@
 <template>
-  <div class="dropdown-custom">
+  <div class="dropdown-custom-input">
     <div
       v-if="label"
       class="h-5 text-break font-weight-medium pb-1 d-flex align-center"
     >
-      <div>
-        {{ label }}
-      </div>
       <v-tooltip v-if="isInfo" bottom>
         <template #activator="{ on, attrs }">
           <NuxtImg
@@ -26,33 +23,76 @@
     </div>
     <!-- {{JSON.stringify(data)}} -->
     <div class="d-flex align-center">
-      <v-select
-        v-model="selectedComp"
-        :label="title"
-        :items="data"
-        :item-text="itemShow.text"
-        :item-value="itemShow.value"
-        :placeholder="placeholder"
-        :disabled="disabledDrop"
-        :loading="disabledDrop"
-        outlined
-        rounded
-        dense
-        color="blue"
-        :class="`custom-select ${disabledDrop ? 'disabled-drop' : ''}`"
+      <div
+        :style="'width: 70%'"
       >
-      </v-select>
-      <v-btn
-        v-if="isDelete"
-        color="error"
-        fab
-        x-small
-        dark
+        <div
+          class="header-NP-label"
+        >
+          {{ label }}
+        </div>
+        <v-select
+          v-model="selectedComp.partnerID"
+          :label="title"
+          :items="data"
+          :item-text="itemShow.text"
+          :item-value="itemShow.value"
+          :placeholder="placeholder"
+          :disabled="disabledDrop"
+          :loading="disabledDrop"
+          outlined
+          rounded
+          dense
+          color="blue"
+          :class="`custom-select ${disabledDrop ? 'disabled-drop' : ''}`"
+        >
+        </v-select>
+      </div>
+      <div
         class="ml-3"
-        @click="actionDelete"
+        :style="'width: 30%'"
       >
-        <v-icon>mdi-trash-can</v-icon>
-      </v-btn>
+        <div
+          class="header-NP-label"
+        >
+          Volume
+        </div>
+        <v-text-field
+          v-model="selectedComp.volume"
+          label="Volume"
+          placeholder="Volume"
+          background-color="white"
+          solo
+          flat
+          dense
+          hide-details
+          rounded
+          outlined
+          type="number"
+          class="custom-text-field"
+        />
+
+      </div>
+      <div
+        class="ml-3"
+      >
+        <div
+          class="header-NP-label"
+        >
+
+        </div>
+        <v-btn
+          v-if="isDelete"
+          color="error"
+          fab
+          x-small
+          dark
+          @click="actionDelete"
+        >
+          <v-icon>mdi-trash-can</v-icon>
+        </v-btn>
+
+      </div>
     </div>
   </div>
 </template>
@@ -65,11 +105,13 @@ import {
   PropType,
 } from '@nuxtjs/composition-api'
 
-// interface FeedbackMessage {
-//   alert: boolean
-//   type: string
-//   message: string | unknown
-// }
+export interface InputNPData {
+  partnerID: string,
+  volume: number,
+  index?: number,
+  type?: string
+}
+
 
 export default defineComponent({
   props: {
@@ -85,10 +127,6 @@ export default defineComponent({
       type: String,
       default: '',
     },
-    selectedValue: {
-      type: String as PropType<string>,
-      default: '',
-    },
     itemShow: {
       type: Object as PropType<{ text: string; value: string }>,
       default: () => ({}),
@@ -102,8 +140,8 @@ export default defineComponent({
       default: '',
     },
     value: {
-      type: String as PropType<String | ''>,
-      default: '',
+      type: Object as PropType<InputNPData>,
+      required: true,
     },
     disabledDrop: {
       type: Boolean,
@@ -125,9 +163,6 @@ export default defineComponent({
     const actionDelete = () => {
       emit('delete')
     }
-    // const selectedValue = reactive({
-    //   value: '',
-    // })
     watch(
       () => [props.disabledDrop],
       () => {
@@ -135,18 +170,11 @@ export default defineComponent({
       },
       { deep: true }
     )
-    // const partnerComp = computed({
-    //   get: () => props.value,
-    //   set: (value: String) => {
-    //     // console.log(value)
-    //     emit('input', value)
-    //   }
-    // })
     const selectedComp = computed({
       get: () => props.value,
-      set: (value: String) => {
+      set: (value: InputNPData) => {
         emit('input', value)
-      },
+      }
     })
 
     return {
@@ -158,9 +186,10 @@ export default defineComponent({
 })
 </script>
 <style lang="scss">
-.dropdown-custom {
+.dropdown-custom-input {
   width: 100%;
   .custom-select {
+    /* min-width: 100%; */
     // .v-select__slot {
     // label {
     /* font-size: 12px;
@@ -185,6 +214,29 @@ export default defineComponent({
         pointer-events: none;
       }
     }
+  }
+
+  .header-NP-label {
+    height: 24px;
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  .custom-text-field {
+    /* width: 100%; */
+    .v-input__slot {
+      fieldset {
+        color: #2196f3 !important;
+      }
+      &:focus-visible {
+        outline: #2196f3  auto 1px !important;;
+      }
+
+    }
+    .v-label {
+        color: grey !important;
+        font-size: 16px;
+    }
+    /* #2196f3 */
   }
 }
 </style>

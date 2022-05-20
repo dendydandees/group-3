@@ -340,7 +340,7 @@ export default defineComponent({
       } as Object
       dataParams = app.$customUtils.setURLParams({
           ...dataParams,
-          batchId: route.value?.params?.batchId
+          batchCode: route.value?.params?.batchId
         })
 
       try {

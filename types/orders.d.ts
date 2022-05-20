@@ -116,6 +116,7 @@ export interface OrderAllocationUpdate {
 export interface FilterOrders {
   orderCode: string;
   batchId: string;
+  batchCode?: string;
   createdFrom: string;
   createdTo: string;
   originCountry: string;

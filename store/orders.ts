@@ -27,6 +27,7 @@ interface ParamsGetSelectedLabels {
 export const filterOrderInit = {
   orderCode: '',
   batchId: '',
+  batchCode: '',
   originCountry: '',
   createdFrom: '',
   createdTo: '',
