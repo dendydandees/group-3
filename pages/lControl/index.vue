@@ -254,20 +254,49 @@
                       :disabled-drop="$fetchState.pending"
                       :item-show="{ text: 'name', value: 'id' }"
                       :is-delete="true"
+                      :is-info="true"
                       @delete="handleDeleteRule({isCOD: true})"
                     />
                   </div>
-                  <!-- <div
+                  <div
+                    v-if="selected.serviceIndex.value === 'LAST_MILE' || selected.serviceIndex.value === 'FIRST_MILE'"
+                    class="mt-2"
+                  >
+                    <!-- <div
+                      v-for="(z, i) in addNPData"
+                      :key="i"
+                    > -->
+                      <LcontrolDropdownCustomInput
+                        v-for="(z, i) in addNPData"
+                        :key="i"
+                        v-model="addNPData[i]"
+                        :label="`${dataPriority[i]} Network Partner`"
+                        :placeholder="'Default Partner'"
+                        :data="marketplacesCOD"
+                        :disabled-drop="$fetchState.pending"
+                        :item-show="{ text: 'name', value: 'id' }"
+                        :is-delete="true"
+                        class="mb-2"
+                        @delete="handleDeleteRule({isVolume: {index: z.index, status: true}})"
+                      />
+
+                    <!-- </div> -->
+                  </div>
+                  <div
+                    v-if="
+                      (selected.serviceIndex.value === 'LAST_MILE' || selected.serviceIndex.value === 'FIRST_MILE') &&
+                      addNPData.length < 3
+                    "
                     :class="
                       `
-                        primary--text btn-COD
+                        primary--text btn-COD ${ selected.partnerID ? '' : 'disabled'}
                       `
                     "
                     style="cursor: pointer"
-                    @click="() => {}"
+                    @click="handleAddNP"
                   >
                     + Add Network Partner
-                  </div> -->
+                  </div>
                 </div>
               </div>
               <v-btn
@@ -287,7 +316,7 @@
     <BaseModalConfirm
       v-model="dialog.deleteRule"
       :dialog-settings="dialogSettings"
-      @doSubmit="deleteRules({idRule: CODpartnerSelected.idRule})"
+      @doSubmit="deleteRules({idRule: dialog.idRule})"
     />
   </section>
 </template>
@@ -324,6 +353,15 @@ export interface RulePayload {
   idRule?: string
 }
 
+export interface InputNPData {
+  partnerID: string,
+  volume: number,
+  index?: number,
+  type?: string,
+  idRule?: string
+  priority?: number
+}
+
 export default defineComponent({
   name: 'LControl',
   layout: 'default',
@@ -351,10 +389,11 @@ export default defineComponent({
     })
     const dialog = ref({
       deleteRule: false,
+      idRule: '',
     })
     const dialogSettings = ref({
       loading: false,
-      title: 'Are you sure you want to delete this COD?',
+      title: 'Are you sure you want to delete this?',
       content: '',
       cancelText: 'Cancel',
       submitText: 'Delete',
@@ -397,6 +436,44 @@ export default defineComponent({
     ]) as Ref<
       { text?: string; disabled: boolean; first?: boolean; href?: string }[]
     >
+
+    // START Handle add network partner
+    const addNPData = ref([]) as Ref<InputNPData[] | []>
+    const dataPriority = ['Primary', 'Secondary', 'Tertiary']
+
+    function handleAddNP () {
+      const newData = {
+        index: 0,
+        partnerID: '',
+        volume: 0,
+        type: 'RULE_TYPE_VOLUME',
+        idRule: ''
+      }
+      newData.index = addNPData.value.length + 1
+      addNPData.value = [...addNPData.value, newData]
+
+    }
+
+    watch(
+      () => [selected.value.rules],
+      ([newRules]) => {
+        const rulesVolume = newRules.filter((el: any) => el.data.definitions.some((x: any) => x.type === 'RULE_TYPE_VOLUME'))
+        addNPData.value = rulesVolume.map((x:any, i: number) => {
+          return {
+            index: i + 1,
+            partnerID: x.data.partnerID,
+            volume: Number(x.data.definitions.filter((y: Definition) => y.type === "RULE_TYPE_VOLUME")[0].value),
+            type: 'RULE_TYPE_VOLUME',
+            idRule: x.idRule,
+            priority: x.data.priority
+          }
+        })
+      },
+      { deep: true }
+    )
+
+    // END Handle add network partner
+
     watch(
       () => [selected.value.serviceIndex],
       ([newService]) => {
@@ -637,7 +714,8 @@ export default defineComponent({
         dialog.value.deleteRule,
         selected.value.rules,
         selected.value.totalRulesPerZone,
-        selected.value.priority
+        selected.value.priority,
+        addNPData
       ],
       ([
         newLControl,
@@ -649,7 +727,8 @@ export default defineComponent({
         newDialogDelete,
         newRules,
         newTotalRules,
-        newPriority
+        newPriority,
+        newNPdata
       ]) => {
 
       let rules = [...newRules] as any
@@ -700,6 +779,32 @@ export default defineComponent({
           const indexCOD = rules.findIndex((el: any) => el.data.definitions.some((x: any) => x.type === 'RULE_TYPE_IS_COD'))
           rules[indexCOD].data.partnerID = CODpartner
       }
+
+      // START Input new data
+        let npData = newNPdata.value
+
+        npData = [...npData].map((x: InputNPData, i: number) => {
+          return   {
+            idRule: x.idRule,
+            id: selected.value.ruleGroupID,
+            data: {
+              partnerID: x.partnerID,
+              priority: x?.priority ?? priorityTemp + 1 + i,
+              definitions: [
+                {
+                  type: 'RULE_TYPE_ZONE',
+                  value: selected.value.zoneIndex?.value,
+                },
+                {
+                  type: x.type,
+                  value: String(x.volume)
+                },
+              ],
+            }
+          }
+        })
+        rules = [...rules, ...npData]
+      // END Input new data
 
         rulesComp.value = rules
       },
@@ -839,6 +944,7 @@ export default defineComponent({
         CODpartnerSelected.value.idRule = ''
         CODpartnerSelected.value.partnerID = ''
         CODpartnerSelected.value.status = false
+        dialog.value.idRule = ''
       } catch (error) {
         return error
       } finally {
@@ -914,7 +1020,7 @@ export default defineComponent({
     function handleCOD () {
       CODpartnerSelected.value.status = !CODpartnerSelected.value.status
     }
-    function handleDeleteRule ({isCOD}: {isCOD?: Boolean}) {
+    function handleDeleteRule ({isCOD, isVolume}: {isCOD?: Boolean, isVolume?: {index: number, status: Boolean}}) {
       if(
         isCOD
       ) {
@@ -925,10 +1031,20 @@ export default defineComponent({
             CODpartnerSelected.value.partnerID = ''
           } else {
           dialog.value.deleteRule = true
+          dialog.value.idRule = idRule
 
         }
         CODpartnerSelected.value.idRule = idRule
 
+      }
+      if(isVolume?.status ) {
+        const index = addNPData.value.findIndex((x: InputNPData) => x.index === isVolume.index)
+        if (index > -1 && addNPData.value.some((el: InputNPData) => !el.idRule)) {
+          addNPData.value.splice(index, 1);
+        } else {
+          dialog.value.deleteRule = true
+          dialog.value.idRule = addNPData.value[index]?.idRule ?? ''
+        }
       }
     }
 
@@ -995,6 +1111,7 @@ export default defineComponent({
         CODpartnerSelected.value.partnerID = ''
         CODpartnerSelected.value.idRule = ''
         rulesComp.value = []
+        addNPData.value = []
       },
       { deep: true }
     )
@@ -1167,6 +1284,9 @@ export default defineComponent({
       handleCOD,
       marketplacesCOD,
       handleInfoCOD,
+      handleAddNP,
+      addNPData,
+      dataPriority,
 
       dialog,
       dialogSettings,
