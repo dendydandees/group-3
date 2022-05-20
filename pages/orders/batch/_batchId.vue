@@ -261,16 +261,16 @@ export default defineComponent({
           const batch = data[x.id]
           return {
             orderCode: x.orderCode,
-            "id": batch.id,
-            "fmCost": Number(batch.fmCost),
-            "lmCost": Number(batch.lmCost),
-            "ccCost": Number(batch.ccCost),
-            "bobCost": Number(batch.bobCost),
-            "codCost": Number(batch.codCost),
-            "total": Number(batch.fmCost) + Number(batch.lmCost) + Number(batch.ccCost) + Number(batch.bobCost) + Number(batch.codCost),
-            "dnt": Number(batch.dutiesFee) + Number(batch.taxFee),
-            "adminFee": Number(batch.fmTransmissionFee) + Number(batch.lmTransmissionFee) + Number(batch.ccTransmissionFee) + Number(batch.bobTransmissionFee),
-            "currency": batch.currency
+            "id": batch?.id,
+            "fmCost": Number(batch?.fmCost),
+            "lmCost": Number(batch?.lmCost),
+            "ccCost": Number(batch?.ccCost),
+            "bobCost": Number(batch?.bobCost),
+            "codCost": Number(batch?.codCost),
+            "total": Number(batch?.fmCost) + Number(batch?.lmCost) + Number(batch?.ccCost) + Number(batch?.bobCost) + Number(batch?.codCost),
+            "dnt": Number(batch?.dutiesFee) + Number(batch?.taxFee),
+            "adminFee": Number(batch?.fmTransmissionFee) + Number(batch?.lmTransmissionFee) + Number(batch?.ccTransmissionFee) + Number(batch?.bobTransmissionFee),
+            "currency": batch?.currency
           }
         })
       }

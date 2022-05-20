@@ -257,6 +257,17 @@
                       @delete="handleDeleteRule({isCOD: true})"
                     />
                   </div>
+                  <!-- <div
+                    :class="
+                      `
+                        primary--text btn-COD
+                      `
+                    "
+                    style="cursor: pointer"
+                    @click="() => {}"
+                  >
+                    + Add Network Partner
+                  </div> -->
                 </div>
               </div>
               <v-btn
