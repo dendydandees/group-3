@@ -125,18 +125,6 @@
             <!-- Submit and reset form -->
             <v-card-actions class="pa-4">
               <v-spacer />
-
-              <v-btn
-                outlined
-                :disabled="formSettings.loading"
-                :loading="formSettings.loading"
-                color="primary"
-                class="mx-2"
-                @click="doReset"
-              >
-                Reset
-              </v-btn>
-
               <v-btn
                 color="primary"
                 type="submit"
@@ -222,7 +210,7 @@ export default defineComponent({
         }
         const response = await doResetPassword(data)
 
-        if (!response?.ID) throw response
+        if (response?.status !== 'ok') throw response
 
         form.value = {
           oldPassword: '',
@@ -251,14 +239,6 @@ export default defineComponent({
         formSettings.loading = false
       }
     }
-    const doReset = async () => {
-      form.value = {
-        oldPassword: '',
-        newPassword: '',
-        confirmPassword: '',
-      }
-      await updatePasswordFormObserver?.value?.reset()
-    }
 
     return {
       alert,
@@ -266,7 +246,6 @@ export default defineComponent({
       form,
       updatePasswordFormObserver,
       doSubmit,
-      doReset,
     }
   },
 })
