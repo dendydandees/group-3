@@ -192,6 +192,12 @@ const initHeaders = [
     width: 180,
   },
   {
+    text: 'Last Mile Tracking No.',
+    value: 'LMTrackingNumber',
+    sortable: false,
+    width: 230,
+  },
+  {
     text: '',
     value: 'actions',
     sortable: false,
@@ -243,6 +249,7 @@ export default defineComponent({
       'destination',
       'destinationPort',
       'creationDate',
+      'LMTrackingNumber',
       'actions',
     ])
     const headers = ref(initHeaders) as Ref<Header[]>
