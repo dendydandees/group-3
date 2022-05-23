@@ -19,6 +19,11 @@ interface inputPatchRules {
   ruleID: string;
 }
 
+interface inputPatchDefinition {
+  data: { value: string; };
+  id: string;
+}
+
 export const state = () => ({
   lControls: [] as RuleGroup[] | [],
   meta: {
@@ -143,6 +148,17 @@ export const actions: ActionTree<RootStateLControls, RootStateLControls> = {
         `/api/clients/${ dataUser?.clientId }/use-bob?country=${ country }`
       );
 
+      return response;
+    } catch (error) {
+      return error;
+    }
+  },
+  async updateDefinition(_store, { id, data }: inputPatchDefinition) {
+    try {
+      const response = await this?.$axios?.$patch(
+        `/api/clients/rule-definitions/${ id ?? '' }`,
+        data
+      );
       return response;
     } catch (error) {
       return error;

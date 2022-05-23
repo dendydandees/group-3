@@ -302,7 +302,7 @@
               <v-btn
                 color="primary darken-1 white--text"
                 style="align-self: end"
-                :disabled="!selected.partnerID"
+                :disabled="handleDisabled()"
                 :loading="$fetchState.pending"
                 @click="btnAction"
               >
@@ -333,6 +333,7 @@ import {
   onUnmounted,
 } from '@nuxtjs/composition-api'
 // Interfaces or types
+import { ru } from 'date-fns/locale';
 import { VuexModuleFilters } from '~/types/filters'
 import {
   VuexModuleLControls,
@@ -359,7 +360,8 @@ export interface InputNPData {
   index?: number,
   type?: string,
   idRule?: string
-  priority?: number
+  priority?: number,
+  definitions?: Definition[]
 }
 
 export default defineComponent({
@@ -390,6 +392,8 @@ export default defineComponent({
     const dialog = ref({
       deleteRule: false,
       idRule: '',
+      isChange: false,
+      status: ''
     })
     const dialogSettings = ref({
       loading: false,
@@ -453,21 +457,45 @@ export default defineComponent({
       addNPData.value = [...addNPData.value, newData]
 
     }
+    watch(
+      () => [addNPData],
+      ([newNPData]) => {
+        localStorage.setItem('addNPData', JSON.stringify(newNPData.value))
+      },
+      { deep: true }
+    )
 
     watch(
-      () => [selected.value.rules],
-      ([newRules]) => {
-        const rulesVolume = newRules.filter((el: any) => el.data.definitions.some((x: any) => x.type === 'RULE_TYPE_VOLUME'))
-        addNPData.value = rulesVolume.map((x:any, i: number) => {
-          return {
-            index: i + 1,
-            partnerID: x.data.partnerID,
-            volume: Number(x.data.definitions.filter((y: Definition) => y.type === "RULE_TYPE_VOLUME")[0].value),
-            type: 'RULE_TYPE_VOLUME',
-            idRule: x.idRule,
-            priority: x.data.priority
-          }
-        })
+      () => [selected.value.rules, dialog.value.isChange],
+      ([newRules, newStatusChange], [oldRules]) => {
+        let rulesVolume = JSON.parse((localStorage.getItem('addNPData') as string)) as InputNPData[]
+        if(
+          (!rulesVolume ||
+          (rulesVolume && rulesVolume.length === 0)
+          ||
+          newStatusChange ||
+          (newRules.length !== oldRules.length))
+          &&
+          dialog.value.status !== 'COD'
+        ) {
+          rulesVolume = newRules.filter((el: any) => el.data?.definitions.some((x: any) => x.type === 'RULE_TYPE_VOLUME'))
+
+          rulesVolume = rulesVolume.map((x:any, i: number) => {
+
+            return {
+              index: i + 1,
+              partnerID: x.data.partnerID,
+              volume: Number(x.data.definitions.filter((y: Definition) => y.type === "RULE_TYPE_VOLUME")[0].value),
+              type: 'RULE_TYPE_VOLUME',
+              idRule: x.idRule,
+              priority: x.data.priority,
+              definitions: x.data.definitions ?? []
+            }
+          })
+          dialog.value.isChange = false
+        }
+        addNPData.value = rulesVolume
+
       },
       { deep: true }
     )
@@ -691,11 +719,11 @@ export default defineComponent({
     }
     function checkDefinition({data, type, isFilter}: {data: Rule[], type: string, isFilter?: boolean}) {
       if(isFilter) {
-      return [...data].filter((x: Rule) =>x.definitions && x.definitions.some(y => y.type === type))[0] ?? {}
+      return [...data].filter((x: Rule) =>x?.definitions && x.definitions.some(y => y.type === type))[0] ?? {}
       } else {
         return [...data].some((x: Rule) =>{
 
-          return x.definitions && x.definitions.some(y => {
+          return x?.definitions && x.definitions.some(y => {
 
             return y.type === type
             }
@@ -784,22 +812,44 @@ export default defineComponent({
         let npData = newNPdata.value
 
         npData = [...npData].map((x: InputNPData, i: number) => {
+
           return   {
             idRule: x.idRule,
             id: selected.value.ruleGroupID,
             data: {
               partnerID: x.partnerID,
               priority: x?.priority ?? priorityTemp + 1 + i,
-              definitions: [
-                {
-                  type: 'RULE_TYPE_ZONE',
-                  value: selected.value.zoneIndex?.value,
-                },
-                {
-                  type: x.type,
-                  value: String(x.volume)
-                },
-              ],
+              definitions: x.definitions && x.definitions.length > 0
+                ? x.definitions.map((z: Definition) => {
+                  let temp = z
+                  switch (z?.type) {
+                    case 'RULE_TYPE_ZONE':
+                      temp = {
+                        ...temp,
+                        value: selected.value.zoneIndex?.value ?? '',
+                      }
+                      break;
+                    case 'RULE_TYPE_VOLUME':
+                      temp = {
+                        ...temp,
+                        value: String(x.volume),
+                      }
+                      break;
+                    default:
+                      break;
+                  }
+                  return temp
+                })
+                : [
+                    {
+                      type: 'RULE_TYPE_ZONE',
+                      value: selected.value.zoneIndex?.value,
+                    },
+                    {
+                      type: x.type,
+                      value: String(x.volume)
+                    },
+                  ]
             }
           }
         })
@@ -846,6 +896,44 @@ export default defineComponent({
           'lControls/lControls/updateRules',
           payload
         )
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+    const updateDefinition = async (
+      data: Definition[]
+    ) => {
+      try {
+        let payload = [...data].filter((y: Definition) => {
+          return y.type !== "RULE_TYPE_ZONE" && y.type !== "RULE_TYPE_IS_COD"
+        }) as any
+        payload = [...payload].map((x: Definition) => {
+          return {
+            id: x.id,
+            data: {
+              value: x.value
+            }
+          }
+        })
+
+        $fetchState.pending = true
+
+        // await storeLControls.dispatch(
+        //   'lControls/lControls/updateDefinition',
+        //   payload
+        // )
+        await Promise.all(payload.map(async (el: any) => {
+          try {
+            await storeLControls.dispatch(
+              'lControls/lControls/updateDefinition',
+              el
+            )
+          } catch (error) {
+            console.log('error'+ error);
+          }
+        }))
       } catch (error) {
         return error
       } finally {
@@ -941,10 +1029,19 @@ export default defineComponent({
           ruleID: idRule,
         })
         await fetchRuleGroups()
-        CODpartnerSelected.value.idRule = ''
-        CODpartnerSelected.value.partnerID = ''
-        CODpartnerSelected.value.status = false
+        // start localstorage
+        // const index = addNPData.value.findIndex((x: InputNPData) => x.idRule === dialog.value.idRule)
+        // addNPData.value.splice(index, 1);
+        // end localstorage
         dialog.value.idRule = ''
+        dialog.value.isChange = true
+
+        if(dialog.value.status === 'COD') {
+          CODpartnerSelected.value.idRule = ''
+          CODpartnerSelected.value.partnerID = ''
+          CODpartnerSelected.value.status = false
+          // dialog.value.status = ''
+        }
       } catch (error) {
         return error
       } finally {
@@ -959,6 +1056,8 @@ export default defineComponent({
 
     const btnAction = async () => {
       try {
+
+
         if (selected.value.isUpdate) {
           await updateRuleGroup()
         }
@@ -966,19 +1065,20 @@ export default defineComponent({
           await addRuleGroup()
         }
 
-          await Promise.all(rulesComp.value.map(async (el: any) => {
-            try {
-              if(el.idRule && selected.value.isUpdate) {
-                await updateRules(el)
-              } else {
-                await addRules(el)
-              }
-            } catch (error) {
-              console.log('error'+ error);
+        await Promise.all(rulesComp.value.map(async (el: any) => {
+          try {
+            if(el.idRule && selected.value.isUpdate) {
+              if(el.data.partnerID) await updateRules(el)
+              await updateDefinition(el.data.definitions)
+            } else {
+              await addRules(el)
             }
-          }))
+          } catch (error) {
+            console.log('error'+ error);
+          }
+        }))
 
-
+        dialog.value.status = ''
         await fetchRuleGroups()
       } catch (error) {
         return error
@@ -1021,6 +1121,7 @@ export default defineComponent({
       CODpartnerSelected.value.status = !CODpartnerSelected.value.status
     }
     function handleDeleteRule ({isCOD, isVolume}: {isCOD?: Boolean, isVolume?: {index: number, status: Boolean}}) {
+      dialog.value.status = ''
       if(
         isCOD
       ) {
@@ -1032,14 +1133,18 @@ export default defineComponent({
           } else {
           dialog.value.deleteRule = true
           dialog.value.idRule = idRule
-
+          dialog.value.status = 'COD'
         }
         CODpartnerSelected.value.idRule = idRule
 
       }
       if(isVolume?.status ) {
         const index = addNPData.value.findIndex((x: InputNPData) => x.index === isVolume.index)
-        if (index > -1 && addNPData.value.some((el: InputNPData) => !el.idRule)) {
+        if (
+          index > -1 &&
+          !addNPData.value[index].idRule
+          // addNPData.value.some((el: InputNPData) => !el.idRule)
+        ) {
           addNPData.value.splice(index, 1);
         } else {
           dialog.value.deleteRule = true
@@ -1050,6 +1155,8 @@ export default defineComponent({
 
     onUnmounted(() => {
       // DELETE SERVICE ON VUEX
+        localStorage.removeItem('addNPData')
+        dialog.value.status = ''
     })
 
     watch(
@@ -1112,6 +1219,8 @@ export default defineComponent({
         CODpartnerSelected.value.idRule = ''
         rulesComp.value = []
         addNPData.value = []
+        localStorage.removeItem('addNPData')
+        dialog.value.status = ''
       },
       { deep: true }
     )
@@ -1127,6 +1236,7 @@ export default defineComponent({
               definitions: el.definitions && el.definitions.length > 0
               ? el.definitions.map(x => {
                   return {
+                    id: x.id,
                     type: x.type,
                     value: x.value,
                   }
@@ -1266,6 +1376,18 @@ export default defineComponent({
       { deep: true }
     )
 
+    function handleDisabled() {
+      if(
+        !selected.value.partnerID ||
+        (CODpartnerSelected.value.status && !CODpartnerSelected.value.partnerID) ||
+        addNPData.value.some((x: InputNPData) => !x.partnerID)
+      ) {
+        return true
+      } else {
+        return false
+      }
+    }
+
     return {
       selected,
       breadcrumbs,
@@ -1291,7 +1413,8 @@ export default defineComponent({
       dialog,
       dialogSettings,
       deleteRules,
-      handleDeleteRule
+      handleDeleteRule,
+      handleDisabled
     }
   },
   head: {},
