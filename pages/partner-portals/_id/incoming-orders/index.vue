@@ -204,6 +204,12 @@ const initHeaders = [
     sortable: false,
     width: 180,
   },
+  {
+    text: 'Last Mile Tracking No.',
+    value: 'LMTrackingNumber',
+    sortable: false,
+    width: 230,
+  },
 ] as Header[]
 
 export default defineComponent({
@@ -276,6 +282,7 @@ export default defineComponent({
       'destination',
       'destinationPort',
       'creationDate',
+      'LMTrackingNumber',
       'actions',
     ])
     const selectAllToggle = () => {

@@ -96,6 +96,16 @@
                 value="creationDate"
               />
             </v-list-item>
+
+            <v-list-item>
+              <v-checkbox
+                v-model="selectedViews"
+                on-icon="mdi-checkbox-marked-circle"
+                off-icon="mdi-checkbox-blank-circle-outline"
+                label="Last Mile Tracking No."
+                value="LMTrackingNumber"
+              />
+            </v-list-item>
           </v-list>
         </v-col>
       </v-row>

@@ -39,6 +39,7 @@
       />
     </template>
 
+    <!-- ORDERs AND INCOMING ORDERS -->
     <!-- order item cell -->
     <template #[`item.orderCode`]="{ item }">
       <v-btn text color="primary" @click="$emit('doGetDetails', item)">
@@ -115,7 +116,19 @@
       </div>
     </template>
 
-    <!-- actions cell -->
+    <!-- creation date cell -->
+    <template #[`item.LMTrackingNumber`]="{ item }">
+      <div class="text--secondary">
+        {{
+          item.orderAllocations.find(
+            (allocation) => allocation.serviceType === 'LAST_MILE'
+          ).externalTrackingNumber
+        }}
+      </div>
+    </template>
+    <!-- END ORDERS AND INCOMING ORDERS -->
+
+    <!-- ACTIONS -->
     <template #[`item.actions`]="{ item }">
       <div class="d-flex align-center">
         <v-btn
@@ -131,11 +144,11 @@
         </v-btn>
       </div>
     </template>
+    <!-- END ACTIONS -->
+
     <!-- START DETAIL MARKETPLACE -->
     <template #[`item.countryTable`]="{ item }">
-      <div
-        style="font-size: 0.975rem !important;"
-      >
+      <div style="font-size: 0.975rem !important">
         {{ item.countryTable }}
       </div>
     </template>
@@ -146,7 +159,7 @@
             ? `green--text font-weight-bold`
             : `error--text font-weight-bold`
         "
-        style="font-size: 0.975rem !important;"
+        style="font-size: 0.975rem !important"
       >
         {{ item.zoneTable }}
       </div>
@@ -158,15 +171,13 @@
             ? `green--text font-weight-bold`
             : `error--text font-weight-bold`
         "
-        style="font-size: 0.975rem !important;"
+        style="font-size: 0.975rem !important"
       >
         {{ item.slaTable ? (item.codTable ? 'Yes' : 'No') : '' }}
       </div>
     </template>
     <template #[`item.slaTable`]="{ item }">
-      <div
-        style="font-size: 0.975rem !important;"
-      >
+      <div style="font-size: 0.975rem !important">
         {{ item.slaTable }}
       </div>
     </template>
