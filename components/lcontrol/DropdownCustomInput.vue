@@ -70,6 +70,7 @@
           outlined
           type="number"
           class="custom-text-field"
+          :disabled="!selectedComp.partnerID"
         />
 
       </div>
