@@ -75,9 +75,9 @@
     </template>
 
     <!-- status cell -->
-    <template #[`item.status`]="{ item: { latestUpdate } }">
+    <template #[`item.status`]="{ item: { orderAllocations } }">
       <div class="text--secondary">
-        {{ latestUpdate ? latestUpdate.comments : '' }}
+        {{ setStatusOrder(orderAllocations) }}
       </div>
     </template>
 
@@ -193,7 +193,7 @@ import {
   useRoute,
 } from '@nuxtjs/composition-api'
 import { FilterDetails, Pagination } from '~/types/applications'
-import { Order } from '~/types/orders'
+import { Order, OrderAllocationUpdate } from '~/types/orders'
 
 import {
   IncomingOrder,
@@ -260,11 +260,24 @@ export default defineComponent({
       }
     }
 
+    // FOR ORDER AND INCOMING ORDER
+    const setStatusOrder = (orderAllocations: OrderAllocationUpdate[]) => {
+      return orderAllocations &&
+        orderAllocations.length !== 0 &&
+        orderAllocations[0]?.omitempty &&
+        orderAllocations[0]?.omitempty.length !== 0
+        ? orderAllocations[0]?.omitempty[0]?.comments
+        : ''
+    }
+    // END FOR ORDER AND INCOMING ORDER
+
     return {
       selected,
       fetch,
       doSelectAll,
       validateSelect,
+      // FOR ORDER AND INCOMING ORDER
+      setStatusOrder,
     }
   },
 })

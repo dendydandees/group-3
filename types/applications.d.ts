@@ -70,3 +70,10 @@ export interface Breadcrumbs {
   to: string
   exact?: boolean
 }
+
+export interface Header {
+  text: string
+  value: string
+  sortable?: boolean
+  width?: number
+}

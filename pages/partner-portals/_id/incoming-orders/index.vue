@@ -142,6 +142,7 @@ import {
   ModalConfirm,
   VuexModuleApplications,
   Alert,
+  Header,
 } from '~/types/applications'
 import {
   IncomingOrder,
@@ -150,25 +151,22 @@ import {
 } from '~/types/partnerPortals/incomingOrders'
 import { VuexModuleFilters, Statuses } from '~/types/filters'
 
-interface Header {
-  text: string
-  value: string
-  sortable?: boolean
-}
-
 const initHeaders = [
   {
     text: 'Order ID',
     value: 'orderCode',
+    width: 150,
   },
   {
     text: 'Batch',
     value: 'batchId',
+    width: 150,
   },
   {
     text: 'Service',
     value: 'serviceType',
     sortable: false,
+    width: 150,
   },
   {
     text: 'Status',
@@ -180,6 +178,7 @@ const initHeaders = [
     text: 'Origin',
     value: 'origin',
     sortable: false,
+    width: 150,
   },
   {
     text: 'Origin Port',
@@ -191,6 +190,7 @@ const initHeaders = [
     text: 'Destination',
     value: 'destination',
     sortable: false,
+    width: 150,
   },
   {
     text: 'Destination Port',
