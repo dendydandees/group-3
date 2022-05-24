@@ -96,14 +96,14 @@
     >
       <v-window v-model="step">
         <v-window-item :value="0">
-          <OrdersBatchViewDetails
+          <OrdersBatchViewSummary
             :step="step"
             :node-calculators="nodeCalculators"
           />
         </v-window-item>
 
         <v-window-item :value="1">
-          <OrdersBatchViewSummary
+          <OrdersBatchViewDetails
             :step="step"
             :node-calculators="nodeCalculators"
           />
@@ -358,7 +358,7 @@ export default defineComponent({
     const selectedTransferCost = ref(1) as string | unknown
 
     // manage windows
-    const step = ref(1)
+    const step = ref(0)
     const stepList = ref([
       {
         text: 'Summary',
