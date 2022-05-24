@@ -31,8 +31,13 @@
           </v-col>
 
           <!-- Pickup details -->
-          <v-col cols="12">
+          <v-col v-if="isPickupExist" cols="12">
             <PickupDetails :fetch-state="$fetchState" :is-upcoming="true" />
+          </v-col>
+
+          <!-- Sender details -->
+          <v-col v-if="isSenderExist" cols="12">
+            <SenderDetails :fetch-state="$fetchState" :is-upcoming="true" />
           </v-col>
         </v-row>
       </v-col>
@@ -66,6 +71,7 @@ import {
 import OrderDetails from '~/components/orders/details/OrderDetails.vue'
 import ConsigneeDetails from '~/components/orders/details/ConsigneeDetails.vue'
 import PickupDetails from '~/components/orders/details/PickupDetails.vue'
+import SenderDetails from '~/components/orders/details/SenderDetails.vue'
 import OrderItems from '~/components/orders/details/OrderItems.vue'
 import UpdatesTimeline from '~/components/orders/details/UpdatesTimeline.vue'
 // types
@@ -78,6 +84,7 @@ export default defineComponent({
     OrderDetails,
     ConsigneeDetails,
     PickupDetails,
+    SenderDetails,
     OrderItems,
     UpdatesTimeline,
   },
@@ -117,6 +124,18 @@ export default defineComponent({
       ]
     }) as ComputedRef<Breadcrumbs[]>
 
+    // check data exist
+    const isPickupExist = computed(
+      () =>
+        !!storeIncomingOrders.state.partnerPortals.incomingOrders
+          .incomingOrderDetails?.order?.order?.pickupContactName
+    )
+    const isSenderExist = computed(
+      () =>
+        !!storeIncomingOrders.state.partnerPortals.incomingOrders
+          .incomingOrderDetails?.order?.order?.senderName
+    )
+
     // manage fetch
     const fetchIncomingOrderDetail = async () => {
       const partnerId = route.value.params.id
@@ -147,6 +166,9 @@ export default defineComponent({
       doBackTo,
       // manage breadcrumbs
       breadCrumbsItems,
+      // check data exist
+      isPickupExist,
+      isSenderExist,
     }
   },
   head: {},

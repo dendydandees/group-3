@@ -135,27 +135,28 @@ import { saveAs } from 'file-saver'
 import { filterOrderInit, filterBatchInit } from '@/store/orders'
 // Interfaces or types
 import { Order, VuexModuleOrders } from '~/types/orders'
-import { FilterDetails, VuexModuleApplications } from '~/types/applications'
-
-interface Header {
-  text: string
-  value: string
-  sortable?: boolean
-}
+import {
+  FilterDetails,
+  Header,
+  VuexModuleApplications,
+} from '~/types/applications'
 
 const initHeaders = [
   {
     text: 'Order ID',
     value: 'orderCode',
+    width: 150,
   },
   {
     text: 'Batch',
     value: 'batchId',
+    width: 150,
   },
   {
     text: 'Service',
     value: 'serviceType',
     sortable: false,
+    width: 150,
   },
   {
     text: 'Status',
@@ -167,6 +168,7 @@ const initHeaders = [
     text: 'Origin',
     value: 'origin',
     sortable: false,
+    width: 150,
   },
   {
     text: 'Origin Port',
@@ -178,6 +180,7 @@ const initHeaders = [
     text: 'Destination',
     value: 'destination',
     sortable: false,
+    width: 150,
   },
   {
     text: 'Destination Port',
@@ -201,6 +204,7 @@ const initHeaders = [
     text: '',
     value: 'actions',
     sortable: false,
+    width: 150,
   },
 ] as Header[]
 
