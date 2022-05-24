@@ -118,7 +118,7 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
     { params, isLControl, isCOD }: GetMarketplaces
   ) {
     let serviceParams = 'service=';
-    if (params && params?.service.length > 0) {
+    if (params && params?.service && params?.service.length > 0) {
       serviceParams = params.service
         .map((el) => {
           return `service=${ el }`;

@@ -5,7 +5,7 @@
       title="Batch Order View"
       :subtitle="batchId"
     />
-    <v-row>
+    <!-- <v-row>
       <v-col
         cols="12"
         md="10"
@@ -45,7 +45,7 @@
         </v-list>
 
       </v-col>
-    </v-row>
+    </v-row> -->
 
     <v-chip-group
       v-model="selectedTransferCost"
@@ -115,7 +115,7 @@
       v-if="selectedTransferCost === 1"
     >
       <v-card
-        v-for="(x, i) in 4"
+        v-for="(x, i) in ordersData"
         :key="i"
         elevation="2"
         class="pl-6 pt-6 pb-6 pr-16 mb-6"
@@ -130,21 +130,22 @@
             <div
               class="primary--text font-weight-bold"
             >
-              LUWADSSA123123123
+              {{x.id}}
             </div>
             <div
               :style="'color: grey; font-size: 14px'"
             >
-              4 items
+              {{x.items && typeof x.item === 'object' ? x.item.length : 0}} items
             </div>
             <div
               class="font-weight-bold"
               :style="'color: grey; font-size: 14px'"
             >
-              Prepaid
+              {{x.paymentType}}
             </div>
           </v-col>
           <v-col
+            v-if="x.orderAllocations && x.orderAllocations.length > 0"
             cols="12"
             md="8"
             class="d-flex flex-column justify-space-between"
@@ -152,24 +153,26 @@
             <div
               class="font-weight-bold"
             >
-              Pos Malaysia
+              {{findNamePartner(x.orderAllocations[0].partnerID)}}
+              <!-- Pos Malaysia -->
             </div>
-            <v-divider
+            <!-- <v-divider
               :style="'border-bottom: 3px solid; border-color: red'"
-            />
+            /> -->
             <div
+              v-if="x.orderAllocations[0].omitempty && x.orderAllocations[0].omitempty.length > 0"
               class="d-flex justify-space-between"
             >
               <div
                 class="grey--text"
                 :style="'font-size: 14px'"
               >
-                Order has been received at destination warehouse
+                {{x.orderAllocations[0].omitempty[0].status}}
               </div>
               <div
                 :style="'font-size: 15px'"
               >
-                17:12 Tue, Mar 15, 2024
+                {{ $dateFns.format(x.orderAllocations[0].omitempty[0].updateTimestamp, 'HH:mm E, MMM dd, yyyy') }}
               </div>
             </div>
           </v-col>
@@ -182,12 +185,42 @@
         <div
           :style="'font-size: 12px; color: red'"
         >
-          6 Orders
+          {{meta.totalCount}} Orders
         </div>
+
+          <div class="d-flex align-center justify-center">
+            <div>
+              <v-btn
+                fab
+                small
+                plain
+                :disabled="paginationTracking.page === 1 || $fetchState.pending"
+                @click="nextOrPrev('-')"
+              >
+                <v-icon dense color="black"> mdi-menu-left </v-icon>
+              </v-btn>
+            </div>
+            <div class="px-3">
+              {{ meta.page }}
+            </div>
+            <div>
+              <v-btn
+                fab
+                small
+                plain
+                :disabled="
+                  paginationTracking.page >= meta.totalPage || $fetchState.pending
+                "
+                @click="nextOrPrev('+')"
+              >
+                <v-icon dense color="black"> mdi-menu-right </v-icon>
+              </v-btn>
+            </div>
+          </div>
         <div
           class="btn-page"
         >
-          15 Orders / Page
+          {{ordersData && ordersData.length ? ordersData.length : 0}} Orders / Page
         </div>
       </div>
 
@@ -206,9 +239,11 @@ import {
   onUnmounted,
   useStore,
   useContext,
-  useFetch
+  useFetch,
+  watch
 } from '@nuxtjs/composition-api'
-import { Order, VuexModuleOrders } from '~/types/orders'
+import { Order, VuexModuleOrders, OrderAllocationData } from '~/types/orders'
+import { VuexModuleMarketplaces } from '~/types/marketplace/marketplace'
 import { FilterDetails } from '~/types/applications'
 
 export interface ParseNodeCalc {
@@ -236,12 +271,26 @@ export default defineComponent({
       sortBy: [''],
       sortDesc: [true],
     })
+    const paginationTracking = ref( {
+      page: 1,
+      itemsPerPage: 10,
+      sortBy: [''],
+      sortDesc: [true],
+    })
     const { $dateFns, app } = useContext()
     const storeOrders = useStore<VuexModuleOrders>()
+    const storeMarketplaces = useStore<VuexModuleMarketplaces>()
+    const marketplaces = computed(
+      () => storeMarketplaces.state.marketplaces.marketplaces.marketplaces
+    )
     const meta = computed(() => storeOrders.state.orders.meta)
 
+    const ordersData = computed(() => {
+      const order = storeOrders.state.orders.orders as Order[]
+      return order
+    })
     const ordersCode = computed(() => {
-      const data = storeOrders.state.orders.orders
+      const data = storeOrders.state.orders.ordersBatchView
       let parsingData = [] as {id: string, orderCode: string}[] | []
       if(data && data.length > 0) {
         parsingData = [...data].map((x: Order) => {
@@ -331,7 +380,7 @@ export default defineComponent({
       router.go(-1)
     }
 
-    const fetchOrders = async (params: FilterDetails) => {
+    const fetchOrders = async ({params, isBatchView}:{params: FilterDetails, isBatchView?:Boolean}) => {
       const { page, itemsPerPage } = params
       const perPage = itemsPerPage !== -1 ? itemsPerPage : meta.value.totalCount
       let dataParams = {
@@ -347,7 +396,7 @@ export default defineComponent({
         $fetchState.pending = true
         const url = 'orders/getOrders'
 
-        await storeOrders.dispatch(url, { params: dataParams })
+        await storeOrders.dispatch(url, { params: dataParams, isBatchView })
       } catch (error) {
         return error
       } finally {
@@ -368,10 +417,64 @@ export default defineComponent({
       }
     }
 
+    const fetchMarketplace = async () => {
+      const dataParams = {
+        page: 1,
+        perPage: 1000,
+      }
+
+      try {
+        // $fetchState.pending = true
+        await storeMarketplaces.dispatch(
+          'marketplaces/marketplaces/getMarketplaces',
+          { params: dataParams, isLControl: false }
+        )
+      } catch (error) {
+        return error
+      } finally {
+        // $fetchState.pending = false
+      }
+    }
+
     const { $fetchState, fetch } = useFetch(async () => {
+      await fetchMarketplace()
       await getNodeCalculators()
-      await fetchOrders(pagination.value)
+      await fetchOrders({params: pagination.value, isBatchView: true})
+      await fetchOrders({params: paginationTracking.value})
     })
+
+    watch(
+      paginationTracking,
+      (newPagination) => {
+        fetchOrders({params: newPagination})
+      },
+      { deep: true }
+    )
+
+    const findNamePartner = (id: string) => {
+      if (marketplaces.value && marketplaces.value.length > 0) {
+        return marketplaces.value.filter((x) => x.id === id)[0]?.name
+      }
+    }
+
+    const nextOrPrev = (type: string) => {
+      switch (type) {
+        case '+':
+          paginationTracking.value = {
+            ...paginationTracking.value,
+            page: paginationTracking.value.page + 1,
+          }
+          break
+        case '-':
+          paginationTracking.value = {
+            ...paginationTracking.value,
+            page: paginationTracking.value.page - 1,
+          }
+          break
+        default:
+          break
+      }
+    }
 
     return {
       step,
@@ -384,7 +487,12 @@ export default defineComponent({
       batchId,
       itemDetail,
       ordersCode,
-      nodeCalculators
+      nodeCalculators,
+      ordersData,
+      findNamePartner,
+      meta,
+      nextOrPrev,
+      paginationTracking
     }
   },
   head: {},

@@ -44,6 +44,7 @@ export const filterBatchInit = {
 
 export const state = () => ({
   orders: [] as Order[],
+  ordersBatchView: [] as Order[],
   orderDetails: {
     order: {} as Order,
     orderItems: [] as OrderItem[],
@@ -64,6 +65,7 @@ export type RootStateOrders = ReturnType<typeof state>;
 
 export const mutations: MutationTree<RootStateOrders> = {
   SET_ORDERS: (state, value: Order[]) => (state.orders = value),
+  SET_ORDERS_BATCH_VIEW: (state, value: Order[]) => (state.ordersBatchView = value),
   SET_ORDER_DETAILS: (state, value: OrderDetails) =>
     (state.orderDetails = value),
   SET_BATCH_ORDERS: (state, value: BatchOrders[]) =>
@@ -79,7 +81,7 @@ export const mutations: MutationTree<RootStateOrders> = {
 };
 
 export const actions: ActionTree<RootStateOrders, RootStateOrders> = {
-  async getOrders({ commit }, { params }: { params: ParamsGetOrder; }) {
+  async getOrders({ commit }, { params, isBatchView }: { params: ParamsGetOrder, isBatchView?: Boolean; }) {
     try {
       const response = await this?.$axios?.$get('/api/clients/orders', {
         params,
@@ -93,9 +95,13 @@ export const actions: ActionTree<RootStateOrders, RootStateOrders> = {
         totalPage,
         totalCount,
       };
+      if (isBatchView) {
+        commit('SET_ORDERS_BATCH_VIEW', data);
+      }
 
       commit('SET_ORDERS', data);
       commit('SET_META', meta);
+
 
       return response;
     } catch (error) {
