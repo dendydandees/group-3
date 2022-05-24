@@ -15,7 +15,7 @@
             :min-width="53"
             :max-width="53"
             class="rounded-circle mr-4 white"
-            :src="data.logo"
+            :src="`data:image/png;base64,${data.logo}`"
             contain
           />
           <div class="header-text" style="font-size: 24px">
@@ -29,7 +29,7 @@
           <div
             v-for="(x, i) in data.partnerServiceTypes"
             :key="i"
-            class="chip-custom"
+            :class="`chip-custom ${$customUtils.setColorServiceType(x.name)}`"
             :style="{
               fontSize: '10px',
               color: 'white',

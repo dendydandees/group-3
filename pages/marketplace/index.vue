@@ -61,11 +61,11 @@
                         v-for="(mile, index) in slide.partnerServiceTypes"
                         :key="index"
                         class="mr-1 my-1"
-                        color="pink"
+                        :color="$customUtils.setColorServiceType(mile.name)"
                         text-color="white"
                         small
                         disabled
-                        style="opacity: 1"
+                        :style="{opacity: 1, border: '1px solid white !important'}"
                       >
                         {{ $customUtils.setServiceType(mile.name) }}
                       </v-chip>
