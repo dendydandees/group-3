@@ -15,7 +15,7 @@ export interface LatestUpdate {
   rawPayload: string;
 }
 
-export interface OmitEmpty {
+export interface UpdatesOrderAllocation {
   comments: string;
   id: string;
   podReceiverContact: string;
@@ -28,61 +28,10 @@ export interface OmitEmpty {
 export interface OrderAllocationData {
   id: string;
   externalTrackingNumber: string;
-  omitempty: OmitEmpty[];
+  updates: UpdatesOrderAllocation[];
   partnerID: string;
   partnerName: string;
   serviceType: string;
-}
-export interface Order {
-  id: string;
-  orderCode: string;
-  batchId: string;
-  clientId: string;
-  consigneeName: string;
-  consigneeNumber: string;
-  consigneeAddress: string;
-  consigneePostal: string;
-  consigneeCountry: string;
-  consigneeCity: string;
-  consigneeState: string;
-  consigneeProvince: string;
-  consigneeEmail: string;
-  consigneeTaxId: string;
-  length: number;
-  width: number;
-  height: number;
-  weight: number;
-  paymentType: string;
-  pickupContactName?: string;
-  pickupContactNumber?: string;
-  pickupState?: string;
-  pickupCity?: string;
-  pickupProvince?: string;
-  pickupPostal?: string;
-  pickupCountry?: string;
-  pickupAddress?: string;
-  senderName?: string;
-  senderNumber?: string;
-  senderContactName?: string;
-  senderContactNumber?: string;
-  senderState?: string;
-  senderCity?: string;
-  senderProvince?: string;
-  senderPostal?: string;
-  senderCountry?: string;
-  senderAddress?: string;
-  refID: number;
-  labelPath: string;
-  requestedServices: string[];
-  destPort: { code: string; };
-  destPortId: string;
-  senderPort?: { code: string; };
-  senderPortId?: string;
-  codCurrency?: string;
-  batchCode?: string;
-  codValue?: number;
-  latestUpdate: LatestUpdate;
-  orderAllocations?: OrderAllocationData[];
 }
 
 
@@ -131,7 +80,7 @@ export interface OrderAllocationUpdate {
     id: string;
     partnerUpdates: PartnerUpdates;
   };
-  omitempty: PartnerUpdates[];
+  updates: PartnerUpdates[];
 }
 
 export interface Order {
