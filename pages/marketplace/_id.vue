@@ -97,6 +97,15 @@
         >
           Download Rate Sheet
         </v-btn>
+        <v-btn
+          v-if="false"
+          color="white darken-1"
+          rounded
+          :class="`mt-3 btn-rate-sheet custom-btn-primary`"
+        >
+          <!-- @click="handleDownloadNP" -->
+          Download SOP
+        </v-btn>
         <!-- <NuxtImg src="/images/logo-detail.svg" width="290" preload /> -->
       </v-col>
       <v-col class="detailed-info" cols="5">
