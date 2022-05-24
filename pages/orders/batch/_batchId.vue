@@ -119,6 +119,7 @@
         :key="i"
         elevation="2"
         class="pl-6 pt-6 pb-6 pr-16 mb-6"
+        :disabled="$fetchState.pending"
       >
         <v-row
         >
@@ -135,7 +136,7 @@
             <div
               :style="'color: grey; font-size: 14px'"
             >
-              {{x.items && typeof x.item === 'object' ? x.item.length : 0}} items
+              {{x.items && typeof x.items === 'object' ? x.items.length : 0}} items
             </div>
             <div
               class="font-weight-bold"
@@ -160,19 +161,20 @@
               :style="'border-bottom: 3px solid; border-color: red'"
             /> -->
             <div
-              v-if="x.orderAllocations[0].omitempty && x.orderAllocations[0].omitempty.length > 0"
+              v-if="x.orderAllocations[0].updates && x.orderAllocations[0].updates.length > 0"
               class="d-flex justify-space-between"
             >
               <div
                 class="grey--text"
                 :style="'font-size: 14px'"
               >
-                {{x.orderAllocations[0].omitempty[0].status}}
+                {{lastStatus(x.orderAllocations)}}
+                <!-- {{x.orderAllocations[0].updates[0].comments}} -->
               </div>
               <div
                 :style="'font-size: 15px'"
               >
-                {{ $dateFns.format(x.orderAllocations[0].omitempty[0].updateTimestamp, 'HH:mm E, MMM dd, yyyy') }}
+                {{ $dateFns.format(x.orderAllocations[0].updates[0].updateTimestamp, 'HH:mm E, MMM dd, yyyy') }}
               </div>
             </div>
           </v-col>
@@ -476,6 +478,10 @@ export default defineComponent({
       }
     }
 
+    function lastStatus(orderAllocations: OrderAllocationData[]) {
+        return orderAllocations[0].updates[0].comments
+    }
+
     return {
       step,
       stepList,
@@ -492,7 +498,8 @@ export default defineComponent({
       findNamePartner,
       meta,
       nextOrPrev,
-      paginationTracking
+      paginationTracking,
+      lastStatus
     }
   },
   head: {},

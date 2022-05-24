@@ -264,9 +264,9 @@ export default defineComponent({
     const setStatusOrder = (orderAllocations: OrderAllocationUpdate[]) => {
       return orderAllocations &&
         orderAllocations.length !== 0 &&
-        orderAllocations[0]?.omitempty &&
-        orderAllocations[0]?.omitempty.length !== 0
-        ? orderAllocations[0]?.omitempty[0]?.comments
+        orderAllocations[0]?.updates &&
+        orderAllocations[0]?.updates.length !== 0
+        ? orderAllocations[0]?.updates[0]?.comments
         : ''
     }
     // END FOR ORDER AND INCOMING ORDER
