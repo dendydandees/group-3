@@ -1,7 +1,7 @@
-import { RootStateDetailMarketplace } from '~/store/marketplaces/detail'
+import { RootStateMarketplaces } from '~/store/marketplaces/marketplaces'
 
 export interface VuexModuleDetailMarketplace {
-  detailMarketplace: RootStateDetailMarketplace
+  marketplaces: RootStateMarketplaces
 }
 
 export interface PartnerServiceType {
@@ -57,4 +57,11 @@ export interface DetailProfile {
   maximumDimension: string
   pikupAndDropOff: boolean
   prohibitedItem: string
+}
+
+export interface Ratings {
+  id: string
+  partnerId: string
+  status: string
+  rating: string
 }

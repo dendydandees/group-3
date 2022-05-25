@@ -7,7 +7,6 @@
           width="100px"
           height="100px"
           class="rounded-circle mr-4"
-
         >
           <v-img
             :aspect-ratio="100 / 100"
@@ -20,16 +19,17 @@
           >
           </v-img>
         </v-card>
+
         <div class="profile-text">
           <div class="headline font-weight-bold">
             {{ detailMarketplace.name }}
           </div>
+
           <v-chip-group
             v-if="
               detailMarketplace.partnerServiceTypes &&
               detailMarketplace.partnerServiceTypes.length > 0
             "
-
           >
             <v-chip
               v-for="(mile, i) in detailMarketplace.partnerServiceTypes"
@@ -44,6 +44,7 @@
           </v-chip-group>
         </div>
       </div>
+
       <div class="profile-btn">
         <v-btn
           color="white darken-1 red--text"
@@ -63,52 +64,34 @@
         </v-btn> -->
       </div>
     </div>
+
     <v-row class="middle-row d-flex align-start">
-      <v-col class="rate d-flex flex-column align-center" cols="3">
-        <div class="text-star-wrapper">
-          <div
-            v-for="(u, n) in tempData.rateDetail"
-            :key="n"
-            :class="`text-star d-flex align-center ${
-              tempData.rateDetail.length - 1 !== n ? 'mb-3' : ''
-            }`"
-          >
-            <v-col class="mr-3 primary--text" cols="3">
-              {{ u.name }}
-            </v-col>
-            <v-col>
-              <NuxtImg
-                v-for="(x, i) in u.rate"
-                :key="i"
-                class="mr-2"
-                src="/images/star-detail.svg"
-                height="21.4"
-                preload
-              />
-            </v-col>
-          </div>
-        </div>
+      <v-col class="rate d-flex flex-column align-center" cols="12" md="3">
+        <MarketplaceDetailRates />
+
         <v-btn
           :disabled="!isRatesAvailable"
-          color="white darken-1"
           rounded
-          :class="`mt-13 btn-rate-sheet custom-btn-primary`"
+          color="white darken-1"
+          class="btn-rate-sheet custom-btn-primary mt-10"
           @click="handleDownloadNP"
         >
           Download Rate Sheet
         </v-btn>
+
         <v-btn
           v-if="false"
-          color="white darken-1"
           rounded
-          :class="`mt-3 btn-rate-sheet custom-btn-primary`"
+          color="white darken-1"
+          class="btn-rate-sheet custom-btn-primary mt-10"
         >
           <!-- @click="handleDownloadNP" -->
           Download SOP
         </v-btn>
         <!-- <NuxtImg src="/images/logo-detail.svg" width="290" preload /> -->
       </v-col>
-      <v-col class="detailed-info" cols="5">
+
+      <v-col class="detailed-info" cols="12" md="5">
         <!-- <v-row
           v-for="(y, p) in tempData.infoDetail"
           :key="p"
@@ -131,17 +114,23 @@
           :key="p"
           class="d-flex"
         >
-          <v-col class="detailed-text font-weight-bold text-no-wrap" cols="5">
+          <v-col
+            class="detailed-text font-weight-bold text--disabled text-no-wrap"
+            cols="5"
+          >
             {{ y.name }}
           </v-col>
+
           <v-col class="detailed-description">
             <!-- {{y.value}} -->
             {{ convertDetailData(detailMarketplace[y.value]) }}
           </v-col>
         </v-row>
       </v-col>
-      <v-col cols="4" class="gallery">
-        <div class="mb-4 font-weight-bold">Gallery</div>
+
+      <v-col cols="12" md="4" class="gallery">
+        <div class="mb-4 font-weight-bold text--disabled">Gallery</div>
+
         <div style="width: 100%">
           <!-- <PhotoCollageWrapper
             v-bind="collage"
@@ -153,6 +142,7 @@
             :column-width="160"
             :gap="8"
           >
+            <!-- eslint-disable-next-line vue/no-template-shadow -->
             <template #default="{ item, index }">
               <div>
                 <NuxtImg
@@ -163,6 +153,7 @@
                   :style="`borderRadius: 20px;cursor: pointer; marginBottom: 8px`"
                   @click="itemClickHandler(index)"
                 />
+
                 <div
                   v-if="index === 8"
                   :style="`padding: 30px 20px ; display: flex; width: 170px; justifyContent: center; borderRadius: 20px;cursor: pointer; backgroundColor: #1961e4; overflow: hidden`"
@@ -178,28 +169,25 @@
         </div>
       </v-col>
     </v-row>
-    <v-row
-      v-if="detailMarketplace.companyBrief"
-      class="mt-8"
-    >
-      <v-col
-        cols="12"
-        md="12"
-      >
-        <div
-          class="font-weight-bold mb-2 title"
-        >
-          Company Brief
+
+    <v-row v-if="detailMarketplace.companyBrief" class="mt-8">
+      <v-col cols="12" md="12">
+        <div class="font-weight-bold text--disabled mb-2">Company Brief</div>
+
+        <div style="text-align: justify">
+          {{ detailMarketplace.companyBrief }}
         </div>
-        <div
-          style="text-align: justify"
-        >
-          {{detailMarketplace.companyBrief}}
-        </div>
-        <NuxtImg class="mt-3" src="/images/logo-detail.svg" width="290" preload />
+
+        <NuxtImg
+          class="mt-3"
+          src="/images/logo-detail.svg"
+          width="290"
+          preload
+        />
       </v-col>
     </v-row>
-    <div class="bottom-row  mt-16">
+
+    <div class="bottom-row mt-16">
       <div class="title-filter primary--text display-1 mb-2">Coverage Area</div>
       <!-- <div class="btn-filter-map d-flex align-center">
         <v-btn
@@ -226,13 +214,14 @@
         </v-col>
       </v-row>
     </div>
+
     <CoolLightBox
       :items="imagesLightBox(detailGalleries)"
       :index="index"
       :slideshow="false"
       @close="index = null"
-    >
-    </CoolLightBox>
+    />
+
     <MarketplaceAddForm
       :dialog="dialog"
       :data="idPartner"
@@ -250,21 +239,19 @@ import {
   useStore,
   useRoute,
   reactive,
-  watch,
   ref,
   Ref,
+  useMeta,
 } from '@nuxtjs/composition-api'
 // Interfaces or types
 import MasonryWall from '@yeger/vue2-masonry-wall'
 // import { PhotoCollageWrapper } from 'vue-photo-collage'
 import CoolLightBox from 'vue-cool-lightbox'
-import { VuexModuleApplications } from '~/types/applications'
 import { VuexModuleMarketplaces } from '~/types/marketplace/marketplace'
 import tempData from '~/static/tempData'
-import { VuexModuleFilters, Zone } from '~/types/filters'
+import { VuexModuleFilters } from '~/types/filters'
 import { DetailMarketplace } from '~/types/marketplace/detail'
 import 'vue-cool-lightbox/dist/vue-cool-lightbox.min.css'
-import partner from '~/middleware/partner'
 
 export default defineComponent({
   name: 'DetailMarketplace',
@@ -279,7 +266,6 @@ export default defineComponent({
     const id = computed(() => route.value.params.id)
     // store manage
     const storeDetailMarketplace = useStore<VuexModuleMarketplaces>()
-    const storeApplications = useStore<VuexModuleApplications>()
     const storeFilters = useStore<VuexModuleFilters>()
     const isRatesAvailable = ref(false) as Ref<Boolean>
     const selectedZone = reactive({
@@ -289,7 +275,6 @@ export default defineComponent({
     const detailMarketplace = computed(
       () => storeDetailMarketplace.state.marketplaces.marketplaces.detail
     ) as any
-    // console.log({detailMarketplace})
     const partnerServiceZones = computed(() => {
       if (
         detailMarketplace.value &&
@@ -311,6 +296,7 @@ export default defineComponent({
             }
           }
         )
+        // eslint-disable-next-line array-callback-return
         let temp2 = [...zones.value].map((el) => {
           if (
             ![...detailMarketplace.value.partnerServiceZones].some((x) => {
@@ -338,18 +324,24 @@ export default defineComponent({
         let filtered = output
         if (selectedZone.value) {
           filtered = output.filter(
-            (el) => el?.countryTable === selectedZone.value
+            (el: any) => el?.countryTable === selectedZone.value
           )
         }
         // console.log({temp2}, [...temp1, ...temp2])
         return filtered
       }
     })
-    console.log(partnerServiceZones)
+    const allRatings = computed(() => {
+      const ratings =
+        storeDetailMarketplace.state.marketplaces.marketplaces.ratings
+
+      if (!ratings || ratings.length === 0) return []
+
+      return [...ratings]
+    })
     const detailGalleries = computed(
       () => storeDetailMarketplace.state.marketplaces.marketplaces.galleries
     )
-    console.log({ detailGalleries, detailMarketplace })
     // const zones = ref([]) as Ref<Zone[]>
 
     const detailProfileHeader = reactive([
@@ -495,8 +487,7 @@ export default defineComponent({
       }
     }
 
-    // action
-
+    // manage fetch
     const fetchDetail = async (id: string) => {
       try {
         $fetchState.pending = true
@@ -552,7 +543,7 @@ export default defineComponent({
       try {
         $fetchState.pending = true
 
-        const {IsAvailable} = await storeDetailMarketplace.dispatch(
+        const { IsAvailable } = await storeDetailMarketplace.dispatch(
           'marketplaces/marketplaces/getRatesAvailable',
           { partnerID: id }
         )
@@ -567,7 +558,7 @@ export default defineComponent({
       try {
         $fetchState.pending = true
 
-        const res = await storeDetailMarketplace.dispatch(
+        await storeDetailMarketplace.dispatch(
           'marketplaces/marketplaces/getRatesDownload',
           { partnerID: id, name: detailMarketplace.value.name + ' rates' }
         )
@@ -577,11 +568,15 @@ export default defineComponent({
         $fetchState.pending = false
       }
     }
-    // fetch
+
     const { $fetchState, fetch } = useFetch(async () => {
       await fetchDetail(id.value)
       await fetchServiceZoneOnce()
       await getRatesAvailable(id.value)
+      await storeDetailMarketplace.dispatch(
+        'marketplaces/marketplaces/getRatings',
+        { partnerId: id.value }
+      )
       // zones.value = [...storeFilters.state.filters.zones]
       // detailGalleries.value = [...storeDetailMarketplace.state.marketplaces.marketplaces.galleries]
     })
@@ -601,6 +596,9 @@ export default defineComponent({
       }
     }
 
+    // manage meta
+    useMeta(() => ({ title: `Client Portal | Marketplace Detail` }))
+
     return {
       collage,
       itemClickHandler,
@@ -617,6 +615,7 @@ export default defineComponent({
       zones,
       selectedZone,
       tempData,
+      allRatings,
       detailGalleries,
       detailProfileHeader,
       convertDetailData,
@@ -626,7 +625,7 @@ export default defineComponent({
       pagination,
       partnerServiceZones,
       isRatesAvailable,
-      handleDownloadNP
+      handleDownloadNP,
     }
   },
   head: {},
@@ -686,7 +685,7 @@ export default defineComponent({
     color: white !important;
   }
   &.disabled {
-    opacity: .5;
+    opacity: 0.5;
   }
 }
 .profile-text {

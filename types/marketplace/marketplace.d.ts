@@ -35,7 +35,7 @@ export interface FilterDetails {
 }
 
 export interface FilterMarketplaces {
-  search: ''
+  search: string
 }
 
 export interface PaginationMarketplaces {

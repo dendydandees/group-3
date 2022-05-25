@@ -270,7 +270,7 @@
                     </div>
                   </v-col> -->
                   <v-col
-                    class="body-2 white--text align-center  d-flex pa-0 wrapper-service"
+                    class="body-2 white--text align-center d-flex pa-0 wrapper-service"
                     cols="7"
                   >
                     <NuxtImg
@@ -301,7 +301,7 @@
                         {{ partner.name }}
                       </v-col>
 
-                        <!-- v-if="partner.partnerServiceZones" -->
+                      <!-- v-if="partner.partnerServiceZones" -->
                       <!-- <v-col
                         v-if="false"
                         class="body-2 white--text align-center d-flex pa-0 ml-3"
@@ -418,6 +418,7 @@ import {
   ref,
   useRouter,
   Ref,
+  useMeta,
 } from '@nuxtjs/composition-api'
 // Interfaces or types
 import {
@@ -726,6 +727,9 @@ export default defineComponent({
       }
       router.push(`/marketplace/${tempId}`)
     }
+
+    // manage meta
+    useMeta(() => ({ title: `Client Portal | Marketplace` }))
 
     return {
       marketplaces,
