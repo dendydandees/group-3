@@ -21,15 +21,15 @@
     <!-- batch id -->
     <v-col cols="12" md="3" class="px-2 py-4">
       <v-text-field
-        v-model="filterOrder.batchId"
+        v-model="filterOrder.batchCode"
         clearable
         outlined
         dense
         rounded
         single-line
         hide-details
-        label="Batch ID"
-        placeholder="Enter your batch id..."
+        label="Batch Code"
+        placeholder="Enter your batch code..."
         background-color="white"
         type="search"
         class="input-filter elevation-1"

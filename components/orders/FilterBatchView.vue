@@ -2,7 +2,7 @@
   <v-row align="center" class="ma-0">
     <v-col cols="12" md="6">
       <v-text-field
-        v-model="filterBatch.batchId"
+        v-model="filterBatch.batchCode"
         clearable
         outlined
         dense

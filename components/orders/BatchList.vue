@@ -1,14 +1,14 @@
 <template>
   <v-col cols="12">
     <v-card
-      v-for="{ id, totalOrder, updatedAt, createdAt } in batchOrders"
-      :key="id"
+      v-for="batch in batchOrders"
+      :key="batch.id"
       elevation="2"
       class="my-4"
     >
       <v-card-text>
         <v-col cols="12">
-          <h2 class="title font-weight-bold primary--text">{{ id }}</h2>
+          <h2 class="title font-weight-bold primary--text">{{ batch.code }}</h2>
         </v-col>
 
         <v-col cols="12">
@@ -17,7 +17,7 @@
               <span class="d-block"> Last Updated </span>
 
               <span class="d-block">
-                {{ $dateFns.format(updatedAt, 'MMM dd, yyyy HH:mm') }}
+                {{ $dateFns.format(batch.updatedAt, 'MMM dd, yyyy HH:mm') }}
               </span>
             </v-col>
 
@@ -25,14 +25,14 @@
               <span class="d-block"> Created </span>
 
               <span class="d-block">
-                {{ $dateFns.format(createdAt, 'MMM dd, yyyy HH:mm') }}
+                {{ $dateFns.format(batch.createdAt, 'MMM dd, yyyy HH:mm') }}
               </span>
             </v-col>
 
             <v-col cols="12" md="4">
               <span class="d-block"> Number of Orders </span>
 
-              <span class="d-block"> {{ totalOrder }} </span>
+              <span class="d-block"> {{ batch.totalOrder }} </span>
             </v-col>
           </v-row>
         </v-col>
@@ -41,7 +41,7 @@
       <v-card-actions>
         <v-spacer />
 
-        <v-btn color="primary" @click="$emit('doGetBatchDetails', id)">
+        <v-btn color="primary" @click="$emit('doGetBatchDetails', batch)">
           View Details
         </v-btn>
       </v-card-actions>
