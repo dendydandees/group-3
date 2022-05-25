@@ -88,7 +88,7 @@
 
       <!-- List data for batch -->
       <v-row v-else align="center" class="my-4">
-        <OrdersBatchList @doGetBatchDetails="doGetBatchDetails" />
+        <OrdersBatchList @doGetBatchDetails="goToBatchView" />
       </v-row>
     </v-fade-transition>
 
@@ -128,13 +128,11 @@ import {
   useRouter,
   Ref,
   useContext,
-  onMounted,
-  useRoute,
 } from '@nuxtjs/composition-api'
 import { saveAs } from 'file-saver'
 import { filterOrderInit, filterBatchInit } from '@/store/orders'
 // Interfaces or types
-import { Order, VuexModuleOrders } from '~/types/orders'
+import { BatchOrders, Order, VuexModuleOrders } from '~/types/orders'
 import {
   FilterDetails,
   Header,
@@ -213,7 +211,6 @@ export default defineComponent({
   layout: 'default',
   setup() {
     const { $dateFns, app } = useContext()
-    const route = useRoute()
     const router = useRouter()
 
     // manage store
@@ -277,26 +274,19 @@ export default defineComponent({
     const doGetDetails = (data: Order) => {
       router.push(`/orders/${data.id}`)
     }
-    const doGetBatchDetails = (item: any) => {
-      orderView.value = 0
-      isShowFilter.value = true
-      setTimeout(() => {
-        filterOrder.value = {
-          ...filterOrder.value,
-          batchId: item.batchCode,
-        }
-      }, 100)
-      setTimeout(() => {
-        fetchDebounced()
-      }, 500)
-    }
-    const goToBatchView = (item: any) => {
-      localStorage.setItem('batch.data', JSON.stringify(item))
+    const goToBatchView = (item: Order | BatchOrders) => {
+      let batchId = ''
+
+      if (isOnListView) {
+        batchId = (item as Order).batchCode
+      } else {
+        batchId = (item as BatchOrders).code
+      }
+
       router.push({
         name: `orders-batch-batchId`,
         params: {
-          batchId: item.batchCode,
-          item,
+          batchId,
         },
       })
     }
@@ -385,14 +375,6 @@ export default defineComponent({
       await fetchOrders(pagination.value)
     })
 
-    onMounted(() => {
-      const batchId = route.value.query?.batchId as string
-
-      if (batchId) {
-        doGetBatchDetails(batchId)
-      }
-    })
-
     // manage filter on changed
     watch(
       filterOrder,
@@ -462,7 +444,6 @@ export default defineComponent({
       headers,
       selectAllToggle,
       doGetDetails,
-      doGetBatchDetails,
       goToBatchView,
       doDownloadSelectedLabel,
       doExportOrders,

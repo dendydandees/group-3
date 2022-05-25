@@ -8,6 +8,8 @@ import Freight from '@/components/base/Icon/Freight.vue'
 import LControl from '@/components/base/Icon/LControl.vue'
 import Domestic from '@/components/base/Icon/Domestic.vue'
 import Dashboard from '@/components/base/Icon/Dashboard.vue'
+import RateFill from '~/components/base/Icon/RateFill.vue'
+import RateOutline from '~/components/base/Icon/RateOutline.vue'
 
 export default {
   rtl: false,
@@ -41,6 +43,8 @@ export default {
       lControl: { component: LControl },
       domestic: { component: Domestic },
       dashboard: { component: Dashboard },
+      rateFill: { component: RateFill },
+      rateOutline: { component: RateOutline },
     },
   },
 }
