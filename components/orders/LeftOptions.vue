@@ -13,7 +13,9 @@
 
     <v-btn
       v-if="isOnListView"
-      :disabled="selectedOrders.length === 0 || loading"
+      :disabled="
+        selectedOrders.length === 0 || loading || !isLabelExistOnSelected
+      "
       outlined
       color="primary"
       class="mr-2"
@@ -50,6 +52,7 @@ export default defineComponent({
     },
     loading: {
       type: Boolean,
+      default: false,
     },
     selectedOrders: {
       type: Array as PropType<Order[]>,
@@ -57,6 +60,10 @@ export default defineComponent({
     },
     isShowFilter: {
       type: Boolean,
+    },
+    isLabelExistOnSelected: {
+      type: Boolean,
+      default: false,
     },
   },
 })

@@ -25,6 +25,7 @@
         :selected-orders="selectedOrders"
         :loading="$fetchState.pending"
         :is-show-filter="isShowFilter"
+        :is-label-exist-on-selected="isLabelExistOnSelected"
         @doDownloadSelectedLabel="doDownloadSelectedLabel"
         @doExportOrders="doExportOrders"
         @doShowFilter="isShowFilter = !isShowFilter"
@@ -76,7 +77,6 @@
             :headers="headers"
             :options="pagination"
             :loading="$fetchState.pending"
-            :is-select-disabled="isLabelExist"
             :show-select="true"
             :action-exist="actionExist"
             @fetch="fetchOrders"
@@ -238,9 +238,6 @@ export default defineComponent({
 
     // manage table
     const selectedOrders = ref([]) as Ref<Order[]>
-    const isLabelExist = computed(() => {
-      return orders.value.some((order) => order.labelPath)
-    })
     const actionExist = ref({
       export: true,
       download: true,
@@ -261,15 +258,14 @@ export default defineComponent({
     const headers = ref(initHeaders) as Ref<Header[]>
     const selectAllToggle = ({ items }: { items: Order[]; value: boolean }) => {
       if (selectedOrders.value.length === 0) {
-        const selectedItems = items.filter((item) => {
-          return item.labelPath
-        })
-
-        return (selectedOrders.value = [...selectedItems])
+        return (selectedOrders.value = [...items])
       } else {
         return (selectedOrders.value = [])
       }
     }
+    const isLabelExistOnSelected = computed(() => {
+      return selectedOrders.value.every((order) => order.labelPath)
+    })
     const doResetPagination = () => {
       pagination.value = {
         ...pagination.value,
@@ -449,11 +445,11 @@ export default defineComponent({
       isOnListView,
       // manage table
       selectedOrders,
-      isLabelExist,
       actionExist,
       selectedViews,
       headers,
       selectAllToggle,
+      isLabelExistOnSelected,
       doGetDetails,
       goToBatchView,
       doDownloadSelectedLabel,

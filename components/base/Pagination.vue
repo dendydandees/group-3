@@ -57,7 +57,7 @@ export default defineComponent({
     })
     const itemsPerPageOptions = computed(() => {
       const textDefault = 'Items/Page'
-      const values = [5, 10, 15, 20]
+      const values = [5, 10, 25, 50, 100]
 
       return values.map((value) => ({
         text: `${value} ${textDefault}`,

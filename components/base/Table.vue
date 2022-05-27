@@ -249,7 +249,7 @@ export default defineComponent({
     },
     isSelectDisabled: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     actionExist: {
       type: Object,
@@ -277,11 +277,9 @@ export default defineComponent({
         return !(item as IncomingOrder).orderAllocations.some(
           (el: OrderAllocation) => el.externalTrackingNumber
         )
-      } else if (route.value.name === 'orders') {
-        return !item.labelPath
-      } else {
-        return false
       }
+
+      return false
     }
 
     // FOR ORDER AND INCOMING ORDER
