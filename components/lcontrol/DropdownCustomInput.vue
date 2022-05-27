@@ -23,12 +23,8 @@
     </div>
     <!-- {{JSON.stringify(data)}} -->
     <div class="d-flex align-center">
-      <div
-        :style="'width: 70%'"
-      >
-        <div
-          class="header-NP-label"
-        >
+      <div :style="'width: 70%'">
+        <div class="header-NP-label">
           {{ label }}
         </div>
         <v-select
@@ -48,15 +44,8 @@
         >
         </v-select>
       </div>
-      <div
-        class="ml-3"
-        :style="'width: 30%'"
-      >
-        <div
-          class="header-NP-label"
-        >
-          Volume
-        </div>
+      <div class="ml-3" :style="'width: 30%'">
+        <div class="header-NP-label">Volume</div>
         <v-text-field
           v-model="selectedComp.volume"
           label="Volume"
@@ -72,16 +61,9 @@
           class="custom-text-field"
           :disabled="!selectedComp.partnerID"
         />
-
       </div>
-      <div
-        class="ml-3"
-      >
-        <div
-          class="header-NP-label"
-        >
-
-        </div>
+      <div class="ml-3">
+        <div class="header-NP-label"></div>
         <v-btn
           v-if="isDelete"
           color="error"
@@ -92,7 +74,6 @@
         >
           <v-icon>mdi-trash-can</v-icon>
         </v-btn>
-
       </div>
     </div>
   </div>
@@ -107,12 +88,11 @@ import {
 } from '@nuxtjs/composition-api'
 
 export interface InputNPData {
-  partnerID: string,
-  volume: number,
-  index?: number,
+  partnerID: string
+  volume: number
+  index?: number
   type?: string
 }
-
 
 export default defineComponent({
   props: {
@@ -175,7 +155,7 @@ export default defineComponent({
       get: () => props.value,
       set: (value: InputNPData) => {
         emit('input', value)
-      }
+      },
     })
 
     return {
@@ -229,13 +209,12 @@ export default defineComponent({
         color: #2196f3 !important;
       }
       &:focus-visible {
-        outline: #2196f3  auto 1px !important;;
+        outline: #2196f3 auto 1px !important;
       }
-
     }
     .v-label {
-        color: grey !important;
-        font-size: 16px;
+      color: grey !important;
+      font-size: 16px;
     }
     /* #2196f3 */
   }

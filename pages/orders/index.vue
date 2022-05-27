@@ -306,13 +306,18 @@ export default defineComponent({
 
       saveAs(response, fileName)
     }
-    const doExportOrders = () => {
+    const doExportOrders = async () => {
       if (selectedOrders.value.length === 0) return
 
-      const selectedLabels = {
-        orderIds: selectedOrders.value.map((order) => order.id),
-      }
-      console.log(selectedLabels)
+      const response = await storeOrders.dispatch('orders/getSelectedExports', {
+        data: selectedOrders.value.map((order) => order.id),
+      })
+      const fileName = `order_exports_${$dateFns.format(
+        new Date(),
+        'yyyy-MM-dd_HH-mm'
+      )}.xlsx`
+
+      saveAs(response, fileName)
     }
 
     // manage filter order

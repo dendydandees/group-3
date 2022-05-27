@@ -1,11 +1,11 @@
 // Interfaces
-import { MutationTree, ActionTree } from 'vuex';
-import SendBird from 'sendbird';
-import SendbirdChat from '@sendbird/chat';
-import { OpenChannelModule } from '@sendbird/chat/openChannel';
+import { MutationTree, ActionTree } from 'vuex'
+import SendBird from 'sendbird'
+import SendbirdChat from '@sendbird/chat'
+import { OpenChannelModule } from '@sendbird/chat/openChannel'
 // import { GroupChannelModule } from '@sendbird/chat/groupChannel';
 
-export const sb = new SendBird({ appId: '', localCacheEnabled: true });
+export const sb = new SendBird({ appId: '', localCacheEnabled: true })
 // export const sb = SendbirdChat.init({
 //   appId,
 //   modules: [
@@ -15,8 +15,6 @@ export const sb = new SendBird({ appId: '', localCacheEnabled: true });
 // });
 
 // console.log({ sb, appId, env: '' });
-
-
 
 // export const state = () => ({
 //   messages: [] as any

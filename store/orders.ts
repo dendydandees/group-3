@@ -20,9 +20,6 @@ interface UploadOrders extends Order {
   type: string
   data: OrderDomestic[] | OrderCrossBorder[]
 }
-interface ParamsGetSelectedLabels {
-  orderIds: string[]
-}
 
 export const filterOrderInit = {
   orderCode: '',
@@ -174,7 +171,7 @@ export const actions: ActionTree<RootStateOrders, RootStateOrders> = {
       return error
     }
   },
-  async getSelectedLabels(_store, { data }: { data: ParamsGetSelectedLabels }) {
+  async getSelectedLabels(_store, { data }: { data: { orderIds: string[] } }) {
     try {
       const response = await this.$axios.$post(
         `api/clients/orders/labels`,
@@ -186,6 +183,11 @@ export const actions: ActionTree<RootStateOrders, RootStateOrders> = {
     } catch (error) {
       return error
     }
+  },
+  async getSelectedExports(_store, { data }: { data: string[] }) {
+    return await this.$axios.$post(`api/clients/orders-export`, data, {
+      responseType: 'blob',
+    })
   },
   async getNodeCalculators({ commit }) {
     try {

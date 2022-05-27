@@ -1,26 +1,12 @@
 <template>
   <article class="details-tab pa-8">
     <v-row>
-      <v-col
-        cols="12"
-        md="6"
-      >
-        <OrdersBatchViewTable
-          :data-table="dataTable"
-          :is-service="true"
-        />
+      <v-col cols="12" md="6">
+        <OrdersBatchViewTable :data-table="dataTable" :is-service="true" />
       </v-col>
-      <v-divider
-        vertical
-        :style="'border-right: 1px dashed red'"
-      />
-      <v-col
-        cols="12"
-        md="6"
-      >
-        <OrdersBatchViewTable
-          :data-table="dataTable2"
-        />
+      <v-divider vertical :style="'border-right: 1px dashed red'" />
+      <v-col cols="12" md="6">
+        <OrdersBatchViewTable :data-table="dataTable2" />
       </v-col>
     </v-row>
   </article>
@@ -36,7 +22,7 @@ import {
   useRouter,
   onMounted,
   watch,
-  PropType
+  PropType,
 } from '@nuxtjs/composition-api'
 import { ValidationObserver } from 'vee-validate'
 
@@ -61,16 +47,16 @@ interface ErrorUpload {
 
 export interface ParseNodeCalc {
   orderCode: String
-  "id": String
-  "fmCost": Number
-  "lmCost": Number
-  "ccCost": Number
-  "bobCost": Number
-  "codCost": Number
-  "total": Number
-  "dnt": Number
-  "adminFee": Number
-  "currency": String
+  id: String
+  fmCost: Number
+  lmCost: Number
+  ccCost: Number
+  bobCost: Number
+  codCost: Number
+  total: Number
+  dnt: Number
+  adminFee: Number
+  currency: String
 }
 
 export default defineComponent({
@@ -96,40 +82,39 @@ export default defineComponent({
     const storeOfOrders = useStore<VuexModuleOrders>()
     const alert = computed(() => storeApplications.state.applications.alert)
     const parseService = computed(() => {
-      const temp =[
+      const temp = [
         {
           name: 'First Mile',
-          value: setTotal('fmCost')
+          value: setTotal('fmCost'),
         },
         {
           name: 'Customs',
-          value: setTotal('ccCost')
+          value: setTotal('ccCost'),
         },
         {
           name: 'BOB',
-          value: setTotal('bobCost')
+          value: setTotal('bobCost'),
         },
         {
           name: 'COD',
-          value: setTotal('codCost')
+          value: setTotal('codCost'),
         },
       ]
       return temp
     })
     const parseCustom = computed(() => {
-      const temp =[
+      const temp = [
         {
           name: 'D&T',
-          value: setTotal('dnt')
+          value: setTotal('dnt'),
         },
         {
           name: 'Admin Fee',
-          value: setTotal('adminFee')
+          value: setTotal('adminFee'),
         },
       ]
       return temp
     })
-
 
     // manage summary table
 
@@ -146,7 +131,6 @@ export default defineComponent({
       ],
     })
 
-
     const dataTable2 = ref({
       content: parseCustom.value,
       headers: [
@@ -160,35 +144,34 @@ export default defineComponent({
       ],
     })
 
-
-
     onMounted(() => {
       storeApplications.commit('applications/RESET_ALERT')
     })
 
     const showBorder = (item: any) => {
-      if (item === "iron") {
-
+      if (item === 'iron') {
         // return {borderRight:'1px dashed red'}
         return 'border-right: 1px dashed red'
       }
-      if(item === 'name') {
+      if (item === 'name') {
         // return {color:'#1961e4', fontWeight: 700}
         return 'color: #1961e4; font-weight: 700'
       }
-
     }
     function setTotal(key: string) {
-      return props.nodeCalculators.reduce( function(a: Number | unknown, b: any){
-          return a + b[key];
-        }, 0)
-
+      return props.nodeCalculators.reduce(function (
+        a: Number | unknown,
+        b: any
+      ) {
+        return a + b[key]
+      },
+      0)
     }
 
     return {
       dataTable,
       dataTable2,
-      showBorder
+      showBorder,
     }
   },
 })
@@ -196,10 +179,9 @@ export default defineComponent({
 
 <style lang="scss">
 @import '~/assets/scss/color.module.scss';
-  .details-tab {
-    thead th:nth-child(6) {
-      border-right: 1px dashed red
-    }
-
+.details-tab {
+  thead th:nth-child(6) {
+    border-right: 1px dashed red;
   }
+}
 </style>

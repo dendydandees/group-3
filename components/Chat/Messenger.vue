@@ -67,7 +67,7 @@
   </v-flex>
 </template>
 
-<script  lang="ts">
+<script lang="ts">
 import {
   computed,
   defineComponent,
@@ -79,12 +79,12 @@ import {
   onUnmounted,
   useRoute,
 } from '@nuxtjs/composition-api'
-import ChatWindow from "./ChatWindow.vue";
-import ChatList from "./ChatList.vue";
-import {sb} from '~/store/sendBird/sendBird';
+import ChatWindow from './ChatWindow.vue'
+import ChatList from './ChatList.vue'
+import { sb } from '~/store/sendBird/sendBird'
 import { VuexModuleSendBird } from '~/types/sendBird/sendBird'
 
-export default  defineComponent ({
+export default defineComponent({
   components: {
     ChatList,
     ChatWindow,
@@ -98,72 +98,64 @@ export default  defineComponent ({
     const newChat = ref(null) as any
 
     function selectChat(channel: any) {
-      selectedChat.value = channel;
+      selectedChat.value = channel
     }
     function setRecipient(user: any) {
-      recipient.value = user;
+      recipient.value = user
     }
 
     const { $fetchState, fetch } = useFetch(async () => {
-      storeSendBird.dispatch(
-        'sendBird/sendBird/connect',
-        '002'
-      )
-      .then(async (res) => {
-        console.log("PSR", res);
-        // if (true) {
-        if (route.params.recipient) {
-          try {
-            const currentUser = sb.currentUser.userId;
+      storeSendBird
+        .dispatch('sendBird/sendBird/connect', '002')
+        .then(async (res) => {
+          console.log('PSR', res)
+          // if (true) {
+          if (route.params.recipient) {
+            try {
+              const currentUser = sb.currentUser.userId
 
-            const chat = await storeSendBird.dispatch(
-              'sendBird/sendBird/startChat',
-              [
-                currentUser,
-                `${route.params.recipient}`,
-                `005`,
-              ]
-            )
+              const chat = await storeSendBird.dispatch(
+                'sendBird/sendBird/startChat',
+                [currentUser, `${route.params.recipient}`, `005`]
+              )
 
-            newChat.value = chat;
-            selectedChat.value = chat;
-          } catch (err) {
-            console.log(err);
+              newChat.value = chat
+              selectedChat.value = chat
+            } catch (err) {
+              console.log(err)
+            }
           }
-        }
-      });
+        })
     })
     return {
       selectedChat,
       recipient,
       newChat,
       selectChat,
-      setRecipient
+      setRecipient,
     }
-  }
-});
+  },
+})
 </script>
 
-<style  lang="scss">
-  .chat-wrapper {
-
-    .v-toolbar__title {
-      font-size: 1em;
-      font-weight: 600;
-    }
-    #dropdown {
-    }
-    .menu-item {
-      height: 28px;
-      font-size: 11px !important;
-    }
-    .menu > .v-list__tile {
-      font-size: 11px !important;
-    }
-    .v-menu__content {
-      top: 70px;
-      left: 860px;
-    }
+<style lang="scss">
+.chat-wrapper {
+  .v-toolbar__title {
+    font-size: 1em;
+    font-weight: 600;
+  }
+  #dropdown {
+  }
+  .menu-item {
+    height: 28px;
+    font-size: 11px !important;
+  }
+  .menu > .v-list__tile {
+    font-size: 11px !important;
+  }
+  .v-menu__content {
+    top: 70px;
+    left: 860px;
+  }
 }
 </style>
-

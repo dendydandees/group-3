@@ -1,16 +1,16 @@
-import { RootStateChat } from '~/store/sendbird';
+import { RootStateChat } from '~/store/sendbird'
 
 export interface VuexModuleChat {
-  sendbird: RootStateChat;
+  sendbird: RootStateChat
 }
 
 export interface ChatUser {
-  user_id: string;
-  nickname: string;
+  user_id: string
+  nickname: string
 }
 export interface ChatChannel {
-  name: string;
-  channel_url: string;
-  logo?: string;
-  client_name: string;
+  name: string
+  channel_url: string
+  logo?: string
+  client_name: string
 }

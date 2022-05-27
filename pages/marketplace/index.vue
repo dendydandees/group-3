@@ -65,7 +65,10 @@
                         text-color="white"
                         small
                         disabled
-                        :style="{opacity: 1, border: '1px solid white !important'}"
+                        :style="{
+                          opacity: 1,
+                          border: '1px solid white !important',
+                        }"
                       >
                         {{ $customUtils.setServiceType(mile.name) }}
                       </v-chip>

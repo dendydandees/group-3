@@ -40,7 +40,7 @@ import {
   reactive,
   useStore,
   useRoute,
-  watch
+  watch,
 } from '@nuxtjs/composition-api'
 import { OrderItem, VuexModuleOrders } from '~/types/orders'
 import { VuexModuleIncomingOrders } from '~/types/partnerPortals/incomingOrders'
@@ -61,22 +61,34 @@ export default defineComponent({
     const storeOrders = useStore<VuexModuleOrders>()
     const storeIncomingOrders = useStore<VuexModuleIncomingOrders>()
     const nodeCalc = computed(() => {
-      if(
+      if (
         storeOrders.state.orders.orderDetails.nodeCalc &&
         storeOrders.state.orders.orderDetails.nodeCalc[route.value?.params?.id]
-      )  {
-        const dataNodeCalc = storeOrders.state.orders.orderDetails.nodeCalc[route.value?.params?.id]
+      ) {
+        const dataNodeCalc =
+          storeOrders.state.orders.orderDetails.nodeCalc[
+            route.value?.params?.id
+          ]
         const temp = {
-          "id": dataNodeCalc.id,
-          "fmCost": Number(dataNodeCalc.fmCost),
-          "lmCost": Number(dataNodeCalc.lmCost),
-          "ccCost": Number(dataNodeCalc.ccCost),
-          "bobCost": Number(dataNodeCalc.bobCost),
-          "codCost": Number(dataNodeCalc.codCost),
-          "total": Number(dataNodeCalc.fmCost) + Number(dataNodeCalc.lmCost) + Number(dataNodeCalc.ccCost) + Number(dataNodeCalc.bobCost) + Number(dataNodeCalc.codCost),
-          "dnt": Number(dataNodeCalc.dutiesFee) + Number(dataNodeCalc.taxFee),
-          "adminFee": Number(dataNodeCalc.fmTransmissionFee) + Number(dataNodeCalc.lmTransmissionFee) + Number(dataNodeCalc.ccTransmissionFee) + Number(dataNodeCalc.bobTransmissionFee),
-          "currency": dataNodeCalc.currency
+          id: dataNodeCalc.id,
+          fmCost: Number(dataNodeCalc.fmCost),
+          lmCost: Number(dataNodeCalc.lmCost),
+          ccCost: Number(dataNodeCalc.ccCost),
+          bobCost: Number(dataNodeCalc.bobCost),
+          codCost: Number(dataNodeCalc.codCost),
+          total:
+            Number(dataNodeCalc.fmCost) +
+            Number(dataNodeCalc.lmCost) +
+            Number(dataNodeCalc.ccCost) +
+            Number(dataNodeCalc.bobCost) +
+            Number(dataNodeCalc.codCost),
+          dnt: Number(dataNodeCalc.dutiesFee) + Number(dataNodeCalc.taxFee),
+          adminFee:
+            Number(dataNodeCalc.fmTransmissionFee) +
+            Number(dataNodeCalc.lmTransmissionFee) +
+            Number(dataNodeCalc.ccTransmissionFee) +
+            Number(dataNodeCalc.bobTransmissionFee),
+          currency: dataNodeCalc.currency,
         }
         return [temp]
       } else {
@@ -87,16 +99,15 @@ export default defineComponent({
     const tableSettings = reactive({
       itemKey: 'id',
       hideDefaultFooter: true,
-      headers: [] as {text: String, value: String | Number}[],
+      headers: [] as { text: String; value: String | Number }[],
     })
-
 
     watch(
       [nodeCalc],
       ([newNode]) => {
         let headerTemp = [] as any
         let objNewNode = {}
-        if(newNode && newNode[0]) objNewNode = newNode[0]
+        if (newNode && newNode[0]) objNewNode = newNode[0]
         const objEntries = Object.entries(objNewNode)
 
         objEntries.forEach((x: any) => {
@@ -104,58 +115,48 @@ export default defineComponent({
           const value = x[1]
           switch (key) {
             case 'fmCost':
-              if(value) {
-                headerTemp.push(
-                  {
-                    text: 'First Mile',
-                    value: 'fmCost',
-                  }
-                )
+              if (value) {
+                headerTemp.push({
+                  text: 'First Mile',
+                  value: 'fmCost',
+                })
               }
-              break;
+              break
             case 'ccCost':
-              if(value) {
-                headerTemp.push(
-                  {
-                    text: 'Customs',
-                    value: 'ccCost',
-                  }
-                )
+              if (value) {
+                headerTemp.push({
+                  text: 'Customs',
+                  value: 'ccCost',
+                })
               }
-              break;
+              break
             case 'lmCost':
-              if(value) {
-                headerTemp.push(
-                  {
-                    text: 'Last Mile',
-                    value: 'lmCost',
-                  }
-                )
+              if (value) {
+                headerTemp.push({
+                  text: 'Last Mile',
+                  value: 'lmCost',
+                })
               }
-              break;
+              break
             case 'bobCost':
-              if(value) {
-                headerTemp.push(
-                  {
-                    text: 'BOB',
-                    value: 'bobCost',
-                  }
-                )
+              if (value) {
+                headerTemp.push({
+                  text: 'BOB',
+                  value: 'bobCost',
+                })
               }
-              break;
+              break
             case 'codCost':
-              if(value) {
-                headerTemp.push(
-                  {
-                    text: 'COD',
-                    value: 'codCost',
-                  }
-                )
+              if (value) {
+                headerTemp.push({
+                  text: 'COD',
+                  value: 'codCost',
+                })
               }
-              break;
+              break
 
             default:
-              break;
+              break
           }
         })
         headerTemp = [
@@ -171,7 +172,7 @@ export default defineComponent({
           {
             text: 'Admin Fee',
             value: 'adminFee',
-          }
+          },
         ]
         tableSettings.headers = headerTemp
       },
@@ -186,7 +187,6 @@ export default defineComponent({
       nodeCalc,
       tableSettings,
       setPrice,
-
     }
   },
 })
