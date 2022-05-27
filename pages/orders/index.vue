@@ -78,6 +78,7 @@
             :loading="$fetchState.pending"
             :is-select-disabled="isLabelExist"
             :show-select="true"
+            :action-exist="actionExist"
             @fetch="fetchOrders"
             @doSelectAll="selectAllToggle"
             @doGetDetails="doGetDetails"
@@ -239,6 +240,10 @@ export default defineComponent({
     const selectedOrders = ref([]) as Ref<Order[]>
     const isLabelExist = computed(() => {
       return orders.value.some((order) => order.labelPath)
+    })
+    const actionExist = ref({
+      export: true,
+      download: true,
     })
     const selectedViews = ref([
       'orderCode',
@@ -445,6 +450,7 @@ export default defineComponent({
       // manage table
       selectedOrders,
       isLabelExist,
+      actionExist,
       selectedViews,
       headers,
       selectAllToggle,

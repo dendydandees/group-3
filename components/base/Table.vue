@@ -132,12 +132,26 @@
     <template #[`item.actions`]="{ item }">
       <div class="d-flex align-center">
         <v-btn
+          v-if="actionExist.export"
+          small
+          dark
+          :loading="loading"
+          color="cyan darken-1"
+          class="ma-2"
+          @click="doExportOrder(item.id)"
+        >
+          Export
+        </v-btn>
+
+        <v-btn
+          v-if="actionExist.download"
           small
           download
+          dark
           :href="item.labelPath || ''"
           :loading="loading"
           :disabled="!item.labelPath"
-          color="info"
+          color="teal darken-1"
           class="ma-2"
         >
           Download
@@ -191,10 +205,13 @@ import {
   computed,
   PropType,
   useRoute,
+  useStore,
+  useContext,
 } from '@nuxtjs/composition-api'
+import { saveAs } from 'file-saver'
+// types
 import { FilterDetails, Pagination } from '~/types/applications'
-import { Order, OrderAllocationUpdate } from '~/types/orders'
-
+import { Order, OrderAllocationUpdate, VuexModuleOrders } from '~/types/orders'
 import {
   IncomingOrder,
   OrderAllocation,
@@ -234,6 +251,13 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    actionExist: {
+      type: Object,
+      default: () => ({
+        export: false,
+        download: false,
+      }),
+    },
   },
   setup(props, { emit }) {
     const route = useRoute()
@@ -261,6 +285,8 @@ export default defineComponent({
     }
 
     // FOR ORDER AND INCOMING ORDER
+    const storeOrders = useStore<VuexModuleOrders>()
+    const { $dateFns } = useContext()
     const setStatusOrder = (orderAllocations: OrderAllocationUpdate[]) => {
       return orderAllocations &&
         orderAllocations.length !== 0 &&
@@ -268,6 +294,17 @@ export default defineComponent({
         orderAllocations[0]?.updates.length !== 0
         ? orderAllocations[0]?.updates[0]?.comments
         : ''
+    }
+    const doExportOrder = async (id: string) => {
+      const response = await storeOrders.dispatch('orders/getSelectedExports', {
+        data: [id],
+      })
+      const fileName = `order_exports_${$dateFns.format(
+        new Date(),
+        'yyyy-MM-dd_HH-mm'
+      )}.xlsx`
+
+      saveAs(response, fileName)
     }
     // END FOR ORDER AND INCOMING ORDER
 
@@ -278,6 +315,7 @@ export default defineComponent({
       validateSelect,
       // FOR ORDER AND INCOMING ORDER
       setStatusOrder,
+      doExportOrder,
     }
   },
 })
