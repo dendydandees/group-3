@@ -1,10 +1,6 @@
 <template>
   <section class="pa-4 pa-md-10 py-8 batchView">
-
-    <BaseHeadlinePage
-      title="Batch Order View"
-      :subtitle="batchId"
-    />
+    <BaseHeadlinePage title="Batch Order View" :subtitle="batchId" />
     <!-- <v-row>
       <v-col
         cols="12"
@@ -61,7 +57,7 @@
         small
         class="custom-chips"
       >
-        {{chip.text}}
+        {{ chip.text }}
       </v-chip>
     </v-chip-group>
 
@@ -79,10 +75,7 @@
           class="custom-tab mx-2"
           @click="doChangeWindow(index)"
         >
-          <v-icon
-            v-if="icon"
-            left dark size="28"
-          >
+          <v-icon v-if="icon" left dark size="28">
             {{ icon }}
           </v-icon>
           {{ text }}
@@ -90,10 +83,7 @@
       </template>
     </v-sheet>
 
-    <v-card
-      v-if="selectedTransferCost === 2"
-      elevation="2"
-    >
+    <v-card v-if="selectedTransferCost === 2" elevation="2">
       <v-window v-model="step">
         <v-window-item :value="0">
           <OrdersBatchViewSummary
@@ -111,9 +101,7 @@
       </v-window>
     </v-card>
 
-    <div
-      v-if="selectedTransferCost === 1"
-    >
+    <div v-if="selectedTransferCost === 1">
       <v-card
         v-for="(x, i) in ordersData"
         :key="i"
@@ -121,28 +109,26 @@
         class="pl-6 pt-6 pb-6 pr-16 mb-6"
         :disabled="$fetchState.pending"
       >
-        <v-row
-        >
+        <v-row>
           <v-col
             cols="12"
             md="4"
             class="d-flex flex-column justify-space-between"
           >
-            <div
-              class="primary--text font-weight-bold"
-            >
-              {{x.id}}
+            <div class="primary--text font-weight-bold">
+              {{ x.id }}
             </div>
-            <div
-              :style="'color: grey; font-size: 14px'"
-            >
-              {{x.items && typeof x.items === 'object' ? x.items.length : 0}} items
+            <div :style="'color: grey; font-size: 14px'">
+              {{
+                x.items && typeof x.items === 'object' ? x.items.length : 0
+              }}
+              items
             </div>
             <div
               class="font-weight-bold"
               :style="'color: grey; font-size: 14px'"
             >
-              {{x.paymentType}}
+              {{ x.paymentType }}
             </div>
           </v-col>
           <v-col
@@ -151,81 +137,76 @@
             md="8"
             class="d-flex flex-column justify-space-between"
           >
-            <div
-              class="font-weight-bold"
-            >
-              {{findNamePartner(x.orderAllocations[0].partnerID)}}
+            <div class="font-weight-bold">
+              {{ findNamePartner(x.orderAllocations[0].partnerID) }}
               <!-- Pos Malaysia -->
             </div>
             <!-- <v-divider
               :style="'border-bottom: 3px solid; border-color: red'"
             /> -->
             <div
-              v-if="x.orderAllocations[0].updates && x.orderAllocations[0].updates.length > 0"
+              v-if="
+                x.orderAllocations[0].updates &&
+                x.orderAllocations[0].updates.length > 0
+              "
               class="d-flex justify-space-between"
             >
-              <div
-                class="grey--text"
-                :style="'font-size: 14px'"
-              >
-                {{lastStatus(x.orderAllocations)}}
+              <div class="grey--text" :style="'font-size: 14px'">
+                {{ lastStatus(x.orderAllocations) }}
                 <!-- {{x.orderAllocations[0].updates[0].comments}} -->
               </div>
-              <div
-                :style="'font-size: 15px'"
-              >
-                {{ $dateFns.format(x.orderAllocations[0].updates[0].updateTimestamp, 'HH:mm E, MMM dd, yyyy') }}
+              <div :style="'font-size: 15px'">
+                {{
+                  $dateFns.format(
+                    x.orderAllocations[0].updates[0].updateTimestamp,
+                    'HH:mm E, MMM dd, yyyy'
+                  )
+                }}
               </div>
             </div>
           </v-col>
         </v-row>
       </v-card>
 
-      <div
-        class="d-flex justify-space-between align-center"
-      >
-        <div
-          :style="'font-size: 12px; color: red'"
-        >
-          {{meta.totalCount}} Orders
+      <div class="d-flex justify-space-between align-center">
+        <div :style="'font-size: 12px; color: red'">
+          {{ meta.totalCount }} Orders
         </div>
 
-          <div class="d-flex align-center justify-center">
-            <div>
-              <v-btn
-                fab
-                small
-                plain
-                :disabled="paginationTracking.page === 1 || $fetchState.pending"
-                @click="nextOrPrev('-')"
-              >
-                <v-icon dense color="black"> mdi-menu-left </v-icon>
-              </v-btn>
-            </div>
-            <div class="px-3">
-              {{ meta.page }}
-            </div>
-            <div>
-              <v-btn
-                fab
-                small
-                plain
-                :disabled="
-                  paginationTracking.page >= meta.totalPage || $fetchState.pending
-                "
-                @click="nextOrPrev('+')"
-              >
-                <v-icon dense color="black"> mdi-menu-right </v-icon>
-              </v-btn>
-            </div>
+        <div class="d-flex align-center justify-center">
+          <div>
+            <v-btn
+              fab
+              small
+              plain
+              :disabled="paginationTracking.page === 1 || $fetchState.pending"
+              @click="nextOrPrev('-')"
+            >
+              <v-icon dense color="black"> mdi-menu-left </v-icon>
+            </v-btn>
           </div>
-        <div
-          class="btn-page"
-        >
-          {{ordersData && ordersData.length ? ordersData.length : 0}} Orders / Page
+          <div class="px-3">
+            {{ meta.page }}
+          </div>
+          <div>
+            <v-btn
+              fab
+              small
+              plain
+              :disabled="
+                paginationTracking.page >= meta.totalPage || $fetchState.pending
+              "
+              @click="nextOrPrev('+')"
+            >
+              <v-icon dense color="black"> mdi-menu-right </v-icon>
+            </v-btn>
+          </div>
+        </div>
+        <div class="btn-page">
+          {{ ordersData && ordersData.length ? ordersData.length : 0 }} Orders /
+          Page
         </div>
       </div>
-
     </div>
   </section>
 </template>
@@ -242,7 +223,7 @@ import {
   useStore,
   useContext,
   useFetch,
-  watch
+  watch,
 } from '@nuxtjs/composition-api'
 import { Order, VuexModuleOrders, OrderAllocationData } from '~/types/orders'
 import { VuexModuleMarketplaces } from '~/types/marketplace/marketplace'
@@ -250,16 +231,16 @@ import { FilterDetails } from '~/types/applications'
 
 export interface ParseNodeCalc {
   orderCode: String
-  "id": String
-  "fmCost": Number
-  "lmCost": Number
-  "ccCost": Number
-  "bobCost": Number
-  "codCost": Number
-  "total": Number
-  "dnt": Number
-  "adminFee": Number
-  "currency": String
+  id: String
+  fmCost: Number
+  lmCost: Number
+  ccCost: Number
+  bobCost: Number
+  codCost: Number
+  total: Number
+  dnt: Number
+  adminFee: Number
+  currency: String
 }
 
 export default defineComponent({
@@ -267,13 +248,13 @@ export default defineComponent({
   setup() {
     const router = useRouter()
     const route = useRoute()
-    const pagination = ref( {
+    const pagination = ref({
       page: 1,
       itemsPerPage: 1000000,
       sortBy: [''],
       sortDesc: [true],
     })
-    const paginationTracking = ref( {
+    const paginationTracking = ref({
       page: 1,
       itemsPerPage: 10,
       sortBy: [''],
@@ -293,12 +274,12 @@ export default defineComponent({
     })
     const ordersCode = computed(() => {
       const data = storeOrders.state.orders.ordersBatchView
-      let parsingData = [] as {id: string, orderCode: string}[] | []
-      if(data && data.length > 0) {
+      let parsingData = [] as { id: string; orderCode: string }[] | []
+      if (data && data.length > 0) {
         parsingData = [...data].map((x: Order) => {
           return {
             id: x.id,
-            orderCode: x.orderCode
+            orderCode: x.orderCode,
           }
         })
       }
@@ -307,23 +288,34 @@ export default defineComponent({
     const nodeCalculators = computed(() => {
       const data = storeOrders.state.orders.orderDetails.nodeCalc
       let parsingData = [] as any
-      if(ordersCode.value && ordersCode.value.length > 0) {
-        parsingData = [...ordersCode.value].map((x: {id: string, orderCode: string}) => {
-          const batch = data[x.id]
-          return {
-            orderCode: x.orderCode,
-            "id": batch?.id,
-            "fmCost": Number(batch?.fmCost),
-            "lmCost": Number(batch?.lmCost),
-            "ccCost": Number(batch?.ccCost),
-            "bobCost": Number(batch?.bobCost),
-            "codCost": Number(batch?.codCost),
-            "total": Number(batch?.fmCost) + Number(batch?.lmCost) + Number(batch?.ccCost) + Number(batch?.bobCost) + Number(batch?.codCost),
-            "dnt": Number(batch?.dutiesFee) + Number(batch?.taxFee),
-            "adminFee": Number(batch?.fmTransmissionFee) + Number(batch?.lmTransmissionFee) + Number(batch?.ccTransmissionFee) + Number(batch?.bobTransmissionFee),
-            "currency": batch?.currency
+      if (ordersCode.value && ordersCode.value.length > 0) {
+        parsingData = [...ordersCode.value].map(
+          (x: { id: string; orderCode: string }) => {
+            const batch = data[x.id]
+            return {
+              orderCode: x.orderCode,
+              id: batch?.id,
+              fmCost: Number(batch?.fmCost),
+              lmCost: Number(batch?.lmCost),
+              ccCost: Number(batch?.ccCost),
+              bobCost: Number(batch?.bobCost),
+              codCost: Number(batch?.codCost),
+              total:
+                Number(batch?.fmCost) +
+                Number(batch?.lmCost) +
+                Number(batch?.ccCost) +
+                Number(batch?.bobCost) +
+                Number(batch?.codCost),
+              dnt: Number(batch?.dutiesFee) + Number(batch?.taxFee),
+              adminFee:
+                Number(batch?.fmTransmissionFee) +
+                Number(batch?.lmTransmissionFee) +
+                Number(batch?.ccTransmissionFee) +
+                Number(batch?.bobTransmissionFee),
+              currency: batch?.currency,
+            }
           }
-        })
+        )
       }
       parsingData = [...parsingData].filter((y: ParseNodeCalc) => {
         return y.fmCost || y.ccCost || y.lmCost || y.bobCost || y.codCost
@@ -333,7 +325,7 @@ export default defineComponent({
 
     const itemDetail = computed(() => {
       let data = route.value?.params?.item
-      if(!data) {
+      if (!data) {
         data = JSON.parse(localStorage.getItem('batch.data') as any)
       }
       return data
@@ -382,7 +374,13 @@ export default defineComponent({
       router.go(-1)
     }
 
-    const fetchOrders = async ({params, isBatchView}:{params: FilterDetails, isBatchView?:Boolean}) => {
+    const fetchOrders = async ({
+      params,
+      isBatchView,
+    }: {
+      params: FilterDetails
+      isBatchView?: Boolean
+    }) => {
       const { page, itemsPerPage } = params
       const perPage = itemsPerPage !== -1 ? itemsPerPage : meta.value.totalCount
       let dataParams = {
@@ -390,9 +388,9 @@ export default defineComponent({
         perPage,
       } as Object
       dataParams = app.$customUtils.setURLParams({
-          ...dataParams,
-          batchCode: route.value?.params?.batchId
-        })
+        ...dataParams,
+        batchCode: route.value?.params?.batchId,
+      })
 
       try {
         $fetchState.pending = true
@@ -441,14 +439,14 @@ export default defineComponent({
     const { $fetchState, fetch } = useFetch(async () => {
       await fetchMarketplace()
       await getNodeCalculators()
-      await fetchOrders({params: pagination.value, isBatchView: true})
-      await fetchOrders({params: paginationTracking.value})
+      await fetchOrders({ params: pagination.value, isBatchView: true })
+      await fetchOrders({ params: paginationTracking.value })
     })
 
     watch(
       paginationTracking,
       (newPagination) => {
-        fetchOrders({params: newPagination})
+        fetchOrders({ params: newPagination })
       },
       { deep: true }
     )
@@ -479,7 +477,7 @@ export default defineComponent({
     }
 
     function lastStatus(orderAllocations: OrderAllocationData[]) {
-        return orderAllocations[0].updates[0].comments
+      return orderAllocations[0].updates[0].comments
     }
 
     return {
@@ -499,7 +497,7 @@ export default defineComponent({
       meta,
       nextOrPrev,
       paginationTracking,
-      lastStatus
+      lastStatus,
     }
   },
   head: {},
@@ -507,7 +505,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-
 .batchView {
   margin-bottom: 40rem;
   .custom-tab {

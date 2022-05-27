@@ -40,62 +40,47 @@
       <template #[`item.adminFee`]="{ item }">
         {{ item.currency }} {{ setPrice(item.adminFee) }}
       </template> -->
-      <template #body="{items, headers}">
-        <tr
-          v-for="(x, i) in items"
-          :key="i"
-        >
+      <template #body="{ items, headers }">
+        <tr v-for="(x, i) in items" :key="i">
           <td
             v-for="(y, index) in headers"
             :key="index"
             :class="
-              (y.value === 'orderCode' &&'primary--text font-weight-bold') + ' td-custom'
+              (y.value === 'orderCode' && 'primary--text font-weight-bold') +
+              ' td-custom'
             "
-            :style="
-              y.value === 'total' && {borderRight:'1px dashed red'}
-            "
+            :style="y.value === 'total' && { borderRight: '1px dashed red' }"
           >
-            {{x[y.value]}}
+            {{ x[y.value] }}
           </td>
         </tr>
-        <tr
-          v-if="items && items.length > 0"
-        >
+        <tr v-if="items && items.length > 0">
           <td
             v-for="(x, i) in headers"
             :key="i"
-            :style="
-              x.value === 'total' && {borderRight:'1px dashed red'}
-            "
+            :style="x.value === 'total' && { borderRight: '1px dashed red' }"
             class="td-custom"
           >
-            <span
-              v-if="x.value === 'orderCode' "
-            >
-
-            </span>
+            <span v-if="x.value === 'orderCode'"> </span>
             <span
               v-else
               :class="
                 x.value === 'total' || x.value === 'dnt'
-                ? 'error--text font-weight-bold'
-                : ''
+                  ? 'error--text font-weight-bold'
+                  : ''
               "
             >
-              {{setTotal(x.value)}}
+              {{ setTotal(x.value) }}
             </span>
           </td>
         </tr>
-        <tr
-          v-else
-        >
+        <tr v-else>
           <td
             :colspan="headers.length"
             class="font-weight-bold grey--text td-custom"
             :style="'text-align: center'"
           >
             No Data
-
           </td>
         </tr>
       </template>
@@ -140,7 +125,7 @@ import {
   useRouter,
   onMounted,
   watch,
-  PropType
+  PropType,
 } from '@nuxtjs/composition-api'
 import { ValidationObserver } from 'vee-validate'
 
@@ -167,16 +152,16 @@ interface ErrorUpload {
 
 export interface ParseNodeCalc {
   orderCode: String
-  "id": String
-  "fmCost": Number
-  "lmCost": Number
-  "ccCost": Number
-  "bobCost": Number
-  "codCost": Number
-  "total": Number
-  "dnt": Number
-  "adminFee": Number
-  "currency": String
+  id: String
+  fmCost: Number
+  lmCost: Number
+  ccCost: Number
+  bobCost: Number
+  codCost: Number
+  total: Number
+  dnt: Number
+  adminFee: Number
+  currency: String
 }
 
 export default defineComponent({
@@ -202,95 +187,83 @@ export default defineComponent({
     const alert = computed(() => storeApplications.state.applications.alert)
     const headersComp = computed(() => {
       let objKeysComp = [] as String[]
-      if(props.nodeCalculators[0]) objKeysComp = Object.keys(props.nodeCalculators[0])
+      if (props.nodeCalculators[0])
+        objKeysComp = Object.keys(props.nodeCalculators[0])
 
-        let headerTemp = [] as any
+      let headerTemp = [] as any
 
-        objKeysComp.forEach((x: any) => {
-          switch (x) {
-            case 'orderCode':
-              headerTemp.push(
-                {
-                  text: 'ORDER ID',
-                  align: 'start',
-                  sortable: false,
-                  value: 'orderCode',
-                }
-              )
-              break;
-            case 'fmCost':
-              if(setTotal(x, true)) {
-                headerTemp.push(
-                  {
-                    text: 'First Mile',
-                    value: 'fmCost',
-                  }
-                )
-              }
-              break;
-            case 'ccCost':
-              if(setTotal(x, true)) {
-                headerTemp.push(
-                  {
-                    text: 'Customs',
-                    value: 'ccCost',
-                  }
-                )
-              }
-              break;
-            case 'lmCost':
-              if(setTotal(x, true)) {
-                headerTemp.push(
-                  {
-                    text: 'Last Mile',
-                    value: 'lmCost',
-                  }
-                )
-              }
-              break;
-            case 'bobCost':
-              if(setTotal(x, true)) {
-                headerTemp.push(
-                  {
-                    text: 'BOB',
-                    value: 'bobCost',
-                  }
-                )
-              }
-              break;
-            case 'codCost':
-              if(setTotal(x, true)) {
-                headerTemp.push(
-                  {
-                    text: 'COD',
-                    value: 'codCost',
-                  }
-                )
-              }
-              break;
+      objKeysComp.forEach((x: any) => {
+        switch (x) {
+          case 'orderCode':
+            headerTemp.push({
+              text: 'ORDER ID',
+              align: 'start',
+              sortable: false,
+              value: 'orderCode',
+            })
+            break
+          case 'fmCost':
+            if (setTotal(x, true)) {
+              headerTemp.push({
+                text: 'First Mile',
+                value: 'fmCost',
+              })
+            }
+            break
+          case 'ccCost':
+            if (setTotal(x, true)) {
+              headerTemp.push({
+                text: 'Customs',
+                value: 'ccCost',
+              })
+            }
+            break
+          case 'lmCost':
+            if (setTotal(x, true)) {
+              headerTemp.push({
+                text: 'Last Mile',
+                value: 'lmCost',
+              })
+            }
+            break
+          case 'bobCost':
+            if (setTotal(x, true)) {
+              headerTemp.push({
+                text: 'BOB',
+                value: 'bobCost',
+              })
+            }
+            break
+          case 'codCost':
+            if (setTotal(x, true)) {
+              headerTemp.push({
+                text: 'COD',
+                value: 'codCost',
+              })
+            }
+            break
 
-            default:
-              break;
-          }
-        })
-        headerTemp = [
-          ...headerTemp,
-          {
-            text: 'Total',
-            value: 'total',
-          },
-          {
-            text: 'D&T',
-            value: 'dnt',
-          },
-          {
-            text: 'Admin Fee',
-            value: 'adminFee',
-          }
-        ]
+          default:
+            break
+        }
+      })
+      headerTemp = [
+        ...headerTemp,
+        {
+          text: 'Total',
+          value: 'total',
+        },
+        {
+          text: 'D&T',
+          value: 'dnt',
+        },
+        {
+          text: 'Admin Fee',
+          value: 'adminFee',
+        },
+      ]
       return headerTemp
     })
-
 
     // manage summary table
 
@@ -298,37 +271,35 @@ export default defineComponent({
       search: '',
     })
 
-
-
     onMounted(() => {
       storeApplications.commit('applications/RESET_ALERT')
     })
 
     const showBorder = (item: any) => {
-      if (item === "codCost") {
-
+      if (item === 'codCost') {
         // return {borderRight:'1px dashed red'}
         return 'border-right: 1px dashed red'
       }
-      if(item === 'orderCode') {
+      if (item === 'orderCode') {
         // return {color:'#1961e4', fontWeight: 700}
         return 'color: #1961e4; font-weight: 700'
       }
-
     }
     const setPrice = (price: string) => {
       return parseFloat(price).toFixed(2)
     }
     function setTotal(key: string, isNotSetPrice?: Boolean) {
-      const total = props.nodeCalculators.reduce( function(a: Number | unknown, b: any){
-          return a + b[key];
-        }, 0)
-      if(isNotSetPrice) {
+      const total = props.nodeCalculators.reduce(function (
+        a: Number | unknown,
+        b: any
+      ) {
+        return a + b[key]
+      },
+      0)
+      if (isNotSetPrice) {
         return total
       } else {
-        return setPrice(
-          total
-        )
+        return setPrice(total)
       }
     }
 
@@ -338,7 +309,7 @@ export default defineComponent({
       // nodeCalculators,
       setPrice,
       showBorder,
-      setTotal
+      setTotal,
     }
   },
 })
@@ -346,28 +317,38 @@ export default defineComponent({
 
 <style lang="scss">
 @import '~/assets/scss/color.module.scss';
-  .summary-tab {
-    th[aria-label="Total"] {
-      border-right: 1px dashed red
-    }
-    thead th {
-      white-space: nowrap;
-    }
-    tbody td:nth-child(7) {
-      border-right: 1px dashed red
-    }
-    .theme--light.v-data-table > .v-data-table__wrapper > table > thead > tr:last-child > th {
-      border-bottom: hidden !important;
-    }
-    .theme--light.v-data-table > .v-data-table__wrapper > table > tbody > tr > td {
-      border-bottom: hidden !important;
-    }
-    .td-custom {
-      font-size: 0.875rem;
-      height: 48px;
-      padding: 0 16px;
-      transition: height 0.2s  cubic-bezier(0.4, 0, 0.6, 1);text-align: start
-    }
-
+.summary-tab {
+  th[aria-label='Total'] {
+    border-right: 1px dashed red;
   }
+  thead th {
+    white-space: nowrap;
+  }
+  tbody td:nth-child(7) {
+    border-right: 1px dashed red;
+  }
+  .theme--light.v-data-table
+    > .v-data-table__wrapper
+    > table
+    > thead
+    > tr:last-child
+    > th {
+    border-bottom: hidden !important;
+  }
+  .theme--light.v-data-table
+    > .v-data-table__wrapper
+    > table
+    > tbody
+    > tr
+    > td {
+    border-bottom: hidden !important;
+  }
+  .td-custom {
+    font-size: 0.875rem;
+    height: 48px;
+    padding: 0 16px;
+    transition: height 0.2s cubic-bezier(0.4, 0, 0.6, 1);
+    text-align: start;
+  }
+}
 </style>

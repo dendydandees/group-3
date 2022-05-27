@@ -90,7 +90,7 @@
                 }"
               >
                 <span>
-                  {{locationMapping(data.partnerServiceZones)}}
+                  {{ locationMapping(data.partnerServiceZones) }}
                 </span>
                 <!-- <span v-for="(x, i) in data.partnerServiceZones" :key="i">
                   {{ x.zone_country}}
@@ -165,7 +165,10 @@
 
 <script lang="ts">
 import { computed, defineComponent, PropType } from '@nuxtjs/composition-api'
-import { Marketplace, PartnerServiceZone } from '~/types/marketplace/marketplace'
+import {
+  Marketplace,
+  PartnerServiceZone,
+} from '~/types/marketplace/marketplace'
 
 // interface FeedbackMessage {
 //   alert: boolean
@@ -228,7 +231,7 @@ export default defineComponent({
       toggle,
       dialogComp,
       addConnection,
-      locationMapping
+      locationMapping,
     }
   },
 })

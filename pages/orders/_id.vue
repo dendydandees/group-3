@@ -99,7 +99,7 @@ export default defineComponent({
     SenderDetails,
     OrderItems,
     UpdatesTimeline,
-    CalculatorOrderItems
+    CalculatorOrderItems,
   },
   layout: 'default',
   setup() {

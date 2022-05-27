@@ -39,35 +39,25 @@
               :content="countChat"
               :value="countChat"
               overlap
-
             >
-              <v-icon>{{'mdi-message-text' }}</v-icon>
+              <v-icon>{{ 'mdi-message-text' }}</v-icon>
             </v-badge>
           </v-btn>
         </template>
-        <v-card
-        >
+        <v-card>
           <v-tabs
             v-model="tab"
             background-color="transparent"
             color="basil"
             grow
           >
-            <v-tab
-              v-for="(item, i) in items"
-              :key="i"
-            >
+            <v-tab v-for="(item, i) in items" :key="i">
               {{ item.name }}
             </v-tab>
           </v-tabs>
           <v-tabs-items v-model="tab">
-            <v-tab-item
-              v-for="(item, i) in items"
-              :key="i"
-            >
-              <v-card
-                width="800px"
-              >
+            <v-tab-item v-for="(item, i) in items" :key="i">
+              <v-card width="800px">
                 <ChatPackageAdvancedChatWindow
                   :is-incoming="item.isIncoming"
                   :is-open="menu"
@@ -84,87 +74,96 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, useContext, ref, Ref, useFetch,useStore, computed, watch } from '@nuxtjs/composition-api'
-import SendBird from 'sendbird';
-import { v4 as uuidv4 } from 'uuid'
 import {
-  VuexModuleMarketplaces
-} from '~/types/marketplace/marketplace'
+  defineComponent,
+  useContext,
+  ref,
+  Ref,
+  useFetch,
+  useStore,
+  computed,
+  watch,
+} from '@nuxtjs/composition-api'
+import SendBird from 'sendbird'
+import { v4 as uuidv4 } from 'uuid'
+import { VuexModuleMarketplaces } from '~/types/marketplace/marketplace'
 import { VuexModuleChat, ChatUser } from '~/types/sendbird'
 
 export default defineComponent({
   name: 'DefaultLayout',
   middleware: 'auth',
   setup() {
-    const {$dateFns, $config } = useContext()
+    const { $dateFns, $config } = useContext()
     const context = useContext()
     const storeMarketplaces = useStore<VuexModuleMarketplaces>()
     const storeChat = useStore<VuexModuleChat>()
-    const sb = new SendBird({ appId: $config.sendBirdKey, localCacheEnabled: true });
+    const sb = new SendBird({
+      appId: $config.sendBirdKey,
+      localCacheEnabled: true,
+    })
     const tab = ref(null) as any
 
-    const userEventHandler = new sb.UserEventHandler();
+    const userEventHandler = new sb.UserEventHandler()
     const items = ref([
       {
-        name:'Messages',
-        isIncoming: false
+        name: 'Messages',
+        isIncoming: false,
       },
       {
-        name:'Incoming Messages',
-        isIncoming: true
-      }
+        name: 'Incoming Messages',
+        isIncoming: true,
+      },
     ]) as any
     const USER_ID = 'abcxyz'
     // const USER_ID = '30551dfc-8f59-467c-9032-868483202a0f'
     const countChat = ref(0) as Ref<Number>
-    const USER_ID_CHAT = computed(
-      () => storeChat.state.sendbird.chatUser)
-    const marketplacesConnected = computed(
-      () =>{
-        const data = storeMarketplaces.state.marketplaces.marketplaces.marketplacesChat
-        return data
+    const USER_ID_CHAT = computed(() => storeChat.state.sendbird.chatUser)
+    const marketplacesConnected = computed(() => {
+      const data =
+        storeMarketplaces.state.marketplaces.marketplaces.marketplacesChat
+      return data
     })
-    const marketplacesConnectedIncoming = computed(
-      () =>{
-        const data = storeMarketplaces.state.marketplaces.marketplaces.incomingChat
-        return data
+    const marketplacesConnectedIncoming = computed(() => {
+      const data =
+        storeMarketplaces.state.marketplaces.marketplaces.incomingChat
+      return data
     })
-    const isThereRoom = computed(
-      () =>{
-        if(
-          (marketplacesConnected.value && marketplacesConnected.value.length > 0) ||
-          (marketplacesConnectedIncoming.value && marketplacesConnectedIncoming.value.length > 0)
-        ) {
-          return true
-        } else {
-          return false
-        }
+    const isThereRoom = computed(() => {
+      if (
+        (marketplacesConnected.value &&
+          marketplacesConnected.value.length > 0) ||
+        (marketplacesConnectedIncoming.value &&
+          marketplacesConnectedIncoming.value.length > 0)
+      ) {
+        return true
+      } else {
+        return false
+      }
     })
 
     watch(
       () => [USER_ID_CHAT],
       ([newUserID]) => {
-        if(newUserID.value && newUserID.value?.user_id) {
-
-          sb.connect(newUserID.value?.user_id, function(user, error){
-          })
+        if (newUserID.value && newUserID.value?.user_id) {
+          sb.connect(newUserID.value?.user_id, function (user, error) {})
         }
       },
       { deep: true }
     )
     const { $fetchState, fetch } = useFetch(async () => {
-      await storeChat.dispatch(
-        'sendbird/getUserChat'
-      )
+      await storeChat.dispatch('sendbird/getUserChat')
       await fetchMarketplaceConnected()
-      const count = await sb.getTotalUnreadMessageCount();
+      const count = await sb.getTotalUnreadMessageCount()
       // const count = await sb.getTotalUnreadChannelCount();
       countChat.value = count
-      userEventHandler.onTotalUnreadMessageCountUpdated = function(totalCount, countByCustomTypes) {
+      userEventHandler.onTotalUnreadMessageCountUpdated = function (
+        totalCount,
+        countByCustomTypes
+      ) {
         countChat.value = totalCount
-      };
+      }
 
-      sb.addUserEventHandler(uuidv4(), userEventHandler);
+      sb.addUserEventHandler(uuidv4(), userEventHandler)
     })
 
     // handle sidenav
@@ -182,8 +181,7 @@ export default defineComponent({
       mini.value = false
     }
 
-
-    async function fetchMarketplaceConnected () {
+    async function fetchMarketplaceConnected() {
       const dataParams = {
         page: 1,
         perPage: 10000,
@@ -212,7 +210,6 @@ export default defineComponent({
       isThereRoom,
       tab,
       items,
-
     }
   },
 })

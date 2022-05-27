@@ -1,8 +1,7 @@
-import { RootStateSendBird } from '~/store/sendBird/sendBird';
+import { RootStateSendBird } from '~/store/sendBird/sendBird'
 
 export interface VuexModuleSendBird {
   sendBird: {
-    sendBird: RootStateSendBird;
-  };
+    sendBird: RootStateSendBird
+  }
 }
-

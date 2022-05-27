@@ -1,6 +1,6 @@
-import minifyTheme from 'minify-css-string';
+import minifyTheme from 'minify-css-string'
 
-const development = process.env.NODE_ENV === 'development';
+const development = process.env.NODE_ENV === 'development'
 
 export default {
   // Rendering property : https://nuxtjs.org/docs/features/rendering-modes
@@ -172,6 +172,6 @@ export default {
   },
   publicRuntimeConfig: {
     sendBirdKey: process.env.VUE_APP_SENDBIRD_KEY,
-    sendBirdToken: process.env.VUE_APP_SENDBIRD_TOKEN
+    sendBirdToken: process.env.VUE_APP_SENDBIRD_TOKEN,
   },
-};
+}

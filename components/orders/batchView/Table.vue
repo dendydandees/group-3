@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="table-batch"
-  >
+  <div class="table-batch">
     <v-data-table
       hide-default-footer
       :headers="dataTableComp.headers"
@@ -9,28 +7,18 @@
       item-key="name"
       disable-sort
     >
-
       <template #[`item.value`]="{ item }">
         {{ setPrice(item.value) }}
       </template>
-      <template #body.append="{items}">
-        <tr
-          v-if="items.length"
-        >
-          <td
-            class="font-weight-bold"
-          >
-            Service Total
-          </td>
-          <td
-            class="font-weight-bold error--text"
-          >
-            {{setTotal()}}
+      <template #body.append="{ items }">
+        <tr v-if="items.length">
+          <td class="font-weight-bold">Service Total</td>
+          <td class="font-weight-bold error--text">
+            {{ setTotal() }}
           </td>
         </tr>
       </template>
     </v-data-table>
-
   </div>
 </template>
 
@@ -74,24 +62,23 @@ export default defineComponent({
   },
   setup(props) {
     const dataTableComp = computed(() => {
-      if(props.isService) {
+      if (props.isService) {
         return {
           ...props.dataTable,
-          content: [...props.dataTable.content].filter((x: any) => x.value)
+          content: [...props.dataTable.content].filter((x: any) => x.value),
         }
       } else {
         return props.dataTable
       }
     })
 
-
     function setPrice(price: string) {
       return parseFloat(price).toFixed(2)
     }
     function setTotal() {
       return setPrice(
-        props.dataTable.content.reduce( function(a: Number | unknown, b: any){
-          return a + b.value;
+        props.dataTable.content.reduce(function (a: Number | unknown, b: any) {
+          return a + b.value
         }, 0)
       )
     }
@@ -99,7 +86,7 @@ export default defineComponent({
     return {
       setTotal,
       setPrice,
-      dataTableComp
+      dataTableComp,
     }
   },
 })
@@ -107,12 +94,22 @@ export default defineComponent({
 
 <style lang="scss">
 @import '~/assets/scss/color.module.scss';
-  .table-batch {
-    .theme--light.v-data-table > .v-data-table__wrapper > table > thead > tr:last-child > th {
-      border-bottom: hidden !important;
-    }
-    .theme--light.v-data-table > .v-data-table__wrapper > table > tbody > tr > td {
-      border-bottom: hidden !important;
-    }
+.table-batch {
+  .theme--light.v-data-table
+    > .v-data-table__wrapper
+    > table
+    > thead
+    > tr:last-child
+    > th {
+    border-bottom: hidden !important;
   }
+  .theme--light.v-data-table
+    > .v-data-table__wrapper
+    > table
+    > tbody
+    > tr
+    > td {
+    border-bottom: hidden !important;
+  }
+}
 </style>

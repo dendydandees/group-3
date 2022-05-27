@@ -218,32 +218,43 @@
                     :item-show="{ text: 'name', value: 'id' }"
                   />
                   <div
-                    v-if="selected.partnerID && selected.serviceIndex.value === 'LAST_MILE' "
+                    v-if="
+                      selected.partnerID &&
+                      selected.serviceIndex.value === 'LAST_MILE'
+                    "
                     class="primary--text"
-                    style="font-size: 12px;margin-top: 5px;justify-content: end;display: flex;"
+                    style="
+                      font-size: 12px;
+                      margin-top: 5px;
+                      justify-content: end;
+                      display: flex;
+                    "
                   >
-                    <span
-                      v-if="handleInfoCOD(selected.partnerID)"
-                    >
+                    <span v-if="handleInfoCOD(selected.partnerID)">
                       Partner available for COD service
                     </span>
-                    <span
-                      v-else
-                      class="error--text"
-                    >
+                    <span v-else class="error--text">
                       Partner not available for COD service
                     </span>
                   </div>
                   <div
-                    v-if="!CODpartnerSelected.status && selected.serviceIndex.value === 'LAST_MILE'"
-                    :class="`primary--text btn-COD ${ selected.partnerID ? '' : 'disabled'}`"
+                    v-if="
+                      !CODpartnerSelected.status &&
+                      selected.serviceIndex.value === 'LAST_MILE'
+                    "
+                    :class="`primary--text btn-COD ${
+                      selected.partnerID ? '' : 'disabled'
+                    }`"
                     style="cursor: pointer"
                     @click="handleCOD"
                   >
                     + Add COD Default Network Partner
                   </div>
                   <div
-                    v-if="CODpartnerSelected.status && selected.serviceIndex.value === 'LAST_MILE'"
+                    v-if="
+                      CODpartnerSelected.status &&
+                      selected.serviceIndex.value === 'LAST_MILE'
+                    "
                     class="d-flex mt-2"
                   >
                     <LcontrolDropdownCustom
@@ -255,43 +266,51 @@
                       :item-show="{ text: 'name', value: 'id' }"
                       :is-delete="true"
                       :is-info="true"
-                      @delete="handleDeleteRule({isCOD: true})"
+                      @delete="handleDeleteRule({ isCOD: true })"
                     />
                   </div>
                   <div
-                    v-if="selected.serviceIndex.value === 'LAST_MILE' || selected.serviceIndex.value === 'FIRST_MILE'"
+                    v-if="
+                      selected.serviceIndex.value === 'LAST_MILE' ||
+                      selected.serviceIndex.value === 'FIRST_MILE'
+                    "
                     class="mt-2"
                   >
                     <!-- <div
                       v-for="(z, i) in addNPData"
                       :key="i"
                     > -->
-                      <LcontrolDropdownCustomInput
-                        v-for="(z, i) in addNPData"
-                        :key="i"
-                        v-model="addNPData[i]"
-                        :label="`${dataPriority[i]} Network Partner`"
-                        :placeholder="'Default Partner'"
-                        :data="marketplacesCOD"
-                        :disabled-drop="$fetchState.pending"
-                        :item-show="{ text: 'name', value: 'id' }"
-                        :is-delete="true"
-                        class="mb-2"
-                        @delete="handleDeleteRule({isVolume: {index: z.index, status: true}})"
-                      />
+                    <LcontrolDropdownCustomInput
+                      v-for="(z, i) in addNPData"
+                      :key="i"
+                      v-model="addNPData[i]"
+                      :label="`${dataPriority[i]} Network Partner`"
+                      :placeholder="'Default Partner'"
+                      :data="marketplacesCOD"
+                      :disabled-drop="$fetchState.pending"
+                      :item-show="{ text: 'name', value: 'id' }"
+                      :is-delete="true"
+                      class="mb-2"
+                      @delete="
+                        handleDeleteRule({
+                          isVolume: { index: z.index, status: true },
+                        })
+                      "
+                    />
 
                     <!-- </div> -->
                   </div>
                   <div
                     v-if="
-                      (selected.serviceIndex.value === 'LAST_MILE' || selected.serviceIndex.value === 'FIRST_MILE') &&
+                      (selected.serviceIndex.value === 'LAST_MILE' ||
+                        selected.serviceIndex.value === 'FIRST_MILE') &&
                       addNPData.length < 3
                     "
-                    :class="
-                      `
-                        primary--text btn-COD ${ selected.partnerID ? '' : 'disabled'}
-                      `
-                    "
+                    :class="`
+                        primary--text btn-COD ${
+                          selected.partnerID ? '' : 'disabled'
+                        }
+                      `"
                     style="cursor: pointer"
                     @click="handleAddNP"
                   >
@@ -316,7 +335,7 @@
     <BaseModalConfirm
       v-model="dialog.deleteRule"
       :dialog-settings="dialogSettings"
-      @doSubmit="deleteRules({idRule: dialog.idRule})"
+      @doSubmit="deleteRules({ idRule: dialog.idRule })"
     />
   </section>
 </template>
@@ -333,7 +352,7 @@ import {
   onUnmounted,
 } from '@nuxtjs/composition-api'
 // Interfaces or types
-import { ru } from 'date-fns/locale';
+import { ru } from 'date-fns/locale'
 import { VuexModuleFilters } from '~/types/filters'
 import {
   VuexModuleLControls,
@@ -355,12 +374,12 @@ export interface RulePayload {
 }
 
 export interface InputNPData {
-  partnerID: string,
-  volume: number,
-  index?: number,
-  type?: string,
+  partnerID: string
+  volume: number
+  index?: number
+  type?: string
   idRule?: string
-  priority?: number,
+  priority?: number
   definitions?: Definition[]
 }
 
@@ -393,7 +412,7 @@ export default defineComponent({
       deleteRule: false,
       idRule: '',
       isChange: false,
-      status: ''
+      status: '',
     })
     const dialogSettings = ref({
       loading: false,
@@ -409,8 +428,8 @@ export default defineComponent({
     const CODpartnerSelected = ref({
       status: false,
       partnerID: '',
-      idRule: ''
-    }) as Ref<{status: boolean, partnerID: string, idRule: string | unknown}>
+      idRule: '',
+    }) as Ref<{ status: boolean; partnerID: string; idRule: string | unknown }>
     const rulesComp = ref([]) as Ref<RulePayload[] | []>
 
     const selected = ref({
@@ -445,17 +464,16 @@ export default defineComponent({
     const addNPData = ref([]) as Ref<InputNPData[] | []>
     const dataPriority = ['Primary', 'Secondary', 'Tertiary']
 
-    function handleAddNP () {
+    function handleAddNP() {
       const newData = {
         index: 0,
         partnerID: '',
         volume: 0,
         type: 'RULE_TYPE_VOLUME',
-        idRule: ''
+        idRule: '',
       }
       newData.index = addNPData.value.length + 1
       addNPData.value = [...addNPData.value, newData]
-
     }
     watch(
       () => [addNPData],
@@ -468,34 +486,38 @@ export default defineComponent({
     watch(
       () => [selected.value.rules, dialog.value.isChange],
       ([newRules, newStatusChange], [oldRules]) => {
-        let rulesVolume = JSON.parse((localStorage.getItem('addNPData') as string)) as InputNPData[]
-        if(
+        let rulesVolume = JSON.parse(
+          localStorage.getItem('addNPData') as string
+        ) as InputNPData[]
+        if (
           (!rulesVolume ||
-          (rulesVolume && rulesVolume.length === 0)
-          ||
-          newStatusChange ||
-          (newRules.length !== oldRules.length))
-          &&
+            (rulesVolume && rulesVolume.length === 0) ||
+            newStatusChange ||
+            newRules.length !== oldRules.length) &&
           dialog.value.status !== 'COD'
         ) {
-          rulesVolume = newRules.filter((el: any) => el.data?.definitions.some((x: any) => x.type === 'RULE_TYPE_VOLUME'))
+          rulesVolume = newRules.filter((el: any) =>
+            el.data?.definitions.some((x: any) => x.type === 'RULE_TYPE_VOLUME')
+          )
 
-          rulesVolume = rulesVolume.map((x:any, i: number) => {
-
+          rulesVolume = rulesVolume.map((x: any, i: number) => {
             return {
               index: i + 1,
               partnerID: x.data.partnerID,
-              volume: Number(x.data.definitions.filter((y: Definition) => y.type === "RULE_TYPE_VOLUME")[0].value),
+              volume: Number(
+                x.data.definitions.filter(
+                  (y: Definition) => y.type === 'RULE_TYPE_VOLUME'
+                )[0].value
+              ),
               type: 'RULE_TYPE_VOLUME',
               idRule: x.idRule,
               priority: x.data.priority,
-              definitions: x.data.definitions ?? []
+              definitions: x.data.definitions ?? [],
             }
           })
           dialog.value.isChange = false
         }
         addNPData.value = rulesVolume
-
       },
       { deep: true }
     )
@@ -606,11 +628,12 @@ export default defineComponent({
       try {
         $fetchState.pending = true
         let routePath = 'getMarketplaces'
-        if(params.isCOD) routePath = 'getMarketplacesConnected'
-        await storeFilters.dispatch(
-          `marketplaces/marketplaces/${routePath}`,
-          { params: dataParams, isLControl: params.isLControl, isCOD: params.isCOD }
-        )
+        if (params.isCOD) routePath = 'getMarketplacesConnected'
+        await storeFilters.dispatch(`marketplaces/marketplaces/${routePath}`, {
+          params: dataParams,
+          isLControl: params.isLControl,
+          isCOD: params.isCOD,
+        })
       } catch (error) {
         return error
       } finally {
@@ -637,9 +660,13 @@ export default defineComponent({
         await storeLControls.dispatch('lControls/lControls/getLControls', {
           params: {},
         })
-        if(selected.value.zoneIndex?.value) {
-          selected.value.rules= parsingRulesPayload(rulesByZone.value[(selected.value.zoneIndex?.value) as string].rules)
-          rulesComp.value = parsingRulesPayload(rulesByZone.value[(selected.value.zoneIndex?.value) as string].rules) as RulePayload[]
+        if (selected.value.zoneIndex?.value) {
+          selected.value.rules = parsingRulesPayload(
+            rulesByZone.value[selected.value.zoneIndex?.value as string].rules
+          )
+          rulesComp.value = parsingRulesPayload(
+            rulesByZone.value[selected.value.zoneIndex?.value as string].rules
+          ) as RulePayload[]
         }
       } catch (error) {
         return error
@@ -694,7 +721,7 @@ export default defineComponent({
               country: selected.value.countryIndex?.value,
               service: selected.value.serviceIndex?.value,
               zone: selected.value.zoneIndex.value,
-              isCOD: true
+              isCOD: true,
             })
           }
 
@@ -706,8 +733,17 @@ export default defineComponent({
           // selected.value.priority = data.data.priority
           selected.value.isUpdate = !!data.data.partnerID
 
-          if(checkDefinition({data: [...selected.value.rules].map(y => y.data), type: 'RULE_TYPE_IS_COD'}))  {
-            const dataCOD = checkDefinition({data: [...selected.value.rules].map(y => y.data), type: 'RULE_TYPE_IS_COD', isFilter: true}) as Rule
+          if (
+            checkDefinition({
+              data: [...selected.value.rules].map((y) => y.data),
+              type: 'RULE_TYPE_IS_COD',
+            })
+          ) {
+            const dataCOD = checkDefinition({
+              data: [...selected.value.rules].map((y) => y.data),
+              type: 'RULE_TYPE_IS_COD',
+              isFilter: true,
+            }) as Rule
 
             CODpartnerSelected.value.partnerID = dataCOD.partnerID
             CODpartnerSelected.value.status = true
@@ -717,16 +753,29 @@ export default defineComponent({
           break
       }
     }
-    function checkDefinition({data, type, isFilter}: {data: Rule[], type: string, isFilter?: boolean}) {
-      if(isFilter) {
-      return [...data].filter((x: Rule) =>x?.definitions && x.definitions.some(y => y.type === type))[0] ?? {}
+    function checkDefinition({
+      data,
+      type,
+      isFilter,
+    }: {
+      data: Rule[]
+      type: string
+      isFilter?: boolean
+    }) {
+      if (isFilter) {
+        return (
+          [...data].filter(
+            (x: Rule) =>
+              x?.definitions && x.definitions.some((y) => y.type === type)
+          )[0] ?? {}
+        )
       } else {
-        return [...data].some((x: Rule) =>{
-
-          return x?.definitions && x.definitions.some(y => {
-
-            return y.type === type
-            }
+        return [...data].some((x: Rule) => {
+          return (
+            x?.definitions &&
+            x.definitions.some((y) => {
+              return y.type === type
+            })
           )
         })
       }
@@ -737,13 +786,14 @@ export default defineComponent({
         storeLControls.state.lControls.lControls.lControls,
         selected.value.countryIndex?.value,
         selected.value.serviceIndex?.value,
-        selected.value.partnerID, CODpartnerSelected.value.partnerID,
+        selected.value.partnerID,
+        CODpartnerSelected.value.partnerID,
         selected.value.ruleGroupID,
         dialog.value.deleteRule,
         selected.value.rules,
         selected.value.totalRulesPerZone,
         selected.value.priority,
-        addNPData
+        addNPData,
       ],
       ([
         newLControl,
@@ -756,14 +806,12 @@ export default defineComponent({
         newRules,
         newTotalRules,
         newPriority,
-        newNPdata
+        newNPdata,
       ]) => {
-
-      let rules = [...newRules] as any
-      const totalRules = newTotalRules as number
-      const priorityTemp = newPriority ?? 0
-      const temp =
-        {
+        let rules = [...newRules] as any
+        const totalRules = newTotalRules as number
+        const priorityTemp = newPriority ?? 0
+        const temp = {
           id: selected.value.ruleGroupID,
           data: {
             partnerID: selected.value.partnerID,
@@ -774,100 +822,116 @@ export default defineComponent({
                 value: selected.value.zoneIndex?.value,
               },
             ],
-          }
+          },
         }
-      if(
-        !checkDefinition({data: [...rules].map(y => y.data), type: 'RULE_TYPE_ZONE'})
-      ) {
-        rules = [...rules, temp]
-      } else if(checkDefinition({data: [...rules].map(y => y.data), type: 'RULE_TYPE_ZONE'})) {
-          const indexCOD = rules.findIndex((el: any) => el.data.definitions.some((x: any) => x.type === 'RULE_TYPE_ZONE'))
+        if (
+          !checkDefinition({
+            data: [...rules].map((y) => y.data),
+            type: 'RULE_TYPE_ZONE',
+          })
+        ) {
+          rules = [...rules, temp]
+        } else if (
+          checkDefinition({
+            data: [...rules].map((y) => y.data),
+            type: 'RULE_TYPE_ZONE',
+          })
+        ) {
+          const indexCOD = rules.findIndex((el: any) =>
+            el.data.definitions.some((x: any) => x.type === 'RULE_TYPE_ZONE')
+          )
           rules[indexCOD].data.partnerID = partnerDefault
-      }
-
-      if(
-        CODpartnerSelected.value.partnerID
-        && !checkDefinition({data: [...rules].map(y => y.data), type: 'RULE_TYPE_IS_COD'})
-      ) {
-        const cod = {
-          id: selected.value.ruleGroupID,
-          data: {
-            partnerID: CODpartnerSelected.value.partnerID,
-            priority: (priorityTemp + 1),
-            definitions: [
-              {
-                type: 'RULE_TYPE_IS_COD',
-                value: selected.value.zoneIndex?.value,
-              },
-            ],
-          }
         }
-        rules = [...rules, cod]
-      } else if(checkDefinition({data: [...rules].map(y => y.data), type: 'RULE_TYPE_IS_COD'})) {
-          const indexCOD = rules.findIndex((el: any) => el.data.definitions.some((x: any) => x.type === 'RULE_TYPE_IS_COD'))
-          rules[indexCOD].data.partnerID = CODpartner
-      }
 
-      // START Input new data
+        if (
+          CODpartnerSelected.value.partnerID &&
+          !checkDefinition({
+            data: [...rules].map((y) => y.data),
+            type: 'RULE_TYPE_IS_COD',
+          })
+        ) {
+          const cod = {
+            id: selected.value.ruleGroupID,
+            data: {
+              partnerID: CODpartnerSelected.value.partnerID,
+              priority: priorityTemp + 1,
+              definitions: [
+                {
+                  type: 'RULE_TYPE_IS_COD',
+                  value: selected.value.zoneIndex?.value,
+                },
+              ],
+            },
+          }
+          rules = [...rules, cod]
+        } else if (
+          checkDefinition({
+            data: [...rules].map((y) => y.data),
+            type: 'RULE_TYPE_IS_COD',
+          })
+        ) {
+          const indexCOD = rules.findIndex((el: any) =>
+            el.data.definitions.some((x: any) => x.type === 'RULE_TYPE_IS_COD')
+          )
+          rules[indexCOD].data.partnerID = CODpartner
+        }
+
+        // START Input new data
         let npData = newNPdata.value
 
         npData = [...npData].map((x: InputNPData, i: number) => {
-
-          return   {
+          return {
             idRule: x.idRule,
             id: selected.value.ruleGroupID,
             data: {
               partnerID: x.partnerID,
               priority: x?.priority ?? priorityTemp + 1 + i,
-              definitions: x.definitions && x.definitions.length > 0
-                ? x.definitions.map((z: Definition) => {
-                  let temp = z
-                  switch (z?.type) {
-                    case 'RULE_TYPE_ZONE':
-                      temp = {
-                        ...temp,
-                        value: selected.value.zoneIndex?.value ?? '',
+              definitions:
+                x.definitions && x.definitions.length > 0
+                  ? x.definitions.map((z: Definition) => {
+                      let temp = z
+                      switch (z?.type) {
+                        case 'RULE_TYPE_ZONE':
+                          temp = {
+                            ...temp,
+                            value: selected.value.zoneIndex?.value ?? '',
+                          }
+                          break
+                        case 'RULE_TYPE_VOLUME':
+                          temp = {
+                            ...temp,
+                            value: String(x.volume),
+                          }
+                          break
+                        default:
+                          break
                       }
-                      break;
-                    case 'RULE_TYPE_VOLUME':
-                      temp = {
-                        ...temp,
+                      return temp
+                    })
+                  : [
+                      {
+                        type: 'RULE_TYPE_ZONE',
+                        value: selected.value.zoneIndex?.value,
+                      },
+                      {
+                        type: x.type,
                         value: String(x.volume),
-                      }
-                      break;
-                    default:
-                      break;
-                  }
-                  return temp
-                })
-                : [
-                    {
-                      type: 'RULE_TYPE_ZONE',
-                      value: selected.value.zoneIndex?.value,
-                    },
-                    {
-                      type: x.type,
-                      value: String(x.volume)
-                    },
-                  ]
-            }
+                      },
+                    ],
+            },
           }
         })
         rules = [...rules, ...npData]
-      // END Input new data
+        // END Input new data
 
         rulesComp.value = rules
       },
       { deep: true }
     )
 
-
-    const addRules = async (
-      data: any
-    ) => {
+    const addRules = async (data: any) => {
       try {
         const payload = data
-
 
         $fetchState.pending = true
 
@@ -878,14 +942,12 @@ export default defineComponent({
         $fetchState.pending = false
       }
     }
-    const updateRules = async (
-      data: any
-    ) => {
+    const updateRules = async (data: any) => {
       try {
         const payload = {
           id: data.idRule,
           data: {
-            partnerID: data.data.partnerID ,
+            partnerID: data.data.partnerID,
             priority: data.data.priority,
           },
         }
@@ -902,19 +964,17 @@ export default defineComponent({
         $fetchState.pending = false
       }
     }
-    const updateDefinition = async (
-      data: Definition[]
-    ) => {
+    const updateDefinition = async (data: Definition[]) => {
       try {
         let payload = [...data].filter((y: Definition) => {
-          return y.type !== "RULE_TYPE_ZONE" && y.type !== "RULE_TYPE_IS_COD"
+          return y.type !== 'RULE_TYPE_ZONE' && y.type !== 'RULE_TYPE_IS_COD'
         }) as any
         payload = [...payload].map((x: Definition) => {
           return {
             id: x.id,
             data: {
-              value: x.value
-            }
+              value: x.value,
+            },
           }
         })
 
@@ -924,16 +984,18 @@ export default defineComponent({
         //   'lControls/lControls/updateDefinition',
         //   payload
         // )
-        await Promise.all(payload.map(async (el: any) => {
-          try {
-            await storeLControls.dispatch(
-              'lControls/lControls/updateDefinition',
-              el
-            )
-          } catch (error) {
-            console.log('error'+ error);
-          }
-        }))
+        await Promise.all(
+          payload.map(async (el: any) => {
+            try {
+              await storeLControls.dispatch(
+                'lControls/lControls/updateDefinition',
+                el
+              )
+            } catch (error) {
+              console.log('error' + error)
+            }
+          })
+        )
       } catch (error) {
         return error
       } finally {
@@ -1017,13 +1079,11 @@ export default defineComponent({
       ]
     })
 
-
-    const deleteRules = async ({idRule} : {idRule?: string}) => {
+    const deleteRules = async ({ idRule }: { idRule?: string }) => {
       try {
         dialogSettings.value.loading = true
 
         $fetchState.pending = true
-
 
         await storeLControls.dispatch('lControls/lControls/deleteRules', {
           ruleID: idRule,
@@ -1036,7 +1096,7 @@ export default defineComponent({
         dialog.value.idRule = ''
         dialog.value.isChange = true
 
-        if(dialog.value.status === 'COD') {
+        if (dialog.value.status === 'COD') {
           CODpartnerSelected.value.idRule = ''
           CODpartnerSelected.value.partnerID = ''
           CODpartnerSelected.value.status = false
@@ -1051,13 +1111,11 @@ export default defineComponent({
       }
     }
     const handleInfoCOD = (partnerID: string) => {
-      return marketplacesCOD.value.some(x => x.id === partnerID)
+      return marketplacesCOD.value.some((x) => x.id === partnerID)
     }
 
     const btnAction = async () => {
       try {
-
-
         if (selected.value.isUpdate) {
           await updateRuleGroup()
         }
@@ -1065,18 +1123,20 @@ export default defineComponent({
           await addRuleGroup()
         }
 
-        await Promise.all(rulesComp.value.map(async (el: any) => {
-          try {
-            if(el.idRule && selected.value.isUpdate) {
-              if(el.data.partnerID) await updateRules(el)
-              await updateDefinition(el.data.definitions)
-            } else {
-              await addRules(el)
+        await Promise.all(
+          rulesComp.value.map(async (el: any) => {
+            try {
+              if (el.idRule && selected.value.isUpdate) {
+                if (el.data.partnerID) await updateRules(el)
+                await updateDefinition(el.data.definitions)
+              } else {
+                await addRules(el)
+              }
+            } catch (error) {
+              console.log('error' + error)
             }
-          } catch (error) {
-            console.log('error'+ error);
-          }
-        }))
+          })
+        )
 
         dialog.value.status = ''
         await fetchRuleGroups()
@@ -1117,35 +1177,47 @@ export default defineComponent({
       return selected.value.serviceIndex?.value === 'CUSTOMS'
     }
 
-    function handleCOD () {
+    function handleCOD() {
       CODpartnerSelected.value.status = !CODpartnerSelected.value.status
     }
-    function handleDeleteRule ({isCOD, isVolume}: {isCOD?: Boolean, isVolume?: {index: number, status: Boolean}}) {
+    function handleDeleteRule({
+      isCOD,
+      isVolume,
+    }: {
+      isCOD?: Boolean
+      isVolume?: { index: number; status: Boolean }
+    }) {
       dialog.value.status = ''
-      if(
-        isCOD
-      ) {
-        const indexCOD = selected.value.rules.findIndex((el: RulePayload) => el.data.definitions.some((x: Definition) => x.type === 'RULE_TYPE_IS_COD'))
+      if (isCOD) {
+        const indexCOD = selected.value.rules.findIndex((el: RulePayload) =>
+          el.data.definitions.some(
+            (x: Definition) => x.type === 'RULE_TYPE_IS_COD'
+          )
+        )
         const idRule = selected.value.rules[indexCOD]?.idRule
-        if(indexCOD === -1 || selected.value.rules.some((el: RulePayload) => !el.idRule)) {
-            CODpartnerSelected.value.status = false
-            CODpartnerSelected.value.partnerID = ''
-          } else {
+        if (
+          indexCOD === -1 ||
+          selected.value.rules.some((el: RulePayload) => !el.idRule)
+        ) {
+          CODpartnerSelected.value.status = false
+          CODpartnerSelected.value.partnerID = ''
+        } else {
           dialog.value.deleteRule = true
           dialog.value.idRule = idRule
           dialog.value.status = 'COD'
         }
         CODpartnerSelected.value.idRule = idRule
-
       }
-      if(isVolume?.status ) {
-        const index = addNPData.value.findIndex((x: InputNPData) => x.index === isVolume.index)
+      if (isVolume?.status) {
+        const index = addNPData.value.findIndex(
+          (x: InputNPData) => x.index === isVolume.index
+        )
         if (
           index > -1 &&
           !addNPData.value[index].idRule
           // addNPData.value.some((el: InputNPData) => !el.idRule)
         ) {
-          addNPData.value.splice(index, 1);
+          addNPData.value.splice(index, 1)
         } else {
           dialog.value.deleteRule = true
           dialog.value.idRule = addNPData.value[index]?.idRule ?? ''
@@ -1155,8 +1227,8 @@ export default defineComponent({
 
     onUnmounted(() => {
       // DELETE SERVICE ON VUEX
-        localStorage.removeItem('addNPData')
-        dialog.value.status = ''
+      localStorage.removeItem('addNPData')
+      dialog.value.status = ''
     })
 
     watch(
@@ -1225,24 +1297,27 @@ export default defineComponent({
       { deep: true }
     )
 
-    function parsingRulesPayload (data: Rule[]) {
-        const rules = data && [...data].map(el => {
+    function parsingRulesPayload(data: Rule[]) {
+      const rules =
+        data &&
+        [...data].map((el) => {
           return {
             id: el.ruleGroupID,
-            idRule: el.id ,
+            idRule: el.id,
             data: {
               partnerID: el.partnerID,
               priority: el.priority,
-              definitions: el.definitions && el.definitions.length > 0
-              ? el.definitions.map(x => {
-                  return {
-                    id: x.id,
-                    type: x.type,
-                    value: x.value,
-                  }
-                })
-              : null,
-            }
+              definitions:
+                el.definitions && el.definitions.length > 0
+                  ? el.definitions.map((x) => {
+                      return {
+                        id: x.id,
+                        type: x.type,
+                        value: x.value,
+                      }
+                    })
+                  : null,
+            },
           }
         })
       return rules ?? []
@@ -1265,7 +1340,7 @@ export default defineComponent({
         newPortIndex,
         newZones,
         newPorts,
-        newLControl
+        newLControl,
       ]) => {
         let temp = [...lControls.value] as RuleGroup[]
         if (newCountryIndex) {
@@ -1299,46 +1374,63 @@ export default defineComponent({
             let rules = [] as any
             ObjRulesByZone[el.id] = {
               rules: temp.map((d: RuleGroup) => {
-
-                const filter = d.Rules && d.Rules.filter((x: Rule) => x.definitions.some((y: Definition) => y.value === el.id))
+                const filter =
+                  d.Rules &&
+                  d.Rules.filter((x: Rule) =>
+                    x.definitions.some((y: Definition) => y.value === el.id)
+                  )
                 return filter
-              } )[0]
+              })[0],
             }
             selected.value.priority = temp.map((d: RuleGroup) => {
-
-                const filter = d.Rules && [...d.Rules].sort((a, b) => b.priority - a.priority)[0]
-                return filter?.priority
+              const filter =
+                d.Rules &&
+                [...d.Rules].sort((a, b) => b.priority - a.priority)[0]
+              return filter?.priority
             })[0]
-            ? temp.map((d: RuleGroup) => {
-                const filter = d.Rules && [...d.Rules].sort((a, b) => b.priority - a.priority)[0]
-                return filter?.priority
-              })[0]
-            : 0
+              ? temp.map((d: RuleGroup) => {
+                  const filter =
+                    d.Rules &&
+                    [...d.Rules].sort((a, b) => b.priority - a.priority)[0]
+                  return filter?.priority
+                })[0]
+              : 0
             if (temp && temp.length > 0) {
               temp.forEach((d: RuleGroup) => {
                 ruleGroupID = d.id
                 serviceType = d.serviceType
-                if(d.Rules && d.Rules.length > 0) totalRulesPerZone = d.Rules.length
+                if (d.Rules && d.Rules.length > 0)
+                  totalRulesPerZone = d.Rules.length
                 rules = parsingRulesPayload(ObjRulesByZone[el.id].rules)
 
-
-                if (ObjRulesByZone[el.id].rules && ObjRulesByZone[el.id].rules.length > 0) {
+                if (
+                  ObjRulesByZone[el.id].rules &&
+                  ObjRulesByZone[el.id].rules.length > 0
+                ) {
                   // selected.value.priority = Math.max(...ObjRulesByZone[el.id].rules.map((o: any) => o.priority))
                   // const highestPriority = [...ObjRulesByZone[el.id].rules].sort((a, b) => b.priority - a.priority)
                   // console.log({priority: Math.max(...ObjRulesByZone[el.id].rules.map((o: any) => o.priority)), highestPriority})
-                  ObjRulesByZone[el.id].rules && ObjRulesByZone[el.id].rules.forEach((c: Rule) => {
-                    if (c.definitions && c.definitions.length > 0) {
-                      c.definitions.forEach((e: Definition) => {
-                        if (e.value === el.id) {
-                          const indexZone = ObjRulesByZone[el.id].rules.findIndex((el: Rule) => el.definitions.some((x: Definition) => x.type === 'RULE_TYPE_ZONE'))
-                          partnerID = ObjRulesByZone[el.id].rules[indexZone]?.partnerID
-                          partnerName = findNamePartner(partnerID)
-                          priority = c.priority
-                          ruleID = e.ruleID
-                        }
-                      })
-                    }
-                  })
+                  ObjRulesByZone[el.id].rules &&
+                    ObjRulesByZone[el.id].rules.forEach((c: Rule) => {
+                      if (c.definitions && c.definitions.length > 0) {
+                        c.definitions.forEach((e: Definition) => {
+                          if (e.value === el.id) {
+                            const indexZone = ObjRulesByZone[
+                              el.id
+                            ].rules.findIndex((el: Rule) =>
+                              el.definitions.some(
+                                (x: Definition) => x.type === 'RULE_TYPE_ZONE'
+                              )
+                            )
+                            partnerID =
+                              ObjRulesByZone[el.id].rules[indexZone]?.partnerID
+                            partnerName = findNamePartner(partnerID)
+                            priority = c.priority
+                            ruleID = e.ruleID
+                          }
+                        })
+                      }
+                    })
                 }
               })
             }
@@ -1361,25 +1453,18 @@ export default defineComponent({
           } else {
             zonesCust.value = computeZone
           }
-
-
         }
       },
       { deep: true }
     )
 
-    watch(
-      selected,
-      () => {
-
-      },
-      { deep: true }
-    )
+    watch(selected, () => {}, { deep: true })
 
     function handleDisabled() {
-      if(
+      if (
         !selected.value.partnerID ||
-        (CODpartnerSelected.value.status && !CODpartnerSelected.value.partnerID) ||
+        (CODpartnerSelected.value.status &&
+          !CODpartnerSelected.value.partnerID) ||
         addNPData.value.some((x: InputNPData) => !x.partnerID)
       ) {
         return true
@@ -1414,7 +1499,7 @@ export default defineComponent({
       dialogSettings,
       deleteRules,
       handleDeleteRule,
-      handleDisabled
+      handleDisabled,
     }
   },
   head: {},
@@ -1603,16 +1688,16 @@ export default defineComponent({
   }
   .btn-COD {
     margin-top: 10px;
-    transition: all .3s;
+    transition: all 0.3s;
     &:hover {
-      opacity: .8;
+      opacity: 0.8;
     }
   }
   .disabled {
     &.btn-COD {
-      cursor: not-allowed
+      cursor: not-allowed;
     }
-    opacity: .5;
+    opacity: 0.5;
     pointer-events: none;
   }
 }
