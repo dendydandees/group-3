@@ -173,21 +173,21 @@ export const actions: ActionTree<RootStateOrders, RootStateOrders> = {
   },
   async getSelectedLabels(_store, { data }: { data: { orderIds: string[] } }) {
     try {
-      const response = await this.$axios.$post(
-        `api/clients/orders/labels`,
-        data,
-        { responseType: 'blob' }
-      )
-
-      return response
+      return await this.$axios.$post(`api/clients/orders/labels`, data, {
+        responseType: 'blob',
+      })
     } catch (error) {
       return error
     }
   },
   async getSelectedExports(_store, { data }: { data: string[] }) {
-    return await this.$axios.$post(`api/clients/orders-export`, data, {
-      responseType: 'blob',
-    })
+    try {
+      return await this.$axios.$post(`api/clients/orders-export`, data, {
+        responseType: 'blob',
+      })
+    } catch (error) {
+      return error
+    }
   },
   async getNodeCalculators({ commit }) {
     try {

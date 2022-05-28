@@ -35,10 +35,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
+import { defineComponent, useMeta } from '@nuxtjs/composition-api'
 
 export default defineComponent({
   name: 'LoginPage',
   layout: 'guest',
+  setup() {
+    useMeta(() => ({ title: `Client Portal | Login` }))
+  },
+  head: {},
 })
 </script>

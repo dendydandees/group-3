@@ -43,7 +43,7 @@
               </template>
 
               <v-row justify="space-between" align="start">
-                <v-col cols="4">
+                <v-col :cols="isOnPublicTrackingNumber ? 12 : 4">
                   <div>
                     <h4
                       class="body-1 ma-0 font-weight-bold text--primary"
@@ -99,6 +99,7 @@ import {
 // types
 import { VuexModuleOrders } from '~/types/orders'
 import { VuexModuleIncomingOrders } from '~/types/partnerPortals/incomingOrders'
+import { VuexModuleTracking } from '~/types/trackings'
 
 export default defineComponent({
   props: {
@@ -112,26 +113,46 @@ export default defineComponent({
     },
   },
   setup(props) {
+    // manage route
     const route = useRoute()
+    const isOnPublicTrackingNumber = computed(
+      () => route.value.name === 'tracking-id'
+    )
+
     // manage store
-    const store = useStore<VuexModuleOrders>()
+    const storeOrders = useStore<VuexModuleOrders>()
     const storeIncomingOrders = useStore<VuexModuleIncomingOrders>()
+    const storeTracking = useStore<VuexModuleTracking>()
     const orderAllocationUpdates = computed(() => {
       return props.isUpcoming
         ? storeIncomingOrders.state.partnerPortals.incomingOrders
             .incomingOrderDetails.order.allocation
-        : store.state.orders.orderDetails.orderAllocationUpdates
+        : route.value.name === 'tracking-id'
+        ? {
+            ...storeTracking.state.trackings.tracking.trackings.map(
+              (track) => ({
+                ...track,
+                externalTracking: { partnerUpdates: track.updates },
+              })
+            ),
+          }
+        : storeOrders.state.orders.orderDetails.orderAllocationUpdates
     })
 
     // manage partner by
     const isShowServiceType = (indexUpdates: number) => {
-      if (route.value.name === 'partner-portals-id-incoming-orders-orderId')
+      if (
+        route.value.name === 'partner-portals-id-incoming-orders-orderId' ||
+        route.value.name === 'tracking-id'
+      )
         return false
 
       return indexUpdates === 0
     }
 
     return {
+      // manage route
+      isOnPublicTrackingNumber,
       // manage store
       orderAllocationUpdates,
       // manage partner by
