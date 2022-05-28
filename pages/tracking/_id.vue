@@ -39,10 +39,9 @@
               </span>
             </div>
 
-            <NuxtImg
+            <v-img
+              :aspect-ratio="16 / 9"
               :src="`data:image/png;base64,${orderTracking.clientLogo}`"
-              format="webp"
-              preload
               class="d-block"
               style="width: 100%"
             />
