@@ -117,7 +117,6 @@
         :items="filterData.country"
         :search-input.sync="search.originCountry"
         clearable
-        cache-items
         outlined
         rounded
         dense
@@ -129,7 +128,13 @@
         label="Origin Country"
         placeholder="Enter your origin country..."
         class="input-filter elevation-1"
-      />
+      >
+        <template #append-item>
+          <div v-if="$fetchState.pending" class="d-flex justify-center">
+            <v-progress-circular indeterminate color="primary" />
+          </div>
+        </template>
+      </v-autocomplete>
     </v-col>
 
     <!-- destination country -->
@@ -139,7 +144,6 @@
         :items="filterData.country"
         :search-input.sync="search.destinationCountry"
         clearable
-        cache-items
         outlined
         rounded
         dense
@@ -151,7 +155,13 @@
         label="Destination Country"
         placeholder="Enter your destination country..."
         class="input-filter elevation-1"
-      />
+      >
+        <template #append-item>
+          <div v-if="$fetchState.pending" class="d-flex justify-center">
+            <v-progress-circular indeterminate color="primary" />
+          </div>
+        </template>
+      </v-autocomplete>
     </v-col>
 
     <!-- origin port -->
@@ -161,7 +171,6 @@
         :items="filterData.ports.data"
         :search-input.sync="search.originPortId"
         clearable
-        cache-items
         outlined
         rounded
         dense
@@ -175,7 +184,11 @@
         class="input-filter elevation-1"
       >
         <template #append-item>
-          <div v-intersect="portIntersect" />
+          <div v-if="$fetchState.pending" class="d-flex justify-center">
+            <v-progress-circular indeterminate color="primary" />
+          </div>
+
+          <div v-else v-intersect="portIntersect" />
         </template>
       </v-autocomplete>
     </v-col>
@@ -187,7 +200,6 @@
         :items="filterData.ports.data"
         :search-input.sync="search.destinationPortId"
         clearable
-        cache-items
         outlined
         rounded
         dense
@@ -201,7 +213,11 @@
         class="input-filter elevation-1"
       >
         <template #append-item>
-          <div v-intersect="portIntersect" />
+          <div v-if="$fetchState.pending" class="d-flex justify-center">
+            <v-progress-circular indeterminate color="primary" />
+          </div>
+
+          <div v-else v-intersect="portIntersect" />
         </template>
       </v-autocomplete>
     </v-col>
@@ -213,7 +229,6 @@
         :items="filterData.serviceTypes"
         :search-input.sync="search.serviceType"
         clearable
-        cache-items
         outlined
         rounded
         dense
@@ -228,7 +243,13 @@
         label="Service Type"
         placeholder="Enter your service type..."
         class="input-filter elevation-1"
-      />
+      >
+        <template #append-item>
+          <div v-if="$fetchState.pending" class="d-flex justify-center">
+            <v-progress-circular indeterminate color="primary" />
+          </div>
+        </template>
+      </v-autocomplete>
     </v-col>
 
     <!-- statuses -->
@@ -238,7 +259,6 @@
         :items="filterData.statuses"
         :search-input.sync="search.statuses"
         clearable
-        cache-items
         outlined
         rounded
         dense
@@ -250,7 +270,13 @@
         label="Status"
         placeholder="Enter your status..."
         class="input-filter elevation-1"
-      />
+      >
+        <template #append-item>
+          <div v-if="$fetchState.pending" class="d-flex justify-center">
+            <v-progress-circular indeterminate color="primary" />
+          </div>
+        </template>
+      </v-autocomplete>
     </v-col>
   </v-row>
 </template>
@@ -333,9 +359,9 @@ export default defineComponent({
     })
     const filterData = ref({
       serviceTypes: [],
-      country: storeFilter.state.filters.countryCodes,
+      country: [],
       statuses: [],
-      ports: storeFilter.state.filters.ports,
+      ports: {} as Ports,
     }) as Ref<FilterData>
 
     // manage ports
@@ -419,11 +445,14 @@ export default defineComponent({
       await getPorts(portsMeta.value)
       await storeFilter.dispatch('filters/getStatuses')
 
-      // format service types
-      filterData.value.serviceTypes = formatServiceTypes()
-
-      // format statuses
-      filterData.value.statuses = formatStatuses()
+      filterData.value = {
+        // format service types
+        serviceTypes: formatServiceTypes(),
+        country: [...storeFilter.state.filters.countryCodes],
+        // format statuses
+        statuses: formatStatuses(),
+        ports: { ...storeFilter.state.filters.ports },
+      }
     })
 
     return {

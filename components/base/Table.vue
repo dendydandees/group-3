@@ -117,13 +117,9 @@
     </template>
 
     <!-- creation date cell -->
-    <template #[`item.LMTrackingNumber`]="{ item }">
+    <template #[`item.LMTrackingNumber`]="{ item: { orderAllocations } }">
       <div class="text--secondary">
-        {{
-          item.orderAllocations.find(
-            (allocation) => allocation.serviceType === 'LAST_MILE'
-          ).externalTrackingNumber
-        }}
+        {{ setLMTrackNumber(orderAllocations) }}
       </div>
     </template>
     <!-- END ORDERS AND INCOMING ORDERS -->
@@ -293,6 +289,13 @@ export default defineComponent({
         ? orderAllocations[0]?.updates[0]?.comments
         : ''
     }
+    const setLMTrackNumber = (orderAllocations: OrderAllocationUpdate[]) => {
+      return (
+        orderAllocations?.find(
+          (allocation) => allocation.serviceType === 'LAST_MILE'
+        )?.externalTrackingNumber ?? ''
+      )
+    }
     const doExportOrder = async (id: string) => {
       const response = await storeOrders.dispatch('orders/getSelectedExports', {
         data: [id],
@@ -313,6 +316,7 @@ export default defineComponent({
       validateSelect,
       // FOR ORDER AND INCOMING ORDER
       setStatusOrder,
+      setLMTrackNumber,
       doExportOrder,
     }
   },
