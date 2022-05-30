@@ -282,12 +282,13 @@ export default defineComponent({
     const storeOrders = useStore<VuexModuleOrders>()
     const { $dateFns } = useContext()
     const setStatusOrder = (orderAllocations: OrderAllocationUpdate[]) => {
-      return orderAllocations &&
-        orderAllocations.length !== 0 &&
-        orderAllocations[0]?.updates &&
-        orderAllocations[0]?.updates.length !== 0
-        ? orderAllocations[0]?.updates[0]?.comments
-        : ''
+      const allocations = orderAllocations?.filter(
+        (allocations) => allocations.updates && allocations.updates.length !== 0
+      )
+
+      if (!allocations || allocations.length === 0) return ''
+
+      return allocations[0].updates[0].comments
     }
     const setLMTrackNumber = (orderAllocations: OrderAllocationUpdate[]) => {
       return (
