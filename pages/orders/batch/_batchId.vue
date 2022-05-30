@@ -116,7 +116,7 @@
             class="d-flex flex-column justify-space-between"
           >
             <div class="primary--text font-weight-bold">
-              {{ x.id }}
+              {{ x.orderCode }}
             </div>
             <div :style="'color: grey; font-size: 14px'">
               {{
