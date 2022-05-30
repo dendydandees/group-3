@@ -96,7 +96,7 @@
 
               <v-col cols="12" md="10" class="pa-0">
                 <v-row>
-                  <v-col cols="12" md="6">
+                  <v-col cols="12" md="12">
                     <v-select
                       v-model="selectedZone.value"
                       :items="countryCodes"
@@ -112,7 +112,7 @@
                     >
                     </v-select>
                   </v-col>
-                  <v-col cols="12" md="6">
+                  <v-col v-if="false" cols="12" md="6">
                     <v-select
                       v-model="selectedPort.value"
                       :items="!selectedZone.value ? [] : ports"
@@ -206,7 +206,10 @@
                 </v-col>
               </v-row>
             </div>
-            <div class="button-your-partner d-flex justify-center mt-6">
+            <div
+              v-if="false"
+              class="button-your-partner d-flex justify-center mt-6"
+            >
               <v-btn plain color="red"> View your connected vendors </v-btn>
             </div>
           </div>
