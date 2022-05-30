@@ -17,10 +17,12 @@ export default defineNuxtPlugin((context, inject) => {
     },
     setColorServiceType: (data: string): string => {
       return data === 'LAST_MILE'
-        ? 'primary'
+        ? 'primary darken-1'
         : data === 'CUSTOMS'
-        ? 'success'
-        : 'secondary'
+        ? 'success darken-1'
+        : data === 'FREIGHT_FORWARDER'
+        ? 'yellow darken-4'
+        : 'secondary darken-1'
     },
     setURLParams: (data: Object) => {
       const paramsFilterOrders = new URLSearchParams()
