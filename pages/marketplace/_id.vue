@@ -187,7 +187,7 @@
       </v-col>
     </v-row>
 
-    <div class="bottom-row mt-16">
+    <div v-if="partnerServiceZones" class="bottom-row mt-16">
       <div class="title-filter primary--text display-1 mb-2">Coverage Area</div>
       <!-- <div class="btn-filter-map d-flex align-center">
         <v-btn
