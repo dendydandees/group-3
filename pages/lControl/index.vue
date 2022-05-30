@@ -286,7 +286,7 @@
                       v-model="addNPData[i]"
                       :label="`${dataPriority[i]} Network Partner`"
                       :placeholder="'Default Partner'"
-                      :data="marketplacesCOD"
+                      :data="marketplaces"
                       :disabled-drop="$fetchState.pending"
                       :item-show="{ text: 'name', value: 'id' }"
                       :is-delete="true"
@@ -398,7 +398,7 @@ export default defineComponent({
       () => storeMarketplaces.state.marketplaces.marketplaces.marketplacesAll
     )
     const marketplaces = computed(
-      () => storeMarketplaces.state.marketplaces.marketplaces.marketplaces
+      () => storeMarketplaces.state.marketplaces.marketplaces.marketplacesConnected
     )
     const marketplacesCOD = computed(
       () => storeMarketplaces.state.marketplaces.marketplaces.marketplacesCOD
@@ -602,6 +602,7 @@ export default defineComponent({
       zone?: string
       isLControl?: Boolean
       isCOD?: Boolean
+      isConnected?: Boolean
     }) => {
       let dataParams = {
         page: 1,
@@ -628,7 +629,7 @@ export default defineComponent({
       try {
         $fetchState.pending = true
         let routePath = 'getMarketplaces'
-        if (params.isCOD) routePath = 'getMarketplacesConnected'
+        if (params.isConnected) routePath = 'getMarketplacesConnected'
         await storeFilters.dispatch(`marketplaces/marketplaces/${routePath}`, {
           params: dataParams,
           isLControl: params.isLControl,
@@ -715,6 +716,7 @@ export default defineComponent({
             country: selected.value.countryIndex?.value,
             service: selected.value.serviceIndex?.value,
             zone: selected.value.zoneIndex.value,
+            isConnected: true
           })
           if (selected.value.serviceIndex?.value === 'LAST_MILE') {
             await fetchMarketplace({
@@ -722,6 +724,7 @@ export default defineComponent({
               service: selected.value.serviceIndex?.value,
               zone: selected.value.zoneIndex.value,
               isCOD: true,
+              isConnected: true
             })
           }
 
