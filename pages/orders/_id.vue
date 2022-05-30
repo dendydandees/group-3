@@ -59,7 +59,21 @@
       </v-col>
     </v-row>
     <!-- Node Calculator items -->
-    <v-row no-gutters align="center" class="mt-6">
+    <div class="mt-6">
+      <span class="title">
+        Estimated Rate
+      </span>
+    </div>
+    <div
+      class="d-flex mb-3"
+    >
+      <span
+        :style="'font-size: 12px; color: #626262'"
+      >
+        *Actual rate will be reflected on invoice
+      </span>
+    </div>
+    <v-row no-gutters align="center" class="mt-2">
       <v-col cols="12" class="white pa-3 elevation-2 rounded-xl">
         <CalculatorOrderItems :fetch-state="$fetchState" />
       </v-col>
