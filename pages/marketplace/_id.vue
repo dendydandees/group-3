@@ -226,7 +226,7 @@
       :dialog="dialog"
       :data="idPartner"
       @toggle="toggle()"
-      @add="addConnection(idPartner.value)"
+      @add="addConnection(idPartner.id)"
     />
   </section>
 </template>
@@ -408,9 +408,9 @@ export default defineComponent({
     const dialog = reactive({
       status: false,
     })
-    const idPartner = reactive({
-      value: '' as String,
-      name: '' as String,
+    const idPartner = ref({
+      // value: '' as String,
+      // name: '' as String,
     })
 
     const collage = {
@@ -519,8 +519,10 @@ export default defineComponent({
       }
     }
     const addPartner = (partner: DetailMarketplace) => {
-      idPartner.value = partner.id
-      idPartner.name = partner.name
+      console.log({partner})
+      // idPartner.value = partner.id
+      // idPartner.name = partner.name
+      idPartner.value = partner
       toggle()
     }
     const addConnection = async (id: String) => {
