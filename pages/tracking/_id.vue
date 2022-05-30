@@ -26,9 +26,7 @@
 
           <div v-else>
             <div class="mb-6">
-              <h1 class="text-uppercase headline font-weight-bold mb-4">
-                Order
-              </h1>
+              <h1 class="text-uppercase headline font-weight-bold">Order :</h1>
 
               <span class="d-block primary--text font-weight-bold">
                 {{ orderTracking.orderCode }}
@@ -40,7 +38,6 @@
             </div>
 
             <v-img
-              :aspect-ratio="16 / 9"
               :src="`data:image/png;base64,${orderTracking.clientLogo}`"
               class="d-block"
               style="width: 100%"
@@ -48,13 +45,11 @@
           </div>
         </v-col>
 
-        <v-col cols="12" md="8">
+        <v-col cols="12" md="8" class="pl-15">
           <UpdatesTimeline :fetch-state="$fetchState" />
         </v-col>
       </v-row>
     </v-container>
-
-    <BaseNavigationFooter />
   </section>
 </template>
 
@@ -103,9 +98,3 @@ export default defineComponent({
   head: {},
 })
 </script>
-
-<style lang="scss">
-.v-footer {
-  border-radius: 0px !important;
-}
-</style>

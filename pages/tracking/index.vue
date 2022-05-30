@@ -2,10 +2,10 @@
   <section class="base">
     <BaseNavigationAppBarGuest />
 
-    <article class="py-4 py-md-10 primary">
-      <v-container>
+    <article class="pt-10 primary" style="height: 100vh">
+      <v-container class="pb-0">
         <v-row class="white--text" align="center" justify="center">
-          <v-col cols="12" md="8" class="text-center">
+          <v-col cols="12" md="6" class="text-center">
             <div class="mb-15">
               <h1 class="display-1 font-weight-bold mb-4">
                 Luwjistik Tracking Platform
@@ -73,11 +73,19 @@
               </ValidationObserver>
             </div>
           </v-col>
+
+          <v-col cols="12" md="6" class="d-none d-md-block pb-0">
+            <NuxtImg
+              src="/images/track-and-trace/tracking-img.png"
+              format="webp"
+              preload
+              class="pr-15"
+              style="transform: scaleX(-1); width: 100%"
+            />
+          </v-col>
         </v-row>
       </v-container>
     </article>
-
-    <BaseNavigationFooter />
   </section>
 </template>
 
