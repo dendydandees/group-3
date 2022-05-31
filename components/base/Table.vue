@@ -66,7 +66,7 @@
           v-for="service in item.requestedServices"
           :key="service"
           small
-          :color="$customUtils.setColorServiceType(service)"
+          :color="$customUtils.setColorServiceType(service, 'chip')"
           class="text-uppercase white--text ma-1"
         >
           {{ $customUtils.setServiceType(service) }}

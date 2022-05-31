@@ -29,7 +29,10 @@
           <div
             v-for="(x, i) in data.partnerServiceTypes"
             :key="i"
-            :class="`chip-custom ${$customUtils.setColorServiceType(x.name)}`"
+            :class="`chip-custom ${$customUtils.setColorServiceType(
+              x.name,
+              'chip'
+            )}`"
             :style="{
               fontSize: '10px',
               color: 'white',

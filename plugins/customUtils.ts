@@ -15,14 +15,24 @@ export default defineNuxtPlugin((context, inject) => {
     setRuleType: (data: string): string => {
       return data.split('RULE_TYPE_')[1]
     },
-    setColorServiceType: (data: string): string => {
+    setColorServiceType: (data: string, type = '') => {
+      if (type === 'chip') {
+        return data === 'LAST_MILE'
+          ? 'primary darken-1'
+          : data === 'CUSTOMS'
+          ? 'success darken-1'
+          : data === 'FREIGHT_FORWARDER'
+          ? 'warning'
+          : 'secondary darken-1'
+      }
+
       return data === 'LAST_MILE'
-        ? 'primary darken-1'
+        ? 'primary'
         : data === 'CUSTOMS'
-        ? 'success darken-1'
+        ? 'success'
         : data === 'FREIGHT_FORWARDER'
-        ? 'yellow darken-4'
-        : 'secondary darken-1'
+        ? 'warning'
+        : 'secondary'
     },
     setURLParams: (data: Object) => {
       const paramsFilterOrders = new URLSearchParams()
