@@ -261,7 +261,6 @@ export default defineComponent({
               'consigneePostal',
               'consigneeCity',
               'consigneeProvince',
-              'consigneeDistrict',
               'destinationPort',
               'length',
               'width',
@@ -271,7 +270,6 @@ export default defineComponent({
               'shipmentIncoterm',
               'senderCountry',
               'senderCity',
-              'senderDistrict',
             ]
             const orderItemsRequired = [
               'description',
