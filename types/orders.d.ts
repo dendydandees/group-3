@@ -95,6 +95,7 @@ export interface Order {
   consigneeCountry: string
   consigneeCity: string
   consigneeState: string
+  consigneeDistrict?: string
   consigneeProvince: string
   consigneeEmail: string
   consigneeTaxId: string
@@ -116,6 +117,7 @@ export interface Order {
   senderContactName?: string
   senderContactNumber?: string
   senderState?: string
+  senderDistrict?: string
   senderCity?: string
   senderProvince?: string
   senderPostal?: string
