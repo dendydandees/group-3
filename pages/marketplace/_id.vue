@@ -74,18 +74,18 @@
           rounded
           color="white darken-1"
           class="btn-rate-sheet custom-btn-primary mt-10"
-          @click="handleDownloadNP"
+          @click="handleDownload"
         >
           Download Rate Sheet
         </v-btn>
 
         <v-btn
-          v-if="false"
+          :disabled="!detailMarketplace.partnerSOPPath"
           rounded
           color="white darken-1"
-          class="btn-rate-sheet custom-btn-primary mt-10"
+          class="btn-rate-sheet custom-btn-primary mt-3"
+          @click="handleDownload({isSOP: true})"
         >
-          <!-- @click="handleDownloadNP" -->
           Download SOP
         </v-btn>
         <!-- <NuxtImg src="/images/logo-detail.svg" width="290" preload /> -->
@@ -583,8 +583,12 @@ export default defineComponent({
       // detailGalleries.value = [...storeDetailMarketplace.state.marketplaces.marketplaces.galleries]
     })
 
-    function handleDownloadNP() {
-      getRatesDownload(id.value)
+    function handleDownload({isSOP}: {isSOP?:string}) {
+      if(isSOP) {
+          window.open(detailMarketplace.value.partnerSOPPath,'_self');
+      } else {
+        getRatesDownload(id.value)
+      }
     }
 
     const convertDetailData = (data: string | number | boolean) => {
@@ -627,7 +631,7 @@ export default defineComponent({
       pagination,
       partnerServiceZones,
       isRatesAvailable,
-      handleDownloadNP,
+      handleDownload,
     }
   },
   head: {},
