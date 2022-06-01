@@ -271,8 +271,10 @@
                   </div>
                   <div
                     v-if="
-                      selected.serviceIndex.value === 'LAST_MILE' ||
-                      selected.serviceIndex.value === 'FIRST_MILE'
+                      (selected.serviceIndex.value === 'LAST_MILE' ||
+                      selected.serviceIndex.value === 'FIRST_MILE')
+                      &&
+                      false
                     "
                     class="mt-2"
                   >
@@ -305,6 +307,8 @@
                       (selected.serviceIndex.value === 'LAST_MILE' ||
                         selected.serviceIndex.value === 'FIRST_MILE') &&
                       addNPData.length < 3
+                      &&
+                      false
                     "
                     :class="`
                         primary--text btn-COD ${
