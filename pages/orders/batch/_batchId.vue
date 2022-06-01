@@ -119,9 +119,7 @@
               {{ x.orderCode }}
             </div>
             <div :style="'color: grey; font-size: 14px'">
-              {{
-                x.items && typeof x.items === 'object' ? x.items.length : 0
-              }}
+              {{ x.items && typeof x.items === 'object' ? x.items.length : 0 }}
               items
             </div>
             <div

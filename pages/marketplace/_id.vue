@@ -519,7 +519,7 @@ export default defineComponent({
       }
     }
     const addPartner = (partner: DetailMarketplace) => {
-      console.log({partner})
+      console.log({ partner })
       // idPartner.value = partner.id
       // idPartner.name = partner.name
       idPartner.value = partner
