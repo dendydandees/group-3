@@ -15,7 +15,7 @@
       <!-- Left options -->
       <OrdersLeftOptions
         :is-on-list-view="false"
-        :selected-orders="[]"
+        :selected-orders="selectedOrders"
         :loading="$fetchState.pending"
         :is-show-filter="isShowFilter"
         @doShowFilter="isShowFilter = !isShowFilter"
@@ -74,6 +74,7 @@
           :loading="$fetchState.pending"
           :is-select-disabled="isExternalTrackingExist"
           :show-select="true"
+          :action-exist="actionExist"
           @fetch="fetchIncomingOrders"
           @doSelectAll="selectAllToggle"
           @doGetDetails="doGetDetails"
@@ -210,6 +211,12 @@ const initHeaders = [
     sortable: false,
     width: 230,
   },
+  {
+    text: '',
+    value: 'actions',
+    sortable: false,
+    width: 150,
+  },
 ] as Header[]
 
 export default defineComponent({
@@ -259,8 +266,8 @@ export default defineComponent({
 
     // manage table
     const selectedOrders = ref([]) as Ref<IncomingOrder[]>
-    const isLabelExist = computed(() => {
-      return incomingOrders.value.some((order) => order.labelPath)
+    const actionExist = ref({
+      download: true,
     })
     const isExternalTrackingExist = computed(() => {
       return incomingOrders.value.some((order: IncomingOrder) => {
@@ -269,8 +276,6 @@ export default defineComponent({
         )
       })
     })
-
-    // manage table
     const headers = ref(initHeaders) as Ref<Header[]>
     const selectedViews = ref([
       'orderCode',
@@ -538,7 +543,7 @@ export default defineComponent({
       filterOrders,
       // manage table
       selectedOrders,
-      isLabelExist,
+      actionExist,
       selectedViews,
       headers,
       selectAllToggle,
