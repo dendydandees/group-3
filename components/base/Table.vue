@@ -143,7 +143,7 @@
           v-if="actionExist.download"
           small
           download
-          dark
+          :dark="!!item.labelPath"
           :href="item.labelPath || ''"
           :loading="loading"
           :disabled="!item.labelPath"

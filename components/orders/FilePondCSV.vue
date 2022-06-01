@@ -165,7 +165,11 @@ export default defineComponent({
           }
           // formatting service type data
           const formatServiceType = (data: boolean | string): boolean => {
-            return typeof data === 'boolean' ? data : data === 'yes'
+            if (!data) return false
+
+            return typeof data === 'boolean'
+              ? data
+              : data.toLowerCase() === 'yes'
           }
           // formatting duplicate order codes
           const checkDuplicateOrderCodes = (
@@ -257,6 +261,7 @@ export default defineComponent({
               'consigneePostal',
               'consigneeCity',
               'consigneeProvince',
+              'consigneeDistrict',
               'destinationPort',
               'length',
               'width',
@@ -266,6 +271,7 @@ export default defineComponent({
               'shipmentIncoterm',
               'senderCountry',
               'senderCity',
+              'senderDistrict',
             ]
             const orderItemsRequired = [
               'description',
@@ -335,8 +341,10 @@ export default defineComponent({
               consigneePostal: order?.consigneePostal?.toString() ?? '',
               consigneeNumber: order?.consigneeNumber?.toString() ?? '',
               consigneeTaxId: order?.consigneeTaxId?.toString() ?? '',
+              consigneeState: order?.consigneeDistrict ?? '',
               senderPostal: order?.senderPostal?.toString() ?? '',
               senderContactNumber: order?.senderContactNumber?.toString() ?? '',
+              senderState: order?.senderDistrict ?? '',
             }
 
             // for domestic

@@ -398,7 +398,8 @@ export default defineComponent({
       () => storeMarketplaces.state.marketplaces.marketplaces.marketplacesAll
     )
     const marketplaces = computed(
-      () => storeMarketplaces.state.marketplaces.marketplaces.marketplacesConnected
+      () =>
+        storeMarketplaces.state.marketplaces.marketplaces.marketplacesConnected
     )
     const marketplacesCOD = computed(
       () => storeMarketplaces.state.marketplaces.marketplaces.marketplacesCOD
@@ -716,7 +717,7 @@ export default defineComponent({
             country: selected.value.countryIndex?.value,
             service: selected.value.serviceIndex?.value,
             zone: selected.value.zoneIndex.value,
-            isConnected: true
+            isConnected: true,
           })
           if (selected.value.serviceIndex?.value === 'LAST_MILE') {
             await fetchMarketplace({
@@ -724,7 +725,7 @@ export default defineComponent({
               service: selected.value.serviceIndex?.value,
               zone: selected.value.zoneIndex.value,
               isCOD: true,
-              isConnected: true
+              isConnected: true,
             })
           }
 

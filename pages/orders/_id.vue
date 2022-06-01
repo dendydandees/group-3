@@ -60,16 +60,10 @@
     </v-row>
     <!-- Node Calculator items -->
     <div class="mt-6">
-      <span class="title">
-        Estimated Rate
-      </span>
+      <span class="title"> Estimated Rate </span>
     </div>
-    <div
-      class="d-flex mb-3"
-    >
-      <span
-        :style="'font-size: 12px; color: #626262'"
-      >
+    <div class="d-flex mb-3">
+      <span :style="'font-size: 12px; color: #626262'">
         *Actual rate will be reflected on invoice
       </span>
     </div>
