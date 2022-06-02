@@ -80,7 +80,7 @@
         </v-btn>
 
         <v-btn
-          :disabled="!detailMarketplace.partnerSOPPath"
+          v-if="detailMarketplace.partnerSOPPath"
           rounded
           color="white darken-1"
           class="btn-rate-sheet custom-btn-primary mt-3"
