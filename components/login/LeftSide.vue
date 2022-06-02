@@ -95,7 +95,9 @@
       </ValidationObserver>
     </div>
 
-    <div>
+    <div
+      v-if="false"
+    >
       <NuxtLink to="#" class="text-decoration-none secondary--text">
         Forgot Password ?
       </NuxtLink>
