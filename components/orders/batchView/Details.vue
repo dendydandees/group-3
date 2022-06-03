@@ -51,7 +51,7 @@
             "
             :style="y.value === 'total' && { borderRight: '1px dashed red' }"
           >
-            {{ x[y.value] }}
+            {{x.currency && y.value && y.value !== 'orderCode' ? x.currency : ''}} {{ x[y.value] }}
           </td>
         </tr>
         <tr v-if="items && items.length > 0">
@@ -70,7 +70,7 @@
                   : ''
               "
             >
-              {{ setTotal(x.value) }}
+              {{items[0] && items[0].currency ? items[0].currency  : ''}} {{ setTotal(x.value) }}
             </span>
           </td>
         </tr>
