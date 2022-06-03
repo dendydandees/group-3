@@ -1,6 +1,6 @@
-import minifyTheme from 'minify-css-string'
+import minifyTheme from 'minify-css-string';
 
-const development = process.env.NODE_ENV === 'development'
+const development = process.env.NODE_ENV === 'development';
 
 export default {
   // Rendering property : https://nuxtjs.org/docs/features/rendering-modes
@@ -90,7 +90,14 @@ export default {
     'nuxt-webpack-optimisations',
     '@nuxtjs/svg',
     '@nuxtjs/date-fns',
+    '@nuxtjs/google-analytics'
   ],
+
+  // GOOGLE ANALYTICS: https://google-analytics.nuxtjs.org
+  googleAnalytics: {
+    id: process.env.VUE_APP_GOOGLE_ANALYTICS
+    // Options
+  },
 
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
@@ -173,5 +180,8 @@ export default {
   publicRuntimeConfig: {
     sendBirdKey: process.env.VUE_APP_SENDBIRD_KEY,
     sendBirdToken: process.env.VUE_APP_SENDBIRD_TOKEN,
+    googleAnalytics: {
+      id: process.env.VUE_APP_GOOGLE_ANALYTICS
+    },
   },
-}
+};
