@@ -73,6 +73,7 @@ export default {
     '~/plugins/vee-validate.js',
     '~/plugins/customUtils.ts',
     { src: '~plugins/vue-carousel-3d', ssr: false },
+    '~/plugins/vue-gtag.js'
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -95,7 +96,9 @@ export default {
 
   // GOOGLE ANALYTICS: https://google-analytics.nuxtjs.org
   googleAnalytics: {
-    id: process.env.VUE_APP_GOOGLE_ANALYTICS
+    id: process.env.VUE_APP_GOOGLE_ANALYTICS,
+    pageTracking: true,
+    sendHitTask: true
     // Options
   },
 
@@ -181,7 +184,9 @@ export default {
     sendBirdKey: process.env.VUE_APP_SENDBIRD_KEY,
     sendBirdToken: process.env.VUE_APP_SENDBIRD_TOKEN,
     googleAnalytics: {
-      id: process.env.VUE_APP_GOOGLE_ANALYTICS
+      id: process.env.VUE_APP_GOOGLE_ANALYTICS,
+      pageTracking: true,
+      sendHitTask: true
     },
   },
 };
