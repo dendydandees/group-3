@@ -1,4 +1,5 @@
 import minifyTheme from 'minify-css-string';
+require('dotenv').config();
 
 const development = process.env.NODE_ENV === 'development';
 
@@ -62,6 +63,13 @@ export default {
         src: 'https://polyfill.io/v3/polyfill.min.js?features=IntersectionObserver',
         body: true,
       },
+      {
+        src: `https://www.googletagmanager.com/gtag/js?id=${ process.env.VUE_APP_GOOGLE_ANALYTICS }`,
+        async: true,
+      },
+      {
+        src: "js/ga.js",
+      }
     ],
   },
 
@@ -73,7 +81,7 @@ export default {
     '~/plugins/vee-validate.js',
     '~/plugins/customUtils.ts',
     { src: '~plugins/vue-carousel-3d', ssr: false },
-    '~/plugins/vue-gtag.js'
+    // '~/plugins/gtag.js',
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -188,5 +196,8 @@ export default {
       pageTracking: true,
       sendHitTask: true
     },
+  },
+  env: {
+    VUE_APP_GOOGLE_ANALYTICS: process.env.VUE_APP_GOOGLE_ANALYTICS
   },
 };
