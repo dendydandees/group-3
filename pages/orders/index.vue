@@ -230,6 +230,7 @@ export default defineComponent({
     })
     const alert = computed(() => storeApplications.state.applications.alert)
 
+
     // manage view
     const orderView = ref(0)
     const isOnListView = computed(() => {
