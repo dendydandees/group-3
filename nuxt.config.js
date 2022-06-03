@@ -2,6 +2,7 @@ import minifyTheme from 'minify-css-string';
 require('dotenv').config();
 
 const development = process.env.NODE_ENV === 'development';
+const production = process.env.NODE_ENV === 'production';
 
 export default {
   // Rendering property : https://nuxtjs.org/docs/features/rendering-modes
@@ -82,6 +83,7 @@ export default {
     '~/plugins/customUtils.ts',
     { src: '~plugins/vue-carousel-3d', ssr: false },
     // '~/plugins/gtag.js',
+    // '~/plugins/vue-gtag.client.js',
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -106,7 +108,13 @@ export default {
   googleAnalytics: {
     id: process.env.VUE_APP_GOOGLE_ANALYTICS,
     pageTracking: true,
-    sendHitTask: true
+    autoTracking: {
+      screenview: true
+    },
+    debug: {
+      sendHitTask: true
+    },
+    dev: production
     // Options
   },
 
@@ -194,7 +202,13 @@ export default {
     googleAnalytics: {
       id: process.env.VUE_APP_GOOGLE_ANALYTICS,
       pageTracking: true,
-      sendHitTask: true
+      autoTracking: {
+        screenview: true
+      },
+      debug: {
+        sendHitTask: true
+      },
+      dev: production
     },
   },
   env: {
