@@ -42,8 +42,20 @@
     <!-- ORDERs AND INCOMING ORDERS -->
     <!-- order item cell -->
     <template #[`item.orderCode`]="{ item }">
-      <v-btn text color="primary" @click="$emit('doGetDetails', item)">
-        {{ item.orderCode }}
+      <v-btn
+        text
+        color="primary"
+        @click="$emit('doGetDetails', item)"
+      >
+        <span>
+          {{ item.orderCode }}
+        </span>
+        <v-icon
+          v-if="item.requestedServices.includes('FREIGHT_FORWARDER')"
+          class="ml-1"
+        >
+          mdi-airplane
+        </v-icon>
       </v-btn>
     </template>
 

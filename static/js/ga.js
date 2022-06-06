@@ -1,4 +1,4 @@
-const dataUser = JSON.parse(localStorage.getItem('auth.user') as any);
+const dataUser = JSON.parse(localStorage.getItem('auth.user'));
 window.dataLayer = window.dataLayer || [];
 function gtag() { dataLayer.push(arguments); }
 gtag('js', new Date());
