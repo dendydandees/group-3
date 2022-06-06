@@ -230,7 +230,6 @@ export default defineComponent({
     })
     const alert = computed(() => storeApplications.state.applications.alert)
 
-
     // manage view
     const orderView = ref(0)
     const isOnListView = computed(() => {
@@ -292,35 +291,6 @@ export default defineComponent({
         },
       })
     }
-    const doDownloadSelectedLabel = async () => {
-      if (selectedOrders.value.length === 0) return
-
-      const selectedLabels = {
-        orderIds: selectedOrders.value.map((order) => order.id),
-      }
-      const response = (await storeOrders.dispatch('orders/getSelectedLabels', {
-        data: selectedLabels,
-      })) as string
-      const fileName = `order_labels_${$dateFns.format(
-        new Date(),
-        'yyyy-MM-dd_HH-mm'
-      )}.pdf`
-
-      saveAs(response, fileName)
-    }
-    const doExportOrders = async () => {
-      if (selectedOrders.value.length === 0) return
-
-      const response = await storeOrders.dispatch('orders/getSelectedExports', {
-        data: selectedOrders.value.map((order) => order.id),
-      })
-      const fileName = `order_exports_${$dateFns.format(
-        new Date(),
-        'yyyy-MM-dd_HH-mm'
-      )}.xlsx`
-
-      saveAs(response, fileName)
-    }
 
     // manage filter order
     const isShowFilter = ref(false)
@@ -381,6 +351,57 @@ export default defineComponent({
       }, 3000)
       await fetchOrders(pagination.value)
     })
+
+    const doDownloadSelectedLabel = async () => {
+      if (selectedOrders.value.length === 0) return
+
+      try {
+        $fetchState.pending = true
+
+        const response = await storeOrders.dispatch(
+          'orders/getSelectedLabels',
+          {
+            data: {
+              orderIds: selectedOrders.value.map((order) => order.id),
+            },
+          }
+        )
+        const fileName = `order_labels_${$dateFns.format(
+          new Date(),
+          'yyyy-MM-dd_HH-mm'
+        )}.pdf`
+
+        saveAs(response, fileName)
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+    const doExportOrders = async () => {
+      if (selectedOrders.value.length === 0) return
+
+      try {
+        $fetchState.pending = true
+
+        const response = await storeOrders.dispatch(
+          'orders/getSelectedExports',
+          {
+            data: selectedOrders.value.map((order) => order.id),
+          }
+        )
+        const fileName = `order_exports_${$dateFns.format(
+          new Date(),
+          'yyyy-MM-dd_HH-mm'
+        )}.xlsx`
+
+        saveAs(response, fileName)
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
 
     // manage filter on changed
     watch(
