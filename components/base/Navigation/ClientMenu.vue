@@ -51,6 +51,7 @@ export default defineComponent({
       { title: 'Orders', icon: '$order', to: '/orders' },
       { title: 'Marketplace', icon: '$marketplace', to: '/marketplace' },
       { title: 'L-Control', icon: '$lControl', to: '/lControl' },
+      // { title: 'Bagging', icon: 'mdi-bag-suitcase-outline', to: '/bagging' },
     ]) as Ref<NavigationLinks[]>
     const isGroupShown = ref(true)
 
