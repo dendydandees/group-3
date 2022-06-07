@@ -2,7 +2,7 @@
   <section class="pa-4 pa-md-10 py-8 baggedPage">
     <BaseHeadlinePage
       title="Bagging"
-      subtitle="Bag parcels toegether and generate a single bag label for ease of shipping and tracking."
+      subtitle="Bag parcels together and generate a single bag label for ease of shipping and tracking."
     >
       <template slot="addition">
         <span class="text--secondary font-weight-medium title">
@@ -25,9 +25,28 @@
       <OrdersRightOptions
       >
         <!-- :loading="$fetchState.pending" -->
-        <template #viewSettings>
+        <template #toggleView>
+          <OrdersToggleView
+            v-model="orderView"
+          />
         </template>
       </OrdersRightOptions>
+      <v-btn
+        color="primary"
+        min-width="200px"
+      >
+        <v-icon
+          v-if="orderView === 1"
+          class="mr-2"
+        >
+          mdi-play
+        </v-icon>
+        {{
+          orderView === 0
+          ? 'BAG'
+          : 'START SCAN'
+        }}
+      </v-btn>
     </v-row>
 
     <v-expand-transition>
@@ -74,6 +93,7 @@
           :color="isActive(index) ? 'primary' : 'white'"
           :class="[isActive(index) ? 'white--text' : 'primary--text']"
           class="custom-tab mx-2"
+          min-width="150px"
           @click="doChangeWindow(index)"
         >
           <v-icon v-if="icon" left dark size="28">
@@ -87,11 +107,13 @@
     <v-card elevation="2">
       <v-window v-model="step">
         <v-window-item :value="0">
-          <BaggingList />
+          <BaggingScanned v-if="orderView === 1"/>
+          <BaggingList v-else/>
         </v-window-item>
 
         <v-window-item :value="1">
-          <BaggingList />
+          <BaggingScanned v-if="orderView === 1"/>
+          <BaggingList v-else/>
         </v-window-item>
       </v-window>
     </v-card>
@@ -141,6 +163,8 @@ export default defineComponent({
   name: 'BaggingPages',
   middleware: 'partner',
   setup() {
+    // manage view
+    const orderView = ref(0)
     // manage table
     const selectedOrders = ref([]) as Ref<any>
     // manage filter order
@@ -150,16 +174,18 @@ export default defineComponent({
     }
     // manage windows
     const step = ref(0)
-    const stepList = ref([
-      {
-        text: 'Bags',
-        icon: '',
-      },
-      {
-        text: 'Unbagged',
-        icon: '',
-      },
-    ])
+    const stepList = computed(() => {
+      return [
+        {
+          text: 'Bags',
+          icon: '',
+        },
+        {
+          text: orderView.value === 0 ? 'Unbagged' : 'Scanned',
+          icon: '',
+        },
+      ]
+    })
     const isActive = (data: number) => step.value === data
     const doChangeWindow = (data: number) => {
       step.value = data
@@ -174,7 +200,8 @@ export default defineComponent({
       stepList,
       step,
       isActive,
-      doChangeWindow
+      doChangeWindow,
+      orderView
     }
   },
   head: {},
