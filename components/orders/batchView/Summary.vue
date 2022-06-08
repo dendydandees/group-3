@@ -88,6 +88,10 @@ export default defineComponent({
           value: setTotal('fmCost'),
         },
         {
+          name: 'Last Mile',
+          value: setTotal('lmCost'),
+        },
+        {
           name: 'Customs',
           value: setTotal('ccCost'),
         },
