@@ -357,7 +357,7 @@ import {
 } from '@nuxtjs/composition-api'
 // Interfaces or types
 import { ru } from 'date-fns/locale'
-import { VuexModuleFilters } from '~/types/filters'
+import { ServiceType, VuexModuleFilters } from '~/types/filters'
 import {
   VuexModuleLControls,
   Definition,
@@ -395,7 +395,20 @@ export default defineComponent({
     const storeFilters = useStore<VuexModuleFilters>()
     const storeLControls = useStore<VuexModuleLControls>()
     const countryCodes = computed(() => storeFilters.state.filters.countryCodes)
-    const serviceTypes = computed(() => storeFilters.state.filters.serviceTypes)
+    const serviceTypes = computed(() => {
+      let filter = storeFilters.state.filters.serviceTypes
+      if(filter && filter.length > 0) {
+        filter = filter.filter((x: ServiceType) => x.name !== 'FREIGHT_FORWARDER')
+        const indexFM = filter.findIndex((x: ServiceType) => x.name === 'FIRST_MILE')
+        const indexCM = filter.findIndex((x: ServiceType) => x.name === 'CUSTOMS')
+        moveItem(indexFM, 0, filter)
+        moveItem(indexCM, 1, filter)
+        console.log({indexCM, indexFM, filter, length: filter.length - 1})
+        // moveItem(indexLM, filter.length - 1, filter)
+      }
+      console.log({filter})
+      return filter
+    })
     const zones = computed(() => storeFilters.state.filters.zones)
     const ports = computed(() => storeFilters.state.filters.ports?.data) as any
     const marketplacesAll = computed(
@@ -554,6 +567,13 @@ export default defineComponent({
       },
       { deep: true }
     )
+
+    function moveItem(from: number, to: number, data: any) {
+      // remove `from` item and store it
+      const f = data.splice(from, 1)[0];
+      // insert stored item into position `to`
+      data.splice(to, 0, f);
+    }
 
     const fetchCountryCodes = async () => {
       try {
