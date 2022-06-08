@@ -86,22 +86,27 @@ export default defineComponent({
         {
           name: 'First Mile',
           value: setTotal('fmCost'),
+          currency: props.nodeCalculators[0] && props.nodeCalculators[0].currency ? props.nodeCalculators[0].currency  : ''
         },
         {
           name: 'Last Mile',
           value: setTotal('lmCost'),
+          currency: props.nodeCalculators[0] && props.nodeCalculators[0].currency ? props.nodeCalculators[0].currency  : ''
         },
         {
           name: 'Customs',
           value: setTotal('ccCost'),
+          currency: props.nodeCalculators[0] && props.nodeCalculators[0].currency ? props.nodeCalculators[0].currency  : ''
         },
         {
           name: 'BOB',
           value: setTotal('bobCost'),
+          currency: props.nodeCalculators[0] && props.nodeCalculators[0].currency ? props.nodeCalculators[0].currency  : ''
         },
         {
           name: 'COD',
           value: setTotal('codCost'),
+          currency: props.nodeCalculators[0] && props.nodeCalculators[0].currency ? props.nodeCalculators[0].currency  : ''
         },
       ]
       return temp
@@ -111,10 +116,12 @@ export default defineComponent({
         {
           name: 'D&T',
           value: setTotal('dnt'),
+          currency: props.nodeCalculators[0] && props.nodeCalculators[0].currency ? props.nodeCalculators[0].currency  : ''
         },
         {
           name: 'Admin Fee',
           value: setTotal('adminFee'),
+          currency: props.nodeCalculators[0] && props.nodeCalculators[0].currency ? props.nodeCalculators[0].currency  : ''
         },
       ]
       return temp

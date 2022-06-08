@@ -34,6 +34,7 @@
       <v-btn
         color="primary"
         min-width="200px"
+        @click="handleBagScanBag"
       >
         <v-icon
           v-if="orderView === 1"
@@ -57,7 +58,7 @@
       >
         <template #filterList>
           <!-- Filter for order list -->
-          <!-- <OrdersFilterListView v-model="filterOrders" /> -->
+          <BaggingFilterListView v-model="filterBagging" />
         </template>
       </OrdersFiltersContainer>
     </v-expand-transition>
@@ -107,12 +108,16 @@
     <v-card elevation="2">
       <v-window v-model="step">
         <v-window-item :value="0">
-          <BaggingScanned v-if="orderView === 1"/>
+          <BaggingScanned
+            v-if="orderView === 1"
+          />
           <BaggingList v-else/>
         </v-window-item>
 
         <v-window-item :value="1">
-          <BaggingScanned v-if="orderView === 1"/>
+          <BaggingScanned
+            v-if="orderView === 1"
+          />
           <BaggingList v-else/>
         </v-window-item>
       </v-window>
@@ -131,6 +136,20 @@
         />
       </template>
     </BaseModalForm> -->
+    <!-- Modal confirm -->
+    <BaggingModalConfirm
+      v-model="dialog.confirm"
+      :dialog-settings="dialogSettings"
+      :is-confirm="true"
+      @doSubmit="submit"
+      @doCancel="handleCancel"
+    />
+    <!-- Modal after click no -->
+    <BaggingModalConfirm
+      v-model="dialog.cancel"
+      :dialog-settings="dialogSettings"
+      @doSubmit="submit({isCancel: true})"
+    />
   </section>
 </template>
 
@@ -158,11 +177,31 @@ import {
   Header,
 } from '~/types/applications'
 import { VuexModuleFilters, Statuses } from '~/types/filters'
+import { filterBaggingInit} from '~/store/bagging/bagging'
+import { VuexModuleDetailBagging, FilterBagging} from '~/types/bagging/bagging'
 
 export default defineComponent({
   name: 'BaggingPages',
   middleware: 'partner',
   setup() {
+    const router = useRouter()
+    const storeApplications = useStore<VuexModuleApplications>()
+    const storeBagging = useStore<VuexModuleDetailBagging>()
+    const dialog = ref({
+      confirm: false,
+      cancel: false
+    })
+    const dialogSettings = ref({
+      loading: false,
+      title: '',
+      content: '',
+      cancelText: '',
+      submitText: '',
+      submitColor: '',
+    }) as Ref<ModalConfirm>
+    const filterBagging = ref({
+      ...(storeBagging.state.bagging as any).bagging.filter,
+    })
     // manage view
     const orderView = ref(0)
     // manage table
@@ -170,7 +209,12 @@ export default defineComponent({
     // manage filter order
     const isShowFilter = ref(false)
     const doResetFilter = () => {
-      // filterOrders.value = filterOrderInit
+      filterBagging.value = {
+        createdFrom: '',
+        createdTo: '',
+        client: '',
+        destination: ''
+      }
     }
     // manage windows
     const step = ref(0)
@@ -191,6 +235,62 @@ export default defineComponent({
       step.value = data
     }
 
+    function handleBagScanBag() {
+      if(orderView.value === 0 ) {
+        dialogSettings.value = {
+          loading: false,
+          title: 'Print label now ?',
+          content: '',
+          cancelText: 'No',
+          submitText: 'Yes',
+          submitColor: 'primary',
+        }
+        dialog.value.confirm = true
+      } else {
+        router.push(`/bagging/scan`)
+      }
+    }
+    async function submit(params: {isCancel?: boolean}) {
+      try {
+        dialogSettings.value.loading = true
+
+        storeApplications.commit('applications/SET_ALERT', {
+          isShow: true,
+          type: 'success',
+          message: 'Print label successfully!',
+        })
+      } catch (error) {
+
+        storeApplications.commit('applications/SET_ALERT', {
+          isShow: true,
+          type: 'error',
+          message: `Print label ${'error'}`,
+        })
+      } finally {
+        dialogSettings.value.loading = false
+        if(params?.isCancel) {
+          dialog.value.cancel = false
+        } else {
+          dialog.value.confirm = false
+        }
+        setTimeout(() => {
+          storeApplications.commit('applications/RESET_ALERT')
+        }, 3000)
+      }
+    }
+    function handleCancel() {
+      dialogSettings.value = {
+        loading: false,
+        title: 'Make sure bags are arranged properly to prevent mix-up',
+        content: '',
+        cancelText: '',
+        submitText: 'Ok',
+        submitColor: 'primary',
+      }
+      dialog.value.cancel = true
+
+    }
+
     useMeta(() => ({ title: 'Partner Portal | Bagging' }))
 
     return {
@@ -201,7 +301,13 @@ export default defineComponent({
       step,
       isActive,
       doChangeWindow,
-      orderView
+      orderView,
+      handleBagScanBag,
+      submit,
+      dialog,
+      dialogSettings,
+      handleCancel,
+      filterBagging
     }
   },
   head: {},

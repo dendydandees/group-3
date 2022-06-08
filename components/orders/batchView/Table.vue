@@ -8,13 +8,13 @@
       disable-sort
     >
       <template #[`item.value`]="{ item }">
-        {{ setPrice(item.value) }}
+       {{item.currency}} {{ setPrice(item.value) }}
       </template>
       <template #body.append="{ items }">
         <tr v-if="items.length">
           <td class="font-weight-bold">Service Total</td>
           <td class="font-weight-bold error--text">
-            {{ setTotal() }}
+            {{items[0] && items[0].currency ? items[0].currency  : ''}} {{ setTotal() }}
           </td>
         </tr>
       </template>

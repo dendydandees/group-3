@@ -403,10 +403,7 @@ export default defineComponent({
         const indexCM = filter.findIndex((x: ServiceType) => x.name === 'CUSTOMS')
         moveItem(indexFM, 0, filter)
         moveItem(indexCM, 1, filter)
-        console.log({indexCM, indexFM, filter, length: filter.length - 1})
-        // moveItem(indexLM, filter.length - 1, filter)
       }
-      console.log({filter})
       return filter
     })
     const zones = computed(() => storeFilters.state.filters.zones)
