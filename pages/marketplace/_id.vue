@@ -374,7 +374,7 @@ export default defineComponent({
         value: 'maximumDimension',
       },
       {
-        name: 'Maximum Weight',
+        name: 'Maximum Weight (kg)',
         value: 'maximumWeight',
       },
       {

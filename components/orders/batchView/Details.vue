@@ -51,7 +51,20 @@
             "
             :style="y.value === 'total' && { borderRight: '1px dashed red' }"
           >
-            {{x.currency && y.value && y.value !== 'orderCode' ? x.currency : ''}} {{ x[y.value] }}
+
+            <!-- <v-btn
+              v-if="y.value === 'orderCode'"
+              text
+              color="primary"
+              @click="doGetDetails(x)"
+            >
+              <span>
+                {{x.currency && y.value && y.value !== 'orderCode' ? x.currency : ''}} {{ x[y.value] }}
+              </span>
+            </v-btn> -->
+            <span >
+              {{x.currency && y.value && y.value !== 'orderCode' ? x.currency : ''}} {{ x[y.value] }}
+            </span>
           </td>
         </tr>
         <tr v-if="items && items.length > 0">
@@ -303,6 +316,11 @@ export default defineComponent({
       }
     }
 
+    const doGetDetails = (data: Order) => {
+      // console.log({data})
+      // router.push(`/orders/${data.id}`)
+    }
+
     return {
       dataTable,
       headersComp,
@@ -310,6 +328,7 @@ export default defineComponent({
       setPrice,
       showBorder,
       setTotal,
+      doGetDetails
     }
   },
 })
