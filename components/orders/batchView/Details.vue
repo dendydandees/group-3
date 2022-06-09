@@ -20,18 +20,26 @@
             "
             :style="y.value === 'total' && { borderRight: '1px dashed red' }"
           >
-            <!-- <v-btn
+            <v-btn
               v-if="y.value === 'orderCode'"
               text
               color="primary"
               @click="doGetDetails(x)"
             >
-              <span>
-                {{x.currency && y.value && y.value !== 'orderCode' ? x.currency : ''}} {{ x[y.value] }}
+              <span
+                class="font-weight-bold"
+              >
+                {{
+                  y.value && y.value !== 'orderCode'
+                    ? setValueByCurrency(x[y.value], x.currency)
+                    : x[y.value] || ''
+                }}
               </span>
-            </v-btn> -->
+            </v-btn>
 
-            <span>
+            <span
+              v-else
+            >
               {{
                 y.value && y.value !== 'orderCode'
                   ? setValueByCurrency(x[y.value], x.currency)
@@ -112,6 +120,7 @@ import {
   useStore,
   onMounted,
   PropType,
+  useRouter,
 } from '@nuxtjs/composition-api'
 
 // interfaces and types
@@ -148,6 +157,7 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const router = useRouter()
     // manage store
     const storeApplications = useStore<VuexModuleApplications>()
     const headersComp = computed(() => {
@@ -283,6 +293,10 @@ export default defineComponent({
         return setValueByCurrency(total, currency)
       }
     }
+    const doGetDetails = (data: any) => {
+      router.push(`/orders/${data.orderId}`)
+    }
+
 
     return {
       dataTable,
@@ -290,6 +304,7 @@ export default defineComponent({
       showBorder,
       setValueByCurrency,
       setTotal,
+      doGetDetails
     }
   },
 })
