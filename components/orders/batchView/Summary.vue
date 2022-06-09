@@ -4,7 +4,9 @@
       <v-col cols="12" md="6">
         <OrdersBatchViewTable :data-table="dataTable" :is-service="true" />
       </v-col>
+
       <v-divider vertical :style="'border-right: 1px dashed red'" />
+
       <v-col cols="12" md="6">
         <OrdersBatchViewTable :data-table="dataTable2" />
       </v-col>
@@ -17,32 +19,16 @@ import {
   computed,
   defineComponent,
   ref,
-  Ref,
   useStore,
-  useRouter,
   onMounted,
-  watch,
   PropType,
 } from '@nuxtjs/composition-api'
-import { ValidationObserver } from 'vee-validate'
 
 // interfaces and types
-import { VForm, VuexModuleApplications } from '~/types/applications'
-import {
-  OrderCrossBorder,
-  OrderDomestic,
-  VuexModuleOrders,
-} from '~/types/orders'
+import { VuexModuleApplications } from '~/types/applications'
 
 export interface Select {
   country: string
-}
-
-interface ErrorUpload {
-  data: {
-    error: string
-    ErrorDetails: { field: string; reason: string; note: string }[]
-  }
 }
 
 export interface ParseNodeCalc {
@@ -61,9 +47,6 @@ export interface ParseNodeCalc {
 
 export default defineComponent({
   name: 'SummaryTab',
-  components: {
-    ValidationObserver,
-  },
   props: {
     step: {
       type: Number,
@@ -75,56 +58,71 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const router = useRouter()
-
     // manage store
     const storeApplications = useStore<VuexModuleApplications>()
-    const storeOfOrders = useStore<VuexModuleOrders>()
-    const alert = computed(() => storeApplications.state.applications.alert)
     const parseService = computed(() => {
-      const temp = [
+      return [
         {
           name: 'First Mile',
           value: setTotal('fmCost'),
-          currency: props.nodeCalculators[0] && props.nodeCalculators[0].currency ? props.nodeCalculators[0].currency  : ''
+          currency:
+            props.nodeCalculators[0] && props.nodeCalculators[0].currency
+              ? props.nodeCalculators[0].currency
+              : '',
         },
         {
           name: 'Last Mile',
           value: setTotal('lmCost'),
-          currency: props.nodeCalculators[0] && props.nodeCalculators[0].currency ? props.nodeCalculators[0].currency  : ''
+          currency:
+            props.nodeCalculators[0] && props.nodeCalculators[0].currency
+              ? props.nodeCalculators[0].currency
+              : '',
         },
         {
           name: 'Customs',
           value: setTotal('ccCost'),
-          currency: props.nodeCalculators[0] && props.nodeCalculators[0].currency ? props.nodeCalculators[0].currency  : ''
+          currency:
+            props.nodeCalculators[0] && props.nodeCalculators[0].currency
+              ? props.nodeCalculators[0].currency
+              : '',
         },
         {
           name: 'BOB',
           value: setTotal('bobCost'),
-          currency: props.nodeCalculators[0] && props.nodeCalculators[0].currency ? props.nodeCalculators[0].currency  : ''
+          currency:
+            props.nodeCalculators[0] && props.nodeCalculators[0].currency
+              ? props.nodeCalculators[0].currency
+              : '',
         },
         {
           name: 'COD',
           value: setTotal('codCost'),
-          currency: props.nodeCalculators[0] && props.nodeCalculators[0].currency ? props.nodeCalculators[0].currency  : ''
+          currency:
+            props.nodeCalculators[0] && props.nodeCalculators[0].currency
+              ? props.nodeCalculators[0].currency
+              : '',
         },
       ]
-      return temp
     })
     const parseCustom = computed(() => {
-      const temp = [
+      return [
         {
           name: 'D&T',
           value: setTotal('dnt'),
-          currency: props.nodeCalculators[0] && props.nodeCalculators[0].currency ? props.nodeCalculators[0].currency  : ''
+          currency:
+            props.nodeCalculators[0] && props.nodeCalculators[0].currency
+              ? props.nodeCalculators[0].currency
+              : '',
         },
         {
           name: 'Admin Fee',
           value: setTotal('adminFee'),
-          currency: props.nodeCalculators[0] && props.nodeCalculators[0].currency ? props.nodeCalculators[0].currency  : ''
+          currency:
+            props.nodeCalculators[0] && props.nodeCalculators[0].currency
+              ? props.nodeCalculators[0].currency
+              : '',
         },
       ]
-      return temp
     })
 
     // manage summary table

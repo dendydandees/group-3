@@ -54,6 +54,7 @@
         v-for="(chip, i) in transferCost"
         :key="i"
         :value="chip.value"
+        :disabled="$fetchState.pending"
         small
         class="custom-chips"
       >
@@ -83,129 +84,161 @@
       </template>
     </v-sheet>
 
-    <v-card v-if="selectedTransferCost === 2" elevation="2">
-      <v-window v-model="step">
-        <v-window-item :value="0">
-          <OrdersBatchViewSummary
-            :step="step"
-            :node-calculators="nodeCalculators"
-          />
-        </v-window-item>
+    <v-row
+      v-if="$fetchState.pending"
+      class="fill-height"
+      align-content="center"
+      justify="center"
+    >
+      <v-col class="text-subtitle-1 text-center" cols="12">
+        Getting the data...
+      </v-col>
+      <v-col cols="6">
+        <v-progress-linear
+          color="primary"
+          indeterminate
+          rounded
+          height="6"
+        ></v-progress-linear>
+      </v-col>
+    </v-row>
 
-        <v-window-item :value="1">
-          <OrdersBatchViewDetails
-            :step="step"
-            :node-calculators="nodeCalculators"
-          />
-        </v-window-item>
-      </v-window>
-    </v-card>
+    <v-scroll-y-transition hide-on-leave>
+      <template v-if="!$fetchState.pending">
+        <v-card v-if="selectedTransferCost === 2" elevation="2">
+          <v-window v-model="step">
+            <v-window-item :value="0">
+              <v-scroll-y-transition hide-on-leave>
+                <OrdersBatchViewSummary
+                  :step="step"
+                  :node-calculators="nodeCalculators"
+                />
+              </v-scroll-y-transition>
+            </v-window-item>
 
-    <div v-if="selectedTransferCost === 1">
-      <v-card
-        v-for="(x, i) in ordersData"
-        :key="i"
-        elevation="2"
-        class="pl-6 pt-6 pb-6 pr-16 mb-6"
-        :disabled="$fetchState.pending"
-      >
-        <v-row>
-          <v-col
-            cols="12"
-            md="4"
-            class="d-flex flex-column justify-space-between"
+            <v-window-item :value="1">
+              <v-scroll-y-transition hide-on-leave>
+                <OrdersBatchViewDetails
+                  :step="step"
+                  :node-calculators="nodeCalculators"
+                />
+              </v-scroll-y-transition>
+            </v-window-item>
+          </v-window>
+        </v-card>
+
+        <div v-if="selectedTransferCost === 1">
+          <v-card
+            v-for="(x, i) in ordersData"
+            :key="i"
+            elevation="2"
+            class="pl-6 pt-6 pb-6 pr-16 mb-6"
+            :disabled="$fetchState.pending"
           >
-            <div class="primary--text font-weight-bold">
-              {{ x.orderCode }}
-            </div>
-            <div :style="'color: grey; font-size: 14px'">
-              {{ x.items && typeof x.items === 'object' ? x.items.length : 0 }}
-              items
-            </div>
-            <div
-              class="font-weight-bold"
-              :style="'color: grey; font-size: 14px'"
-            >
-              {{ x.paymentType }}
-            </div>
-          </v-col>
-          <v-col
-            v-if="x.orderAllocations && x.orderAllocations.length > 0"
-            cols="12"
-            md="8"
-            class="d-flex flex-column justify-space-between"
-          >
-            <div class="font-weight-bold">
-              {{ findNamePartner(x.orderAllocations[0].partnerID) }}
-              <!-- Pos Malaysia -->
-            </div>
-            <!-- <v-divider
+            <v-row>
+              <v-col
+                cols="12"
+                md="4"
+                class="d-flex flex-column justify-space-between"
+              >
+                <div class="primary--text font-weight-bold">
+                  {{ x.orderCode }}
+                </div>
+                <div :style="'color: grey; font-size: 14px'">
+                  {{
+                    x.items && typeof x.items === 'object' ? x.items.length : 0
+                  }}
+                  items
+                </div>
+                <div
+                  class="font-weight-bold"
+                  :style="'color: grey; font-size: 14px'"
+                >
+                  {{ x.paymentType }}
+                </div>
+              </v-col>
+              <v-col
+                v-if="x.orderAllocations && x.orderAllocations.length > 0"
+                cols="12"
+                md="8"
+                class="d-flex flex-column justify-space-between"
+              >
+                <div class="font-weight-bold">
+                  {{ findNamePartner(x.orderAllocations[0].partnerID) }}
+                  <!-- Pos Malaysia -->
+                </div>
+                <!-- <v-divider
               :style="'border-bottom: 3px solid; border-color: red'"
             /> -->
-            <div
-              v-if="
-                x.orderAllocations[0].updates &&
-                x.orderAllocations[0].updates.length > 0
-              "
-              class="d-flex justify-space-between"
-            >
-              <div class="grey--text" :style="'font-size: 14px'">
-                {{ lastStatus(x.orderAllocations) }}
-                <!-- {{x.orderAllocations[0].updates[0].comments}} -->
+                <div
+                  v-if="
+                    x.orderAllocations[0].updates &&
+                    x.orderAllocations[0].updates.length > 0
+                  "
+                  class="d-flex justify-space-between"
+                >
+                  <div class="grey--text" :style="'font-size: 14px'">
+                    {{ lastStatus(x.orderAllocations) }}
+                    <!-- {{x.orderAllocations[0].updates[0].comments}} -->
+                  </div>
+                  <div :style="'font-size: 15px'">
+                    {{
+                      $dateFns.format(
+                        x.orderAllocations[0].updates[0].updateTimestamp,
+                        'HH:mm E, MMM dd, yyyy'
+                      )
+                    }}
+                  </div>
+                </div>
+              </v-col>
+            </v-row>
+          </v-card>
+
+          <div class="d-flex justify-space-between align-center">
+            <div :style="'font-size: 12px; color: red'">
+              {{ meta.totalCount }} Orders
+            </div>
+
+            <div class="d-flex align-center justify-center">
+              <div>
+                <v-btn
+                  fab
+                  small
+                  plain
+                  :disabled="
+                    paginationTracking.page === 1 || $fetchState.pending
+                  "
+                  @click="nextOrPrev('-')"
+                >
+                  <v-icon dense color="black"> mdi-menu-left </v-icon>
+                </v-btn>
               </div>
-              <div :style="'font-size: 15px'">
-                {{
-                  $dateFns.format(
-                    x.orderAllocations[0].updates[0].updateTimestamp,
-                    'HH:mm E, MMM dd, yyyy'
-                  )
-                }}
+              <div class="px-3">
+                {{ meta.page }}
+              </div>
+              <div>
+                <v-btn
+                  fab
+                  small
+                  plain
+                  :disabled="
+                    paginationTracking.page >= meta.totalPage ||
+                    $fetchState.pending
+                  "
+                  @click="nextOrPrev('+')"
+                >
+                  <v-icon dense color="black"> mdi-menu-right </v-icon>
+                </v-btn>
               </div>
             </div>
-          </v-col>
-        </v-row>
-      </v-card>
-
-      <div class="d-flex justify-space-between align-center">
-        <div :style="'font-size: 12px; color: red'">
-          {{ meta.totalCount }} Orders
-        </div>
-
-        <div class="d-flex align-center justify-center">
-          <div>
-            <v-btn
-              fab
-              small
-              plain
-              :disabled="paginationTracking.page === 1 || $fetchState.pending"
-              @click="nextOrPrev('-')"
-            >
-              <v-icon dense color="black"> mdi-menu-left </v-icon>
-            </v-btn>
-          </div>
-          <div class="px-3">
-            {{ meta.page }}
-          </div>
-          <div>
-            <v-btn
-              fab
-              small
-              plain
-              :disabled="
-                paginationTracking.page >= meta.totalPage || $fetchState.pending
-              "
-              @click="nextOrPrev('+')"
-            >
-              <v-icon dense color="black"> mdi-menu-right </v-icon>
-            </v-btn>
+            <div class="btn-page">
+              {{ ordersData && ordersData.length ? ordersData.length : 0 }}
+              Orders / Page
+            </div>
           </div>
         </div>
-        <div class="btn-page">
-          {{ ordersData && ordersData.length ? ordersData.length : 0 }} Orders /
-          Page
-        </div>
-      </div>
-    </div>
+      </template>
+    </v-scroll-y-transition>
   </section>
 </template>
 
@@ -258,7 +291,7 @@ export default defineComponent({
       sortBy: [''],
       sortDesc: [true],
     })
-    const { $dateFns, app } = useContext()
+    const { app } = useContext()
     const storeOrders = useStore<VuexModuleOrders>()
     const storeMarketplaces = useStore<VuexModuleMarketplaces>()
     const marketplaces = computed(
@@ -435,7 +468,7 @@ export default defineComponent({
       }
     }
 
-    const { $fetchState, fetch } = useFetch(async () => {
+    const { $fetchState } = useFetch(async () => {
       await fetchMarketplace()
       await getNodeCalculators()
       await fetchOrders({ params: pagination.value, isBatchView: true })
