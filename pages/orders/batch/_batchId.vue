@@ -141,7 +141,10 @@
                 md="4"
                 class="d-flex flex-column justify-space-between"
               >
-                <div class="primary--text font-weight-bold">
+                <div
+                  class="primary--text font-weight-bold custom-text-btn"
+                  @click="doGetDetails(x)"
+                >
                   {{ x.orderCode }}
                 </div>
                 <div :style="'color: grey; font-size: 14px'">
@@ -512,6 +515,11 @@ export default defineComponent({
       return orderAllocations[0].updates[0].comments
     }
 
+    const doGetDetails = (data: any) => {
+      // console.log({data})
+      router.push(`/orders/${data.id}`)
+    }
+
     return {
       step,
       stepList,
@@ -530,6 +538,7 @@ export default defineComponent({
       nextOrPrev,
       paginationTracking,
       lastStatus,
+      doGetDetails
     }
   },
   head: {},
@@ -587,6 +596,13 @@ export default defineComponent({
     border-radius: 20px;
     color: $error;
     font-size: 12px;
+  }
+  .custom-text-btn {
+    transition: all .3s;
+    cursor: pointer;
+    &:hover {
+      opacity: .7;
+    }
   }
 }
 </style>
