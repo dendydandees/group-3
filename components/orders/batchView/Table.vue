@@ -8,13 +8,18 @@
       disable-sort
     >
       <template #[`item.value`]="{ item }">
-       {{item.currency}} {{ setPrice(item.value) }}
+        <span>
+          {{ item.currency ? setPrice(item.value, item.currency) : '' }}
+        </span>
       </template>
+
+      <!-- eslint-disable vue/valid-v-slot -->
       <template #body.append="{ items }">
         <tr v-if="items.length">
           <td class="font-weight-bold">Service Total</td>
+
           <td class="font-weight-bold error--text">
-            {{items[0] && items[0].currency ? items[0].currency  : ''}} {{ setTotal() }}
+            {{ items[0] && items[0].currency ? setTotal() : '' }}
           </td>
         </tr>
       </template>
@@ -23,29 +28,11 @@
 </template>
 
 <script lang="ts">
-import {
-  computed,
-  defineComponent,
-  ref,
-  Ref,
-  useStore,
-  useRouter,
-  onMounted,
-  watch,
-} from '@nuxtjs/composition-api'
-import { ValidationObserver } from 'vee-validate'
+import { computed, defineComponent } from '@nuxtjs/composition-api'
 
 // interfaces and types
-
 export interface Select {
   country: string
-}
-
-interface ErrorUpload {
-  data: {
-    error: string
-    ErrorDetails: { field: string; reason: string; note: string }[]
-  }
 }
 
 export default defineComponent({
@@ -68,25 +55,52 @@ export default defineComponent({
           content: [...props.dataTable.content].filter((x: any) => x.value),
         }
       } else {
-        return props.dataTable
+        return {
+          ...props.dataTable,
+          content: [...props.dataTable.content].filter((x: any) => x.value)
+            .length
+            ? [...props.dataTable.content]
+            : [],
+        }
       }
     })
 
-    function setPrice(price: string) {
-      return parseFloat(price).toFixed(2)
+    function setPrice(price: number, currency: string) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        maximumFractionDigits: 2,
+        currencyDisplay: 'code',
+        currency,
+      }).format(price)
     }
     function setTotal() {
-      return setPrice(
-        props.dataTable.content.reduce(function (a: Number | unknown, b: any) {
-          return a + b.value
-        }, 0)
-      )
+      const total = props.dataTable.content.reduce(function (
+        a: Number | unknown,
+        b: any
+      ) {
+        return a + b.value
+      },
+      0)
+      // get the highest occurrence of currency
+      const currency = [...props.dataTable.content]
+        ?.sort(
+          (itemA: any, itemB: any) =>
+            props.dataTable.content.filter(
+              (value: any) => value.currency === itemA.currency
+            ).length -
+            props.dataTable.content.filter(
+              (value: any) => value === itemB.currency
+            ).length
+        )
+        ?.pop()?.currency as string
+
+      return currency ? setPrice(total, currency) : ''
     }
 
     return {
-      setTotal,
-      setPrice,
       dataTableComp,
+      setPrice,
+      setTotal,
     }
   },
 })

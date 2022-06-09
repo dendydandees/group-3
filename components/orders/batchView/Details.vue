@@ -9,37 +9,6 @@
       :search="dataTable.search"
       disable-sort
     >
-      <!-- <template #item.orderCode="{ item }">
-        <div
-          class="primary--text font-weight-bold"
-        >
-          {{item.orderCode}}
-        </div>
-      </template>
-      <template #[`item.fmCost`]="{ item }">
-        {{ item.currency }} {{ setPrice(item.fmCost) }}
-      </template>
-      <template #[`item.ccCost`]="{ item }">
-        {{ item.currency }} {{ setPrice(item.ccCost) }}
-      </template>
-      <template #[`item.lmCost`]="{ item }">
-        {{ item.currency }} {{ setPrice(item.lmCost) }}
-      </template>
-      <template #[`item.bobCost`]="{ item }">
-        {{ item.currency }} {{ setPrice(item.bobCost) }}
-      </template>
-      <template #[`item.codCost`]="{ item }">
-        {{ item.currency }} {{ setPrice(item.codCost) }}
-      </template>
-      <template #[`item.total`]="{ item }">
-        {{ item.currency }} {{ setPrice(item.total) }}
-      </template>
-      <template #[`item.dnt`]="{ item }">
-        {{ item.currency }} {{ setPrice(item.dnt) }}
-      </template>
-      <template #[`item.adminFee`]="{ item }">
-        {{ item.currency }} {{ setPrice(item.adminFee) }}
-      </template> -->
       <template #body="{ items, headers }">
         <tr v-for="(x, i) in items" :key="i">
           <td
@@ -51,8 +20,7 @@
             "
             :style="y.value === 'total' && { borderRight: '1px dashed red' }"
           >
-
-            <v-btn
+            <!-- <v-btn
               v-if="y.value === 'orderCode'"
               text
               color="primary"
@@ -61,12 +29,18 @@
               <span>
                 {{x.currency && y.value && y.value !== 'orderCode' ? x.currency : ''}} {{ x[y.value] }}
               </span>
-            </v-btn>
-            <span v-else>
-              {{x.currency && y.value && y.value !== 'orderCode' ? x.currency : ''}} {{ x[y.value] }}
+            </v-btn> -->
+
+            <span>
+              {{
+                y.value && y.value !== 'orderCode'
+                  ? setValueByCurrency(x[y.value], x.currency)
+                  : x[y.value] || ''
+              }}
             </span>
           </td>
         </tr>
+
         <tr v-if="items && items.length > 0">
           <td
             v-for="(x, i) in headers"
@@ -75,25 +49,27 @@
             class="td-custom"
           >
             <span v-if="x.value === 'orderCode'"> </span>
+
             <span
               v-else
               :class="
                 x.value === 'total' || x.value === 'dnt'
-                  ? 'error--text font-weight-bold'
+                  ? 'primary--text font-weight-bold'
                   : ''
               "
             >
-              {{items[0] && items[0].currency ? items[0].currency  : ''}} {{ setTotal(x.value) }}
+              {{ items[0] && items[0].currency ? setTotal(x.value) : '' }}
             </span>
           </td>
         </tr>
+
         <tr v-else>
           <td
             :colspan="headers.length"
-            class="font-weight-bold grey--text td-custom"
+            class="grey--text td-custom"
             :style="'text-align: center'"
           >
-            No Data
+            No data available
           </td>
         </tr>
       </template>
@@ -133,34 +109,16 @@ import {
   computed,
   defineComponent,
   ref,
-  Ref,
   useStore,
-  useRouter,
   onMounted,
-  watch,
   PropType,
 } from '@nuxtjs/composition-api'
-import { ValidationObserver } from 'vee-validate'
 
 // interfaces and types
-import { VForm, VuexModuleApplications } from '~/types/applications'
-import {
-  NodeCalculator,
-  Order,
-  OrderCrossBorder,
-  OrderDomestic,
-  VuexModuleOrders,
-} from '~/types/orders'
+import { VuexModuleApplications } from '~/types/applications'
 
 export interface Select {
   country: string
-}
-
-interface ErrorUpload {
-  data: {
-    error: string
-    ErrorDetails: { field: string; reason: string; note: string }[]
-  }
 }
 
 export interface ParseNodeCalc {
@@ -179,9 +137,6 @@ export interface ParseNodeCalc {
 
 export default defineComponent({
   name: 'DetailsTab',
-  components: {
-    ValidationObserver,
-  },
   props: {
     step: {
       type: Number,
@@ -193,11 +148,8 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const router = useRouter()
-
     // manage store
     const storeApplications = useStore<VuexModuleApplications>()
-    const alert = computed(() => storeApplications.state.applications.alert)
     const headersComp = computed(() => {
       let objKeysComp = [] as String[]
       if (props.nodeCalculators[0])
@@ -279,7 +231,6 @@ export default defineComponent({
     })
 
     // manage summary table
-
     const dataTable = ref({
       search: '',
     })
@@ -290,16 +241,19 @@ export default defineComponent({
 
     const showBorder = (item: any) => {
       if (item === 'codCost') {
-        // return {borderRight:'1px dashed red'}
         return 'border-right: 1px dashed red'
       }
       if (item === 'orderCode') {
-        // return {color:'#1961e4', fontWeight: 700}
         return 'color: #1961e4; font-weight: 700'
       }
     }
-    const setPrice = (price: string) => {
-      return parseFloat(price).toFixed(2)
+    const setValueByCurrency = (price: number, currency: string) => {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        maximumFractionDigits: 2,
+        currencyDisplay: 'code',
+        currency,
+      }).format(price)
     }
     function setTotal(key: string, isNotSetPrice?: Boolean) {
       const total = props.nodeCalculators.reduce(function (
@@ -309,25 +263,33 @@ export default defineComponent({
         return a + b[key]
       },
       0)
+
+      // get the highest occurrence of currency
+      const currency = [...props.nodeCalculators]
+        ?.sort(
+          (itemA: any, itemB: any) =>
+            props.nodeCalculators.filter(
+              (value: any) => value.currency === itemA.currency
+            ).length -
+            props.nodeCalculators.filter(
+              (value: any) => value.currency === itemB.currency
+            ).length
+        )
+        ?.pop()?.currency as string
+
       if (isNotSetPrice) {
         return total
       } else {
-        return setPrice(total)
+        return setValueByCurrency(total, currency)
       }
-    }
-
-    const doGetDetails = (data: any) => {
-      router.push(`/orders/${data.orderId}`)
     }
 
     return {
       dataTable,
       headersComp,
-      // nodeCalculators,
-      setPrice,
       showBorder,
+      setValueByCurrency,
       setTotal,
-      doGetDetails
     }
   },
 })
