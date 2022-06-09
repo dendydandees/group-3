@@ -203,11 +203,11 @@ export default defineComponent({
       ...(storeBagging.state.bagging as any).bagging.filter,
     })
     // manage view
-    const orderView = ref(0)
+    const orderView = ref((storeBagging.state.bagging as any).bagging.tab.orderView)
     // manage table
     const selectedOrders = ref([]) as Ref<any>
     // manage filter order
-    const isShowFilter = ref(false)
+    const isShowFilter = ref((storeBagging.state.bagging as any).bagging.isShowFilter)
     const doResetFilter = () => {
       filterBagging.value = {
         createdFrom: '',
@@ -217,7 +217,7 @@ export default defineComponent({
       }
     }
     // manage windows
-    const step = ref(0)
+    const step = ref((storeBagging.state.bagging as any).bagging.tab.step)
     const stepList = computed(() => {
       return [
         {
@@ -234,6 +234,42 @@ export default defineComponent({
     const doChangeWindow = (data: number) => {
       step.value = data
     }
+
+
+    // manage filter on changed
+    watch(
+      filterBagging,
+      (newFilter) => {
+        // doResetPagination()
+        storeApplications.commit('bagging/bagging/SET_FILTER', {
+          ...newFilter,
+        })
+      },
+      { deep: true }
+    )
+    // manage filter on changed
+    watch(
+      isShowFilter,
+      (newFilterBtn) => {
+        // doResetPagination()
+        storeApplications.commit('bagging/bagging/SET_FILTER_BTN', {
+          ...newFilterBtn,
+        })
+      },
+      { deep: true }
+    )
+
+    watch(
+      [orderView, step],
+      ([newOrderView, newStep]) => {
+
+        storeApplications.commit('bagging/bagging/SET_TAB_BTN', {
+          orderView: newOrderView,
+          step: newStep
+        })
+      },
+      { deep: true }
+    )
 
     function handleBagScanBag() {
       if(orderView.value === 0 ) {
