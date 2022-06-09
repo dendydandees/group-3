@@ -382,10 +382,10 @@ export default defineComponent({
         value: 2,
       },
     ])
-    const selectedTransferCost = ref(1) as string | unknown
+    const selectedTransferCost = ref(storeOrders.state.orders.tabBatchView.selectedTransferCost) as string | unknown
 
     // manage windows
-    const step = ref(0)
+    const step = ref(storeOrders.state.orders.tabBatchView.step)
     const stepList = ref([
       {
         text: 'Summary',
@@ -400,6 +400,20 @@ export default defineComponent({
     const doChangeWindow = (data: number) => {
       step.value = data
     }
+
+
+    watch(
+      [selectedTransferCost, step],
+      ([newSelectedTransferCost, newStep]) => {
+
+        storeOrders.commit('orders/SET_TAB_BTN_BATCHVIEW', {
+          selectedTransferCost: newSelectedTransferCost,
+          step: newStep
+        })
+      },
+      { deep: true }
+    )
+
     // manage title
     useMeta(() => ({
       title: `Client Portal | Batch Orders View`,
