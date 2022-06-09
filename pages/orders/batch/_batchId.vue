@@ -293,6 +293,7 @@ export default defineComponent({
             return {
               orderCode: x.orderCode,
               id: batch?.id,
+              orderId: x.id,
               fmCost: Number(batch?.fmCost),
               lmCost: Number(batch?.lmCost),
               ccCost: Number(batch?.ccCost),
