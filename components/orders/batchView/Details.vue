@@ -52,7 +52,7 @@
             :style="y.value === 'total' && { borderRight: '1px dashed red' }"
           >
 
-            <!-- <v-btn
+            <v-btn
               v-if="y.value === 'orderCode'"
               text
               color="primary"
@@ -61,8 +61,8 @@
               <span>
                 {{x.currency && y.value && y.value !== 'orderCode' ? x.currency : ''}} {{ x[y.value] }}
               </span>
-            </v-btn> -->
-            <span >
+            </v-btn>
+            <span v-else>
               {{x.currency && y.value && y.value !== 'orderCode' ? x.currency : ''}} {{ x[y.value] }}
             </span>
           </td>
@@ -316,9 +316,8 @@ export default defineComponent({
       }
     }
 
-    const doGetDetails = (data: Order) => {
-      // console.log({data})
-      // router.push(`/orders/${data.id}`)
+    const doGetDetails = (data: any) => {
+      router.push(`/orders/${data.orderId}`)
     }
 
     return {

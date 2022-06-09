@@ -27,6 +27,11 @@ export const state = () => ({
     totalCount: 8,
   } as Meta,
   filter,
+  isShowFilter: false,
+  tab: {
+    orderView: 0,
+    step: 0
+  }
 });
 
 export type RootStateBagging = ReturnType<typeof state>;
@@ -34,6 +39,8 @@ export type RootStateBagging = ReturnType<typeof state>;
 export const mutations: MutationTree<RootStateBagging> = {
   SET_META: (state, value: Meta) => (state.meta = value),
   SET_FILTER: (state, value: FilterBagging) => (state.filter = value),
+  SET_FILTER_BTN: (state) => (state.isShowFilter = !state.isShowFilter),
+  SET_TAB_BTN: (state, value: { orderView: number, step: number; }) => (state.tab = value),
   RESET_FILTER: (state) => (state.filter = filterBaggingInit),
 };
 
