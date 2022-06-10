@@ -37,6 +37,10 @@ export default defineComponent({
     loading: {
       type: Boolean,
     },
+    isBagging: {
+      type: Boolean,
+      default: false
+    }
   },
   setup(props, { emit }) {
     const orderView = computed({
@@ -46,11 +50,11 @@ export default defineComponent({
     const listView = ref([
       {
         icon: 'mdi-view-list',
-        text: 'List view',
+        text: props.isBagging ? 'Unbagged View' : 'List view',
       },
       {
         icon: 'mdi-select-group',
-        text: 'Batch view',
+        text: props.isBagging ? 'Scanned View' : 'Batch view',
       },
     ])
 

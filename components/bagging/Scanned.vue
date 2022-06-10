@@ -1,80 +1,9 @@
 <template>
   <article class="scanned-tab pa-8">
-    <!-- <v-card
-      class="mx-auto"
-    >
-      <v-container fluid class="px-0">
-        <v-row>
-          <v-col
-            v-for="(partner, u) in 4"
-            :key="u"
-            cols="4"
-            class="d-flex align-center justify-space-between pa-4"
-          >
-            <v-card
-              elevation="1"
-              shaped
-              tile
-              class="rounded-xl d-flex flex-column  pa-4 align-center"
-              width="100%"
-              height="300px"
-              color="white"
-            >
-              <v-btn
-                color="green darken-1 white--text"
-              >
-                CLOSE BAG
-              </v-btn>
-              <div>
-                SINGAPORE - 1
-              </div>
-              <div>
-                Orders: 10
-              </div>
-              <v-divider width="100%"/>
-              <v-virtual-scroll
-                :items="[1, 2, 3, 4, 5]"
-                height="200"
-                item-height="64"
-              >
-                <template #default="{ item }">
-                  <v-list-item :key="item">
-                    <v-list-item-action>
-                      <v-btn
-                        fab
-                        small
-                        depressed
-                        color="primary"
-                      >
-                        1
-                      </v-btn>
-                    </v-list-item-action>
-
-                    <v-list-item-content>
-                      <v-list-item-title>
-                        User Database Record <strong>ID 1</strong>
-                      </v-list-item-title>
-                    </v-list-item-content>
-
-                    <v-list-item-action>
-                      <v-icon small>
-                        mdi-open-in-new
-                      </v-icon>
-                    </v-list-item-action>
-                  </v-list-item>
-
-                  <v-divider></v-divider>
-                </template>
-              </v-virtual-scroll>
-            </v-card>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-card> -->
     <v-container fluid class="pa-0">
       <v-row>
         <v-col
-          v-for="(partner, u) in 4"
+          v-for="(partner, u) in dataComp"
           :key="u"
           cols="4"
           class="d-flex align-center justify-space-between pa-4"
@@ -85,7 +14,7 @@
             width="100%"
             :style="'overflow: hidden'"
           >
-            <v-card-title class=" d-flex justify-center align-center text-center mb-3">
+            <v-card-title class=" d-flex flex-column justify-center align-center text-center mb-3">
               <v-btn
                 color="green darken-1 white--text mb-4"
                 @click="toggleConfirm"
@@ -93,17 +22,17 @@
                 CLOSE BAG
               </v-btn>
               <div class="text-h4 mb-2">
-                SINGAPORE - 1
+                {{partner.name}}
               </div>
               <div class="title">
-                Orders: 10
+                Orders: {{partner.total_orders}}
               </div>
             </v-card-title>
 
             <v-divider></v-divider>
 
             <v-virtual-scroll
-              :items="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
+              :items="partner.orders"
               :item-height="50"
               height="200"
             >
@@ -120,7 +49,7 @@
 
                   <v-list-item-content>
                     <v-list-item-title>
-                      tessss
+                      {{item.orderCode}}
                     </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
@@ -169,6 +98,10 @@ export default defineComponent({
   components: {
   },
   props: {
+    data: {
+      type: Array,
+      required: true
+    }
   },
   setup(props) {
     const storeApplications = useStore<VuexModuleApplications>()
@@ -184,70 +117,14 @@ export default defineComponent({
       submitText: '',
       submitColor: '',
     }) as Ref<ModalConfirm>
-    const dataTemp = [
-      {
-        name: 'Malaysia',
-        port: 'KUL',
-        total_orders: 15,
-        sub: [
-          {
-            name: 'Malaysia - 1',
-            total_orders: 10,
-            orders: [
-              {
-                orderCode: 'TES1321'
-              }
-            ]
-          },
-          {
-            name: 'Malaysia - 2',
-            total_orders: 5,
-            orders: [
-              {
-                orderCode: 'TES123'
-              },
-              {
-                orderCode: 'TES321'
-              },
-              {
-                orderCode: 'TES456'
-              }
-            ]
-          }
-        ]
-      },
-      {
-        name: 'Singapore',
-        port: 'SIN',
-        total_orders: 15,
-        sub: [
-          {
-            name: 'Singapore - 1',
-            total_orders: 10,
-            orders: [
-              {
-                orderCode: 'SIN1321'
-              }
-            ]
-          },
-          {
-            name: 'Singapore - 2',
-            total_orders: 5,
-            orders: [
-              {
-                orderCode: 'SIN123'
-              },
-              {
-                orderCode: 'SIN321'
-              },
-              {
-                orderCode: 'SIN456'
-              }
-            ]
-          }
-        ]
-      }
-    ]
+    const dataComp = computed(() => {
+      let data = props.data.map((x: any,i: number) => {
+        return x.sub
+      })
+      data = [].concat.apply([], data);
+      return data
+    })
+
     function toggleConfirm() {
       dialogSettings.value = {
         loading: false,
@@ -300,7 +177,7 @@ export default defineComponent({
 
     }
     return {
-      dataTemp,
+      dataComp,
       dialog,
       dialogSettings,
       toggleConfirm,
