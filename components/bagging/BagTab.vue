@@ -177,7 +177,7 @@ export default defineComponent({
       set: (value) => {
         emit('input', value)
       },
-    })
+    }) as Ref<Order[]>
     // const selectedOrders = ref([]) as Ref<Order[]>
     const actionExist = ref({
       // export: true,
@@ -205,7 +205,7 @@ export default defineComponent({
       }
     }
     const isLabelExistOnSelected = computed(() => {
-      return selectedOrders.value.every((order) => order.labelPath)
+      return selectedOrders.value.every((order: any) => order.labelPath)
     })
     const doResetPagination = () => {
       pagination.value = {

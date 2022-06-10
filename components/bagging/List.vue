@@ -101,7 +101,7 @@ export default defineComponent({
   },
   setup(props) {
     const checklist = ref([]) as Ref<any>
-    const dataTemp = props.data
+    const dataTemp = props.data as any
 
     function handleDisabled({order,sub,parent, index}: {order: any, sub: any, parent: any, index?:{parent: number, sub: number, order: number}}) {
       let nameParent = ''
