@@ -38,7 +38,9 @@
     </v-col>
 
     <!-- created to  -->
-    <v-col cols="12" md="3" class="px-2 py-4">
+    <v-col
+      cols="12" md="3" class="px-2 py-4"
+    >
       <v-menu
         v-model="menu.createdTo"
         :close-on-content-click="false"
@@ -75,8 +77,13 @@
     </v-col>
 
 
-    <!-- origin country -->
-    <v-col cols="12" md="3" class="px-2 py-4">
+    <!-- client -->
+    <v-col
+      v-if="!isClient"
+      cols="12"
+      md="3"
+      class="px-2 py-4"
+    >
       <v-autocomplete
         v-model="filterBagging.client"
         :items="[]"
@@ -101,7 +108,7 @@
         </template>
       </v-autocomplete>
     </v-col>
-    <!-- batch id -->
+    <!-- destination -->
     <v-col cols="12" md="3" class="px-2 py-4">
       <v-text-field
         v-model="filterBagging.destination"
@@ -142,6 +149,10 @@ export default defineComponent({
       type: Object as PropType<FilterBagging>,
       required: true,
     },
+    isClient: {
+      type: Boolean,
+      default: false
+    }
   },
   setup(props, { emit }) {
     const { app, $dateFns } = useContext()

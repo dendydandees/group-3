@@ -11,12 +11,13 @@
       </template>
     </BaseHeadlinePage>
 
-    <v-row align="center" justify="end">
+    <v-row align="center" justify="end" :style="'min-height: 72px'">
       <!-- Left options -->
       <OrdersLeftOptions
         :is-on-list-view="false"
         :selected-orders="selectedOrders"
         :is-show-filter="isShowFilter"
+        :is-on-bags-tab="true"
         @doShowFilter="isShowFilter = !isShowFilter"
       />
         <!-- :loading="$fetchState.pending" -->
@@ -27,7 +28,9 @@
         <!-- :loading="$fetchState.pending" -->
         <template #toggleView>
           <OrdersToggleView
+            v-if="step !== 0"
             v-model="orderView"
+            :is-bagging="true"
           />
         </template>
       </OrdersRightOptions>
@@ -43,9 +46,7 @@
           mdi-play
         </v-icon>
         {{
-          orderView === 0
-          ? 'BAG'
-          : 'START SCAN'
+          nameBtn
         }}
       </v-btn>
     </v-row>
@@ -58,7 +59,7 @@
       >
         <template #filterList>
           <!-- Filter for order list -->
-          <BaggingFilterListView v-model="filterBagging" />
+          <BaggingFilterListView v-model="filterBagging" :is-client="true"/>
         </template>
       </OrdersFiltersContainer>
     </v-expand-transition>
@@ -108,17 +109,17 @@
     <v-card elevation="2">
       <v-window v-model="step">
         <v-window-item :value="0">
-          <BaggingScanned
-            v-if="orderView === 1"
+          <BaggingBagTab
+            v-model="selectedOrders"
           />
-          <BaggingList v-else/>
         </v-window-item>
 
         <v-window-item :value="1">
           <BaggingScanned
             v-if="orderView === 1"
+            :data="dataTemp"
           />
-          <BaggingList v-else/>
+          <BaggingList v-else :data="dataTemp"/>
         </v-window-item>
       </v-window>
     </v-card>
@@ -216,6 +217,72 @@ export default defineComponent({
         destination: ''
       }
     }
+
+    const dataTemp = [
+      {
+        name: 'Malaysia',
+        port: 'KUL',
+        total_orders: 15,
+        sub: [
+          {
+            name: 'Malaysia - 1',
+            total_orders: 10,
+            orders: [
+              {
+                orderCode: 'TES1321'
+              }
+            ]
+          },
+          {
+            name: 'Malaysia - 2',
+            total_orders: 5,
+            orders: [
+              {
+                orderCode: 'TES123'
+              },
+              {
+                orderCode: 'TES321'
+              },
+              {
+                orderCode: 'TES456'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        name: 'Singapore',
+        port: 'SIN',
+        total_orders: 15,
+        sub: [
+          {
+            name: 'Singapore - 1',
+            total_orders: 10,
+            orders: [
+              {
+                orderCode: 'SIN1321'
+              }
+            ]
+          },
+          {
+            name: 'Singapore - 2',
+            total_orders: 5,
+            orders: [
+              {
+                orderCode: 'SIN123'
+              },
+              {
+                orderCode: 'SIN321'
+              },
+              {
+                orderCode: 'SIN456'
+              }
+            ]
+          }
+        ]
+      }
+    ]
+
     // manage windows
     const step = ref((storeBagging.state.bagging as any).bagging.tab.step)
     const stepList = computed(() => {
@@ -234,7 +301,19 @@ export default defineComponent({
     const doChangeWindow = (data: number) => {
       step.value = data
     }
-
+    const nameBtn = computed(() => {
+        let temp = ''
+        if(step.value === 1) {
+          if(orderView.value === 0) {
+            temp = 'BAG'
+          } else {
+            temp = 'START SCAN'
+          }
+        } else {
+          temp = 'DOWNLOAD BAG LABEL'
+        }
+        return temp
+    })
 
     // manage filter on changed
     watch(
@@ -272,18 +351,22 @@ export default defineComponent({
     )
 
     function handleBagScanBag() {
-      if(orderView.value === 0 ) {
-        dialogSettings.value = {
-          loading: false,
-          title: 'Print label now ?',
-          content: '',
-          cancelText: 'No',
-          submitText: 'Yes',
-          submitColor: 'primary',
+      dialogSettings.value = {
+        loading: false,
+        title: 'Print label now ?',
+        content: '',
+        cancelText: 'No',
+        submitText: 'Yes',
+        submitColor: 'primary',
+      }
+      if(step.value === 1) {
+        if(orderView.value === 0 ) {
+          dialog.value.confirm = true
+        } else {
+          router.push(`/bagging/scan`)
         }
-        dialog.value.confirm = true
       } else {
-        router.push(`/bagging/scan`)
+        dialog.value.confirm = true
       }
     }
     async function submit(params: {isCancel?: boolean}) {
@@ -343,7 +426,9 @@ export default defineComponent({
       dialog,
       dialogSettings,
       handleCancel,
-      filterBagging
+      filterBagging,
+      nameBtn,
+      dataTemp
     }
   },
   head: {},

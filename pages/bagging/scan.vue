@@ -165,6 +165,15 @@ export default defineComponent({
       router.go(-1)
     }
 
+    const speech = ref({
+      isLoading: true,
+      name: '',
+      selectedVoice: 49, // GOOGLE voice
+      synth: window.speechSynthesis,
+      voiceList: [] as any,
+      greetingSpeech: new window.SpeechSynthesisUtterance()
+    })
+
 
     async function submit(params: {isCancel?: boolean}) {
       try {
@@ -225,6 +234,7 @@ export default defineComponent({
           ...allScanned.value,
           inputBarcode.value
         ]
+        greet(inputBarcode.value)
         inputBarcode.value = ''
       }
     }
@@ -232,6 +242,32 @@ export default defineComponent({
     function validationCard() {
       return allScanned.value && allScanned.value.length && allScanned.value[allScanned.value.length - 1]
     }
+
+    function greet (text: string) {
+      // it should be 'craic', but it doesn't sound right
+      speech.value.greetingSpeech.text = text
+      speech.value.greetingSpeech.voice = speech.value.voiceList[speech.value.selectedVoice]
+      speech.value.synth.speak(speech.value.greetingSpeech)
+    }
+    function listenForSpeechEvents () {
+      speech.value.greetingSpeech.onstart = () => {
+        speech.value.isLoading = true
+      }
+      speech.value.greetingSpeech.onend = () => {
+        speech.value.isLoading = false
+      }
+    }
+
+    const { $fetchState, fetch } = useFetch(async () => {
+      speech.value.voiceList = speech.value.synth.getVoices()
+      speech.value.synth.onvoiceschanged = () => {
+      speech.value.voiceList = speech.value.synth.getVoices()
+        setTimeout(() => {
+          speech.value.isLoading = false
+        }, 800)
+      }
+      listenForSpeechEvents()
+    })
 
     useMeta(() => ({ title: 'Client Portal | Scan' }))
 

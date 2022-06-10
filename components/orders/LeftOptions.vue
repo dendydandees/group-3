@@ -35,7 +35,7 @@
       Filter
     </v-btn>
 
-    <span v-if="isOnListView" class="subtitle-2 text--secondary">
+    <span v-if="isOnListView || isOnBagsTab" class="subtitle-2 text--secondary">
       {{ selectedOrders.length }} Orders selected
     </span>
   </v-col>
@@ -48,6 +48,9 @@ import { Order } from '~/types/orders'
 export default defineComponent({
   props: {
     isOnListView: {
+      type: Boolean,
+    },
+    isOnBagsTab: {
       type: Boolean,
     },
     loading: {

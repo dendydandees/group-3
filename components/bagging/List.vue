@@ -43,7 +43,15 @@
               >
                 <template #default="{ active }">
                   <v-list-item-action>
-                    <v-checkbox :input-value="active"></v-checkbox>
+                    <!-- <v-checkbox :input-value="active"></v-checkbox> -->
+
+                    <v-checkbox
+                      v-ripple
+                      on-icon="mdi-checkbox-marked-circle"
+                      off-icon="mdi-checkbox-blank-circle-outline"
+                      color="primary"
+                      :input-value="active"
+                    />
                   </v-list-item-action>
 
                   <v-list-item-content
@@ -86,73 +94,15 @@ export default defineComponent({
   components: {
   },
   props: {
+    data: {
+      type: Array,
+      required: true
+    }
   },
   setup(props) {
     const checklist = ref([]) as Ref<any>
-    const dataTemp = [
-      {
-        name: 'Malaysia',
-        port: 'KUL',
-        total_orders: 15,
-        sub: [
-          {
-            name: 'Malaysia - 1',
-            total_orders: 10,
-            orders: [
-              {
-                orderCode: 'TES1321'
-              }
-            ]
-          },
-          {
-            name: 'Malaysia - 2',
-            total_orders: 5,
-            orders: [
-              {
-                orderCode: 'TES123'
-              },
-              {
-                orderCode: 'TES321'
-              },
-              {
-                orderCode: 'TES456'
-              }
-            ]
-          }
-        ]
-      },
-      {
-        name: 'Singapore',
-        port: 'SIN',
-        total_orders: 15,
-        sub: [
-          {
-            name: 'Singapore - 1',
-            total_orders: 10,
-            orders: [
-              {
-                orderCode: 'SIN1321'
-              }
-            ]
-          },
-          {
-            name: 'Singapore - 2',
-            total_orders: 5,
-            orders: [
-              {
-                orderCode: 'SIN123'
-              },
-              {
-                orderCode: 'SIN321'
-              },
-              {
-                orderCode: 'SIN456'
-              }
-            ]
-          }
-        ]
-      }
-    ]
+    const dataTemp = props.data
+
     function handleDisabled({order,sub,parent, index}: {order: any, sub: any, parent: any, index?:{parent: number, sub: number, order: number}}) {
       let nameParent = ''
       let nameSub = ''
@@ -193,6 +143,9 @@ export default defineComponent({
   .v-list-group {
     .v-icon {
       color: white;
+      &.mdi-checkbox-blank-circle-outline {
+        color: rgba(0, 0, 0, 0.54) !important;
+      }
     }
     .mdi-checkbox-blank-outline {
       color: grey
