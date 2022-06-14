@@ -117,9 +117,9 @@
         <v-window-item :value="1">
           <BaggingScanned
             v-if="orderView === 1"
-            :data="dataTemp"
+            :data="dataMerged"
           />
-          <BaggingList v-else :data="dataTemp"/>
+          <BaggingList v-else :data="dataMerged"/>
         </v-window-item>
       </v-window>
     </v-card>
@@ -218,6 +218,16 @@ export default defineComponent({
       }
     }
 
+    const dataMerged = ref([])
+
+    const newScanned = computed(() => {
+      if(!localStorage.getItem('newScanned')) {
+        return []
+      } else {
+        return JSON.parse(localStorage.getItem('newScanned') as string)
+      }
+    })
+
     const dataTemp = [
       {
         name: 'Malaysia',
@@ -282,6 +292,24 @@ export default defineComponent({
         ]
       }
     ]
+
+
+    onMounted(() => {
+      const merged = dataTemp
+      newScanned.value.forEach((x: any, i: number) => {
+        dataTemp.forEach((y, u) => {
+          if(y.sub.some((z) => z.name === x.name)) {
+            const indexSub = y.sub.findIndex((z) => z.name === x.name)
+            const scanned = {
+              orderCode: x.value,
+              new: x.new
+            }
+            merged[u].sub[indexSub].orders.unshift(scanned)
+          }
+        })
+      })
+      dataMerged.value = merged as any
+    })
 
     // manage windows
     const step = ref((storeBagging.state.bagging as any).bagging.tab.step)
@@ -428,7 +456,8 @@ export default defineComponent({
       handleCancel,
       filterBagging,
       nameBtn,
-      dataTemp
+      dataTemp,
+      dataMerged
     }
   },
   head: {},

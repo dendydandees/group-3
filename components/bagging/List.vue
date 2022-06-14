@@ -38,7 +38,8 @@
                 v-for="(x, orderIndex) in sub.orders"
                 :key="orderIndex"
                 :value="x"
-                :style="'margin-left: 30px;'"
+                :class="`${x.new ? 'bg-custom' : ''}`"
+                :style="`margin-left: 30px; `"
                 :disabled="handleDisabled({order: x, sub, parent, index:{parent: index, sub: subIndex, order: orderIndex}})"
               >
                 <template #default="{ active }">
@@ -169,6 +170,16 @@ export default defineComponent({
     }
     .custom-item-content {
       flex: 3.5;
+    }
+  }
+  .bg-custom {
+    background: $primary;
+    color: white !important;
+    .v-icon {
+      color: white !important;
+    }
+    .v-btn__content {
+      color: white !important;
     }
   }
 }

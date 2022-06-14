@@ -38,7 +38,7 @@
             >
               <template #default="{ item }">
                 <v-list-item
-                  class="custom-list-item-scroll"
+                  :class="`custom-list-item-scroll ${item.new ? 'bg-custom' : ''}`"
                 >
                   <v-list-item-avatar>
                     <v-icon
@@ -198,6 +198,13 @@ export default defineComponent({
       .v-icon {
         color: white !important;
       }
+    }
+  }
+  .bg-custom {
+    background: $primary;
+    color: white !important;
+    .v-icon {
+      color: white !important;
     }
   }
 }

@@ -230,10 +230,25 @@ export default defineComponent({
 
     function enterInput(event: KeyboardEvent) {
       if(event.key === 'Enter') {
+        let temp = 'Singapore - '
+        if(allScanned.value.length % 2 !== 0) {
+          temp = temp + '2'
+        } else {
+          temp = temp + '1'
+        }
+        const data = {
+          name: temp,
+          value: inputBarcode.value,
+          new: true
+        }
+
+        const initialData = localStorage.getItem('newScanned') ? JSON.parse(localStorage.getItem('newScanned') as string) : allScanned.value
+
         allScanned.value = [
-          ...allScanned.value,
-          inputBarcode.value
+          ...initialData,
+          data
         ]
+        localStorage.setItem('newScanned', JSON.stringify( allScanned.value))
         greet(inputBarcode.value)
         inputBarcode.value = ''
       }
