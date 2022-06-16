@@ -279,7 +279,7 @@ export default defineComponent({
     const goToBatchView = (item: Order | BatchOrders) => {
       let batchId = ''
 
-      if (isOnListView) {
+      if (isOnListView.value) {
         batchId = (item as Order).batchCode
       } else {
         batchId = (item as BatchOrders).code

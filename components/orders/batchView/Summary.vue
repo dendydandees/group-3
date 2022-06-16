@@ -115,7 +115,7 @@ export default defineComponent({
               : '',
         },
         {
-          name: 'Admin Fee',
+          name: 'Transmission Fee',
           value: setTotal('adminFee'),
           currency:
             props.nodeCalculators[0] && props.nodeCalculators[0].currency

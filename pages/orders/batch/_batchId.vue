@@ -71,6 +71,7 @@
       <template v-for="({ text, icon }, index) in stepList">
         <v-btn
           :key="text"
+          :disabled="$fetchState.pending"
           :color="isActive(index) ? 'primary' : 'white'"
           :class="[isActive(index) ? 'white--text' : 'primary--text']"
           class="custom-tab mx-2"
