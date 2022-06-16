@@ -26,9 +26,7 @@
               color="primary"
               @click="doGetDetails(x)"
             >
-              <span
-                class="font-weight-bold"
-              >
+              <span class="font-weight-bold">
                 {{
                   y.value && y.value !== 'orderCode'
                     ? setValueByCurrency(x[y.value], x.currency)
@@ -37,9 +35,7 @@
               </span>
             </v-btn>
 
-            <span
-              v-else
-            >
+            <span v-else>
               {{
                 y.value && y.value !== 'orderCode'
                   ? setValueByCurrency(x[y.value], x.currency)
@@ -233,7 +229,7 @@ export default defineComponent({
           value: 'dnt',
         },
         {
-          text: 'Admin Fee',
+          text: 'Transmission Fee',
           value: 'adminFee',
         },
       ]
@@ -297,14 +293,13 @@ export default defineComponent({
       router.push(`/orders/${data.orderId}`)
     }
 
-
     return {
       dataTable,
       headersComp,
       showBorder,
       setValueByCurrency,
       setTotal,
-      doGetDetails
+      doGetDetails,
     }
   },
 })

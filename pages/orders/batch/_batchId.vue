@@ -322,6 +322,7 @@ export default defineComponent({
     const nodeCalculators = computed(() => {
       const data = storeOrders.state.orders.orderDetails.nodeCalc
       let parsingData = [] as any
+
       if (ordersCode.value && ordersCode.value.length > 0) {
         parsingData = [...ordersCode.value].map(
           (x: { id: string; orderCode: string }) => {
@@ -352,9 +353,11 @@ export default defineComponent({
           }
         )
       }
+
       parsingData = [...parsingData].filter((y: ParseNodeCalc) => {
         return y.fmCost || y.ccCost || y.lmCost || y.bobCost || y.codCost
       })
+
       return parsingData
     })
 
@@ -382,7 +385,9 @@ export default defineComponent({
         value: 2,
       },
     ])
-    const selectedTransferCost = ref(storeOrders.state.orders.tabBatchView.selectedTransferCost) as string | unknown
+    const selectedTransferCost = ref(
+      storeOrders.state.orders.tabBatchView.selectedTransferCost
+    ) as string | unknown
 
     // manage windows
     const step = ref(storeOrders.state.orders.tabBatchView.step)
@@ -401,14 +406,12 @@ export default defineComponent({
       step.value = data
     }
 
-
     watch(
       [selectedTransferCost, step],
       ([newSelectedTransferCost, newStep]) => {
-
         storeOrders.commit('orders/SET_TAB_BTN_BATCHVIEW', {
           selectedTransferCost: newSelectedTransferCost,
-          step: newStep
+          step: newStep,
         })
       },
       { deep: true }
@@ -552,7 +555,7 @@ export default defineComponent({
       nextOrPrev,
       paginationTracking,
       lastStatus,
-      doGetDetails
+      doGetDetails,
     }
   },
   head: {},
@@ -612,10 +615,10 @@ export default defineComponent({
     font-size: 12px;
   }
   .custom-text-btn {
-    transition: all .3s;
+    transition: all 0.3s;
     cursor: pointer;
     &:hover {
-      opacity: .7;
+      opacity: 0.7;
     }
   }
 }

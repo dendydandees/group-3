@@ -222,6 +222,7 @@ export default defineComponent({
     const pagination = ref({
       ...storeApplications.state.applications.pagination,
     })
+    const orderTabView = ref(storeOrders.state.orders.orderTabView)
     const filterOrder = ref({
       ...storeOrders.state.orders.filterOrder,
     })
@@ -231,7 +232,7 @@ export default defineComponent({
     const alert = computed(() => storeApplications.state.applications.alert)
 
     // manage view
-    const orderView = ref(0)
+    const orderView = ref(orderTabView.value)
     const isOnListView = computed(() => {
       return orderView.value === 0
     })
@@ -295,8 +296,8 @@ export default defineComponent({
     // manage filter order
     const isShowFilter = ref(false)
     const doResetFilter = () => {
-      filterOrder.value = filterOrderInit
-      filterBatch.value = filterBatchInit
+      filterOrder.value = { ...filterOrderInit }
+      filterBatch.value = { ...filterBatchInit }
     }
 
     // Debounced fetch
@@ -443,9 +444,10 @@ export default defineComponent({
       )
     })
     // manage view on changed
-    watch(orderView, (_newView) => {
+    watch(orderView, (newValue) => {
       doResetFilter()
       selectedOrders.value = []
+      storeOrders.commit('orders/SET_ORDER_TAB_VIEW', newValue)
     })
 
     // manage page title
