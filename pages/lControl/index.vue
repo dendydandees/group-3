@@ -4,13 +4,16 @@
       <div class="header">
         <div class="text">L-CONTROL</div>
       </div>
+
       <div class="body-wrapper border-bottom">
         <div class="country-wrapper">
           <div class="text">COUNTRY</div>
         </div>
+
         <div class="service-wrapper service-color">
           <div class="text">SERVICE</div>
         </div>
+
         <div class="zone-wrapper">
           <div class="text">
             <v-breadcrumbs :items="breadcrumbs" divider=">" class="pa-0">
@@ -39,6 +42,7 @@
           </div>
         </div>
       </div>
+
       <div class="content-wrapper">
         <div class="country-wrapper-content scroller">
           <div
@@ -60,9 +64,11 @@
             >
               {{ el.name }}
             </div>
+
             <div class="text-sub">Manually Updated</div>
           </div>
         </div>
+
         <div
           class="service-wrapper-content service-color scroller blue-scroller"
         >
@@ -108,6 +114,7 @@
                 />
               </template>
             </v-switch>
+
             <v-card class="pa-4" elevation="3" style="height: 100%">
               <div class="d-flex align-center mb-3">
                 <NuxtImg
@@ -116,12 +123,14 @@
                   :height="18"
                   class="mr-1"
                 />
+
                 <span
                   style="color: #ff3d17; font-size: 13px; line-height: 16px"
                 >
                   What is BOB?
                 </span>
               </div>
+
               <div style="color: #1961e4; font-size: 14px; line-height: 17px">
                 BOB will help you select the most suitable network partner based
                 on our analytical data
@@ -129,6 +138,7 @@
             </v-card>
           </div>
         </div>
+
         <div
           :class="`zone-wrapper-content ${
             selected.useBOB ? 'd-flex align-center justify-center' : ''
@@ -147,16 +157,24 @@
               }`"
             >
               <div :class="`d-flex align-center justify-space-between`">
-                <div style="max-width: 50%">
+                <div style="max-width: 40%">
                   {{ isCustoms() ? el.name : el.zoneName }}
                 </div>
-                <div>
+
+                <div style="max-width: 40%" class="d-flex align-center">
                   <span
                     v-if="true"
-                    style="font-size: 15px; line-height: 18px; color: #575757"
+                    style="
+                      font-size: 15px;
+                      line-height: 18px;
+                      color: #575757;
+                      max-width: 80%;
+                    "
+                    class="d-inline-block text-truncate"
                   >
                     {{ !el.partnerID ? 'Waiting for Setup' : el.partnerName }}
                   </span>
+
                   <v-btn
                     color="primary darken-1 white--text ml-6"
                     @click="
@@ -177,6 +195,7 @@
               </div>
             </div>
           </div>
+
           <div
             v-else-if="selected.useBOB"
             :class="`d-flex flex-column align-center justify-center`"
@@ -194,10 +213,12 @@
             </div>
             <!-- </div> -->
           </div>
+
           <div v-else class="content-zone-selected">
             <v-btn icon color="primary" @click="backBtnHandler()">
               <v-icon> mdi-arrow-left-thick </v-icon>
             </v-btn>
+
             <div class="zone-column-right">
               <div>
                 <div
@@ -206,6 +227,7 @@
                 >
                   {{ selected.zoneIndex && selected.zoneIndex.name }}
                 </div>
+
                 <div>
                   <LcontrolDropdownCustom
                     v-model="selected.partnerID"
@@ -217,6 +239,7 @@
                     :disabled-drop="$fetchState.pending"
                     :item-show="{ text: 'name', value: 'id' }"
                   />
+
                   <div
                     v-if="
                       selected.partnerID &&
@@ -233,16 +256,18 @@
                     <span v-if="handleInfoCOD(selected.partnerID)">
                       Partner available for COD service
                     </span>
+
                     <span v-else class="error--text">
                       Partner not available for COD service
                     </span>
                   </div>
+
                   <div
                     v-if="
                       !CODpartnerSelected.status &&
                       selected.serviceIndex.value === 'LAST_MILE'
                     "
-                    :class="`primary--text btn-COD ${
+                    :class="`my-3 primary--text btn-COD ${
                       selected.partnerID ? '' : 'disabled'
                     }`"
                     style="cursor: pointer"
@@ -250,6 +275,7 @@
                   >
                     + Add COD Default Network Partner
                   </div>
+
                   <div
                     v-if="
                       CODpartnerSelected.status &&
@@ -269,13 +295,9 @@
                       @delete="handleDeleteRule({ isCOD: true })"
                     />
                   </div>
+
                   <div
-                    v-if="
-                      (selected.serviceIndex.value === 'LAST_MILE' ||
-                      selected.serviceIndex.value === 'FIRST_MILE')
-                      &&
-                      false
-                    "
+                    v-if="selected.serviceIndex.value === 'LAST_MILE'"
                     class="mt-2"
                   >
                     <!-- <div
@@ -302,13 +324,11 @@
 
                     <!-- </div> -->
                   </div>
+
                   <div
                     v-if="
-                      (selected.serviceIndex.value === 'LAST_MILE' ||
-                        selected.serviceIndex.value === 'FIRST_MILE') &&
+                      selected.serviceIndex.value === 'LAST_MILE' &&
                       addNPData.length < 3
-                      &&
-                      false
                     "
                     :class="`
                         primary--text btn-COD ${
@@ -322,6 +342,7 @@
                   </div>
                 </div>
               </div>
+
               <v-btn
                 color="primary darken-1 white--text"
                 style="align-self: end"
@@ -336,6 +357,7 @@
         </div>
       </div>
     </v-card>
+
     <BaseModalConfirm
       v-model="dialog.deleteRule"
       :dialog-settings="dialogSettings"
@@ -397,10 +419,16 @@ export default defineComponent({
     const countryCodes = computed(() => storeFilters.state.filters.countryCodes)
     const serviceTypes = computed(() => {
       let filter = storeFilters.state.filters.serviceTypes
-      if(filter && filter.length > 0) {
-        filter = filter.filter((x: ServiceType) => x.name !== 'FREIGHT_FORWARDER')
-        const indexFM = filter.findIndex((x: ServiceType) => x.name === 'FIRST_MILE')
-        const indexCM = filter.findIndex((x: ServiceType) => x.name === 'CUSTOMS')
+      if (filter && filter.length > 0) {
+        filter = filter.filter(
+          (x: ServiceType) => x.name !== 'FREIGHT_FORWARDER'
+        )
+        const indexFM = filter.findIndex(
+          (x: ServiceType) => x.name === 'FIRST_MILE'
+        )
+        const indexCM = filter.findIndex(
+          (x: ServiceType) => x.name === 'CUSTOMS'
+        )
         moveItem(indexFM, 0, filter)
         moveItem(indexCM, 1, filter)
       }
@@ -567,9 +595,9 @@ export default defineComponent({
 
     function moveItem(from: number, to: number, data: any) {
       // remove `from` item and store it
-      const f = data.splice(from, 1)[0];
+      const f = data.splice(from, 1)[0]
       // insert stored item into position `to`
-      data.splice(to, 0, f);
+      data.splice(to, 0, f)
     }
 
     const fetchCountryCodes = async () => {
