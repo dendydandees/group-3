@@ -7,6 +7,7 @@ export default defineNuxtMiddleware(({ from, route, store }) => {
     if (route.name?.includes('orders')) {
       store.commit('orders/RESET_FILTER_ORDERS')
       store.commit('orders/RESET_FILTER_BATCH')
+      store.commit('orders/RESET_ORDER_TAB_VIEW')
       store.commit('partnerPortals/incomingOrders/RESET_FILTER')
     } else if (route.name?.includes('marketplace')) {
       store.commit('marketplaces/marketplaces/RESET_FILTER')

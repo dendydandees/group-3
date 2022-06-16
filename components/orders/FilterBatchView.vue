@@ -9,7 +9,7 @@
         rounded
         single-line
         hide-details
-        label="Search by batch code"
+        label="Batch code"
         placeholder="Enter your batch code..."
         background-color="white"
         type="search"
