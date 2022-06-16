@@ -53,14 +53,14 @@
               }}
             </v-icon>
 
-            <div class="d-none d-md-flex flex-column text-start">
+            <div class="d-none d-md-flex flex-column justify-start text-start">
               <p
                 class="ma-0 subtitle-2 font-weight-bold text-capitalize text-left"
               >
                 {{ user.role }}
               </p>
 
-              <p class="ma-0 subtitle-2 text-lowercase">
+              <p class="ma-0 subtitle-2 text-lowercase text-left">
                 {{ user.email }}
               </p>
             </div>
@@ -72,11 +72,7 @@
             <!-- to profile -->
             <v-list-item nuxt to="/account-profiles" color="primary">
               <v-list-item-avatar color="primary">
-                <v-icon
-                  dark
-                  class="white--text mt-0 mt-md-1 ml-0 ml-md-1"
-                  size="32"
-                >
+                <v-icon dark class="white--text mt-0 mt-md-1" size="32">
                   {{
                     $vuetify.breakpoint.mobile
                       ? 'mdi-account-circle'
