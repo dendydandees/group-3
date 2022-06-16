@@ -230,7 +230,7 @@ export default defineComponent({
 
     function enterInput(event: KeyboardEvent) {
       if(event.key === 'Enter') {
-        let temp = 'Singapore - '
+        let temp = 'Indonesia - '
         if(allScanned.value.length % 2 !== 0) {
           temp = temp + '2'
         } else {
@@ -241,14 +241,14 @@ export default defineComponent({
           value: inputBarcode.value,
           new: true
         }
-
-        const initialData = localStorage.getItem('newScanned') ? JSON.parse(localStorage.getItem('newScanned') as string) : allScanned.value
+        const user = localStorage.getItem('auth.user') ? JSON.parse(localStorage.getItem('auth.user') as string) : {}
+        const initialData = user && user.email && localStorage.getItem(`newScanned.${user.email}`) ? JSON.parse(localStorage.getItem(`newScanned.${user.email}`) as string) : allScanned.value
 
         allScanned.value = [
           ...initialData,
           data
         ]
-        localStorage.setItem('newScanned', JSON.stringify( allScanned.value))
+        localStorage.setItem(`newScanned.${user.email}`, JSON.stringify( allScanned.value))
         greet(inputBarcode.value)
         inputBarcode.value = ''
       }
