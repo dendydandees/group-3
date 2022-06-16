@@ -221,10 +221,11 @@ export default defineComponent({
     const dataMerged = ref([])
 
     const newScanned = computed(() => {
-      if(!localStorage.getItem('newScanned')) {
+      const user = localStorage.getItem('auth.user') ? JSON.parse(localStorage.getItem('auth.user') as string) : {}
+      if(!localStorage.getItem(`newScanned.${user.email}`) || (!user && !user.email)) {
         return []
       } else {
-        return JSON.parse(localStorage.getItem('newScanned') as string)
+        return localStorage.getItem(`newScanned.${user.email}`) ? JSON.parse(localStorage.getItem(`newScanned.${user.email}`) as string) : []
       }
     })
 
@@ -295,7 +296,8 @@ export default defineComponent({
 
 
     onMounted(() => {
-      const merged = dataTemp
+      // START LOGIC FOR SAVING SCANNED ITEM IN LOCAL STORAGE
+      let merged = dataTemp
       newScanned.value.forEach((x: any, i: number) => {
         dataTemp.forEach((y, u) => {
           if(y.sub.some((z) => z.name === x.name)) {
@@ -308,7 +310,72 @@ export default defineComponent({
           }
         })
       })
+
+      const filteredNotIn = newScanned.value.filter((item: any) => !dataTemp.some((x) => x.name === item.name.split(' - ')[0]))
+
+      let newCountry = [] as any
+      const countTotal = {} as any
+      const countTotalSub = {} as any
+      const sub = {} as any
+      const orders = {} as any
+      filteredNotIn.forEach((x: any) => {
+        const splitName = x.name.split(' - ')[0]
+        countTotal[splitName] = (countTotal[splitName] || 0) + 1
+        countTotalSub[x.name] = (countTotalSub[x.name] || 0) + 1
+        sub[splitName] = []
+        orders[x.name] = []
+        if(!newCountry.some((z: any) => z.name === splitName)) {
+          const data = {
+            name: splitName,
+            port: splitName,
+            total_orders: 0,
+            sub: []
+          }
+          newCountry.push(data)
+        }
+      })
+      filteredNotIn.forEach((x: any) => {
+        const splitName = x.name.split(' - ')[0]
+        const scanned = {
+          name: x.name,
+          total_orders: countTotalSub[x.name],
+          orders: []
+        }
+        orders[x.name] = [
+          ...orders[x.name], {
+            orderCode: x.value,
+            new: x.new
+          }
+        ]
+        if(!sub[splitName].some((z: any) => z.name === x.name)) {
+
+          sub[splitName] = [
+            ...sub[splitName],
+            scanned
+          ]
+        }
+      })
+
+      newCountry = newCountry.map((x: any) => {
+        return {
+          ...x,
+          total_orders: countTotal[x.name],
+          sub: sub[x.name].map((y: any) => {
+            return {
+              ...y,
+              orders: orders[y.name]
+            }
+          })
+        }
+      })
+
+      merged = [
+        ...merged,
+        ...newCountry
+      ]
       dataMerged.value = merged as any
+
+      // END LOGIC FOR SAVING SCANNED ITEM IN LOCAL STORAGE
     })
 
     // manage windows
