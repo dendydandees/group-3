@@ -512,7 +512,7 @@ export default defineComponent({
         index: 0,
         partnerID: '',
         volume: 0,
-        type: 'RULE_TYPE_VOLUME',
+        type: 'RULE_TYPE_VOLUME_LIMIT',
         idRule: '',
       }
       newData.index = addNPData.value.length + 1
@@ -540,7 +540,9 @@ export default defineComponent({
           dialog.value.status !== 'COD'
         ) {
           rulesVolume = newRules.filter((el: any) =>
-            el.data?.definitions.some((x: any) => x.type === 'RULE_TYPE_VOLUME')
+            el.data?.definitions.some(
+              (x: any) => x.type === 'RULE_TYPE_VOLUME_LIMIT'
+            )
           )
 
           rulesVolume = rulesVolume.map((x: any, i: number) => {
@@ -549,10 +551,10 @@ export default defineComponent({
               partnerID: x.data.partnerID,
               volume: Number(
                 x.data.definitions.filter(
-                  (y: Definition) => y.type === 'RULE_TYPE_VOLUME'
+                  (y: Definition) => y.type === 'RULE_TYPE_VOLUME_LIMIT'
                 )[0].value
               ),
-              type: 'RULE_TYPE_VOLUME',
+              type: 'RULE_TYPE_VOLUME_LIMIT',
               idRule: x.idRule,
               priority: x.data.priority,
               definitions: x.data.definitions ?? [],
@@ -950,7 +952,7 @@ export default defineComponent({
                             value: selected.value.zoneIndex?.value ?? '',
                           }
                           break
-                        case 'RULE_TYPE_VOLUME':
+                        case 'RULE_TYPE_VOLUME_LIMIT':
                           temp = {
                             ...temp,
                             value: String(x.volume),
