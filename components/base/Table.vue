@@ -300,7 +300,7 @@ export default defineComponent({
 
       if (!allocations || allocations.length === 0) return ''
 
-      return allocations[0].updates[0].comments
+      return allocations[0].updates[0].status
     }
     const setLMTrackNumber = (orderAllocations: OrderAllocationUpdate[]) => {
       return (
