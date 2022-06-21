@@ -7,28 +7,28 @@
     class="elevation-0"
   >
     <template #[`item.fmCost`]="{ item }">
-      {{ item.currency }} {{ setPrice(item.fmCost) }}
+      {{ setPrice(item.fmCost, item.currency) }}
     </template>
     <template #[`item.ccCost`]="{ item }">
-      {{ item.currency }} {{ setPrice(item.ccCost) }}
+      {{ setPrice(item.ccCost, item.currency) }}
     </template>
     <template #[`item.lmCost`]="{ item }">
-      {{ item.currency }} {{ setPrice(item.lmCost) }}
+      {{ setPrice(item.lmCost, item.currency) }}
     </template>
     <template #[`item.bobCost`]="{ item }">
-      {{ item.currency }} {{ setPrice(item.bobCost) }}
+      {{ setPrice(item.bobCost, item.currency) }}
     </template>
     <template #[`item.codCost`]="{ item }">
-      {{ item.currency }} {{ setPrice(item.codCost) }}
+      {{ setPrice(item.codCost, item.currency) }}
     </template>
     <template #[`item.total`]="{ item }">
-      {{ item.currency }} {{ setPrice(item.total) }}
+      {{ setPrice(item.total, item.currency) }}
     </template>
     <template #[`item.dnt`]="{ item }">
-      {{ item.currency }} {{ setPrice(item.dnt) }}
+      {{ setPrice(item.dnt, item.currency) }}
     </template>
     <template #[`item.adminFee`]="{ item }">
-      {{ item.currency }} {{ setPrice(item.adminFee) }}
+      {{ setPrice(item.adminFee, item.currency) }}
     </template>
   </v-data-table>
 </template>
@@ -42,8 +42,7 @@ import {
   useRoute,
   watch,
 } from '@nuxtjs/composition-api'
-import { OrderItem, VuexModuleOrders } from '~/types/orders'
-import { VuexModuleIncomingOrders } from '~/types/partnerPortals/incomingOrders'
+import { VuexModuleOrders } from '~/types/orders'
 
 export default defineComponent({
   props: {
@@ -56,10 +55,9 @@ export default defineComponent({
       default: false,
     },
   },
-  setup(props) {
+  setup() {
     const route = useRoute() as any
     const storeOrders = useStore<VuexModuleOrders>()
-    const storeIncomingOrders = useStore<VuexModuleIncomingOrders>()
     const nodeCalc = computed(() => {
       if (
         storeOrders.state.orders.orderDetails.nodeCalc &&
@@ -170,7 +168,7 @@ export default defineComponent({
             value: 'dnt',
           },
           {
-            text: 'Admin Fee',
+            text: 'Transmission Fee',
             value: 'adminFee',
           },
         ]
@@ -179,8 +177,15 @@ export default defineComponent({
       { deep: true }
     )
 
-    const setPrice = (price: string) => {
-      return parseFloat(price).toFixed(2)
+    const setPrice = (price: string, currency: string) => {
+      if (!price || !currency) return ''
+
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        maximumFractionDigits: 2,
+        currencyDisplay: 'code',
+        currency,
+      }).format(parseFloat(price))
     }
 
     return {
