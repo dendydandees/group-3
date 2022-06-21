@@ -76,7 +76,11 @@
                     <span>By</span>
 
                     <span class="font-weight-bold">
-                      {{ partnerName }}
+                      {{
+                        serviceType === 'FREIGHT_FORWARDER'
+                        ? 'LUWJISTIK'
+                        : partnerName
+                      }}
                     </span>
                   </h2>
                 </v-col>
@@ -100,6 +104,7 @@ import {
 import { VuexModuleOrders } from '~/types/orders'
 import { VuexModuleIncomingOrders } from '~/types/partnerPortals/incomingOrders'
 import { VuexModuleTracking } from '~/types/trackings'
+import tempData from '~/static/tempData'
 
 export default defineComponent({
   props: {
@@ -149,6 +154,8 @@ export default defineComponent({
 
       return indexUpdates === 0
     }
+
+    console.log({orderAllocationUpdates})
 
     return {
       // manage route
