@@ -60,7 +60,7 @@
                 selected.countryIndex && selected.countryIndex.index === i
                   ? 'red-color'
                   : ''
-              }`"
+              } ${$fetchState.pending ? 'disabled' : ''}`"
             >
               {{ el.name }}
             </div>
@@ -79,7 +79,7 @@
               selected.serviceIndex && selected.serviceIndex.index === i
                 ? 'red-color'
                 : ''
-            } ${selected.useBOB ? 'disabled' : ''}`"
+            } ${selected.useBOB || $fetchState.pending ? 'disabled' : ''}`"
             :style="`${
               selected.countryIndex === null ? 'visibility: hidden;' : ''
             }line-height: 36px`"
@@ -87,10 +87,12 @@
           >
             {{ $customUtils.setServiceType(el.name) }}
           </div>
+
           <div v-if="selected.countryIndex !== null">
             <v-switch
               v-model="selected.useBOB"
               inset
+              :disabled="$fetchState.pending"
               color="#FF3D17"
               :style="`${
                 selected.countryIndex === null ? 'visibility: hidden;' : ''
@@ -106,6 +108,7 @@
                 >
                   BOB {{ selected.useBOB ? 'Activated' : 'Inactive' }}
                 </span>
+
                 <NuxtImg
                   src="/images/qMark.svg"
                   preload
@@ -177,6 +180,7 @@
 
                   <v-btn
                     color="primary darken-1 white--text ml-6"
+                    :disabled="$fetchState.pending"
                     @click="
                       indexSelect(
                         {
@@ -267,10 +271,12 @@
                       !CODpartnerSelected.status &&
                       selected.serviceIndex.value === 'LAST_MILE'
                     "
-                    :class="`my-3 primary--text btn-COD ${
+                    :class="`my-3 btn-COD ${
                       selected.partnerID ? '' : 'disabled'
+                    } ${
+                      $fetchState.pending ? 'text--secondary' : 'primary--text'
                     }`"
-                    style="cursor: pointer"
+                    :style="`${$fetchState.pending ? '' : 'cursor: pointer'}`"
                     @click="handleCOD"
                   >
                     + Add COD Default Network Partner
@@ -331,11 +337,11 @@
                       addNPData.length < 3
                     "
                     :class="`
-                        primary--text btn-COD ${
-                          selected.partnerID ? '' : 'disabled'
-                        }
+                        my-3 btn-COD ${selected.partnerID ? '' : 'disabled'} ${
+                      $fetchState.pending ? 'text--secondary' : 'primary--text'
+                    }
                       `"
-                    style="cursor: pointer"
+                    :style="`${$fetchState.pending ? '' : 'cursor: pointer'}`"
                     @click="handleAddNP"
                   >
                     + Add Network Partner
@@ -346,8 +352,7 @@
               <v-btn
                 color="primary darken-1 white--text"
                 style="align-self: end"
-                :disabled="handleDisabled()"
-                :loading="$fetchState.pending"
+                :disabled="$fetchState.pending || handleDisabled()"
                 @click="btnAction"
               >
                 SAVE CHANGES
@@ -363,6 +368,16 @@
       :dialog-settings="dialogSettings"
       @doSubmit="deleteRules({ idRule: dialog.idRule })"
     />
+
+    <v-snackbar
+      :value="alert.isShow"
+      rounded="pill"
+      right
+      bottom
+      :color="alert.type"
+    >
+      {{ alert.message }}
+    </v-snackbar>
   </section>
 </template>
 
@@ -378,7 +393,6 @@ import {
   onUnmounted,
 } from '@nuxtjs/composition-api'
 // Interfaces or types
-import { ru } from 'date-fns/locale'
 import { ServiceType, VuexModuleFilters } from '~/types/filters'
 import {
   VuexModuleLControls,
@@ -387,7 +401,7 @@ import {
   RuleGroup,
 } from '~/types/lControl/lControl'
 import { VuexModuleMarketplaces } from '~/types/marketplace/marketplace'
-import { ModalConfirm } from '~/types/applications'
+import { ModalConfirm, VuexModuleApplications } from '~/types/applications'
 
 export interface RulePayload {
   data: {
@@ -413,6 +427,7 @@ export default defineComponent({
   name: 'LControl',
   layout: 'default',
   setup() {
+    const storeOfApplications = useStore<VuexModuleApplications>()
     const storeMarketplaces = useStore<VuexModuleMarketplaces>()
     const storeFilters = useStore<VuexModuleFilters>()
     const storeLControls = useStore<VuexModuleLControls>()
@@ -451,6 +466,7 @@ export default defineComponent({
         storeLControls.state.lControls.lControls.lControls
       )
     })
+    const alert = computed(() => storeOfApplications.state.applications.alert)
     const dialog = ref({
       deleteRule: false,
       idRule: '',
@@ -518,6 +534,7 @@ export default defineComponent({
       newData.index = addNPData.value.length + 1
       addNPData.value = [...addNPData.value, newData]
     }
+
     watch(
       () => [addNPData],
       ([newNPData]) => {
@@ -566,7 +583,6 @@ export default defineComponent({
       },
       { deep: true }
     )
-
     // END Handle add network partner
 
     watch(
@@ -601,7 +617,6 @@ export default defineComponent({
       // insert stored item into position `to`
       data.splice(to, 0, f)
     }
-
     const fetchCountryCodes = async () => {
       try {
         $fetchState.pending = true
@@ -612,7 +627,9 @@ export default defineComponent({
       } catch (error) {
         return error
       } finally {
-        $fetchState.pending = false
+        setTimeout(() => {
+          $fetchState.pending = false
+        }, 1500)
       }
     }
     const fetchServices = async () => {
@@ -623,7 +640,9 @@ export default defineComponent({
       } catch (error) {
         return error
       } finally {
-        $fetchState.pending = false
+        setTimeout(() => {
+          $fetchState.pending = false
+        }, 1500)
       }
     }
     const getPorts = async () => {
@@ -645,7 +664,9 @@ export default defineComponent({
       } catch (error) {
         return error
       } finally {
-        $fetchState.pending = false
+        setTimeout(() => {
+          $fetchState.pending = false
+        }, 1500)
       }
     }
     const fetchMarketplace = async (params: {
@@ -690,7 +711,9 @@ export default defineComponent({
       } catch (error) {
         return error
       } finally {
-        $fetchState.pending = false
+        setTimeout(() => {
+          $fetchState.pending = false
+        }, 1500)
       }
     }
     const fetchMarketplaceAll = async () => {
@@ -703,7 +726,9 @@ export default defineComponent({
       } catch (error) {
         return error
       } finally {
-        $fetchState.pending = false
+        setTimeout(() => {
+          $fetchState.pending = false
+        }, 1500)
       }
     }
     const fetchRuleGroups = async () => {
@@ -720,11 +745,15 @@ export default defineComponent({
           rulesComp.value = parsingRulesPayload(
             rulesByZone.value[selected.value.zoneIndex?.value as string].rules
           ) as RulePayload[]
+
+          selected.value.isUpdate = !!selected.value.rules.length
         }
       } catch (error) {
         return error
       } finally {
-        $fetchState.pending = false
+        setTimeout(() => {
+          $fetchState.pending = false
+        }, 1500)
       }
     }
 
@@ -909,7 +938,7 @@ export default defineComponent({
             id: selected.value.ruleGroupID,
             data: {
               partnerID: CODpartnerSelected.value.partnerID,
-              priority: priorityTemp + 1,
+              priority: 99,
               definitions: [
                 {
                   type: 'RULE_TYPE_IS_COD',
@@ -940,7 +969,7 @@ export default defineComponent({
             id: selected.value.ruleGroupID,
             data: {
               partnerID: x.partnerID,
-              priority: x?.priority ?? priorityTemp + 1 + i,
+              priority: i + 2,
               definitions:
                 x.definitions && x.definitions.length > 0
                   ? x.definitions.map((z: Definition) => {
@@ -983,62 +1012,21 @@ export default defineComponent({
       },
       { deep: true }
     )
-
-    const addRules = async (data: any) => {
-      try {
-        const payload = data
-
-        $fetchState.pending = true
-
-        await storeLControls.dispatch('lControls/lControls/addRules', payload)
-      } catch (error) {
-        return error
-      } finally {
-        $fetchState.pending = false
-      }
-    }
-    const updateRules = async (data: any) => {
-      try {
-        const payload = {
-          id: data.idRule,
-          data: {
-            partnerID: data.data.partnerID,
-            priority: data.data.priority,
-          },
-        }
-
-        $fetchState.pending = true
-
-        await storeLControls.dispatch(
-          'lControls/lControls/updateRules',
-          payload
-        )
-      } catch (error) {
-        return error
-      } finally {
-        $fetchState.pending = false
-      }
-    }
     const updateDefinition = async (data: Definition[]) => {
       try {
-        let payload = [...data].filter((y: Definition) => {
-          return y.type !== 'RULE_TYPE_ZONE' && y.type !== 'RULE_TYPE_IS_COD'
-        }) as any
-        payload = [...payload].map((x: Definition) => {
-          return {
-            id: x.id,
-            data: {
-              value: x.value,
-            },
-          }
-        })
+        const payload = [...data]
+          .filter((y: Definition) => {
+            return y.type !== 'RULE_TYPE_ZONE' && y.type !== 'RULE_TYPE_IS_COD'
+          })
+          .map((x: Definition) => {
+            return {
+              id: x.id,
+              data: {
+                value: x.value,
+              },
+            }
+          })
 
-        $fetchState.pending = true
-
-        // await storeLControls.dispatch(
-        //   'lControls/lControls/updateDefinition',
-        //   payload
-        // )
         await Promise.all(
           payload.map(async (el: any) => {
             try {
@@ -1047,84 +1035,53 @@ export default defineComponent({
                 el
               )
             } catch (error) {
-              console.log('error' + error)
+              return error
             }
           })
         )
       } catch (error) {
         return error
-      } finally {
-        $fetchState.pending = false
       }
     }
-    const addRuleGroup = async () => {
+    // handle bob
+    const addBOB = async () => {
       try {
-        const data = {
-          defaultPartnerID: selected.value.partnerID,
-          serviceType: selected.value.serviceIndex?.value,
-          countryCode: selected.value.countryIndex?.value,
-        }
-
-        $fetchState.pending = true
-
-        const res = await storeLControls.dispatch(
-          'lControls/lControls/addRuleGroup',
-          data
-        )
-        if (res) {
-          selected.value.ruleGroupID = res?.id
-        }
-      } catch (error: any) {
-        return error
-      } finally {
-        $fetchState.pending = false
-      }
-    }
-    const updateRuleGroup = async () => {
-      try {
-        const data = {
-          defaultPartnerID: selected.value.partnerID,
-          ruleGroupID: selected.value.ruleGroupID,
-        }
-
         $fetchState.pending = true
 
         await storeLControls.dispatch(
-          'lControls/lControls/updateRuleGroup',
-          data
+          `lControls/lControls/addBOB`,
+          selected.value.countryIndex?.value
         )
-      } catch (error: any) {
-        return error
-      } finally {
-        $fetchState.pending = false
-      }
-    }
-    const addBOB = async () => {
-      try {
-        const payload = selected.value.countryIndex?.value
-
-        $fetchState.pending = true
-
-        await storeLControls.dispatch(`lControls/lControls/addBOB`, payload)
       } catch (error) {
         return error
       } finally {
-        $fetchState.pending = false
+        setTimeout(() => {
+          $fetchState.pending = false
+        }, 1500)
       }
     }
     const deleteBOB = async () => {
       try {
-        const payload = selected.value.countryIndex?.value
         $fetchState.pending = true
 
-        await storeLControls.dispatch('lControls/lControls/deleteBOB', payload)
+        await storeLControls.dispatch(
+          'lControls/lControls/deleteBOB',
+          selected.value.countryIndex?.value
+        )
       } catch (error) {
         return error
       } finally {
-        $fetchState.pending = false
+        setTimeout(() => {
+          $fetchState.pending = false
+        }, 1500)
       }
     }
+
+    // fetch all
     const { $fetchState } = useFetch(async () => {
+      setTimeout(() => {
+        storeOfApplications.commit('applications/RESET_ALERT')
+      }, 3000)
       // FETCH COUNTRY
       await fetchMarketplaceAll()
       await fetchCountryCodes()
@@ -1134,16 +1091,73 @@ export default defineComponent({
       ]
     })
 
+    // handle rule group and rules
+    const handleRuleGroup = {
+      add: async () => {
+        try {
+          $fetchState.pending = true
+
+          const data = {
+            defaultPartnerID: selected.value.partnerID,
+            serviceType: selected.value.serviceIndex?.value,
+            countryCode: selected.value.countryIndex?.value,
+          }
+          const res = await storeLControls.dispatch(
+            'lControls/lControls/addRuleGroup',
+            data
+          )
+
+          if (res) {
+            selected.value.ruleGroupID = res?.id
+          }
+        } catch (error: any) {
+          return error
+        } finally {
+          $fetchState.pending = false
+        }
+      },
+      update: async () => {
+        try {
+          await storeLControls.dispatch('lControls/lControls/updateRuleGroup', {
+            defaultPartnerID: selected.value.partnerID,
+            ruleGroupID: selected.value.ruleGroupID,
+          })
+        } catch (error) {
+          return error
+        }
+      },
+    }
+    const handleRules = {
+      add: async (data: any) => {
+        try {
+          await storeLControls.dispatch('lControls/lControls/addRules', data)
+        } catch (error) {
+          return error
+        }
+      },
+      update: async (data: any) => {
+        try {
+          await storeLControls.dispatch('lControls/lControls/updateRules', {
+            id: data.idRule,
+            data: {
+              partnerID: data.data.partnerID,
+              priority: data.data.priority,
+            },
+          })
+        } catch (error) {
+          return error
+        }
+      },
+    }
+
     const deleteRules = async ({ idRule }: { idRule?: string }) => {
       try {
-        dialogSettings.value.loading = true
-
         $fetchState.pending = true
+        dialogSettings.value.loading = true
 
         await storeLControls.dispatch('lControls/lControls/deleteRules', {
           ruleID: idRule,
         })
-        await fetchRuleGroups()
         // start localstorage
         // const index = addNPData.value.findIndex((x: InputNPData) => x.idRule === dialog.value.idRule)
         // addNPData.value.splice(index, 1);
@@ -1157,49 +1171,88 @@ export default defineComponent({
           CODpartnerSelected.value.status = false
           // dialog.value.status = ''
         }
+
+        await fetchRuleGroups()
+        await btnAction()
       } catch (error) {
         return error
       } finally {
-        dialogSettings.value.loading = false
-        dialog.value.deleteRule = false
-        $fetchState.pending = false
+        setTimeout(() => {
+          dialogSettings.value.loading = false
+          dialog.value.deleteRule = false
+          $fetchState.pending = false
+        }, 1500)
       }
     }
     const handleInfoCOD = (partnerID: string) => {
       return marketplacesCOD.value.some((x) => x.id === partnerID)
     }
-
     const btnAction = async () => {
+      let actionsMessage = ''
+
       try {
-        if (selected.value.isUpdate) {
-          await updateRuleGroup()
-        }
-        if (!selected.value.ruleGroupID) {
-          await addRuleGroup()
+        $fetchState.pending = true
+
+        // handle update and add rule group
+        if (selected.value.isUpdate && selected.value.ruleGroupID) {
+          actionsMessage = 'updated'
+          await handleRuleGroup.update()
+        } else {
+          actionsMessage = 'addedd'
+          await handleRuleGroup.add()
         }
 
         await Promise.all(
           rulesComp.value.map(async (el: any) => {
+            // set the priority for Network Partner (primary, secondary, tertiary) before hit endpoint
+            if (el.data.definitions.length > 1 && el.idRule) {
+              const findPriorityNP = addNPData.value.find(
+                (rule) => rule.idRule === el.idRule
+              )
+
+              el.data.priority = Number(findPriorityNP?.index) + 1
+            }
+
+            // handle add and update rules
             try {
               if (el.idRule && selected.value.isUpdate) {
-                if (el.data.partnerID) await updateRules(el)
+                if (el.data.partnerID) await handleRules.update(el)
                 await updateDefinition(el.data.definitions)
               } else {
-                await addRules(el)
+                await handleRules.add(el)
               }
             } catch (error) {
-              console.log('error' + error)
+              return error
             }
           })
         )
 
-        dialog.value.status = ''
+        storeOfApplications.commit('applications/SET_ALERT', {
+          isShow: true,
+          type: 'success',
+          message: `Successfully ${actionsMessage} L-Control!`,
+        })
+        dialog.value.status = `Successfully ${actionsMessage} L-Control!`
         await fetchRuleGroups()
-      } catch (error) {
+      } catch (error: any) {
+        storeOfApplications.commit('applications/SET_ALERT', {
+          isShow: true,
+          type: 'error',
+          message: `Failed ${actionsMessage} L-Control!`,
+        })
+        dialog.value.status = error.message
+
         return error
+      } finally {
+        setTimeout(() => {
+          dialog.value.status = ''
+          $fetchState.pending = false
+        }, 1500)
+        setTimeout(() => {
+          storeOfApplications.commit('applications/RESET_ALERT')
+        }, 3000)
       }
     }
-
     const handleBob = async (e: boolean) => {
       try {
         if (e) {
@@ -1212,26 +1265,21 @@ export default defineComponent({
         return error
       }
     }
-
     const backBtnHandler = () => {
       selected.value.zoneIndex = null
       breadcrumbs.value = [breadcrumbs.value[0]]
     }
-
     function computeLControls(data: RuleGroup[]) {
       return data
     }
-
     function findNamePartner(id: string) {
       if (marketplacesAll.value && marketplacesAll.value.length > 0) {
         return marketplacesAll.value.filter((x) => x.id === id)[0]?.name
       }
     }
-
     function isCustoms() {
       return selected.value.serviceIndex?.value === 'CUSTOMS'
     }
-
     function handleCOD() {
       CODpartnerSelected.value.status = !CODpartnerSelected.value.status
     }
@@ -1250,6 +1298,7 @@ export default defineComponent({
           )
         )
         const idRule = selected.value.rules[indexCOD]?.idRule
+
         if (
           indexCOD === -1 ||
           selected.value.rules.some((el: RulePayload) => !el.idRule)
@@ -1261,12 +1310,15 @@ export default defineComponent({
           dialog.value.idRule = idRule
           dialog.value.status = 'COD'
         }
+
         CODpartnerSelected.value.idRule = idRule
       }
+
       if (isVolume?.status) {
         const index = addNPData.value.findIndex(
           (x: InputNPData) => x.index === isVolume.index
         )
+
         if (
           index > -1 &&
           !addNPData.value[index].idRule
@@ -1281,6 +1333,7 @@ export default defineComponent({
     }
 
     onUnmounted(() => {
+      storeOfApplications.commit('applications/RESET_ALERT')
       // DELETE SERVICE ON VUEX
       localStorage.removeItem('addNPData')
       dialog.value.status = ''
@@ -1549,7 +1602,7 @@ export default defineComponent({
       handleAddNP,
       addNPData,
       dataPriority,
-
+      alert,
       dialog,
       dialogSettings,
       deleteRules,

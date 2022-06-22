@@ -14,7 +14,6 @@
 
         <v-btn
           outlined
-          :loading="dialogSettings.loading"
           :disabled="dialogSettings.loading"
           color="primary"
           class="mx-2"
@@ -24,7 +23,6 @@
         </v-btn>
 
         <v-btn
-          :loading="dialogSettings.loading"
           :disabled="dialogSettings.loading"
           :color="dialogSettings.submitColor"
           @click="$emit('doSubmit')"
