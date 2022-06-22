@@ -119,7 +119,7 @@
             v-if="orderView === 1"
             :data="dataMerged"
           />
-          <BaggingList v-else :data="dataMerged"/>
+          <BaggingList v-else v-model="selectedUnbagged" :data="dataMerged"/>
         </v-window-item>
       </v-window>
     </v-card>
@@ -170,6 +170,7 @@ import {
   onMounted,
 } from '@nuxtjs/composition-api'
 // Interface and types
+import { PropType } from 'vue'
 import {
   FilterDetails,
   ModalConfirm,
@@ -179,7 +180,8 @@ import {
 } from '~/types/applications'
 import { VuexModuleFilters, Statuses } from '~/types/filters'
 import { filterBaggingInit} from '~/store/bagging/bagging'
-import { VuexModuleDetailBagging, FilterBagging} from '~/types/bagging/bagging'
+import { VuexModuleDetailBagging, FilterBagging, Unbagged, InputPostBag} from '~/types/bagging/bagging'
+import tempData from '~/static/tempData'
 
 export default defineComponent({
   name: 'BaggingPages',
@@ -217,8 +219,9 @@ export default defineComponent({
         destination: ''
       }
     }
+    const selectedUnbagged = ref({}) as Ref<InputPostBag | {}>
 
-    const dataMerged = ref([])
+    const dataMerged = ref([]) as Ref<Unbagged[]>
 
     const newScanned = computed(() => {
       const user = localStorage.getItem('auth.user') ? JSON.parse(localStorage.getItem('auth.user') as string) : {}
@@ -229,151 +232,154 @@ export default defineComponent({
       }
     })
 
-    const dataTemp = [
-      {
-        name: 'Malaysia',
-        port: 'KUL',
-        total_orders: 15,
-        sub: [
-          {
-            name: 'Malaysia - 1',
-            total_orders: 10,
-            orders: [
-              {
-                orderCode: 'TES1321'
-              }
-            ]
-          },
-          {
-            name: 'Malaysia - 2',
-            total_orders: 5,
-            orders: [
-              {
-                orderCode: 'TES123'
-              },
-              {
-                orderCode: 'TES321'
-              },
-              {
-                orderCode: 'TES456'
-              }
-            ]
-          }
-        ]
-      },
-      {
-        name: 'Singapore',
-        port: 'SIN',
-        total_orders: 15,
-        sub: [
-          {
-            name: 'Singapore - 1',
-            total_orders: 10,
-            orders: [
-              {
-                orderCode: 'SIN1321'
-              }
-            ]
-          },
-          {
-            name: 'Singapore - 2',
-            total_orders: 5,
-            orders: [
-              {
-                orderCode: 'SIN123'
-              },
-              {
-                orderCode: 'SIN321'
-              },
-              {
-                orderCode: 'SIN456'
-              }
-            ]
-          }
-        ]
-      }
-    ]
+    const dataTemp = tempData.bagging.data.unbagged as Unbagged[]
+    // [
+    //   {
+    //     name: 'Malaysia',
+    //     port: 'KUL',
+    //     total_orders: 15,
+    //     sub: [
+    //       {
+    //         name: 'Malaysia - 1',
+    //         total_orders: 10,
+    //         orders: [
+    //           {
+    //             orderCode: 'TES1321'
+    //           }
+    //         ]
+    //       },
+    //       {
+    //         name: 'Malaysia - 2',
+    //         total_orders: 5,
+    //         orders: [
+    //           {
+    //             orderCode: 'TES123'
+    //           },
+    //           {
+    //             orderCode: 'TES321'
+    //           },
+    //           {
+    //             orderCode: 'TES456'
+    //           }
+    //         ]
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     name: 'Singapore',
+    //     port: 'SIN',
+    //     total_orders: 15,
+    //     sub: [
+    //       {
+    //         name: 'Singapore - 1',
+    //         total_orders: 10,
+    //         orders: [
+    //           {
+    //             orderCode: 'SIN1321'
+    //           }
+    //         ]
+    //       },
+    //       {
+    //         name: 'Singapore - 2',
+    //         total_orders: 5,
+    //         orders: [
+    //           {
+    //             orderCode: 'SIN123'
+    //           },
+    //           {
+    //             orderCode: 'SIN321'
+    //           },
+    //           {
+    //             orderCode: 'SIN456'
+    //           }
+    //         ]
+    //       }
+    //     ]
+    //   }
+    // ]
 
 
     onMounted(() => {
       // START LOGIC FOR SAVING SCANNED ITEM IN LOCAL STORAGE
-      let merged = dataTemp
-      newScanned.value.forEach((x: any, i: number) => {
-        dataTemp.forEach((y, u) => {
-          if(y.sub.some((z) => z.name === x.name)) {
-            const indexSub = y.sub.findIndex((z) => z.name === x.name)
-            const scanned = {
-              orderCode: x.value,
-              new: x.new
-            }
-            merged[u].sub[indexSub].orders.unshift(scanned)
-          }
-        })
-      })
+      // let merged = dataTemp
+      // newScanned.value.forEach((x: any, i: number) => {
+      //   dataTemp.forEach((y, u) => {
+      //     if(y.sub.some((z) => z.name === x.name)) {
+      //       const indexSub = y.sub.findIndex((z) => z.name === x.name)
+      //       const scanned = {
+      //         orderCode: x.value,
+      //         new: x.new
+      //       }
+      //       merged[u].sub[indexSub].orders.unshift(scanned)
+      //     }
+      //   })
+      // })
 
-      const filteredNotIn = newScanned.value.filter((item: any) => !dataTemp.some((x) => x.name === item.name.split(' - ')[0]))
+      // const filteredNotIn = newScanned.value.filter((item: any) => !dataTemp.some((x) => x.name === item.name.split(' - ')[0]))
 
-      let newCountry = [] as any
-      const countTotal = {} as any
-      const countTotalSub = {} as any
-      const sub = {} as any
-      const orders = {} as any
-      filteredNotIn.forEach((x: any) => {
-        const splitName = x.name.split(' - ')[0]
-        countTotal[splitName] = (countTotal[splitName] || 0) + 1
-        countTotalSub[x.name] = (countTotalSub[x.name] || 0) + 1
-        sub[splitName] = []
-        orders[x.name] = []
-        if(!newCountry.some((z: any) => z.name === splitName)) {
-          const data = {
-            name: splitName,
-            port: splitName,
-            total_orders: 0,
-            sub: []
-          }
-          newCountry.push(data)
-        }
-      })
-      filteredNotIn.forEach((x: any) => {
-        const splitName = x.name.split(' - ')[0]
-        const scanned = {
-          name: x.name,
-          total_orders: countTotalSub[x.name],
-          orders: []
-        }
-        orders[x.name] = [
-          ...orders[x.name], {
-            orderCode: x.value,
-            new: x.new
-          }
-        ]
-        if(!sub[splitName].some((z: any) => z.name === x.name)) {
+      // let newCountry = [] as any
+      // const countTotal = {} as any
+      // const countTotalSub = {} as any
+      // const sub = {} as any
+      // const orders = {} as any
+      // filteredNotIn.forEach((x: any) => {
+      //   const splitName = x.name.split(' - ')[0]
+      //   countTotal[splitName] = (countTotal[splitName] || 0) + 1
+      //   countTotalSub[x.name] = (countTotalSub[x.name] || 0) + 1
+      //   sub[splitName] = []
+      //   orders[x.name] = []
+      //   if(!newCountry.some((z: any) => z.name === splitName)) {
+      //     const data = {
+      //       name: splitName,
+      //       port: splitName,
+      //       total_orders: 0,
+      //       sub: []
+      //     }
+      //     newCountry.push(data)
+      //   }
+      // })
+      // filteredNotIn.forEach((x: any) => {
+      //   const splitName = x.name.split(' - ')[0]
+      //   const scanned = {
+      //     name: x.name,
+      //     total_orders: countTotalSub[x.name],
+      //     orders: []
+      //   }
+      //   orders[x.name] = [
+      //     ...orders[x.name], {
+      //       orderCode: x.value,
+      //       new: x.new
+      //     }
+      //   ]
+      //   if(!sub[splitName].some((z: any) => z.name === x.name)) {
 
-          sub[splitName] = [
-            ...sub[splitName],
-            scanned
-          ]
-        }
-      })
+      //     sub[splitName] = [
+      //       ...sub[splitName],
+      //       scanned
+      //     ]
+      //   }
+      // })
 
-      newCountry = newCountry.map((x: any) => {
-        return {
-          ...x,
-          total_orders: countTotal[x.name],
-          sub: sub[x.name].map((y: any) => {
-            return {
-              ...y,
-              orders: orders[y.name]
-            }
-          })
-        }
-      })
+      // newCountry = newCountry.map((x: any) => {
+      //   return {
+      //     ...x,
+      //     total_orders: countTotal[x.name],
+      //     sub: sub[x.name].map((y: any) => {
+      //       return {
+      //         ...y,
+      //         orders: orders[y.name]
+      //       }
+      //     })
+      //   }
+      // })
 
-      merged = [
-        ...merged,
-        ...newCountry
-      ]
-      dataMerged.value = merged as any
+      // merged = [
+      //   ...merged,
+      //   ...newCountry
+      // ]
+      // dataMerged.value = merged as any
+
+      dataMerged.value = dataTemp
 
       // END LOGIC FOR SAVING SCANNED ITEM IN LOCAL STORAGE
     })
@@ -441,6 +447,14 @@ export default defineComponent({
           orderView: newOrderView,
           step: newStep
         })
+      },
+      { deep: true }
+    )
+
+    watch(
+      [orderView],
+      ([newOrderView]) => {
+        selectedUnbagged.value = {}
       },
       { deep: true }
     )
@@ -542,7 +556,8 @@ export default defineComponent({
       filterBagging,
       nameBtn,
       dataTemp,
-      dataMerged
+      dataMerged,
+      selectedUnbagged
     }
   },
   head: {},

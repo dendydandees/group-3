@@ -54,7 +54,7 @@ export const actions: ActionTree<RootStateBagging, RootStateBagging> =
 {
   async getBags({ commit }) {
     try {
-      const response = await this.$axios.$get('/bags');
+      const response = await this.$axios.$get('/api/clients/bags');
       const { data, page, totalPage, totalCount } = response;
 
       if (!data) throw response;
@@ -74,7 +74,7 @@ export const actions: ActionTree<RootStateBagging, RootStateBagging> =
   },
   async postBags({ commit }, { payload }: { payload: InputPostBag; }) {
     try {
-      const response = await this.$axios.$post('/bags', payload
+      const response = await this.$axios.$post('/api/clients/bags', payload
       );
       return response;
     } catch (error) {
@@ -83,7 +83,7 @@ export const actions: ActionTree<RootStateBagging, RootStateBagging> =
   },
   async postScanOrder({ commit }, { orderID }: { orderID: string; }) {
     try {
-      const response = await this.$axios.$post(`/scan-order/${ orderID }`);
+      const response = await this.$axios.$post(`/api/clients/scan-order/${ orderID }`);
       return response;
     } catch (error) {
       return error;

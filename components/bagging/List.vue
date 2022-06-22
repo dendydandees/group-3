@@ -11,22 +11,22 @@
           :key="index"
         >
           <template #activator>
-            <v-list-item-title>{{parent.name}} - {{parent.port}}</v-list-item-title>
-            <v-list-item-subtitle>Total Orders: {{parent.total_orders}}</v-list-item-subtitle>
+            <v-list-item-title>{{parent.dest_country}} - {{parent.dest_port}}</v-list-item-title>
+            <v-list-item-subtitle>Total Orders: {{orderTotal(parent.order_group)}}</v-list-item-subtitle>
           </template>
 
           <v-list-group
-            v-for="(sub, subIndex) in parent.sub"
+            v-for="(sub, subIndex) in parent.order_group"
             :key="subIndex"
             no-action
             sub-group
           >
             <template #activator>
               <v-list-item-content>
-                <v-list-item-title>{{sub.name}}</v-list-item-title>
+                <v-list-item-title>{{sub.group_name}}</v-list-item-title>
               </v-list-item-content>
               <v-list-item-content class="custom-item-content">
-                <v-list-item-subtitle>Total Orders: {{sub.total_orders}}</v-list-item-subtitle>
+                <v-list-item-subtitle>Total Orders: {{sub.orders && sub.orders.length ? sub.orders.length : 0}}</v-list-item-subtitle>
               </v-list-item-content>
             </template>
             <v-list-item-group
@@ -88,7 +88,9 @@ import {
   onMounted,
   watch,
   PropType,
+  useContext
 } from '@nuxtjs/composition-api'
+import { VuexModuleDetailBagging, FilterBagging, Unbagged, Bagged, Order, InputPostBag} from '~/types/bagging/bagging'
 
 export default defineComponent({
   name: 'BaggingList',
@@ -96,29 +98,63 @@ export default defineComponent({
   },
   props: {
     data: {
-      type: Array,
+      type: Array as PropType<Unbagged[] | []>,
       required: true
-    }
+    },
+    value: {
+      type: Object as PropType<InputPostBag | {}>,
+      required: true
+    },
   },
-  setup(props) {
+  setup(props, { emit }) {
+    const { app, $dateFns } = useContext()
     const checklist = ref([]) as Ref<any>
-    const dataTemp = props.data as any
+    const dataTemp = props.data as Unbagged[]
+    const selectedUnbagged = computed({
+      get: () => props.value,
+      set: (value) => {
+        emit('input', value)
+      },
+    })
+
+    watch(
+      () => [checklist.value],
+      ([newChecklist]) => {
+        let finalPayload = {}
+
+        if(newChecklist && newChecklist.length > 0) {
+          const id = newChecklist[0].id
+          let orderGroups = dataTemp.map((x: Unbagged) => x.order_group) as any
+          orderGroups = [].concat.apply([], orderGroups);
+          const filterData = (orderGroups.filter((x: Bagged) => x.orders && x.orders.some((y: Order) => y.id === id)))[0]
+          finalPayload = {
+            bag_name: filterData.group_name + '-' + $dateFns.format(
+            new Date(),
+            'yyyy-MM-dd\'T\'HH:mm:ss.SSS'
+          ),
+            order_ids: newChecklist.map((x: Order) => x.id)
+          }
+        }
+        selectedUnbagged.value = finalPayload
+      },
+      { deep: true }
+    )
 
     function handleDisabled({order,sub,parent, index}: {order: any, sub: any, parent: any, index?:{parent: number, sub: number, order: number}}) {
       let nameParent = ''
       let nameSub = ''
       if(checklist.value && checklist.value[0]) {
         const data = dataTemp
-        const indexParent = data.findIndex((x: any) => x?.sub.some((y: any) => y?.orders.some((z: any) => z.orderCode === checklist.value[0].orderCode)))
-        const indexSub = data[indexParent].sub.findIndex((x: any) => x?.orders.some((y: any) => y.orderCode === checklist.value[0].orderCode))
-        nameParent = data[indexParent].name
-        nameSub = data[indexParent].sub[indexSub].name
+        const indexParent = data.findIndex((x: Unbagged) => x?.order_group.some((y: Bagged) => y?.orders.some((z: Order) => z.orderCode === checklist.value[0].orderCode)))
+        const indexSub = data[indexParent].order_group.findIndex((x: Bagged) => x?.orders.some((y: Order) => y.orderCode === checklist.value[0].orderCode))
+        nameParent = data[indexParent].dest_country
+        nameSub = data[indexParent].order_group[indexSub].group_name
       }
 
       if(!nameParent || !nameSub) return false
       if(
-        parent.name === nameParent &&
-        sub.name === nameSub
+        parent.dest_country === nameParent &&
+        sub.group_name === nameSub
       ) {
         return false
       } else {
@@ -128,11 +164,15 @@ export default defineComponent({
     function changePage() {
       // alert('yes')
     }
+    function orderTotal(data: Bagged[]) {
+      return data.reduce(function (acc, obj) { return acc + (obj.orders && obj.orders.length ? obj.orders.length : 0); }, 0);
+    }
     return {
       checklist,
       dataTemp,
       handleDisabled,
-      changePage
+      changePage,
+      orderTotal
     }
   },
 })

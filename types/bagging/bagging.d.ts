@@ -17,14 +17,23 @@ export interface InputPostBag {
   order_ids: string[];
 }
 
-export interface Bagged {
+export interface Order {
   id: string,
   orderCode: string;
 }
 
-export interface Unbagged {
+export interface Bagged {
+  id: string,
   group_name: string,
-  orders: Bagged[];
+  dest_port: string,
+  dest_country: string,
+  orders: Order[];
+}
+
+export interface Unbagged {
+  dest_port: string,
+  dest_country: string,
+  order_group: Bagged[];
 }
 
 export interface BagData {
