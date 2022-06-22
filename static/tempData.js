@@ -647,5 +647,32 @@ export default {
         ]
       }
     }
-  ]
+  ],
+  bagging: {
+    data: {
+      "bagged": [
+        {
+          "id": "e81fdd19-194e-44f6-bff8-8c76116b2eab",
+          "orderCode": "LUWTEST011"
+        },
+        {
+          "id": "e4fc128a-764c-4b41-b5f7-2dd694298fcb",
+          "orderCode": "LUWTEST13"
+        }
+      ],
+      "unbagged": [
+        {
+          "destCountry": 'Malaysia',
+          "destPort": 'KUL',
+          "group_name": "54KULMNLSAP",
+          "orders": [
+            {
+              "id": "f26a12bc-eeb4-4b6e-bbbf-9c4626525c3e",
+              "orderCode": "LUWTEST11"
+            }
+          ]
+        }
+      ]
+    }
+  }
 };

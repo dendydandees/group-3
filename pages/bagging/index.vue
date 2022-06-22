@@ -505,7 +505,25 @@ export default defineComponent({
 
     }
 
-    useMeta(() => ({ title: 'Partner Portal | Bagging' }))
+
+    async function fetchBags () {
+
+      try {
+        $fetchState.pending = true
+        await storeBagging.dispatch('bagging/bagging/getBags')
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+
+
+    const { $fetchState, fetch } = useFetch(async () => {
+      await fetchBags()
+    })
+
+    useMeta(() => ({ title: 'Client Portal | Bagging' }))
 
     return {
       isShowFilter,
