@@ -152,7 +152,7 @@ export interface FilterBatch {
   batchCode: string
 }
 
-interface OrderUpload extends Order {
+export interface OrderUpload extends Order {
   items: OrderItem[]
 }
 

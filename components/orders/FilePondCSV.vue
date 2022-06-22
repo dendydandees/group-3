@@ -30,7 +30,12 @@ import FilePondPluginFileEncode from 'filepond-plugin-file-encode'
 
 // Interfaces and types
 import { ErrorFilePond } from '../base/FilePond/Image.vue'
-import { OrderCrossBorder, OrderDomestic, OrderItem } from '~/types/orders'
+import {
+  OrderCrossBorder,
+  OrderDomestic,
+  OrderItem,
+  OrderUpload,
+} from '~/types/orders'
 import { VuexModuleApplications } from '~/types/applications'
 
 // Create component file pond
@@ -227,10 +232,10 @@ export default defineComponent({
 
             const isRequired = (
               key: string,
-              data: any,
+              data: OrderUpload | OrderItem,
               onOrderItems = false
             ) => {
-              if (!(data as any)[key]) {
+              if (!(data as unknown as Record<string, string>)[key]) {
                 errorMessages.value.push(
                   `${key.charAt(0).toUpperCase() + key.slice(1)} ${
                     onOrderItems ? 'order item' : ''
@@ -240,14 +245,34 @@ export default defineComponent({
             }
             const isNotNumber = (
               key: string,
-              data: any,
+              data: OrderUpload | OrderItem,
               onOrderItems = false
             ) => {
-              if (typeof (data as any)[key] === 'string') {
+              if (
+                typeof (data as unknown as Record<string, string>)[key] ===
+                'string'
+              ) {
                 errorMessages.value.push(
                   `${key.charAt(0).toUpperCase() + key.slice(1)} ${
                     onOrderItems ? 'order item' : ''
                   } on ${order.orderCode} must be number!`
+                )
+              }
+            }
+            const isValidEmail = (
+              key: string,
+              data: OrderUpload | OrderItem,
+              onOrderItems = false
+            ) => {
+              if (
+                !/.+@.+\..+/.test(
+                  (data as unknown as Record<string, string>)[key]
+                )
+              ) {
+                errorMessages.value.push(
+                  `${key.charAt(0).toUpperCase() + key.slice(1)} ${
+                    onOrderItems ? 'order item' : ''
+                  } on ${order.orderCode} must be a valid email!`
                 )
               }
             }
@@ -271,6 +296,7 @@ export default defineComponent({
               'senderCountry',
               'senderCity',
             ]
+            const cellMustBeValidEmail = ['consigneeEmail']
             const orderItemsRequired = [
               'description',
               'quantity',
@@ -281,9 +307,11 @@ export default defineComponent({
             const orderItemsNumber = ['quantity', 'price']
 
             // check is number
-            cellMustBeNumber.forEach((item) => isNotNumber(item, order))
+            cellMustBeNumber.forEach((key) => isNotNumber(key, order))
             // check is required
-            cellMustBeRequired.forEach((item) => isRequired(item, order))
+            cellMustBeRequired.forEach((key) => isRequired(key, order))
+            // check is valid email
+            cellMustBeValidEmail.forEach((key) => isValidEmail(key, order))
 
             items.forEach((item) => {
               // check order item is number
