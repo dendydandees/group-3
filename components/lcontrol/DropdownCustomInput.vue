@@ -35,7 +35,6 @@
           :item-value="itemShow.value"
           :placeholder="placeholder"
           :disabled="disabledDrop"
-          :loading="disabledDrop"
           outlined
           rounded
           dense
@@ -58,14 +57,16 @@
           rounded
           outlined
           type="number"
+          :min="0"
           class="custom-text-field"
-          :disabled="!selectedComp.partnerID"
+          :disabled="!selectedComp.partnerID || disabledDrop"
         />
       </div>
       <div class="ml-3">
         <div class="header-NP-label"></div>
         <v-btn
           v-if="isDelete"
+          :loading="disabledDrop"
           color="error"
           fab
           x-small

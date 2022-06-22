@@ -34,7 +34,6 @@
         :item-value="itemShow.value"
         :placeholder="placeholder"
         :disabled="disabledDrop"
-        :loading="disabledDrop"
         outlined
         rounded
         dense
@@ -44,6 +43,7 @@
       </v-select>
       <v-btn
         v-if="isDelete"
+        :loading="disabledDrop"
         color="error"
         fab
         x-small
