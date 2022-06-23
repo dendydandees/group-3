@@ -1123,6 +1123,8 @@ export default defineComponent({
           if (res) {
             selected.value.ruleGroupID = res?.id
           }
+
+          return res
         } catch (error: any) {
           return error
         } finally {
@@ -1131,10 +1133,13 @@ export default defineComponent({
       },
       update: async () => {
         try {
-          await storeLControls.dispatch('lControls/lControls/updateRuleGroup', {
-            defaultPartnerID: selected.value.partnerID,
-            ruleGroupID: selected.value.ruleGroupID,
-          })
+          return await storeLControls.dispatch(
+            'lControls/lControls/updateRuleGroup',
+            {
+              defaultPartnerID: selected.value.partnerID,
+              ruleGroupID: selected.value.ruleGroupID,
+            }
+          )
         } catch (error) {
           return error
         }
@@ -1207,13 +1212,18 @@ export default defineComponent({
         $fetchState.pending = true
 
         // handle update and add rule group
+        let responseRuleGroup = {} as any
         if (selected.value.isUpdate && selected.value.ruleGroupID) {
           actionsMessage = 'updated'
-          await handleRuleGroup.update()
+          responseRuleGroup = await handleRuleGroup.update()
         } else {
           actionsMessage = 'added'
-          await handleRuleGroup.add()
+          responseRuleGroup = await handleRuleGroup.add()
         }
+
+        // eslint-disable-next-line no-prototype-builtins
+        if (!responseRuleGroup.hasOwnProperty('id'))
+          throw new Error(`Failed to ${actionsMessage} L-Control rules!`)
 
         await Promise.all(
           rulesComp.value.map(async (el: any) => {
@@ -1250,7 +1260,7 @@ export default defineComponent({
         storeOfApplications.commit('applications/SET_ALERT', {
           isShow: true,
           type: 'success',
-          message: `Successfully ${actionsMessage} L-Control!`,
+          message: `Successfully ${actionsMessage} L-Control rules!`,
         })
         dialog.value.status = `Successfully ${actionsMessage} L-Control!`
         await fetchRuleGroups()
@@ -1258,7 +1268,7 @@ export default defineComponent({
         storeOfApplications.commit('applications/SET_ALERT', {
           isShow: true,
           type: 'error',
-          message: `Failed ${actionsMessage} L-Control!`,
+          message: `Failed ${actionsMessage} L-Control rules!`,
         })
         dialog.value.status = error.message
 
