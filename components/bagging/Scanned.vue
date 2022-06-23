@@ -148,6 +148,7 @@ export default defineComponent({
         order_ids: data.orders.map((x: Order) => x.id)
       }
       selectedUnbagged.value = parseInput
+      console.log(selectedUnbagged)
     }
     async function submit(params: {isCancel?: boolean}) {
       try {

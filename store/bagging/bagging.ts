@@ -8,6 +8,7 @@ import {
   Bagged,
   Unbagged
 } from '~/types/bagging/bagging';
+import tempData from '~/static/tempData';
 
 
 export const filterBaggingInit = {
@@ -26,6 +27,7 @@ const filter = {
 
 export const state = () => ({
   bags: {} as BagData,
+  unbagged: tempData.bagging.data.unbagged as Unbagged[],
   meta: {
     page: 1,
     totalPage: 1,

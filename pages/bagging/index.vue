@@ -37,6 +37,7 @@
       <v-btn
         color="primary"
         min-width="200px"
+        :disabled="!Object.keys(selectedUnbagged).length && orderView !== 1"
         @click="handleBagScanBag"
       >
         <v-icon
@@ -232,156 +233,53 @@ export default defineComponent({
       }
     })
 
-    const dataTemp = tempData.bagging.data.unbagged as Unbagged[]
-    // [
-    //   {
-    //     name: 'Malaysia',
-    //     port: 'KUL',
-    //     total_orders: 15,
-    //     sub: [
-    //       {
-    //         name: 'Malaysia - 1',
-    //         total_orders: 10,
-    //         orders: [
-    //           {
-    //             orderCode: 'TES1321'
-    //           }
-    //         ]
-    //       },
-    //       {
-    //         name: 'Malaysia - 2',
-    //         total_orders: 5,
-    //         orders: [
-    //           {
-    //             orderCode: 'TES123'
-    //           },
-    //           {
-    //             orderCode: 'TES321'
-    //           },
-    //           {
-    //             orderCode: 'TES456'
-    //           }
-    //         ]
-    //       }
-    //     ]
-    //   },
-    //   {
-    //     name: 'Singapore',
-    //     port: 'SIN',
-    //     total_orders: 15,
-    //     sub: [
-    //       {
-    //         name: 'Singapore - 1',
-    //         total_orders: 10,
-    //         orders: [
-    //           {
-    //             orderCode: 'SIN1321'
-    //           }
-    //         ]
-    //       },
-    //       {
-    //         name: 'Singapore - 2',
-    //         total_orders: 5,
-    //         orders: [
-    //           {
-    //             orderCode: 'SIN123'
-    //           },
-    //           {
-    //             orderCode: 'SIN321'
-    //           },
-    //           {
-    //             orderCode: 'SIN456'
-    //           }
-    //         ]
-    //       }
-    //     ]
-    //   }
-    // ]
+    // const dataTemp = tempData.bagging.data.unbagged as Unbagged[]
+    const dataTemp =  computed(() => {
+      const data = tempData.bagging.data.unbagged
+      let tempArr = [] as {group_name: string, id: string, orderCode: string, new?: boolean}[]
+      data.forEach(x => {
+        newScanned.value.forEach((k: {orderCode: string, new?: boolean}) => {
+          let temp = {} as {group_name: string, id: string, orderCode: string, new?: boolean}
+          x.order_group.forEach(m => {
+            m.orders.forEach(n => {
+              if(k.orderCode === n.orderCode) {
+                temp = {
+                  group_name: m.group_name,
+                  id: n.id,
+                  ...k,
+                }
+              }
+            })
+          })
+        tempArr.push(temp)
+        })
+      })
+      tempArr = tempArr.filter(x => Object.keys(x).length)
+
+      const noOrder = [...data].map(x => {
+        return {
+            ...x,
+            order_group: x.order_group && (x.order_group.map(y => {
+            return {
+              ...y,
+              orders: (tempArr.filter(k => k.group_name === y.group_name)).map(l => {
+                return  {
+                  id: l.id,
+                  orderCode: l.orderCode,
+                  new: l.new ?? false
+                }
+              })
+            }
+          })).filter(b => b.orders.length)
+        }
+      })
+      return noOrder
+    })
 
 
     onMounted(() => {
-      // START LOGIC FOR SAVING SCANNED ITEM IN LOCAL STORAGE
-      // let merged = dataTemp
-      // newScanned.value.forEach((x: any, i: number) => {
-      //   dataTemp.forEach((y, u) => {
-      //     if(y.sub.some((z) => z.name === x.name)) {
-      //       const indexSub = y.sub.findIndex((z) => z.name === x.name)
-      //       const scanned = {
-      //         orderCode: x.value,
-      //         new: x.new
-      //       }
-      //       merged[u].sub[indexSub].orders.unshift(scanned)
-      //     }
-      //   })
-      // })
 
-      // const filteredNotIn = newScanned.value.filter((item: any) => !dataTemp.some((x) => x.name === item.name.split(' - ')[0]))
-
-      // let newCountry = [] as any
-      // const countTotal = {} as any
-      // const countTotalSub = {} as any
-      // const sub = {} as any
-      // const orders = {} as any
-      // filteredNotIn.forEach((x: any) => {
-      //   const splitName = x.name.split(' - ')[0]
-      //   countTotal[splitName] = (countTotal[splitName] || 0) + 1
-      //   countTotalSub[x.name] = (countTotalSub[x.name] || 0) + 1
-      //   sub[splitName] = []
-      //   orders[x.name] = []
-      //   if(!newCountry.some((z: any) => z.name === splitName)) {
-      //     const data = {
-      //       name: splitName,
-      //       port: splitName,
-      //       total_orders: 0,
-      //       sub: []
-      //     }
-      //     newCountry.push(data)
-      //   }
-      // })
-      // filteredNotIn.forEach((x: any) => {
-      //   const splitName = x.name.split(' - ')[0]
-      //   const scanned = {
-      //     name: x.name,
-      //     total_orders: countTotalSub[x.name],
-      //     orders: []
-      //   }
-      //   orders[x.name] = [
-      //     ...orders[x.name], {
-      //       orderCode: x.value,
-      //       new: x.new
-      //     }
-      //   ]
-      //   if(!sub[splitName].some((z: any) => z.name === x.name)) {
-
-      //     sub[splitName] = [
-      //       ...sub[splitName],
-      //       scanned
-      //     ]
-      //   }
-      // })
-
-      // newCountry = newCountry.map((x: any) => {
-      //   return {
-      //     ...x,
-      //     total_orders: countTotal[x.name],
-      //     sub: sub[x.name].map((y: any) => {
-      //       return {
-      //         ...y,
-      //         orders: orders[y.name]
-      //       }
-      //     })
-      //   }
-      // })
-
-      // merged = [
-      //   ...merged,
-      //   ...newCountry
-      // ]
-      // dataMerged.value = merged as any
-
-      dataMerged.value = dataTemp
-
-      // END LOGIC FOR SAVING SCANNED ITEM IN LOCAL STORAGE
+      dataMerged.value = dataTemp.value
     })
 
     // manage windows

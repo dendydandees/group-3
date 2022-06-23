@@ -683,7 +683,7 @@ export default {
           "order_group": [
             {
               "id": "",
-              "group_name": "54KULMNLSAP",
+              "group_name": "54KULMNLSAPXXX",
               "dest_port": "MNL",
               "dest_country": "PH",
               "orders": [
@@ -701,7 +701,7 @@ export default {
               "id": "",
               "group_name": "54KULMNLTES",
               "dest_port": "MNL",
-              "dest_country": "PH",
+              "dest_country": "MY",
               "orders": [
                 {
                   "id": "f26a12bc-eeb4-4b6e-bbbf-9c4626525c3e",
@@ -713,13 +713,13 @@ export default {
         },
         {
           "dest_port": "IND",
-          "dest_country": "KUL",
+          "dest_country": "MY",
           "order_group": [
             {
               "id": "",
               "group_name": "54KULMNLSAP",
               "dest_port": "MNL",
-              "dest_country": "PH",
+              "dest_country": "MY",
               "orders": [
                 {
                   "id": "f26a12bc-eeb4-4b6e-bbbf-9c4626525c3e",

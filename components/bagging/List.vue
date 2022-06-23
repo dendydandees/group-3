@@ -9,6 +9,7 @@
         <v-list-group
           v-for="(parent, index) in dataTemp"
           :key="index"
+          :style="`${orderTotal(parent.order_group) ? '' : 'display: none'}`"
         >
           <template #activator>
             <v-list-item-title>{{parent.dest_country}} - {{parent.dest_port}}</v-list-item-title>
@@ -59,7 +60,7 @@
                   >
                     <!-- <v-list-item-title>{{x.orderCode}}</v-list-item-title> -->
                     <v-list-item-title>
-                      <v-btn text color="primary" @click.stop="changePage">
+                      <v-btn text color="primary" @click.stop="changePage(x.id)">
                         <span>
                           {{ x.orderCode }}
                         </span>
@@ -107,6 +108,7 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
+    const router = useRouter()
     const { app, $dateFns } = useContext()
     const checklist = ref([]) as Ref<any>
     const dataTemp = props.data as Unbagged[]
@@ -161,8 +163,8 @@ export default defineComponent({
         return true
       }
     }
-    function changePage() {
-      // alert('yes')
+    function changePage(id: string) {
+      router.push(`/orders/${id}`)
     }
     function orderTotal(data: Bagged[]) {
       return data.reduce(function (acc, obj) { return acc + (obj.orders && obj.orders.length ? obj.orders.length : 0); }, 0);
@@ -172,7 +174,8 @@ export default defineComponent({
       dataTemp,
       handleDisabled,
       changePage,
-      orderTotal
+      orderTotal,
+
     }
   },
 })
