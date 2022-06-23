@@ -899,30 +899,33 @@ export default defineComponent({
           id: selected.value.ruleGroupID,
           data: {
             partnerID: selected.value.partnerID,
-            priority: priorityTemp + 1,
+            priority: 1,
             definitions: [
               {
-                type: 'RULE_TYPE_ZONE',
+                type: isCustoms() ? 'RULE_TYPE_PORT' : 'RULE_TYPE_ZONE',
                 value: selected.value.zoneIndex?.value,
               },
             ],
           },
         }
+
         if (
           !checkDefinition({
             data: [...rules].map((y) => y.data),
-            type: 'RULE_TYPE_ZONE',
+            type: isCustoms() ? 'RULE_TYPE_PORT' : 'RULE_TYPE_ZONE',
           })
         ) {
           rules = [...rules, temp]
         } else if (
           checkDefinition({
             data: [...rules].map((y) => y.data),
-            type: 'RULE_TYPE_ZONE',
+            type: isCustoms() ? 'RULE_TYPE_PORT' : 'RULE_TYPE_ZONE',
           })
         ) {
           const indexCOD = rules.findIndex((el: any) =>
-            el.data.definitions.some((x: any) => x.type === 'RULE_TYPE_ZONE')
+            el.data.definitions.some((x: any) =>
+              x.type === isCustoms() ? 'RULE_TYPE_PORT' : 'RULE_TYPE_ZONE'
+            )
           )
           rules[indexCOD].data.partnerID = partnerDefault
         }
@@ -1016,7 +1019,11 @@ export default defineComponent({
       try {
         const payload = [...data]
           .filter((y: Definition) => {
-            return y.type !== 'RULE_TYPE_ZONE' && y.type !== 'RULE_TYPE_IS_COD'
+            return (
+              y.type !== 'RULE_TYPE_ZONE' &&
+              y.type !== 'RULE_TYPE_IS_COD' &&
+              y.type !== 'RULE_TYPE_PORT'
+            )
           })
           .map((x: Definition) => {
             return {
@@ -1198,13 +1205,20 @@ export default defineComponent({
           actionsMessage = 'updated'
           await handleRuleGroup.update()
         } else {
-          actionsMessage = 'addedd'
+          actionsMessage = 'added'
           await handleRuleGroup.add()
         }
 
         await Promise.all(
           rulesComp.value.map(async (el: any) => {
-            // set the priority for Network Partner (primary, secondary, tertiary) before hit endpoint
+            /* SET DATA FOR CUSTOMS */
+            // set the type definition for Customs
+            if (isCustoms()) {
+              el.data.definitions[0].type = 'RULE_TYPE_PORT'
+            }
+
+            /* SET DATA FOR LAST MILE */
+            // set the priority for Network Partner (primary, secondary, tertiary) before hit endpoint (currently it's just for Last Mile)
             if (el.data.definitions.length > 1 && el.idRule) {
               const findPriorityNP = addNPData.value.find(
                 (rule) => rule.idRule === el.idRule
@@ -1527,7 +1541,9 @@ export default defineComponent({
                               el.id
                             ].rules.findIndex((el: Rule) =>
                               el.definitions.some(
-                                (x: Definition) => x.type === 'RULE_TYPE_ZONE'
+                                (x: Definition) =>
+                                  x.type === 'RULE_TYPE_ZONE' ||
+                                  'RULE_TYPE_PORT'
                               )
                             )
                             partnerID =
