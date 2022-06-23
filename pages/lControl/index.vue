@@ -219,7 +219,12 @@
           </div>
 
           <div v-else class="content-zone-selected">
-            <v-btn icon color="primary" @click="backBtnHandler()">
+            <v-btn
+              :disabled="$fetchState.pending"
+              icon
+              color="primary"
+              @click="backBtnHandler()"
+            >
               <v-icon> mdi-arrow-left-thick </v-icon>
             </v-btn>
 
@@ -738,6 +743,7 @@ export default defineComponent({
         await storeLControls.dispatch('lControls/lControls/getLControls', {
           params: {},
         })
+
         if (selected.value.zoneIndex?.value) {
           selected.value.rules = parsingRulesPayload(
             rulesByZone.value[selected.value.zoneIndex?.value as string].rules
@@ -746,7 +752,7 @@ export default defineComponent({
             rulesByZone.value[selected.value.zoneIndex?.value as string].rules
           ) as RulePayload[]
 
-          selected.value.isUpdate = !!selected.value.rules.length
+          selected.value.isUpdate = !!selected.value.ruleGroupID
         }
       } catch (error) {
         return error
@@ -815,7 +821,7 @@ export default defineComponent({
           selected.value.rules = data.data.rules
           selected.value.ruleID = data.data.ruleID
           // selected.value.priority = data.data.priority
-          selected.value.isUpdate = !!data.data.partnerID
+          selected.value.isUpdate = !!data.data.ruleGroupID
 
           if (
             checkDefinition({
