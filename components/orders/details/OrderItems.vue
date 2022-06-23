@@ -7,7 +7,7 @@
     class="elevation-0"
   >
     <template #[`item.price`]="{ item }">
-      {{ item.currency }} {{ setPrice(item.price) }}
+      {{ setPrice(item.price, item.currency) }}
     </template>
 
     <template #footer>
@@ -82,13 +82,20 @@ export default defineComponent({
         },
       ],
     })
-    const setPrice = (price: string) => {
-      return parseFloat(price).toFixed(2)
+    const setPrice = (price: string, currency: string) => {
+      if (!price || !currency) return ''
+
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        maximumFractionDigits: 2,
+        currencyDisplay: 'code',
+        currency,
+      }).format(parseFloat(price))
     }
     const setTotal = () => {
-      const orderItemsTemp =
-        orderItems.value && orderItems.value.length > 0 ? orderItems.value : []
-      const totalPrice = orderItemsTemp.reduce(
+      if (!orderItems.value && orderItems.value.length === 0) return ''
+
+      const totalPrice = orderItems.value.reduce(
         (previous: number, current: OrderItem) => {
           const total =
             previous + parseFloat(current.price as unknown as string)
@@ -97,10 +104,26 @@ export default defineComponent({
         },
         0
       )
-      const currency =
-        orderItemsTemp.length !== 0 ? orderItemsTemp[0].currency : ''
+      // get the highest occurrence of currency
+      const currency = [...orderItems.value]
+        ?.sort(
+          (itemA: any, itemB: any) =>
+            orderItems.value.filter(
+              (value: any) => value.currency === itemA.currency
+            ).length -
+            orderItems.value.filter((value: any) => value === itemB.currency)
+              .length
+        )
+        ?.pop()?.currency as string
 
-      return `${currency} ${totalPrice.toFixed(2)}`
+      if (!currency) return ''
+
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        maximumFractionDigits: 2,
+        currencyDisplay: 'code',
+        currency,
+      }).format(totalPrice)
     }
 
     return {
