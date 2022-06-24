@@ -25,6 +25,7 @@
         color="green"
         min-width="200px"
         class="mr-3 white--text"
+        :disabled="disabledCloseBag()"
         @click="handleBagScanBag"
       >
         <v-icon
@@ -61,7 +62,7 @@
           elevation="2"
           width="100%"
           :color="`${
-            allScanned.length
+            allScanned.length && allScanned.some((x) => x.new)
             ? validationCard()
             : 'white'
             // validationCard()
@@ -79,7 +80,7 @@
           } pa-15 d-flex flex-column align-center justify-center`"
         >
           <div
-            v-if="allScanned.length"
+            v-if="allScanned.length && allScanned.some((x) => x.new)"
             class="text-center"
           >
             <div class="text-h1 font-weight-bold mb-15">
@@ -150,11 +151,12 @@ export default defineComponent({
   name: 'ScanPages',
   middleware: 'partner',
   setup() {
+    const { app, $dateFns } = useContext()
     const router = useRouter()
     const storeApplications = useStore<VuexModuleApplications>()
     const storeFilters = useStore<VuexModuleFilters>()
     const storeBagging = useStore<VuexModuleDetailBagging>()
-    const unbaggedData = computed(() => (storeBagging.state.bagging as any).bagging.unbagged)
+    const unbaggedData = computed(() => ((storeBagging.state.bagging as any).bagging.unbagged))
     const countryCodes = computed(() => storeFilters.state.filters.countryCodes)
     const inputBarcode = ref('')
     const user = localStorage.getItem('auth.user') ? JSON.parse(localStorage.getItem('auth.user') as string) : {}
@@ -207,10 +209,45 @@ export default defineComponent({
 
     })
 
+    function parseInput() {
+      let orderGroups = unbaggedData.value.map((x: Unbagged) => x.order_group && x.order_group).filter((z: any) => z && z.length > 0)
+      orderGroups = [].concat.apply([], orderGroups);
+      const payload = orderGroups.map((x: Bagged) => {
+        return {
+          bag_name: x.group_name + '-' + $dateFns.format(
+            new Date(),
+            'yyyy-MM-dd\'T\'HH:mm:ss.SSS'
+          ),
+          order_ids: (x.orders && x.orders.filter((y) => (allScanned.value.some((z: {orderCode: string, new: boolean}) => (z.orderCode === y.orderCode) && z.new))))?.map((k) => k.id)
+        }
+      }).filter((q: InputPostBag) => q.order_ids && q.order_ids.length)
+      return payload
+    }
+
 
     async function submit(params: {isCancel?: boolean}) {
       try {
         dialogSettings.value.loading = true
+        const payloadArr = parseInput()
+        await Promise.all(
+          payloadArr.map(async (el: InputPostBag) => {
+            try {
+              await storeBagging.dispatch(
+                'bagging/bagging/postBags',
+                {payload: el}
+              )
+            } catch (error) {
+              return error
+            }
+          })
+        )
+        await fetchBags()
+        allScanned.value = allScanned.value.map((x: any) => {
+          return {
+            ...x,
+            new: false
+          }
+        })
 
         storeApplications.commit('applications/SET_ALERT', {
           isShow: true,
@@ -314,6 +351,7 @@ export default defineComponent({
       let dataFilter = [...unbaggedData.value].map((x: Unbagged,i: number) => {
         return x.order_group
       }) as any
+
       dataFilter = [].concat.apply([], dataFilter);
       dataFilter = dataFilter.filter((x: Bagged) => x.orders && x.orders.some((y: Order) => y.orderCode === barcode))
 
@@ -337,6 +375,8 @@ export default defineComponent({
 
     function validationCard(params?: {isText?: Boolean}) {
 
+      const isNew = allScanned.value.some((x: any) => x.new)
+
       if(!params?.isText) {
         if(
           allScanned.value &&
@@ -352,7 +392,8 @@ export default defineComponent({
         if(
           allScanned.value &&
           allScanned.value.length &&
-          searchName(lastEnter.value)
+          searchName(lastEnter.value) &&
+          isNew
         ) {
           return 'white--text'
         } else {
@@ -391,7 +432,20 @@ export default defineComponent({
       }
     }
 
+    async function fetchBags () {
+
+      try {
+        $fetchState.pending = true
+        await storeBagging.dispatch('bagging/bagging/getBags')
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+
     const { $fetchState, fetch } = useFetch(async () => {
+      await fetchBags()
       await fetchCountryCodes()
       speech.value.voiceList = speech.value.synth.getVoices()
       speech.value.synth.onvoiceschanged = () => {
@@ -402,6 +456,10 @@ export default defineComponent({
       }
       listenForSpeechEvents()
     })
+
+    function disabledCloseBag() {
+      return !allScanned.value.some((x: any) => x.new)
+    }
 
     useMeta(() => ({ title: 'Client Portal | Scan' }))
 
@@ -417,7 +475,8 @@ export default defineComponent({
       allScanned,
       validationCard,
       cardData,
-      searchCountry
+      searchCountry,
+      disabledCloseBag
     }
   },
   head: {},

@@ -35,6 +35,7 @@
         </template>
       </OrdersRightOptions>
       <v-btn
+        v-if="step === 1"
         color="primary"
         min-width="200px"
         :disabled="!Object.keys(selectedUnbagged).length && orderView !== 1"
@@ -46,6 +47,18 @@
         >
           mdi-play
         </v-icon>
+        {{
+          nameBtn
+        }}
+      </v-btn>
+
+      <v-btn
+        v-else
+        color="primary"
+        min-width="200px"
+        :disabled="!selectedOrders.length"
+        @click="handleBagScanBag"
+      >
         {{
           nameBtn
         }}
@@ -222,7 +235,7 @@ export default defineComponent({
     }
     const selectedUnbagged = ref({}) as Ref<InputPostBag | {}>
 
-    const dataMerged = ref([]) as Ref<Unbagged[]>
+    // const dataMerged = ref([]) as Ref<Unbagged[]>
 
     const newScanned = computed(() => {
       const user = localStorage.getItem('auth.user') ? JSON.parse(localStorage.getItem('auth.user') as string) : {}
@@ -234,8 +247,8 @@ export default defineComponent({
     })
 
     // const dataTemp = tempData.bagging.data.unbagged as Unbagged[]
-    const dataTemp =  computed(() => {
-      const data = tempData.bagging.data.unbagged
+    const dataMerged =  computed(() => {
+      const data = (storeBagging.state.bagging as any).bagging.unbagged as Unbagged[]
       let tempArr = [] as {group_name: string, id: string, orderCode: string, new?: boolean}[]
       data.forEach(x => {
         newScanned.value.forEach((k: {orderCode: string, new?: boolean}) => {
@@ -274,13 +287,13 @@ export default defineComponent({
         }
       })
       return noOrder
-    })
+    }) as Ref<Unbagged[]>
 
 
-    onMounted(() => {
+    // onMounted(() => {
 
-      dataMerged.value = dataTemp.value
-    })
+    //   dataMerged.value = dataTemp.value
+    // })
 
     // manage windows
     const step = ref((storeBagging.state.bagging as any).bagging.tab.step)
@@ -377,8 +390,16 @@ export default defineComponent({
       }
     }
     async function submit(params: {isCancel?: boolean}) {
+
       try {
         dialogSettings.value.loading = true
+        if(step.value !== 0) {
+          await storeBagging.dispatch(
+            'bagging/bagging/postBags',
+            {payload: selectedUnbagged.value}
+          )
+          await fetchBags()
+        }
 
         storeApplications.commit('applications/SET_ALERT', {
           isShow: true,
@@ -453,7 +474,7 @@ export default defineComponent({
       handleCancel,
       filterBagging,
       nameBtn,
-      dataTemp,
+      // dataTemp,
       dataMerged,
       selectedUnbagged
     }

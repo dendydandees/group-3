@@ -27,6 +27,11 @@ export interface Bagged {
   group_name: string,
   dest_port: string,
   dest_country: string,
+  departure: string,
+  flight: string,
+  flight_date: string,
+  origin_port: string,
+  status: string,
   orders: Order[];
 }
 
@@ -37,6 +42,6 @@ export interface Unbagged {
 }
 
 export interface BagData {
-  bagged: InputPostBag[],
+  bagged: Bagged[],
   unbagged: Unbagged[],
 }

@@ -4,7 +4,9 @@
       class="mx-auto"
 
     >
-      <v-list>
+      <v-list
+        v-if="dataTemp && dataTemp.length"
+      >
 
         <v-list-group
           v-for="(parent, index) in dataTemp"
@@ -74,6 +76,12 @@
           </v-list-group>
         </v-list-group>
       </v-list>
+      <div
+        v-else
+        class="d-flex justify-center font-weight-bold"
+      >
+        No Data
+      </div>
     </v-card>
   </article>
 </template>
@@ -111,7 +119,11 @@ export default defineComponent({
     const router = useRouter()
     const { app, $dateFns } = useContext()
     const checklist = ref([]) as Ref<any>
-    const dataTemp = props.data as Unbagged[]
+    // const dataTemp = props.data as Unbagged[]
+    const dataTemp = computed(() => {
+      const temp = props.data.filter((y) => y.order_group.length)
+      return temp
+    }) as Ref<Unbagged[]>
     const selectedUnbagged = computed({
       get: () => props.value,
       set: (value) => {
@@ -126,7 +138,7 @@ export default defineComponent({
 
         if(newChecklist && newChecklist.length > 0) {
           const id = newChecklist[0].id
-          let orderGroups = dataTemp.map((x: Unbagged) => x.order_group) as any
+          let orderGroups = dataTemp.value.map((x: Unbagged) => x.order_group) as any
           orderGroups = [].concat.apply([], orderGroups);
           const filterData = (orderGroups.filter((x: Bagged) => x.orders && x.orders.some((y: Order) => y.id === id)))[0]
           finalPayload = {
@@ -146,7 +158,7 @@ export default defineComponent({
       let nameParent = ''
       let nameSub = ''
       if(checklist.value && checklist.value[0]) {
-        const data = dataTemp
+        const data = dataTemp.value
         const indexParent = data.findIndex((x: Unbagged) => x?.order_group.some((y: Bagged) => y?.orders.some((z: Order) => z.orderCode === checklist.value[0].orderCode)))
         const indexSub = data[indexParent].order_group.findIndex((x: Bagged) => x?.orders.some((y: Order) => y.orderCode === checklist.value[0].orderCode))
         nameParent = data[indexParent].dest_country

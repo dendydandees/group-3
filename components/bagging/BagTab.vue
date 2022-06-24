@@ -25,12 +25,12 @@
     </v-fade-transition>
 
     <!-- Pagination universal (order and batch view) -->
-    <BasePagination
+    <!-- <BasePagination
       v-model="pagination"
       :meta="meta"
       :loading="$fetchState.pending"
       @resetPage="pagination.page = 1"
-    />
+    /> -->
 
 
     <v-snackbar
@@ -71,57 +71,58 @@ import {
   Header,
   VuexModuleApplications,
 } from '~/types/applications'
+import { VuexModuleDetailBagging, FilterBagging, Unbagged, InputPostBag} from '~/types/bagging/bagging'
 
 const initHeaders = [
   {
     text: 'Bag ID',
-    value: 'orderCode',
+    value: 'id',
     width: 150,
   },
   {
     text: 'Orders',
-    value: 'destinationPort',
+    value: 'orderBags',
     width: 150,
   },
   {
     text: 'Status',
-    value: 'status',
+    value: 'statusBags',
     sortable: false,
     width: 200,
   },
   {
     text: 'Origin Port',
-    value: 'originPort',
+    value: 'origin_port',
     sortable: false,
     width: 150,
   },
   {
     text: 'Destination Port',
-    value: 'destinationPort',
+    value: 'dest_port',
     sortable: false,
     width: 180,
   },
   {
     text: 'Flight',
-    value: 'creationDate',
+    value: 'flight',
     sortable: false,
     width: 150,
   },
   {
     text: 'Date',
-    value: 'creationDate',
+    value: 'flight_date',
     sortable: false,
     width: 180,
   },
   {
     text: 'Departure',
-    value: 'LMTrackingNumber',
+    value: 'departure',
     sortable: false,
     width: 230,
   },
   {
     text: 'Arrival',
-    value: 'originPort',
+    value: 'arrival',
     sortable: false,
     width: 150,
   },
@@ -149,7 +150,9 @@ export default defineComponent({
     // manage store
     const storeOrders = useStore<VuexModuleOrders>()
     const storeApplications = useStore<VuexModuleApplications>()
-    const orders = computed(() => storeOrders.state.orders.orders)
+    const storeBagging = useStore<VuexModuleDetailBagging>()
+    const orders = computed(() => (storeBagging.state.bagging as any).bagging.bags)
+
     const meta = computed(() => storeOrders.state.orders.meta)
     const pagination = ref({
       ...storeApplications.state.applications.pagination,

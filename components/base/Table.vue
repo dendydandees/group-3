@@ -136,6 +136,21 @@
     </template>
     <!-- END ORDERS AND INCOMING ORDERS -->
 
+    <!-- START BAGGING PAGE -->
+    <!-- order bags -->
+    <template #[`item.orderBags`]="{ item}">
+      <div class="text--secondary">
+        {{ item.orders.length }}
+      </div>
+    </template>
+    <!-- status bags -->
+    <template #[`item.statusBags`]="{ item}">
+      <div class="text--secondary">
+        {{ item.status }}
+      </div>
+    </template>
+    <!-- END BAGGING PAGE -->
+
     <!-- ACTIONS -->
     <template #[`item.actions`]="{ item }">
       <div class="d-flex align-center">

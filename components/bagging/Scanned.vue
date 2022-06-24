@@ -1,7 +1,9 @@
 <template>
   <article class="scanned-tab pa-8">
     <v-container fluid class="pa-0">
-      <v-row>
+      <v-row
+        v-if="dataComp && dataComp.length"
+      >
         <v-col
           v-for="(partner, u) in dataComp"
           :key="u"
@@ -58,6 +60,12 @@
           </v-card>
         </v-col>
       </v-row>
+      <v-row
+        v-else
+        class="d-flex justify-center font-weight-bold"
+      >
+        No Scanned Items
+      </v-row>
     </v-container>
 
 
@@ -107,6 +115,7 @@ export default defineComponent({
   },
   setup(props) {
     const storeApplications = useStore<VuexModuleApplications>()
+    const storeBagging = useStore<VuexModuleDetailBagging>()
     const { app, $dateFns } = useContext()
     const dialog = ref({
       confirm: false,
@@ -148,11 +157,15 @@ export default defineComponent({
         order_ids: data.orders.map((x: Order) => x.id)
       }
       selectedUnbagged.value = parseInput
-      console.log(selectedUnbagged)
     }
     async function submit(params: {isCancel?: boolean}) {
       try {
         dialogSettings.value.loading = true
+        await storeBagging.dispatch(
+          'bagging/bagging/postBags',
+          {payload: selectedUnbagged.value}
+        )
+        await fetchBags()
 
         storeApplications.commit('applications/SET_ALERT', {
           isShow: true,
@@ -176,6 +189,15 @@ export default defineComponent({
         setTimeout(() => {
           storeApplications.commit('applications/RESET_ALERT')
         }, 3000)
+      }
+    }
+
+    async function fetchBags () {
+
+      try {
+        await storeBagging.dispatch('bagging/bagging/getBags')
+      } catch (error) {
+        return error
       }
     }
     function handleCancel() {
