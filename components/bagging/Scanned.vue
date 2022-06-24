@@ -1,7 +1,9 @@
 <template>
   <article class="scanned-tab pa-8">
     <v-container fluid class="pa-0">
-      <v-row>
+      <v-row
+        v-if="dataComp && dataComp.length"
+      >
         <v-col
           v-for="(partner, u) in dataComp"
           :key="u"
@@ -17,15 +19,15 @@
             <v-card-title class=" d-flex flex-column justify-center align-center text-center mb-3">
               <v-btn
                 color="green darken-1 white--text mb-4"
-                @click="toggleConfirm"
+                @click="toggleConfirm(partner)"
               >
                 CLOSE BAG
               </v-btn>
               <div class="text-h4 mb-2">
-                {{partner.name}}
+                {{partner.group_name}}
               </div>
               <div class="title">
-                Orders: {{partner.total_orders}}
+                Orders: {{partner.orders && partner.orders.length ? partner.orders.length : 0}}
               </div>
             </v-card-title>
 
@@ -57,6 +59,12 @@
             </v-virtual-scroll>
           </v-card>
         </v-col>
+      </v-row>
+      <v-row
+        v-else
+        class="d-flex justify-center font-weight-bold"
+      >
+        No Scanned Items
       </v-row>
     </v-container>
 
@@ -90,8 +98,10 @@ import {
   onMounted,
   watch,
   PropType,
+  useContext
 } from '@nuxtjs/composition-api'
 import { ModalConfirm, VuexModuleApplications } from '~/types/applications'
+import { VuexModuleDetailBagging, FilterBagging, Unbagged, Bagged, Order, InputPostBag} from '~/types/bagging/bagging'
 
 export default defineComponent({
   name: 'BaggingScanned',
@@ -99,12 +109,14 @@ export default defineComponent({
   },
   props: {
     data: {
-      type: Array,
+      type: Array as PropType<Unbagged[]>,
       required: true
     }
   },
   setup(props) {
     const storeApplications = useStore<VuexModuleApplications>()
+    const storeBagging = useStore<VuexModuleDetailBagging>()
+    const { app, $dateFns } = useContext()
     const dialog = ref({
       confirm: false,
       cancel: false
@@ -118,14 +130,15 @@ export default defineComponent({
       submitColor: '',
     }) as Ref<ModalConfirm>
     const dataComp = computed(() => {
-      let data = props.data.map((x: any,i: number) => {
-        return x.sub
-      })
+      let data = props.data.map((x: Unbagged,i: number) => {
+        return x.order_group
+      }) as any
       data = [].concat.apply([], data);
       return data
-    })
+    }) as Ref<Bagged[]>
+    const selectedUnbagged = ref({}) as Ref<InputPostBag | {}>
 
-    function toggleConfirm() {
+    function toggleConfirm(data: Bagged) {
       dialogSettings.value = {
         loading: false,
         title: 'Print label now ?',
@@ -135,10 +148,24 @@ export default defineComponent({
         submitColor: 'primary',
       }
       dialog.value.confirm = true
+
+      const parseInput = {
+        bag_name: data.group_name + '-' + $dateFns.format(
+        new Date(),
+        'yyyy-MM-dd\'T\'HH:mm:ss.SSS'
+      ),
+        order_ids: data.orders.map((x: Order) => x.id)
+      }
+      selectedUnbagged.value = parseInput
     }
     async function submit(params: {isCancel?: boolean}) {
       try {
         dialogSettings.value.loading = true
+        await storeBagging.dispatch(
+          'bagging/bagging/postBags',
+          {payload: selectedUnbagged.value}
+        )
+        await fetchBags()
 
         storeApplications.commit('applications/SET_ALERT', {
           isShow: true,
@@ -162,6 +189,15 @@ export default defineComponent({
         setTimeout(() => {
           storeApplications.commit('applications/RESET_ALERT')
         }, 3000)
+      }
+    }
+
+    async function fetchBags () {
+
+      try {
+        await storeBagging.dispatch('bagging/bagging/getBags')
+      } catch (error) {
+        return error
       }
     }
     function handleCancel() {

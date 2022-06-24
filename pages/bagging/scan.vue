@@ -25,6 +25,7 @@
         color="green"
         min-width="200px"
         class="mr-3 white--text"
+        :disabled="disabledCloseBag()"
         @click="handleBagScanBag"
       >
         <v-icon
@@ -61,30 +62,34 @@
           elevation="2"
           width="100%"
           :color="`${
-            validationCard()
-            ? 'green'
+            allScanned.length && allScanned.some((x) => x.new)
+            ? validationCard()
             : 'white'
+            // validationCard()
+            // ? 'green'
+            // : 'white'
           }`"
           min-height="500px"
           :class="`${
-            validationCard()
-            ?
-            'white--text'
-            :
-            ''
+            validationCard({isText: true})
+            // validationCard()
+            // ?
+            // 'white--text'
+            // :
+            // ''
           } pa-15 d-flex flex-column align-center justify-center`"
         >
           <div
-            v-if="validationCard()"
+            v-if="allScanned.length && allScanned.some((x) => x.new)"
             class="text-center"
           >
             <div class="text-h1 font-weight-bold mb-15">
               <!-- SINGAPORE - 1 -->
-              {{allScanned[allScanned.length - 1]}}
+              {{searchCountry(cardData.dest_country)}}
             </div>
             <div class="text-h2">
               <!-- LUWDASLDKM123123 -->
-              {{allScanned[allScanned.length - 1]}}
+              {{cardData.group_name}}
             </div>
           </div>
           <div
@@ -139,16 +144,26 @@ import {
   Alert,
   Header,
 } from '~/types/applications'
-import { VuexModuleFilters, Statuses } from '~/types/filters'
+import { VuexModuleFilters, Statuses, CountryCode } from '~/types/filters'
+import { VuexModuleDetailBagging, FilterBagging, Unbagged, InputPostBag, Order, Bagged} from '~/types/bagging/bagging'
 
 export default defineComponent({
   name: 'ScanPages',
   middleware: 'partner',
   setup() {
+    const { app, $dateFns } = useContext()
     const router = useRouter()
     const storeApplications = useStore<VuexModuleApplications>()
+    const storeFilters = useStore<VuexModuleFilters>()
+    const storeBagging = useStore<VuexModuleDetailBagging>()
+    const unbaggedData = computed(() => ((storeBagging.state.bagging as any).bagging.unbagged))
+    const countryCodes = computed(() => storeFilters.state.filters.countryCodes)
     const inputBarcode = ref('')
+    const user = localStorage.getItem('auth.user') ? JSON.parse(localStorage.getItem('auth.user') as string) : {}
+
+    const lastEnter = ref('')
     const allScanned = ref([]) as Ref<any>
+    const cardData = ref({}) as Ref<any>
     const dialog = ref({
       confirm: false,
       cancel: false
@@ -175,9 +190,64 @@ export default defineComponent({
     })
 
 
+    const newScanned = computed(() => {
+      if(!localStorage.getItem(`newScanned.${user.email}`) || (!user && !user.email)) {
+        return []
+      } else {
+        return localStorage.getItem(`newScanned.${user.email}`) ? JSON.parse(localStorage.getItem(`newScanned.${user.email}`) as string) : []
+      }
+    })
+
+    onMounted(() => {
+      const temp = newScanned.value.map((x: any) => {
+        return {
+          ...x,
+          new: false
+        }
+      })
+      localStorage.setItem(`newScanned.${user.email}`, JSON.stringify( temp))
+
+    })
+
+    function parseInput() {
+      let orderGroups = unbaggedData.value.map((x: Unbagged) => x.order_group && x.order_group).filter((z: any) => z && z.length > 0)
+      orderGroups = [].concat.apply([], orderGroups);
+      const payload = orderGroups.map((x: Bagged) => {
+        return {
+          bag_name: x.group_name + '-' + $dateFns.format(
+            new Date(),
+            'yyyy-MM-dd\'T\'HH:mm:ss.SSS'
+          ),
+          order_ids: (x.orders && x.orders.filter((y) => (allScanned.value.some((z: {orderCode: string, new: boolean}) => (z.orderCode === y.orderCode) && z.new))))?.map((k) => k.id)
+        }
+      }).filter((q: InputPostBag) => q.order_ids && q.order_ids.length)
+      return payload
+    }
+
+
     async function submit(params: {isCancel?: boolean}) {
       try {
         dialogSettings.value.loading = true
+        const payloadArr = parseInput()
+        await Promise.all(
+          payloadArr.map(async (el: InputPostBag) => {
+            try {
+              await storeBagging.dispatch(
+                'bagging/bagging/postBags',
+                {payload: el}
+              )
+            } catch (error) {
+              return error
+            }
+          })
+        )
+        await fetchBags()
+        allScanned.value = allScanned.value.map((x: any) => {
+          return {
+            ...x,
+            new: false
+          }
+        })
 
         storeApplications.commit('applications/SET_ALERT', {
           isShow: true,
@@ -230,32 +300,107 @@ export default defineComponent({
 
     function enterInput(event: KeyboardEvent) {
       if(event.key === 'Enter') {
-        let temp = 'Indonesia - '
-        if(allScanned.value.length % 2 !== 0) {
-          temp = temp + '2'
-        } else {
-          temp = temp + '1'
-        }
+        // let temp = 'Indonesia - '
+        // if(allScanned.value.length % 2 !== 0) {
+        //   temp = temp + '2'
+        // } else {
+        //   temp = temp + '1'
+        // }
         const data = {
-          name: temp,
-          value: inputBarcode.value,
+          orderCode: inputBarcode.value,
           new: true
         }
+        // const data = inputBarcode.value
         const user = localStorage.getItem('auth.user') ? JSON.parse(localStorage.getItem('auth.user') as string) : {}
         const initialData = user && user.email && localStorage.getItem(`newScanned.${user.email}`) ? JSON.parse(localStorage.getItem(`newScanned.${user.email}`) as string) : allScanned.value
 
-        allScanned.value = [
-          ...initialData,
-          data
-        ]
+        let mergeAllscanned = []
+        if( Object.keys(searchName(inputBarcode.value)).length) {
+          mergeAllscanned = [
+            ...initialData,
+            data
+          ]
+        } else {
+          mergeAllscanned = [
+            ...initialData
+          ]
+        }
+
+        allScanned.value = mergeAllscanned.filter((value, index, self) =>
+          index === self.findIndex((t) => (
+            t.orderCode === value.orderCode
+          ))
+        )
         localStorage.setItem(`newScanned.${user.email}`, JSON.stringify( allScanned.value))
-        greet(inputBarcode.value)
+
+        let destCountry = searchName(inputBarcode.value).dest_country  as any
+        cardData.value = searchName(inputBarcode.value)
+        if(destCountry ) {
+          destCountry = searchCountry(destCountry)
+
+        }
+
+
+        greet(destCountry ?? 'No Data')
+        lastEnter.value = inputBarcode.value
         inputBarcode.value = ''
       }
     }
 
-    function validationCard() {
-      return allScanned.value && allScanned.value.length && allScanned.value[allScanned.value.length - 1]
+    function searchName(barcode: string) {
+      let dataFilter = [...unbaggedData.value].map((x: Unbagged,i: number) => {
+        return x.order_group
+      }) as any
+
+      dataFilter = [].concat.apply([], dataFilter);
+      dataFilter = dataFilter.filter((x: Bagged) => x.orders && x.orders.some((y: Order) => y.orderCode === barcode))
+
+      if(dataFilter && dataFilter.length > 0) {
+        const mainData = dataFilter[0] as Bagged
+
+        return {
+          dest_country: mainData.dest_country,
+          dest_port: mainData.dest_port,
+          group_name: mainData.group_name
+        }
+      } else {
+        return {}
+      }
+    }
+
+    function searchCountry(countryCode: string) {
+      const filterCountry = ([...countryCodes.value].filter((x: CountryCode) => x.value === countryCode))[0]
+      return filterCountry?.name ?? 'No Data'
+    }
+
+    function validationCard(params?: {isText?: Boolean}) {
+
+      const isNew = allScanned.value.some((x: any) => x.new)
+
+      if(!params?.isText) {
+        if(
+          allScanned.value &&
+          allScanned.value.length &&
+          searchName(lastEnter.value)?.dest_country
+        ) {
+          return 'green'
+        } else {
+          return 'red'
+        }
+      }
+      if(params?.isText) {
+        if(
+          allScanned.value &&
+          allScanned.value.length &&
+          searchName(lastEnter.value) &&
+          isNew
+        ) {
+          return 'white--text'
+        } else {
+          return ''
+        }
+      }
+      // return allScanned.value && allScanned.value.length && allScanned.value[allScanned.value.length - 1]
     }
 
     function greet (text: string) {
@@ -273,7 +418,35 @@ export default defineComponent({
       }
     }
 
+    const fetchCountryCodes = async () => {
+      try {
+        $fetchState.pending = true
+
+        await storeFilters.dispatch('filters/getCountryCodes', {
+          params: { isActive: true },
+        })
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+
+    async function fetchBags () {
+
+      try {
+        $fetchState.pending = true
+        await storeBagging.dispatch('bagging/bagging/getBags')
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
+
     const { $fetchState, fetch } = useFetch(async () => {
+      await fetchBags()
+      await fetchCountryCodes()
       speech.value.voiceList = speech.value.synth.getVoices()
       speech.value.synth.onvoiceschanged = () => {
       speech.value.voiceList = speech.value.synth.getVoices()
@@ -283,6 +456,10 @@ export default defineComponent({
       }
       listenForSpeechEvents()
     })
+
+    function disabledCloseBag() {
+      return !allScanned.value.some((x: any) => x.new)
+    }
 
     useMeta(() => ({ title: 'Client Portal | Scan' }))
 
@@ -296,7 +473,10 @@ export default defineComponent({
       inputBarcode,
       enterInput,
       allScanned,
-      validationCard
+      validationCard,
+      cardData,
+      searchCountry,
+      disabledCloseBag
     }
   },
   head: {},

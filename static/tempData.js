@@ -647,5 +647,89 @@ export default {
         ]
       }
     }
-  ]
+  ],
+  bagging: {
+    data: {
+      "bagged": [
+        {
+          "id": "65837d3a-77c4-4f76-9208-a95058d416c2",
+          "group_name": "54KULMNLSAP",
+          "dest_port": "MNL",
+          "dest_country": "PH",
+          "orders": [
+            {
+              "id": "e81fdd19-194e-44f6-bff8-8c76116b2eab",
+              "orderCode": "LUWTEST011"
+            }
+          ]
+        },
+        {
+          "id": "93bdda88-fa2e-4668-8072-f8d2bba5f713",
+          "group_name": "54KULMNLSAP",
+          "dest_port": "MNL",
+          "dest_country": "PH",
+          "orders": [
+            {
+              "id": "e4fc128a-764c-4b41-b5f7-2dd694298fcb",
+              "orderCode": "LUWTEST13"
+            }
+          ]
+        }
+      ],
+      "unbagged": [
+        {
+          "dest_port": "MNL",
+          "dest_country": "PH",
+          "order_group": [
+            {
+              "id": "",
+              "group_name": "54KULMNLSAPXXX",
+              "dest_port": "MNL",
+              "dest_country": "PH",
+              "orders": [
+                {
+                  "id": "f26a12bc-eeb4-4b6e-bbbf-9c4626525c3e",
+                  "orderCode": "LUWTEST133"
+                },
+                {
+                  "id": "dsadas-eeb4-4b6e-bbbf-9c4626525c3e",
+                  "orderCode": "LUWTEST134"
+                }
+              ]
+            },
+            {
+              "id": "",
+              "group_name": "54KULMNLTES",
+              "dest_port": "MNL",
+              "dest_country": "MY",
+              "orders": [
+                {
+                  "id": "f26a12bc-eeb4-4b6e-bbbf-9c4626525c3e",
+                  "orderCode": "LUWTEST44"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "dest_port": "IND",
+          "dest_country": "MY",
+          "order_group": [
+            {
+              "id": "",
+              "group_name": "54KULMNLSAP",
+              "dest_port": "MNL",
+              "dest_country": "MY",
+              "orders": [
+                {
+                  "id": "f26a12bc-eeb4-4b6e-bbbf-9c4626525c3e",
+                  "orderCode": "LUWTEST55"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
 };
