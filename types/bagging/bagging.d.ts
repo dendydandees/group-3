@@ -41,6 +41,14 @@ export interface Unbagged {
   order_group: Bagged[];
 }
 
+export interface BagUpdate {
+  id: string,
+  bag_id: string,
+  status: string,
+  comments: string,
+  update_timestamp: string;
+}
+
 export interface BagData {
   bagged: Bagged[],
   unbagged: Unbagged[],
