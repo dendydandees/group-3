@@ -456,9 +456,6 @@ export default defineComponent({
     })
     const zones = computed(() => storeFilters.state.filters.zones)
     const ports = computed(() => storeFilters.state.filters.ports?.data) as any
-    const marketplacesAll = computed(
-      () => storeMarketplaces.state.marketplaces.marketplaces.marketplacesAll
-    )
     const marketplaces = computed(
       () =>
         storeMarketplaces.state.marketplaces.marketplaces.marketplacesConnected
@@ -713,21 +710,6 @@ export default defineComponent({
           isLControl: params.isLControl,
           isCOD: params.isCOD,
         })
-      } catch (error) {
-        return error
-      } finally {
-        setTimeout(() => {
-          $fetchState.pending = false
-        }, 1500)
-      }
-    }
-    const fetchMarketplaceAll = async () => {
-      try {
-        $fetchState.pending = true
-
-        await storeFilters.dispatch(
-          'marketplaces/marketplaces/getMarketplacesAll'
-        )
       } catch (error) {
         return error
       } finally {
@@ -1096,7 +1078,11 @@ export default defineComponent({
         storeOfApplications.commit('applications/RESET_ALERT')
       }, 3000)
       // FETCH COUNTRY
-      await fetchMarketplaceAll()
+      await fetchMarketplace({
+        country: selected.value.countryIndex?.value,
+        service: selected.value.serviceIndex?.value,
+        isConnected: true,
+      })
       await fetchCountryCodes()
       await fetchRuleGroups()
       lControlsCust.value = [
@@ -1303,8 +1289,8 @@ export default defineComponent({
       return data
     }
     function findNamePartner(id: string) {
-      if (marketplacesAll.value && marketplacesAll.value.length > 0) {
-        return marketplacesAll.value.filter((x) => x.id === id)[0]?.name
+      if (marketplaces.value && marketplaces.value.length > 0) {
+        return marketplaces.value.filter((x) => x.id === id)[0]?.name
       }
     }
     function isCustoms() {
