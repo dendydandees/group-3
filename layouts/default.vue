@@ -87,13 +87,13 @@ import {
 import SendBird from 'sendbird'
 import { v4 as uuidv4 } from 'uuid'
 import { VuexModuleMarketplaces } from '~/types/marketplace/marketplace'
-import { VuexModuleChat, ChatUser } from '~/types/sendbird'
+import { VuexModuleChat } from '~/types/sendbird'
 
 export default defineComponent({
   name: 'DefaultLayout',
   middleware: 'auth',
   setup() {
-    const { $dateFns, $config } = useContext()
+    const { $config } = useContext()
     const context = useContext()
     const storeMarketplaces = useStore<VuexModuleMarketplaces>()
     const storeChat = useStore<VuexModuleChat>()
@@ -145,25 +145,27 @@ export default defineComponent({
       () => [USER_ID_CHAT],
       ([newUserID]) => {
         if (newUserID.value && newUserID.value?.user_id) {
-          sb.connect(newUserID.value?.user_id, function (user, error) {})
+          sb.connect(newUserID.value?.user_id, function (_user, _error) {})
         }
       },
       { deep: true }
     )
-    const { $fetchState, fetch } = useFetch(async () => {
-      await storeChat.dispatch('sendbird/getUserChat')
-      await fetchMarketplaceConnected()
-      const count = await sb.getTotalUnreadMessageCount()
-      // const count = await sb.getTotalUnreadChannelCount();
-      countChat.value = count
-      userEventHandler.onTotalUnreadMessageCountUpdated = function (
-        totalCount,
-        countByCustomTypes
-      ) {
-        countChat.value = totalCount
-      }
+    const { $fetchState } = useFetch(() => {
+      setTimeout(async () => {
+        await storeChat.dispatch('sendbird/getUserChat')
+        await fetchMarketplaceConnected()
+        const count = await sb.getTotalUnreadMessageCount()
+        // const count = await sb.getTotalUnreadChannelCount();
+        countChat.value = count
+        userEventHandler.onTotalUnreadMessageCountUpdated = function (
+          totalCount,
+          _countByCustomTypes
+        ) {
+          countChat.value = totalCount
+        }
 
-      sb.addUserEventHandler(uuidv4(), userEventHandler)
+        sb.addUserEventHandler(uuidv4(), userEventHandler)
+      }, 5000)
     })
 
     // handle sidenav

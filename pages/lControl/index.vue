@@ -219,7 +219,12 @@
           </div>
 
           <div v-else class="content-zone-selected">
-            <v-btn icon color="primary" @click="backBtnHandler()">
+            <v-btn
+              :disabled="$fetchState.pending"
+              icon
+              color="primary"
+              @click="backBtnHandler()"
+            >
               <v-icon> mdi-arrow-left-thick </v-icon>
             </v-btn>
 
@@ -738,6 +743,7 @@ export default defineComponent({
         await storeLControls.dispatch('lControls/lControls/getLControls', {
           params: {},
         })
+
         if (selected.value.zoneIndex?.value) {
           selected.value.rules = parsingRulesPayload(
             rulesByZone.value[selected.value.zoneIndex?.value as string].rules
@@ -746,7 +752,7 @@ export default defineComponent({
             rulesByZone.value[selected.value.zoneIndex?.value as string].rules
           ) as RulePayload[]
 
-          selected.value.isUpdate = !!selected.value.rules.length
+          selected.value.isUpdate = !!selected.value.ruleGroupID
         }
       } catch (error) {
         return error
@@ -815,7 +821,7 @@ export default defineComponent({
           selected.value.rules = data.data.rules
           selected.value.ruleID = data.data.ruleID
           // selected.value.priority = data.data.priority
-          selected.value.isUpdate = !!data.data.partnerID
+          selected.value.isUpdate = !!data.data.ruleGroupID
 
           if (
             checkDefinition({
@@ -899,30 +905,33 @@ export default defineComponent({
           id: selected.value.ruleGroupID,
           data: {
             partnerID: selected.value.partnerID,
-            priority: priorityTemp + 1,
+            priority: 1,
             definitions: [
               {
-                type: 'RULE_TYPE_ZONE',
+                type: isCustoms() ? 'RULE_TYPE_PORT' : 'RULE_TYPE_ZONE',
                 value: selected.value.zoneIndex?.value,
               },
             ],
           },
         }
+
         if (
           !checkDefinition({
             data: [...rules].map((y) => y.data),
-            type: 'RULE_TYPE_ZONE',
+            type: isCustoms() ? 'RULE_TYPE_PORT' : 'RULE_TYPE_ZONE',
           })
         ) {
           rules = [...rules, temp]
         } else if (
           checkDefinition({
             data: [...rules].map((y) => y.data),
-            type: 'RULE_TYPE_ZONE',
+            type: isCustoms() ? 'RULE_TYPE_PORT' : 'RULE_TYPE_ZONE',
           })
         ) {
           const indexCOD = rules.findIndex((el: any) =>
-            el.data.definitions.some((x: any) => x.type === 'RULE_TYPE_ZONE')
+            el.data.definitions.some((x: any) =>
+              x.type === isCustoms() ? 'RULE_TYPE_PORT' : 'RULE_TYPE_ZONE'
+            )
           )
           rules[indexCOD].data.partnerID = partnerDefault
         }
@@ -1016,7 +1025,11 @@ export default defineComponent({
       try {
         const payload = [...data]
           .filter((y: Definition) => {
-            return y.type !== 'RULE_TYPE_ZONE' && y.type !== 'RULE_TYPE_IS_COD'
+            return (
+              y.type !== 'RULE_TYPE_ZONE' &&
+              y.type !== 'RULE_TYPE_IS_COD' &&
+              y.type !== 'RULE_TYPE_PORT'
+            )
           })
           .map((x: Definition) => {
             return {
@@ -1110,6 +1123,8 @@ export default defineComponent({
           if (res) {
             selected.value.ruleGroupID = res?.id
           }
+
+          return res
         } catch (error: any) {
           return error
         } finally {
@@ -1118,10 +1133,13 @@ export default defineComponent({
       },
       update: async () => {
         try {
-          await storeLControls.dispatch('lControls/lControls/updateRuleGroup', {
-            defaultPartnerID: selected.value.partnerID,
-            ruleGroupID: selected.value.ruleGroupID,
-          })
+          return await storeLControls.dispatch(
+            'lControls/lControls/updateRuleGroup',
+            {
+              defaultPartnerID: selected.value.partnerID,
+              ruleGroupID: selected.value.ruleGroupID,
+            }
+          )
         } catch (error) {
           return error
         }
@@ -1194,17 +1212,29 @@ export default defineComponent({
         $fetchState.pending = true
 
         // handle update and add rule group
+        let responseRuleGroup = {} as any
         if (selected.value.isUpdate && selected.value.ruleGroupID) {
           actionsMessage = 'updated'
-          await handleRuleGroup.update()
+          responseRuleGroup = await handleRuleGroup.update()
         } else {
-          actionsMessage = 'addedd'
-          await handleRuleGroup.add()
+          actionsMessage = 'added'
+          responseRuleGroup = await handleRuleGroup.add()
         }
+
+        // eslint-disable-next-line no-prototype-builtins
+        if (!responseRuleGroup.hasOwnProperty('id'))
+          throw new Error(`Failed to ${actionsMessage} L-Control rules!`)
 
         await Promise.all(
           rulesComp.value.map(async (el: any) => {
-            // set the priority for Network Partner (primary, secondary, tertiary) before hit endpoint
+            /* SET DATA FOR CUSTOMS */
+            // set the type definition for Customs
+            if (isCustoms()) {
+              el.data.definitions[0].type = 'RULE_TYPE_PORT'
+            }
+
+            /* SET DATA FOR LAST MILE */
+            // set the priority for Network Partner (primary, secondary, tertiary) before hit endpoint (currently it's just for Last Mile)
             if (el.data.definitions.length > 1 && el.idRule) {
               const findPriorityNP = addNPData.value.find(
                 (rule) => rule.idRule === el.idRule
@@ -1230,7 +1260,7 @@ export default defineComponent({
         storeOfApplications.commit('applications/SET_ALERT', {
           isShow: true,
           type: 'success',
-          message: `Successfully ${actionsMessage} L-Control!`,
+          message: `Successfully ${actionsMessage} L-Control rules!`,
         })
         dialog.value.status = `Successfully ${actionsMessage} L-Control!`
         await fetchRuleGroups()
@@ -1238,7 +1268,7 @@ export default defineComponent({
         storeOfApplications.commit('applications/SET_ALERT', {
           isShow: true,
           type: 'error',
-          message: `Failed ${actionsMessage} L-Control!`,
+          message: `Failed ${actionsMessage} L-Control rules!`,
         })
         dialog.value.status = error.message
 
@@ -1527,7 +1557,9 @@ export default defineComponent({
                               el.id
                             ].rules.findIndex((el: Rule) =>
                               el.definitions.some(
-                                (x: Definition) => x.type === 'RULE_TYPE_ZONE'
+                                (x: Definition) =>
+                                  x.type === 'RULE_TYPE_ZONE' ||
+                                  'RULE_TYPE_PORT'
                               )
                             )
                             partnerID =
