@@ -533,7 +533,7 @@ export default defineComponent({
         type: 'RULE_TYPE_VOLUME_LIMIT',
         idRule: '',
       }
-      newData.index = addNPData.value.length + 1
+      newData.index = addNPData.value.length
       addNPData.value = [...addNPData.value, newData]
     }
 
