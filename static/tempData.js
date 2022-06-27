@@ -730,6 +730,29 @@ export default {
           ]
         }
       ]
-    }
+    },
+    bag_updates: [
+      {
+        "id": "e7151729-c2e0-4918-a5d5-0e01349de120",
+        "bag_id": "65837d3a-77c4-4f76-9208-a95058d416c2",
+        "status": "FFInFlight",
+        "comments": "In Flight",
+        "update_timestamp": "2022-06-06T20:24:50.462788+08:00"
+      },
+      {
+        "id": "eb3efeb9-e31b-4b53-88db-0031ec1d4ad5",
+        "bag_id": "65837d3a-77c4-4f76-9208-a95058d416c2",
+        "status": "FFReceived",
+        "comments": "Received by Freight Forwarder",
+        "update_timestamp": "2022-06-06T13:24:50.462788+08:00"
+      },
+      {
+        "id": "49abb36c-9156-48a6-a7e4-c2e9493a9383",
+        "bag_id": "65837d3a-77c4-4f76-9208-a95058d416c2",
+        "status": "FMDeliveredToFreightForwarder",
+        "comments": "Delivered to Freight Forwarder",
+        "update_timestamp": "2022-06-06T03:24:50.462788+08:00"
+      }
+    ]
   }
 };

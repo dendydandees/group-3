@@ -6,7 +6,8 @@ import {
   BagData,
   InputPostBag,
   Bagged,
-  Unbagged
+  Unbagged,
+  BagUpdate
 } from '~/types/bagging/bagging';
 import tempData from '~/static/tempData';
 
@@ -28,6 +29,7 @@ const filter = {
 export const state = () => ({
   bags: [] as Bagged[],
   unbagged: [] as Unbagged[],
+  bagUpdates: [] as BagUpdate[],
   meta: {
     page: 1,
     totalPage: 1,
@@ -48,6 +50,7 @@ export const mutations: MutationTree<RootStateBagging> = {
     state.bags = value.bagged ?? [];
     state.unbagged = value.unbagged ?? [];
   },
+  SET_BAG_UPDATE: (state, value: BagUpdate[]) => (state.bagUpdates = value ?? []),
   SET_META: (state, value: Meta) => (state.meta = value),
   SET_FILTER: (state, value: FilterBagging) => (state.filter = value),
   SET_FILTER_BTN: (state) => (state.isShowFilter = !state.isShowFilter),
@@ -82,6 +85,18 @@ export const actions: ActionTree<RootStateBagging, RootStateBagging> =
   async postScanOrder({ commit }, { orderID }: { orderID: string; }) {
     try {
       const response = await this.$axios.$post(`/api/clients/scan-order/${ orderID }`);
+      return response;
+    } catch (error) {
+      return error;
+    }
+  },
+  async getBagsUpdate({ commit }, { bagID }: { bagID: string; }) {
+    try {
+      const response = await this.$axios.$get(`/api/clients/bags/${ bagID }/updates`);
+
+      if (!response) throw response;
+
+      commit('SET_BAG_UPDATE', response.bag_updates);
       return response;
     } catch (error) {
       return error;

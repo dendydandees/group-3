@@ -183,7 +183,7 @@ export default defineComponent({
     }) as Ref<Order[]>
     // const selectedOrders = ref([]) as Ref<Order[]>
     const actionExist = ref({
-      // export: true,
+      updates: true,
       download: true,
     })
     const selectedViews = ref([
