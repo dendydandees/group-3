@@ -15,11 +15,12 @@
             :loading="$fetchState.pending"
             :show-select="true"
             :action-exist="actionExist"
-            @fetch="fetchOrders"
             @doSelectAll="selectAllToggle"
             @doGetDetails="doGetDetails"
             @doGetBatchDetails="goToBatchView"
+            @doHandleModalTrack="doHandleModalTrack"
           />
+            <!-- @fetch="fetchOrders" -->
         </v-col>
       </v-row>
     </v-fade-transition>
@@ -31,6 +32,15 @@
       :loading="$fetchState.pending"
       @resetPage="pagination.page = 1"
     /> -->
+
+
+    <BaggingModalTrack
+      v-model="dialog.track"
+      :dialog-settings="dialogSettings"
+      :fetch-state="$fetchState"
+      :data="bagUpdates"
+      :data-item="bagItem"
+    />
 
 
     <v-snackbar
@@ -70,13 +80,14 @@ import {
   FilterDetails,
   Header,
   VuexModuleApplications,
+  ModalConfirm
 } from '~/types/applications'
-import { VuexModuleDetailBagging, FilterBagging, Unbagged, InputPostBag} from '~/types/bagging/bagging'
+import { VuexModuleDetailBagging, FilterBagging, Unbagged, InputPostBag, Bagged} from '~/types/bagging/bagging'
 
 const initHeaders = [
   {
     text: 'Bag ID',
-    value: 'id',
+    value: 'group_name',
     width: 150,
   },
   {
@@ -152,6 +163,8 @@ export default defineComponent({
     const storeApplications = useStore<VuexModuleApplications>()
     const storeBagging = useStore<VuexModuleDetailBagging>()
     const orders = computed(() => (storeBagging.state.bagging as any).bagging.bags)
+    const bagUpdates = computed(() => (storeBagging.state.bagging as any).bagging.bagUpdates)
+    const bagItem = ref({})
 
     const meta = computed(() => storeOrders.state.orders.meta)
     const pagination = ref({
@@ -164,6 +177,17 @@ export default defineComponent({
       ...storeOrders.state.orders.filterBatch,
     })
     const alert = computed(() => storeApplications.state.applications.alert)
+    const dialog = ref({
+      track: false,
+    })
+    const dialogSettings = ref({
+      loading: false,
+      title: '',
+      content: '',
+      cancelText: '',
+      submitText: '',
+      submitColor: '',
+    }) as Ref<ModalConfirm>
 
     // manage view
     const orderView = ref(0)
@@ -216,8 +240,8 @@ export default defineComponent({
         page: 1,
       }
     }
-    const doGetDetails = (data: Order) => {
-      router.push(`/orders/${data.id}`)
+    const doGetDetails = (data: Bagged) => {
+
     }
     const goToBatchView = (item: Order | BatchOrders) => {
       let batchId = ''
@@ -252,49 +276,76 @@ export default defineComponent({
         fetch()
       }, 300)
     }
-    const fetchOrders = async (params: FilterDetails) => {
-      const { page, itemsPerPage } = pagination.value
-      const perPage = itemsPerPage !== -1 ? itemsPerPage : meta.value.totalCount
-      let dataParams = {
-        page,
-        perPage,
-      } as Object
+    // const fetchOrders = async (params: FilterDetails) => {
+    //   const { page, itemsPerPage } = pagination.value
+    //   const perPage = itemsPerPage !== -1 ? itemsPerPage : meta.value.totalCount
+    //   let dataParams = {
+    //     page,
+    //     perPage,
+    //   } as Object
 
-      if (isOnListView.value) {
-        const { sortBy, sortDesc } = params
+    //   if (isOnListView.value) {
+    //     const { sortBy, sortDesc } = params
 
-        dataParams = app.$customUtils.setURLParams({
-          ...dataParams,
-          ...filterOrder.value,
-          sortBy: sortBy && sortBy[0] === 'orderCode' ? 'order_code' : null,
-          sortDesc: sortDesc ? sortDesc[0] : null,
-        })
-      } else {
-        dataParams = app.$customUtils.setURLParams({
-          ...dataParams,
-          ...filterBatch.value,
-        })
-      }
+    //     dataParams = app.$customUtils.setURLParams({
+    //       ...dataParams,
+    //       ...filterOrder.value,
+    //       sortBy: sortBy && sortBy[0] === 'orderCode' ? 'order_code' : null,
+    //       sortDesc: sortDesc ? sortDesc[0] : null,
+    //     })
+    //   } else {
+    //     dataParams = app.$customUtils.setURLParams({
+    //       ...dataParams,
+    //       ...filterBatch.value,
+    //     })
+    //   }
 
-      try {
-        $fetchState.pending = true
-        const url = isOnListView.value
-          ? 'orders/getOrders'
-          : 'orders/getBatchOrders'
+    //   try {
+    //     $fetchState.pending = true
+    //     const url = isOnListView.value
+    //       ? 'orders/getOrders'
+    //       : 'orders/getBatchOrders'
 
-        await storeOrders.dispatch(url, { params: dataParams })
-      } catch (error) {
-        return error
-      } finally {
-        $fetchState.pending = false
-      }
-    }
+    //     await storeOrders.dispatch(url, { params: dataParams })
+    //   } catch (error) {
+    //     return error
+    //   } finally {
+    //     $fetchState.pending = false
+    //   }
+    // }
     const { $fetchState, fetch } = useFetch(async () => {
       setTimeout(() => {
         storeApplications.commit('applications/RESET_ALERT')
       }, 3000)
-      await fetchOrders(pagination.value)
+      // await fetchOrders(pagination.value)
     })
+
+
+    const fetchBagUpdates = async (bagID: string) => {
+
+      try {
+        $fetchState.pending = true
+
+
+        await storeBagging.dispatch(
+          'bagging/bagging/getBagsUpdate',
+          {bagID}
+        )
+        $fetchState.pending = false
+      } catch (error) {
+        return error
+      }
+    }
+
+    function doHandleModalTrack(data?: Bagged) {
+      if(data && Object.keys(data).length) {
+        fetchBagUpdates(data.id)
+        bagItem.value = data
+      } else {
+        bagItem.value = {}
+      }
+      dialog.value.track = !dialog.value.track
+    }
 
     const doDownloadSelectedLabel = async () => {
       if (selectedOrders.value.length === 0) return
@@ -418,8 +469,13 @@ export default defineComponent({
       isShowFilter,
       doResetFilter,
       // manage fetch
-      fetchOrders,
+      // fetchOrders,
       fetchDebounced,
+      dialogSettings,
+      dialog,
+      doHandleModalTrack,
+      bagUpdates,
+      bagItem
     }
   },
   head: {},

@@ -186,7 +186,7 @@
           :loading="loading"
           color="cyan darken-1"
           class="ma-2"
-          @click="track(item.id)"
+          @click="track(item)"
         >
           Track
         </v-btn>
@@ -241,6 +241,7 @@ import {
   useRoute,
   useStore,
   useContext,
+  useFetch
 } from '@nuxtjs/composition-api'
 import { saveAs } from 'file-saver'
 // types
@@ -250,7 +251,7 @@ import {
   IncomingOrder,
   OrderAllocation,
 } from '~/types/partnerPortals/incomingOrders'
-import { VuexModuleDetailBagging, FilterBagging, Unbagged, InputPostBag} from '~/types/bagging/bagging'
+import { VuexModuleDetailBagging, FilterBagging, Unbagged, InputPostBag, Bagged} from '~/types/bagging/bagging'
 
 export default defineComponent({
   name: 'BaseTable',
@@ -353,11 +354,10 @@ export default defineComponent({
     }
     // END FOR ORDER AND INCOMING ORDER
 
-    async function track (id: string) {
-      await storeBagging.dispatch(
-        'bagging/bagging/getBagsUpdate',
-        {bagID: id}
-      )
+
+
+    function track (data: Bagged) {
+      emit('doHandleModalTrack', data)
     }
 
     return {
