@@ -8,78 +8,91 @@
       <v-card-title class="text-h5">
         {{dataItem.group_name && dataItem.group_name}}
       </v-card-title>
-      <template slot="progress">
-        <v-progress-linear color="primary" height="8" indeterminate />
-      </template>
+      <div
+        v-if="data && data.length"
+      >
+        <template slot="progress">
+          <v-progress-linear color="primary" height="8" indeterminate />
+        </template>
 
-      <BaseLoading v-if="fetchState.pending" />
+        <BaseLoading v-if="fetchState.pending" />
 
-      <v-expand-transition>
-        <v-card-text v-if="!fetchState.pending" class="body-1 pa-6">
-          <v-timeline dense>
-            <template
-            >
-              <v-timeline-item
-                v-for="(x, i) in data"
-                :key="`${x.id}, ${x.status}`"
-                small
-                :class="`${data.length - 1 !== i ? 'mb-10' : ''}`"
-                fill-dot
-                :color="'primary'"
+        <v-expand-transition>
+          <v-card-text v-if="!fetchState.pending" class="body-1 pa-6">
+            <v-timeline dense>
+              <template
               >
-                <template #opposite>
-                  <span class="d-block body-2">
-                    {{ $dateFns.format(x.update_timestamp, 'HH:mm') }}
-                  </span>
+                <v-timeline-item
+                  v-for="(x, i) in data"
+                  :key="`${x.id}, ${x.status}`"
+                  small
+                  :class="`${data.length - 1 !== i ? 'mb-10' : ''}`"
+                  fill-dot
+                  :color="'primary'"
+                >
+                  <template #opposite>
+                    <span class="d-block body-2">
+                      {{ $dateFns.format(x.update_timestamp, 'HH:mm') }}
+                    </span>
 
-                  <span class="d-block body-2">
-                    {{ $dateFns.format(x.update_timestamp, 'E, MMM dd, yyyy') }}
-                  </span>
-                </template>
+                    <span class="d-block body-2">
+                      {{ $dateFns.format(x.update_timestamp, 'E, MMM dd, yyyy') }}
+                    </span>
+                  </template>
 
-                <v-row justify="space-between" align="start">
-                  <v-col :cols="12">
-                    <div>
-                      <h4
-                        class="body-1 ma-0 font-weight-bold text--primary"
-                      >
-                        {{ x.status }}
-                      </h4>
+                  <v-row justify="space-between" align="start">
+                    <v-col :cols="12">
+                      <div>
+                        <h4
+                          class="body-1 ma-0 font-weight-bold text--primary"
+                        >
+                          {{ x.status }}
+                        </h4>
 
-                      <p v-if="x.comments" class="body-2">
-                        {{ x.comments }}
-                      </p>
-                    </div>
-                  </v-col>
+                        <p v-if="x.comments" class="body-2">
+                          {{ x.comments }}
+                        </p>
+                      </div>
+                    </v-col>
 
-                  <!-- <v-col
-                    cols="8"
-                    class="text-right py-0"
-                  >
-                    <h3
-                      class="title text-capitalize"
+                    <!-- <v-col
+                      cols="8"
+                      class="text-right py-0"
                     >
-                      INI SERVICE TYPE
-                    </h3>
+                      <h3
+                        class="title text-capitalize"
+                      >
+                        INI SERVICE TYPE
+                      </h3>
 
-                    <h2 class="title font-weight-medium text--primary">
-                      <span>By</span>
+                      <h2 class="title font-weight-medium text--primary">
+                        <span>By</span>
 
-                      <span class="font-weight-bold">
-                        {{
-                          serviceType === 'FREIGHT_FORWARDER'
-                          ? 'LUWJISTIK'
-                          : partnerName
-                        }}
-                      </span>
-                    </h2>
-                  </v-col> -->
-                </v-row>
-              </v-timeline-item>
-            </template>
-          </v-timeline>
+                        <span class="font-weight-bold">
+                          {{
+                            serviceType === 'FREIGHT_FORWARDER'
+                            ? 'LUWJISTIK'
+                            : partnerName
+                          }}
+                        </span>
+                      </h2>
+                    </v-col> -->
+                  </v-row>
+                </v-timeline-item>
+              </template>
+            </v-timeline>
+          </v-card-text>
+        </v-expand-transition>
+      </div>
+      <div
+        v-else
+      >
+        <v-card-text
+          class="d-flex justify-center my-10 grey--text font-weight-bold"
+        >
+          No Data Track
         </v-card-text>
-      </v-expand-transition>
+      </div>
     </v-card>
   </v-dialog>
 </template>

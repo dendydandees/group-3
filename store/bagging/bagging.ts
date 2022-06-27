@@ -96,8 +96,8 @@ export const actions: ActionTree<RootStateBagging, RootStateBagging> =
 
       if (!response) throw response;
 
-      // commit('SET_BAG_UPDATE', response.bag_updates);
-      commit('SET_BAG_UPDATE', tempData.bagging.bag_updates);
+      commit('SET_BAG_UPDATE', response.bag_updates);
+      // commit('SET_BAG_UPDATE', tempData.bagging.bag_updates);
 
       return response;
     } catch (error) {
