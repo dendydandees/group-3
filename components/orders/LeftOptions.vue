@@ -27,7 +27,7 @@
     <v-btn
       :depressed="isShowFilter"
       :outlined="isShowFilter"
-      :disabled="loading"
+      :disabled="loading || !isOnBagsTab.filter"
       color="primary"
       :class="[isOnListView ? 'mr-2' : '']"
       @click="$emit('doShowFilter')"
@@ -35,8 +35,11 @@
       Filter
     </v-btn>
 
-    <span v-if="isOnListView || isOnBagsTab" class="subtitle-2 text--secondary">
+    <span v-if="isOnListView" class="subtitle-2 text--secondary">
       {{ selectedOrders.length }} Orders selected
+    </span>
+    <span v-if="isOnBagsTab.text" class="subtitle-2 text--secondary">
+      {{ selectedOrders.length }} {{isUnbagged ? 'Unbagged' : 'Bag'}} selected
     </span>
   </v-col>
 </template>
@@ -51,7 +54,11 @@ export default defineComponent({
       type: Boolean,
     },
     isOnBagsTab: {
-      type: Boolean,
+      type: Object,
+      default: () => ({
+        text: false,
+        filter: false
+      }),
     },
     loading: {
       type: Boolean,
@@ -65,6 +72,10 @@ export default defineComponent({
       type: Boolean,
     },
     isLabelExistOnSelected: {
+      type: Boolean,
+      default: false,
+    },
+    isUnbagged: {
       type: Boolean,
       default: false,
     },

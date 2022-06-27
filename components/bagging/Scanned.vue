@@ -81,7 +81,7 @@
     <BaggingModalConfirm
       v-model="dialog.cancel"
       :dialog-settings="dialogSettings"
-      @doSubmit="submit({isCancel: true})"
+      @doSubmit="() => (dialog.cancel = false)"
     />
 
   </article>
@@ -166,18 +166,20 @@ export default defineComponent({
           {payload: selectedUnbagged.value}
         )
         await fetchBags()
+        const textMsg = params?.isCancel ? 'Close Bag' : 'Print label'
 
         storeApplications.commit('applications/SET_ALERT', {
           isShow: true,
           type: 'success',
-          message: 'Print label successfully!',
+          message: `${textMsg} successfully!`,
         })
       } catch (error) {
 
+        const textMsg = params?.isCancel ? 'Close Bag' : 'Print label'
         storeApplications.commit('applications/SET_ALERT', {
           isShow: true,
           type: 'error',
-          message: `Print label ${'error'}`,
+          message: `${textMsg} successfully!`,
         })
       } finally {
         dialogSettings.value.loading = false
@@ -200,7 +202,8 @@ export default defineComponent({
         return error
       }
     }
-    function handleCancel() {
+    async function handleCancel() {
+      await submit({isCancel: true})
       dialogSettings.value = {
         loading: false,
         title: 'Make sure bags are arranged properly to prevent mix-up',

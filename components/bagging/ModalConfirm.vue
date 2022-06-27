@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" max-width="450" persistent eager>
+  <v-dialog v-model="dialog" max-width="450" @click:outside="toggle()">
     <v-card
 
     >
@@ -83,10 +83,14 @@ export default defineComponent({
       }
       dialog.value = false
     }
+    const toggle = () => {
+      dialog.value = !dialog.value
+    }
 
     return {
       dialog,
       doClose,
+      toggle
     }
   },
 })
