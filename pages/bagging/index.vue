@@ -31,6 +31,7 @@
         <!-- :loading="$fetchState.pending" -->
         <template #toggleView>
           <OrdersToggleView
+            v-if="step !== 0"
             v-model="orderView"
             :is-bagging="true"
           />
@@ -370,7 +371,7 @@ export default defineComponent({
     watch(
       [orderView],
       ([newOrderView]) => {
-        selectedUnbagged.value = {}
+        selectedUnbagged.value = {} as any
       },
       { deep: true }
     )
