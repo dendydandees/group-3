@@ -17,16 +17,17 @@
         :selected-orders="selectedINFO"
         :is-show-filter="isShowFilter"
         :is-on-bags-tab="{
-          text: step === 0 || orderView === 0,
-          filter: step === 0
+          text: true,
+          filter: true
         }"
-        :is-unbagged="step === 1 && orderView === 0"
+        :is-unbagged="true"
         @doShowFilter="isShowFilter = !isShowFilter"
       />
         <!-- :loading="$fetchState.pending" -->
 
       <!-- Right options -->
       <OrdersRightOptions
+        v-if="step === 2 || step === 3"
       >
         <!-- :loading="$fetchState.pending" -->
         <template #toggleView>
@@ -38,7 +39,7 @@
         </template>
       </OrdersRightOptions>
       <v-btn
-        v-if="step === 1"
+        v-if="step === 2 || step === 3"
         color="primary"
         min-width="200px"
         :disabled="!Object.keys(selectedUnbagged).length && orderView !== 1"
@@ -70,7 +71,7 @@
 
     <v-expand-transition>
       <OrdersFiltersContainer
-        :is-show-filter="isShowFilter && (step === 0)"
+        :is-show-filter="isShowFilter"
         @doToggleFilter="isShowFilter = !isShowFilter"
         @doResetFilter="doResetFilter"
       >
@@ -106,12 +107,21 @@
     <v-card elevation="2">
       <v-window v-model="step">
         <v-window-item :value="0">
+        </v-window-item>
+        <v-window-item :value="1">
           <BaggingBagTab
             v-model="selectedOrders"
           />
         </v-window-item>
+        <v-window-item :value="2">
+          <BaggingScanned
+            v-if="orderView === 1"
+            :data="dataMerged"
+          />
+          <BaggingList v-else v-model="selectedUnbagged" :data="dataMerged"/>
+        </v-window-item>
 
-        <v-window-item :value="1">
+        <v-window-item :value="3">
           <BaggingScanned
             v-if="orderView === 1"
             :data="dataMerged"
@@ -213,39 +223,8 @@ export default defineComponent({
     const filterBagging = ref({
       ...(storeBagging.state.bagging as any).bagging.filter,
     })
-    // manage windows
-    const step = ref((storeBagging.state.bagging as any).bagging.tab.step)
-    const stepList = computed(() => {
-      return [
-        {
-          text: 'Bags',
-          icon: '',
-        },
-        {
-          text: orderView.value === 0 ? 'Unbagged' : 'Scanned',
-          icon: '',
-        },
-      ]
-    })
-    const isActive = (data: number) => step.value === data
-    const doChangeWindow = (data: number) => {
-      step.value = data
-    }
-    const nameBtn = computed(() => {
-        let temp = ''
-        if(step.value === 1) {
-          if(orderView.value === 0) {
-            temp = 'BAG'
-          } else {
-            temp = 'START SCAN'
-          }
-        } else {
-          temp = 'DOWNLOAD BAG LABEL'
-        }
-        return temp
-    })
     // manage view
-    const orderView = ref((storeBagging.state.bagging as any).bagging.tab.orderView[step.value])
+    const orderView = ref((storeBagging.state.bagging as any).bagging.tab.orderView)
     // manage table
     const selectedOrders = ref([]) as Ref<any>
     // manage filter order
@@ -332,6 +311,45 @@ export default defineComponent({
     //   dataMerged.value = dataTemp.value
     // })
 
+    // manage windows
+    const step = ref((storeBagging.state.bagging as any).bagging.tab.step)
+    const stepList = computed(() => {
+      return [
+        {
+          text: 'Manifest',
+          icon: '',
+        },
+        {
+          text: 'Complete',
+          icon: '',
+        },
+        {
+          text: 'Bags',
+          icon: '',
+        },
+        {
+          text: orderView.value === 0 ? 'Unbagged' : 'Scanned',
+          icon: '',
+        },
+      ]
+    })
+    const isActive = (data: number) => step.value === data
+    const doChangeWindow = (data: number) => {
+      step.value = data
+    }
+    const nameBtn = computed(() => {
+        let temp = ''
+        if(step.value === 2 || step.value === 3) {
+          if(orderView.value === 0) {
+            temp = step.value === 3 ? 'BAG' : 'COMPLETE'
+          } else {
+            temp = 'START SCAN'
+          }
+        } else {
+          temp = 'DOWNLOAD BAG LABEL'
+        }
+        return temp
+    })
 
     // manage filter on changed
     watch(
@@ -359,11 +377,9 @@ export default defineComponent({
     watch(
       [orderView, step],
       ([newOrderView, newStep]) => {
+
         storeApplications.commit('bagging/bagging/SET_TAB_BTN', {
-          orderView: {
-            ...(storeBagging.state.bagging as any).bagging.tab.orderView,
-            [`${newStep}`]: newOrderView
-          },
+          orderView: newOrderView,
           step: newStep
         })
       },

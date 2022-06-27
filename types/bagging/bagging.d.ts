@@ -4,6 +4,12 @@ export interface VuexModuleDetailBagging {
   bagging: RootStateBagging;
 }
 
+export interface TabState {
+  orderView: {
+    [key: string]: number,
+  };
+  step: number;
+}
 
 export interface FilterBagging {
   createdFrom: string;
