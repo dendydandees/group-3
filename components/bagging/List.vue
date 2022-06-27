@@ -118,10 +118,14 @@ export default defineComponent({
   setup(props, { emit }) {
     const router = useRouter()
     const { app, $dateFns } = useContext()
+    const storeBagging = useStore<VuexModuleDetailBagging>()
     const checklist = ref([]) as Ref<any>
     // const dataTemp = props.data as Unbagged[]
     const dataTemp = computed(() => {
-      const temp = props.data.filter((y) => y.order_group.length)
+      checklist.value = []
+      const temp = (storeBagging.state.bagging as any).bagging.unbagged as Unbagged[]
+      // console.log({props: props.data, store: temp2})
+      // const temp = props.data.filter((y) => y.order_group.length)
       return temp
     }) as Ref<Unbagged[]>
     const selectedUnbagged = computed({
@@ -134,6 +138,7 @@ export default defineComponent({
     watch(
       () => [checklist.value],
       ([newChecklist]) => {
+        // console.log({newChecklist})
         let finalPayload = {}
 
         if(newChecklist && newChecklist.length > 0) {
@@ -141,12 +146,16 @@ export default defineComponent({
           let orderGroups = dataTemp.value.map((x: Unbagged) => x.order_group) as any
           orderGroups = [].concat.apply([], orderGroups);
           const filterData = (orderGroups.filter((x: Bagged) => x.orders && x.orders.some((y: Order) => y.id === id)))[0]
-          finalPayload = {
-            bag_name: filterData.group_name + '-' + $dateFns.format(
-            new Date(),
-            'yyyy-MM-dd\'T\'HH:mm:ss.SSS'
-          ),
-            order_ids: newChecklist.map((x: Order) => x.id)
+          // console.log({filterData})
+          if(filterData?.group_name) {
+            finalPayload = {
+              bag_name: filterData.group_name + '-' + $dateFns.format(
+              new Date(),
+              'yyyy-MM-dd\'T\'HH:mm:ss.SSS'
+            ),
+              order_ids: newChecklist.map((x: Order) => x.id)
+            }
+
           }
         }
         selectedUnbagged.value = finalPayload
@@ -160,9 +169,9 @@ export default defineComponent({
       if(checklist.value && checklist.value[0]) {
         const data = dataTemp.value
         const indexParent = data.findIndex((x: Unbagged) => x?.order_group.some((y: Bagged) => y?.orders.some((z: Order) => z.orderCode === checklist.value[0].orderCode)))
-        const indexSub = data[indexParent].order_group.findIndex((x: Bagged) => x?.orders.some((y: Order) => y.orderCode === checklist.value[0].orderCode))
-        nameParent = data[indexParent].dest_country
-        nameSub = data[indexParent].order_group[indexSub].group_name
+        const indexSub = data[indexParent]?.order_group && data[indexParent]?.order_group.findIndex((x: Bagged) => x?.orders.some((y: Order) => y.orderCode === checklist.value[0].orderCode))
+        nameParent = data[indexParent]?.dest_country
+        nameSub = data[indexParent]?.order_group[indexSub].group_name
       }
 
       if(!nameParent || !nameSub) return false
