@@ -4,20 +4,23 @@
       title="Bagging"
       subtitle="Bag parcels together and generate a single bag label for ease of shipping and tracking."
     >
-      <template slot="addition">
+      <!-- <template slot="addition">
         <span class="text--secondary font-weight-medium title">
           &bull; {{ '0' }} Total Orders
         </span>
-      </template>
+      </template> -->
     </BaseHeadlinePage>
 
     <v-row align="center" justify="end" :style="'min-height: 72px'">
       <!-- Left options -->
       <OrdersLeftOptions
-        :is-on-list-view="false"
-        :selected-orders="selectedOrders"
+        :selected-orders="selectedINFO"
         :is-show-filter="isShowFilter"
-        :is-on-bags-tab="true"
+        :is-on-bags-tab="{
+          text: step === 0 || orderView === 0,
+          filter: step === 0
+        }"
+        :is-unbagged="step === 1 && orderView === 0"
         @doShowFilter="isShowFilter = !isShowFilter"
       />
         <!-- :loading="$fetchState.pending" -->
@@ -28,7 +31,6 @@
         <!-- :loading="$fetchState.pending" -->
         <template #toggleView>
           <OrdersToggleView
-            v-if="step !== 0"
             v-model="orderView"
             :is-bagging="true"
           />
@@ -67,7 +69,7 @@
 
     <v-expand-transition>
       <OrdersFiltersContainer
-        :is-show-filter="isShowFilter"
+        :is-show-filter="isShowFilter && (step === 0)"
         @doToggleFilter="isShowFilter = !isShowFilter"
         @doResetFilter="doResetFilter"
       >
@@ -77,26 +79,6 @@
         </template>
       </OrdersFiltersContainer>
     </v-expand-transition>
-
-    <!-- <v-row align="center">
-      <v-col cols="12">
-        <BaseTable
-          v-model="selectedOrders"
-          item-key="id"
-          :items="incomingOrders"
-          :headers="headers"
-          :options="pagination"
-          :loading="$fetchState.pending"
-          :is-select-disabled="isExternalTrackingExist"
-          :show-select="true"
-          :action-exist="actionExist"
-          @fetch="fetchIncomingOrders"
-          @doSelectAll="selectAllToggle"
-          @doGetDetails="doGetDetails"
-          @doGetBatchDetails="doGetBatchDetails"
-        />
-      </v-col>
-    </v-row> -->
 
     <v-sheet
       color="transparent"
@@ -163,8 +145,17 @@
     <BaggingModalConfirm
       v-model="dialog.cancel"
       :dialog-settings="dialogSettings"
-      @doSubmit="submit({isCancel: true})"
+      @doSubmit="() => (dialog.cancel = false)"
     />
+   <v-snackbar
+      :value="alert.isShow"
+      rounded="pill"
+      right
+      bottom
+      :color="alert.type"
+    >
+      {{ alert.message }}
+    </v-snackbar>
   </section>
 </template>
 
@@ -204,6 +195,8 @@ export default defineComponent({
     const router = useRouter()
     const storeApplications = useStore<VuexModuleApplications>()
     const storeBagging = useStore<VuexModuleDetailBagging>()
+    const storeOfApplications = useStore<VuexModuleApplications>()
+    const alert = computed(() => storeOfApplications.state.applications.alert)
     const dialog = ref({
       confirm: false,
       cancel: false
@@ -233,7 +226,19 @@ export default defineComponent({
         destination: ''
       }
     }
-    const selectedUnbagged = ref({}) as Ref<InputPostBag | {}>
+    const selectedUnbagged = ref({}) as Ref<InputPostBag>
+    const selectedINFO = computed(() => {
+      if(step.value === 1 && orderView.value === 0) {
+        return  selectedUnbagged.value &&selectedUnbagged.value?.order_ids ? selectedUnbagged.value?.order_ids : []
+      }
+
+      if(step.value === 0 && orderView.value === 0) {
+        return selectedOrders.value
+      }
+
+      return []
+    })
+
 
     // const dataMerged = ref([]) as Ref<Unbagged[]>
 
@@ -390,6 +395,7 @@ export default defineComponent({
       }
     }
     async function submit(params: {isCancel?: boolean}) {
+      const textMsg = params?.isCancel ? 'Close Bag' : 'Print label'
 
       try {
         dialogSettings.value.loading = true
@@ -399,19 +405,26 @@ export default defineComponent({
             {payload: selectedUnbagged.value}
           )
           await fetchBags()
+          storeApplications.commit('applications/SET_ALERT', {
+            isShow: true,
+            type: 'success',
+            message: `${textMsg} successfully!`,
+          })
         }
 
-        storeApplications.commit('applications/SET_ALERT', {
-          isShow: true,
-          type: 'success',
-          message: 'Print label successfully!',
-        })
+        if(step.value === 0 && !params?.isCancel) {
+          storeApplications.commit('applications/SET_ALERT', {
+            isShow: true,
+            type: 'success',
+            message: `${textMsg} successfully!`,
+          })
+        }
       } catch (error) {
 
         storeApplications.commit('applications/SET_ALERT', {
           isShow: true,
           type: 'error',
-          message: `Print label ${'error'}`,
+          message: `${'error'}`,
         })
       } finally {
         dialogSettings.value.loading = false
@@ -425,7 +438,8 @@ export default defineComponent({
         }, 3000)
       }
     }
-    function handleCancel() {
+    async function handleCancel() {
+      await submit({isCancel: true})
       dialogSettings.value = {
         loading: false,
         title: 'Make sure bags are arranged properly to prevent mix-up',
@@ -476,7 +490,9 @@ export default defineComponent({
       nameBtn,
       // dataTemp,
       dataMerged,
-      selectedUnbagged
+      selectedUnbagged,
+      alert,
+      selectedINFO
     }
   },
   head: {},

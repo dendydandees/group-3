@@ -116,8 +116,17 @@
     <BaggingModalConfirm
       v-model="dialog.cancel"
       :dialog-settings="dialogSettings"
-      @doSubmit="submit({isCancel: true})"
+      @doSubmit="() => (dialog.cancel = false)"
     />
+   <v-snackbar
+      :value="alert.isShow"
+      rounded="pill"
+      right
+      bottom
+      :color="alert.type"
+    >
+      {{ alert.message }}
+    </v-snackbar>
   </section>
 </template>
 
@@ -156,6 +165,7 @@ export default defineComponent({
     const storeApplications = useStore<VuexModuleApplications>()
     const storeFilters = useStore<VuexModuleFilters>()
     const storeBagging = useStore<VuexModuleDetailBagging>()
+    const alert = computed(() => storeApplications.state.applications.alert)
     const unbaggedData = computed(() => ((storeBagging.state.bagging as any).bagging.unbagged))
     const countryCodes = computed(() => storeFilters.state.filters.countryCodes)
     const inputBarcode = ref('')
@@ -249,17 +259,20 @@ export default defineComponent({
           }
         })
 
-        storeApplications.commit('applications/SET_ALERT', {
-          isShow: true,
-          type: 'success',
-          message: 'Print label successfully!',
-        })
-      } catch (error) {
+        const textMsg = params?.isCancel ? 'Close Bag' : 'Print label'
 
         storeApplications.commit('applications/SET_ALERT', {
           isShow: true,
+          type: 'success',
+          message: `${textMsg} successfully!`,
+        })
+      } catch (error) {
+
+        const textMsg = params?.isCancel ? 'Close Bag' : 'Print label'
+        storeApplications.commit('applications/SET_ALERT', {
+          isShow: true,
           type: 'error',
-          message: `Print label ${'error'}`,
+          message: `${textMsg} successfully!`,
         })
       } finally {
         dialogSettings.value.loading = false
@@ -273,7 +286,8 @@ export default defineComponent({
         }, 3000)
       }
     }
-    function handleCancel() {
+    async function handleCancel() {
+      await submit({isCancel: true})
       dialogSettings.value = {
         loading: false,
         title: 'Make sure bags are arranged properly to prevent mix-up',
@@ -476,7 +490,8 @@ export default defineComponent({
       validationCard,
       cardData,
       searchCountry,
-      disabledCloseBag
+      disabledCloseBag,
+      alert
     }
   },
   head: {},
