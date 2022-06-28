@@ -167,6 +167,18 @@
         </v-btn>
 
         <v-btn
+          v-if="actionExist.edit"
+          small
+          :dark="!!item.labelPath"
+          :loading="loading"
+          color="teal darken-1"
+          class="ma-2 white--text"
+          @click="doMovePageBagPartner(item)"
+        >
+          Edit
+        </v-btn>
+
+        <v-btn
           v-if="actionExist.download"
           small
           download
@@ -360,6 +372,11 @@ export default defineComponent({
       emit('doHandleModalTrack', data)
     }
 
+    function doMovePageBagPartner(data: any) {
+
+      emit('doMovePageBagPartner', data)
+    }
+
     return {
       selected,
       fetch,
@@ -369,7 +386,8 @@ export default defineComponent({
       setStatusOrder,
       setLMTrackNumber,
       doExportOrder,
-      track
+      track,
+      doMovePageBagPartner
     }
   },
 })

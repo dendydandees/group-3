@@ -45,7 +45,11 @@
                   <v-list-item-avatar>
                     <v-icon
                     >
-                      mdi-email-outline
+                      {{
+                        isBagTabPartner
+                        ? 'mdi-bag-personal-outline'
+                        : 'mdi-email-outline'
+                      }}
                     </v-icon>
                   </v-list-item-avatar>
 
@@ -111,6 +115,10 @@ export default defineComponent({
     data: {
       type: Array as PropType<Unbagged[]>,
       required: true
+    },
+    isBagTabPartner: {
+      type: Boolean,
+      default: false
     }
   },
   setup(props) {

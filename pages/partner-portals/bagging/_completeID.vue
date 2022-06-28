@@ -1,53 +1,43 @@
 <template>
-  <section class="pa-4 pa-md-10 py-8 scanPage">
+  <section class="pa-4 pa-md-10 py-8 editComplete">
 
-    <v-row align="center" justify="end">
-      <div
-        :style="'width: 30%'"
+    <v-row align="start" justify="space-between">
+      <v-card
+        color="primary"
+        class="pa-5"
+        width="450px"
       >
-        <v-text-field
-          v-model="inputBarcode"
-          clearable
-          outlined
-          dense
-          rounded
-          single-line
-          hide-details
-          label="Input Barcode"
-          placeholder="Enter your barcode..."
-          background-color="white"
-          type="search"
-          class="input-filter mr-3"
-          @keydown="enterInput"
-        />
-      </div>
-      <v-btn
-        color="green"
-        min-width="200px"
-        class="mr-3 white--text"
-        :disabled="disabledCloseBag()"
-        @click="handleBagScanBag"
-      >
-        <v-icon
-          class="mr-2"
-          small
+        <v-card-title
+          class="white--text pa-0 mb-2"
         >
-          mdi-bag-suitcase-outline
-        </v-icon>
-        CLOSE BAG
-      </v-btn>
+          TEST-MAINBAG
+        </v-card-title>
+        <v-card-text
+          class="pa-0 white--text"
+        >
+          <div
+            v-for="(x, i) in 3"
+            :key="i"
+            class="d-flex align-start"
+          >
+            <div
+              class="pr-2 font-weight-bold"
+              :style="'width: 27.5%'"
+            >
+              Order ID
+            </div>
+            <div>
+              : dsadalk213123
+            </div>
+          </div>
+        </v-card-text>
+      </v-card>
       <v-btn
         color="primary"
         min-width="200px"
         @click="handleStop"
       >
-        <v-icon
-        small
-          class="mr-2"
-        >
-          mdi-block-helper
-        </v-icon>
-        STOP SCAN
+        DONE
       </v-btn>
     </v-row>
     <v-row
@@ -61,47 +51,97 @@
         <v-card
           elevation="2"
           width="100%"
-          :color="`${
-            allScanned.length && allScanned.some((x) => x.new)
-            ? validationCard()
-            : 'white'
-            // validationCard()
-            // ? 'green'
-            // : 'white'
-          }`"
-          min-height="500px"
-          :class="`${
-            validationCard({isText: true})
-            // validationCard()
-            // ?
-            // 'white--text'
-            // :
-            // ''
-          } pa-15 d-flex flex-column align-center justify-center`"
         >
-          <div
-            v-if="allScanned.length && allScanned.some((x) => x.new)"
-            class="text-center"
-          >
-            <div class="text-h1 font-weight-bold mb-15">
-              <!-- SINGAPORE - 1 -->
-              {{searchCountry(cardData.dest_country)}}
-            </div>
-            <div class="text-h2">
-              <!-- LUWDASLDKM123123 -->
-              {{cardData.group_name}}
-            </div>
-          </div>
-          <div
-            v-else
-            class="text-center"
-          >
-            <div class="text-h1 font-weight-bold">
-              PLEASE SCAN ITEM
-            </div>
-          </div>
-        </v-card>
+          <article class="scanned-tab pa-8">
+            <v-container fluid class="pa-0">
+              <v-row
+              >
+                <v-col
+                  v-for="(partner, u) in [1,2,3,4]"
+                  :key="u"
+                  cols="4"
+                  class="d-flex align-center justify-space-between pa-4"
+                >
+                  <v-card
+                    elevation="1"
+                    class="mx-auto"
+                    width="100%"
+                    :style="'overflow: hidden'"
+                  >
+                    <v-card-title class=" d-flex flex-column justify-center align-center text-center mb-3">
+                      <v-btn
+                        color="primary darken-1 white--text mb-4"
+                        @click="actionCard.toggleConfirm({isBulk: true})"
+                      >
+                        DELETE BAG
+                      </v-btn>
+                      <div class="text-h4 mb-2">
+                        TESSSSLALLALALALLALALA
+                      </div>
+                      <div class="title">
+                        Orders: 1000
+                      </div>
+                    </v-card-title>
 
+                    <v-divider></v-divider>
+
+                    <v-virtual-scroll
+                      :items="[1,2,3,4,5,6,7,8,9,10]"
+                      :item-height="50"
+                      height="200"
+                    >
+                      <template #default="{ item, index }">
+                        <v-list-item
+                          v-if="index !== 9"
+                          :class="`custom-list-item-scroll ${item.new ? 'bg-custom' : ''}`"
+                        >
+                          <v-list-item-avatar>
+                            <v-icon
+                            >
+                              mdi-email-outline
+                            </v-icon>
+                          </v-list-item-avatar>
+
+                          <v-list-item-content>
+                            <v-list-item-title>
+                              TESSADDSADSAD
+                            </v-list-item-title>
+                          </v-list-item-content>
+                          <v-list-item-icon
+                            class="custom-icon-bagging"
+                            @click="actionCard.toggleConfirm()"
+                          >
+                            <v-icon>
+                              mdi-delete-outline
+                            </v-icon>
+                          </v-list-item-icon>
+                        </v-list-item>
+                        <v-list-item
+                          v-else
+                          :class="`${false ? 'bg-custom' : ''}`"
+                          @click="actionCard.addItem()"
+                        >
+                          <v-list-item-avatar>
+                            <v-icon
+                            >
+                              mdi-plus-circle-outline
+                            </v-icon>
+                          </v-list-item-avatar>
+
+                          <v-list-item-content>
+                            <v-list-item-title>
+                              Add Order
+                            </v-list-item-title>
+                          </v-list-item-content>
+                        </v-list-item>
+                      </template>
+                    </v-virtual-scroll>
+                  </v-card>
+                </v-col>
+              </v-row>
+            </v-container>
+          </article>
+        </v-card>
       </v-col>
     </v-row>
     <!-- Modal confirm -->
@@ -110,7 +150,7 @@
       :dialog-settings="dialogSettings"
       :is-confirm="true"
       @doSubmit="submit"
-      @doCancel="handleCancel"
+      @doCancel="actionCard.handleCancel"
     />
     <!-- Modal after click no -->
     <BaggingModalConfirm
@@ -157,7 +197,7 @@ import { VuexModuleFilters, Statuses, CountryCode } from '~/types/filters'
 import { VuexModuleDetailBagging, FilterBagging, Unbagged, InputPostBag, Order, Bagged} from '~/types/bagging/bagging'
 
 export default defineComponent({
-  name: 'ScanPages',
+  name: 'EditComplete',
   middleware: 'partner',
   setup() {
     const { app, $dateFns } = useContext()
@@ -292,19 +332,7 @@ export default defineComponent({
         }, 3000)
       }
     }
-    async function handleCancel() {
-      await submit({isCancel: true})
-      dialogSettings.value = {
-        loading: false,
-        title: 'Make sure bags are arranged properly to prevent mix-up',
-        content: '',
-        cancelText: '',
-        submitText: 'Ok',
-        submitColor: 'primary',
-      }
-      dialog.value.cancel = true
 
-    }
 
     function handleBagScanBag() {
       dialogSettings.value = {
@@ -480,12 +508,44 @@ export default defineComponent({
     function disabledCloseBag() {
       return !allScanned.value.some((x: any) => x.new)
     }
+    const actionCard = {
+      deleteItem: () => {
+        console.log('test')
+      },
+      addItem: () => {
+        console.log('add')
+      },
+      toggleConfirm: (params?: {data?: Bagged, isBulk?: Boolean}) => {
+        dialogSettings.value = {
+          loading: false,
+          title: 'Delete {orderID} now ?',
+          content: '',
+          cancelText: 'No',
+          submitText: 'Yes',
+          submitColor: 'error',
+        }
+        if(params?.isBulk) {
+          dialogSettings.value.title = 'Delete {group_name} now ?'
+        }
+        dialog.value.confirm = true
+      },
+      handleCancel: () => {
+        dialogSettings.value = {
+          loading: false,
+          title: '',
+          content: '',
+          cancelText: '',
+          submitText: '',
+          submitColor: '',
+        }
+        dialog.value.confirm = false
+      }
+    }
 
-    useMeta(() => ({ title: 'Client Portal | Scan' }))
+    useMeta(() => ({ title: 'Partner Portal | Edit' }))
 
     return {
       handleStop,
-      handleCancel,
       submit,
       dialog,
       dialogSettings,
@@ -497,7 +557,9 @@ export default defineComponent({
       cardData,
       searchCountry,
       disabledCloseBag,
-      alert
+      alert,
+
+      actionCard
     }
   },
   head: {},
@@ -505,6 +567,18 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-.scanPage {
+.editComplete {
+  .list-custom {
+    min-height: unset;
+    padding: unset
+  }
+  .custom-icon-bagging {
+    cursor: pointer;
+    &:hover {
+      .v-icon {
+        color: rgb(255, 111, 111) !important
+      }
+    }
+  }
 }
 </style>

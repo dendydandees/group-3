@@ -17,6 +17,10 @@ export interface FilterBagging {
   client: string;
   destination: string;
 }
+export interface InputManifest {
+  manifest: boolean,
+  mawb: string;
+}
 
 export interface InputPostBag {
   bag_name: string;
