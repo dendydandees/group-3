@@ -1,7 +1,7 @@
 <template>
   <v-dialog
     v-model="mawbInput.manifest"
-    max-width="650"
+    max-width="750"
     @click:outside="toggle()"
   >
     <v-card
@@ -60,7 +60,7 @@
                 label="Length"
                 placeholder="Length..."
                 background-color="white"
-                type="search"
+                type="number"
                 class="input-filter"
                 append-icon="cm"
               />
@@ -76,7 +76,7 @@
                 label="Width"
                 placeholder="Width..."
                 background-color="white"
-                type="search"
+                type="number"
                 class="input-filter"
                 append-icon="cm"
               />
@@ -92,7 +92,7 @@
                 label="Height"
                 placeholder="Height..."
                 background-color="white"
-                type="search"
+                type="number"
                 class="input-filter"
                 append-icon="cm"
               />
@@ -108,7 +108,7 @@
                 label="Weight"
                 placeholder="Weight..."
                 background-color="white"
-                type="search"
+                type="number"
                 class="input-filter"
                 append-icon="kg"
               />
