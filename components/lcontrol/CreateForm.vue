@@ -159,7 +159,6 @@ import {
   // FilterDetails,
   // PartnerServiceZone,
 } from '~/types/marketplace/marketplace'
-import { Definition } from '~/types/lControl/lControl'
 
 export default defineComponent({
   props: {
@@ -198,7 +197,7 @@ export default defineComponent({
     const marketplaces = computed(
       () => storeMarketplaces.state.marketplaces.marketplaces.marketplaces
     )
-    const ruleAdd = ref([]) as Ref<Definition[]>
+    const ruleAdd = ref([]) as Ref<any>
 
     const ruleType = computed(() => [
       {
@@ -246,7 +245,7 @@ export default defineComponent({
       emit('toggle')
     }
     const addRuleBtn = (id: number) => {
-      const data: Definition = {
+      const data = {
         [`type`]: '',
         [`value`]: '',
         id,

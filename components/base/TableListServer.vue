@@ -159,7 +159,6 @@ import CountryFlag from 'vue-country-flag'
 import { DataOptions, DataTableHeader, ItemGroup } from 'vuetify'
 import { ActionsTable, FilterDetails, Meta } from '~/types/applications'
 import { VuexModuleMarketplaces } from '~/types/marketplace/marketplace'
-import { RuleGroup } from '~/types/lControl/lControl'
 
 export default defineComponent({
   components: {
@@ -234,7 +233,7 @@ export default defineComponent({
     const getDetailItem = (data: {}) => {
       emit('doGetDetails', data)
     }
-    const addRuleModal = (data: RuleGroup) => {
+    const addRuleModal = (data: any) => {
       emit('addRuleModal', data)
       // console.log('addRuleModal', data)
       fetchMarketplace(data.countryCode, data.serviceType)
