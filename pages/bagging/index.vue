@@ -191,7 +191,7 @@ import tempData from '~/static/tempData'
 
 export default defineComponent({
   name: 'BaggingPages',
-  middleware: 'partner',
+  layout: 'default',
   setup() {
     const router = useRouter()
     const storeApplications = useStore<VuexModuleApplications>()

@@ -35,14 +35,15 @@
           <v-divider></v-divider>
         </v-row>
         <div
-          v-for="(x, i) in 4"
+          v-for="(x, i) in selected"
           :key="i"
         >
           <v-row>
             <v-col cols="12" md="12" :class="`${i === 0 ? 'mt-4' : ''} pb-0`">
               <div>
                 <span  class="font-weight-bold">Bag ID:</span>
-                tes
+                {{x.group_name}}
+                <!-- {{mawbInput.generateManifest[x.id].groupName}} -->
               </div>
             </v-col>
           </v-row>
@@ -50,7 +51,7 @@
           >
             <v-col cols="12" md="3" class="px-2">
               <v-text-field
-                v-model="mawbInput.mawb"
+                v-model="mawbInput.generateManifest[x.id].length"
                 clearable
                 outlined
                 dense
@@ -66,7 +67,7 @@
             </v-col>
             <v-col cols="12" md="3" class="px-2">
               <v-text-field
-                v-model="mawbInput.mawb"
+                v-model="mawbInput.generateManifest[x.id].width"
                 clearable
                 outlined
                 dense
@@ -82,7 +83,7 @@
             </v-col>
             <v-col cols="12" md="3" class="px-2">
               <v-text-field
-                v-model="mawbInput.mawb"
+                v-model="mawbInput.generateManifest[x.id].height"
                 clearable
                 outlined
                 dense
@@ -98,7 +99,7 @@
             </v-col>
             <v-col cols="12" md="3" class="px-2">
               <v-text-field
-                v-model="mawbInput.mawb"
+                v-model="mawbInput.generateManifest[x.id].weight"
                 clearable
                 outlined
                 dense
@@ -133,7 +134,7 @@
             color="primary"
             class="mx-2"
             width="100%"
-            @click="doClose"
+            @click="toggle()"
           >
             {{ dialogSettings.cancelText }}
           </v-btn>
@@ -145,7 +146,7 @@
         >
           <v-btn
             :loading="dialogSettings.loading"
-            :disabled="dialogSettings.loading"
+            :disabled="dialogSettings.loading || disabledBtn()"
             :color="dialogSettings.submitColor"
             width="100%"
             @click="$emit('doSubmit')"
@@ -160,10 +161,11 @@
 </template>
 
 <script lang="ts">
+import generate from '@babel/generator';
 import { defineComponent, PropType, computed } from '@nuxtjs/composition-api'
 // Interfaces and types
 import { ModalConfirm } from '~/types/applications'
-import { InputManifest} from '~/types/bagging/bagging'
+import { InputManifest, Bagged} from '~/types/bagging/bagging'
 
 export default defineComponent({
   props: {
@@ -178,6 +180,10 @@ export default defineComponent({
     isConfirm:{
       type: Boolean as PropType<boolean>,
       default: false,
+    },
+    selected:{
+      type: Array as PropType<Bagged[] | []>,
+      default: () => ([]),
     }
   },
   setup(props, { emit }) {
@@ -195,10 +201,23 @@ export default defineComponent({
       mawbInput.value.manifest = !mawbInput.value.manifest
     }
 
+    function disabledBtn() {
+      if(mawbInput.value.generateManifest) {
+        const arrIsEmpty = Object.values(mawbInput.value.generateManifest).map((x, i) => {
+          return {
+            groupName: x.groupName,
+            isEmpty: !(x.length && x.width && x.height && x.weight)
+          }
+        })
+        return arrIsEmpty.some((x) => x.isEmpty)
+      }
+    }
+
     return {
       mawbInput,
       doClose,
-      toggle
+      toggle,
+      disabledBtn
     }
   },
 })

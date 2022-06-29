@@ -753,6 +753,7 @@ export default {
         "comments": "Delivered to Freight Forwarder",
         "update_timestamp": "2022-06-06T03:24:50.462788+08:00"
       }
-    ]
+    ],
+
   }
 };

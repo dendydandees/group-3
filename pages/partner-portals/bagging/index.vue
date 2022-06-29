@@ -43,6 +43,7 @@
         color="primary"
         min-width="200px"
         class="mr-2"
+        :disabled="!selectedOrders.length"
         @click="handleManifest()"
       >
         Generate Manifest
@@ -167,6 +168,7 @@
     <!-- Modal Manifest -->
     <BaggingGenerateManifest
       v-model="inputMAWB"
+      :selected="selectedOrders"
       :dialog-settings="dialogSettings"
       @doSubmit="() => (inputMAWB.manifest = false)"
       @doCancel="() => (inputMAWB.manifest = false)"
@@ -209,7 +211,7 @@ import {
 } from '~/types/applications'
 import { VuexModuleFilters, Statuses } from '~/types/filters'
 import { filterBaggingInit} from '~/store/bagging/bagging'
-import { VuexModuleDetailBagging, FilterBagging, Unbagged, InputPostBag, InputManifest} from '~/types/bagging/bagging'
+import { VuexModuleDetailBagging, FilterBagging, Unbagged, InputPostBag, InputManifest, GenerateManifest} from '~/types/bagging/bagging'
 import tempData from '~/static/tempData'
 
 export default defineComponent({
@@ -236,10 +238,6 @@ export default defineComponent({
     const filterBagging = ref({
       ...(storeBagging.state.bagging as any).bagging.filter,
     })
-    const inputMAWB = ref({
-      manifest: false,
-      mawb: ''
-    }) as Ref<InputManifest>
     // manage windows
     const step = ref((storeBagging.state.bagging as any).bagging.tab.step)
     const stepList = computed(() => {
@@ -266,6 +264,31 @@ export default defineComponent({
     const orderView = ref((storeBagging.state.bagging as any).bagging.tab.orderView[step.value])
     // manage table
     const selectedOrders = ref([]) as Ref<any>
+    const inputMAWB = ref({
+      manifest: false,
+    }) as Ref<InputManifest>
+
+    watch(
+      () => [selectedOrders.value],
+      ([newSelectedOrders]) => {
+          const generateManifest = {} as GenerateManifest
+          newSelectedOrders.forEach((x: any) => {
+            generateManifest[x.id] = {
+              groupName: x.group_name,
+              length: '',
+              width: '',
+              height: '',
+              weight: '',
+            }
+          });
+          inputMAWB.value = {
+            ...inputMAWB.value,
+            mawb: '',
+            generateManifest
+          }
+      },
+      { deep: true }
+    )
     // manage filter order
     const isShowFilter = ref((storeBagging.state.bagging as any).bagging.isShowFilter)
     const doResetFilter = () => {
