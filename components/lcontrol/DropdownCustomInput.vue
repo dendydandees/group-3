@@ -4,7 +4,7 @@
       v-if="label"
       class="h-5 text-break font-weight-medium pb-1 d-flex align-center"
     >
-      <v-tooltip v-if="isInfo" bottom>
+      <v-tooltip v-if="isInfo" bottom max-width="250">
         <template #activator="{ on, attrs }">
           <NuxtImg
             src="/images/qMark.svg"
@@ -21,12 +21,13 @@
         >
       </v-tooltip>
     </div>
-    <!-- {{JSON.stringify(data)}} -->
+
     <div class="d-flex align-center">
       <div :style="'width: 70%'">
         <div class="header-NP-label">
           {{ label }}
         </div>
+
         <v-select
           v-model="selectedComp.partnerID"
           :label="title"
@@ -43,10 +44,12 @@
         >
         </v-select>
       </div>
+
       <div class="ml-3" :style="'width: 30%'">
         <div class="header-NP-label">Volume</div>
+
         <v-text-field
-          v-model="selectedComp.volume"
+          v-model.number="selectedComp.volume"
           label="Volume"
           placeholder="Volume"
           background-color="white"
@@ -56,14 +59,17 @@
           hide-details
           rounded
           outlined
+          hide-spin-buttons
           type="number"
           :min="0"
           class="custom-text-field"
           :disabled="!selectedComp.partnerID || disabledDrop"
         />
       </div>
+
       <div class="ml-3">
         <div class="header-NP-label"></div>
+
         <v-btn
           v-if="isDelete"
           :loading="disabledDrop"
@@ -167,6 +173,7 @@ export default defineComponent({
   },
 })
 </script>
+
 <style lang="scss">
 .dropdown-custom-input {
   width: 100%;

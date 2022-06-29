@@ -7,7 +7,8 @@
       <div>
         {{ label }}
       </div>
-      <v-tooltip v-if="isInfo" bottom>
+
+      <v-tooltip v-if="isInfo" color="info" bottom max-width="250">
         <template #activator="{ on, attrs }">
           <NuxtImg
             src="/images/qMark.svg"
@@ -18,13 +19,14 @@
             v-on="on"
           />
         </template>
+
         <span
           >COD default Network Partner allocation will allow all COD orders will
           automatically be allocated to this specific NP</span
         >
       </v-tooltip>
     </div>
-    <!-- {{JSON.stringify(data)}} -->
+
     <div class="d-flex align-center">
       <v-select
         v-model="selectedComp"
@@ -41,6 +43,7 @@
         :class="`custom-select ${disabledDrop ? 'disabled-drop' : ''}`"
       >
       </v-select>
+
       <v-btn
         v-if="isDelete"
         :loading="disabledDrop"

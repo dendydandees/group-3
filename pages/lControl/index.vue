@@ -5,373 +5,109 @@
         <div class="text">L-CONTROL</div>
       </div>
 
-      <div class="body-wrapper border-bottom">
-        <div class="country-wrapper">
-          <div class="text">COUNTRY</div>
-        </div>
-
-        <div class="service-wrapper service-color">
-          <div class="text">SERVICE</div>
-        </div>
-
-        <div class="zone-wrapper">
-          <div class="text">
-            <v-breadcrumbs :items="breadcrumbs" divider=">" class="pa-0">
-              <template #item="{ item }">
-                <v-breadcrumbs-item
-                  :href="item.href"
-                  :disabled="item.disabled"
-                  :class="`${!item.first ? 'active-bread' : ''}`"
-                >
-                  {{ item.text.toUpperCase() }}
-                </v-breadcrumbs-item>
-              </template>
-            </v-breadcrumbs>
-            <!-- ZONE
-            <span>
-              <v-icon
-                large
-                color="black"
-              >
-                mdi-menu-left
-              </v-icon>
-              <span>
-                KUALA LUMPUR
-              </span>
-            </span> -->
-          </div>
-        </div>
-      </div>
+      <Heading :breadcrumbs="breadcrumbs" />
 
       <div class="content-wrapper">
-        <div class="country-wrapper-content scroller">
-          <div
-            v-for="(el, i) in countryCodes"
-            :key="i"
-            :class="`text padding-text-country ${
-              selected.countryIndex && selected.countryIndex.index === i
-                ? 'service-color'
-                : ''
-            }`"
-            @click="indexSelect({ index: i, value: el.value }, 'country')"
-          >
-            <div
-              :class="`${
-                selected.countryIndex && selected.countryIndex.index === i
-                  ? 'red-color'
-                  : ''
-              } ${$fetchState.pending ? 'disabled' : ''}`"
-            >
-              {{ el.name }}
-            </div>
+        <CountriesWrapper
+          :user-selected="userSelected"
+          :loading="$fetchState.pending"
+          @handleCountrySelection="handleSelections.country"
+        />
 
-            <div class="text-sub">Manually Updated</div>
-          </div>
-        </div>
+        <ServicesWrapper
+          v-model="userSelected"
+          :loading="$fetchState.pending"
+          @handleServiceSelections="handleSelections.service"
+          @handleBob="handleBob"
+        />
 
-        <div
-          class="service-wrapper-content service-color scroller blue-scroller"
+        <ZoneWrapper
+          :user-selected="userSelected"
+          :loading="$fetchState.pending"
+          :is-on-service-type="isOnServiceType"
+          :ports-meta="portsMeta"
+          :show-ports-or-zones="showPortsOrZones"
+          @getPorts="getPorts(portsMeta)"
+          @changePortsMeta="portsMeta = value"
+          @handleZoneSelection="handleSelections.zone"
         >
-          <div
-            v-for="(el, i) in serviceTypes"
-            :key="i"
-            :class="`text ${
-              selected.serviceIndex && selected.serviceIndex.index === i
-                ? 'red-color'
-                : ''
-            } ${selected.useBOB || $fetchState.pending ? 'disabled' : ''}`"
-            :style="`${
-              selected.countryIndex === null ? 'visibility: hidden;' : ''
-            }line-height: 36px`"
-            @click="indexSelect({ index: i, value: el.name }, 'service')"
-          >
-            {{ $customUtils.setServiceType(el.name) }}
-          </div>
+          <template #form>
+            <div class="content-zone-selected">
+              <v-btn
+                :disabled="$fetchState.pending"
+                icon
+                color="primary"
+                @click="handleBackToZoneSelection"
+              >
+                <v-icon> mdi-arrow-left-thick </v-icon>
+              </v-btn>
 
-          <div v-if="selected.countryIndex !== null">
-            <v-switch
-              v-model="selected.useBOB"
-              inset
-              :disabled="$fetchState.pending"
-              color="#FF3D17"
-              :style="`${
-                selected.countryIndex === null ? 'visibility: hidden;' : ''
-              }`"
-              class="ma-0"
-              @change="handleBob"
-            >
-              <template #label>
-                <span
-                  :style="`color: ${
-                    selected.useBOB ? '#FF3D17' : '#1961E4'
-                  }; font-weight: 500;white-space: nowrap`"
-                >
-                  BOB {{ selected.useBOB ? 'Activated' : 'Inactive' }}
-                </span>
-
-                <NuxtImg
-                  src="/images/qMark.svg"
-                  preload
-                  :height="18"
-                  class="ml-2"
-                />
-              </template>
-            </v-switch>
-
-            <v-card class="pa-4" elevation="3" style="height: 100%">
-              <div class="d-flex align-center mb-3">
-                <NuxtImg
-                  src="/images/qMark.svg"
-                  preload
-                  :height="18"
-                  class="mr-1"
-                />
-
-                <span
-                  style="color: #ff3d17; font-size: 13px; line-height: 16px"
-                >
-                  What is BOB?
-                </span>
-              </div>
-
-              <div style="color: #1961e4; font-size: 14px; line-height: 17px">
-                BOB will help you select the most suitable network partner based
-                on our analytical data
-              </div>
-            </v-card>
-          </div>
-        </div>
-
-        <div
-          :class="`zone-wrapper-content ${
-            selected.useBOB ? 'd-flex align-center justify-center' : ''
-          } scroller`"
-        >
-          <div
-            v-if="selected.zoneIndex === null && !selected.useBOB"
-            :class="`zone-text`"
-          >
-            <div
-              v-for="(el, i) in zonesCust"
-              :key="i"
-              :class="`text`"
-              :style="`${
-                selected.serviceIndex === null ? 'visibility: hidden;' : ''
-              }`"
-            >
-              <div :class="`d-flex align-center justify-space-between`">
-                <div style="max-width: 40%">
-                  {{ isCustoms() ? el.name : el.zoneName }}
-                </div>
-
-                <div style="max-width: 40%" class="d-flex align-center">
-                  <span
-                    v-if="true"
-                    style="
-                      font-size: 15px;
-                      line-height: 18px;
-                      color: #575757;
-                      max-width: 80%;
-                    "
-                    class="d-inline-block text-truncate"
-                  >
-                    {{ !el.partnerID ? 'Waiting for Setup' : el.partnerName }}
-                  </span>
-
-                  <v-btn
-                    color="primary darken-1 white--text ml-6"
-                    :disabled="$fetchState.pending"
-                    @click="
-                      indexSelect(
-                        {
-                          index: i,
-                          value: el.id,
-                          name: isCustoms() ? el.name : el.zoneName,
-                          data: el,
-                        },
-                        'zone'
-                      )
-                    "
-                  >
-                    {{ !el.partnerID ? 'SETUP' : 'UPDATE' }}
-                  </v-btn>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            v-else-if="selected.useBOB"
-            :class="`d-flex flex-column align-center justify-center`"
-            style="width: 400px"
-          >
-            <!-- <div> -->
-            <NuxtImg src="/images/BOB.svg" preload :width="400" class="mb-4" />
-            <div style="text-align: center; font-size: 14px; line-height: 20px">
-              BOB is Luwjistik’s own in-house tool that simplifies your shipping
-              process by giving you a fixed end-to-end rate instead of a modular
-              rate. Using our machine learning we will automatically choose the
-              best freight forwarder, custom broker and last mile provider for
-              needs. With BOB, you would not need to connect to different
-              partners in multiple countries as we will do that on your behalf.
-            </div>
-            <!-- </div> -->
-          </div>
-
-          <div v-else class="content-zone-selected">
-            <v-btn
-              :disabled="$fetchState.pending"
-              icon
-              color="primary"
-              @click="backBtnHandler()"
-            >
-              <v-icon> mdi-arrow-left-thick </v-icon>
-            </v-btn>
-
-            <div class="zone-column-right">
-              <div>
-                <div
-                  style="line-height: 36px; font-size: 18px; font-weight: 700"
-                  class="mb-3"
-                >
-                  {{ selected.zoneIndex && selected.zoneIndex.name }}
-                </div>
-
+              <div class="zone-column-right">
                 <div>
-                  <LcontrolDropdownCustom
-                    v-model="selected.partnerID"
-                    :label="`${
-                      isCustoms() ? 'Port' : 'Zone'
-                    } Default Network Partner`"
-                    :placeholder="'Default Partner'"
-                    :data="marketplaces"
-                    :disabled-drop="$fetchState.pending"
-                    :item-show="{ text: 'name', value: 'id' }"
+                  <div
+                    style="line-height: 36px; font-size: 18px; font-weight: 700"
+                    class="mb-3"
+                  >
+                    {{
+                      isOnServiceType.customs
+                        ? userSelected.port.name
+                        : userSelected.zone.zoneName
+                    }}
+                  </div>
+
+                  <BaseLoadingLinear
+                    v-if="$fetchState.pending"
+                    :title="'Getting form data...'"
                   />
 
-                  <div
-                    v-if="
-                      selected.partnerID &&
-                      selected.serviceIndex.value === 'LAST_MILE'
-                    "
-                    class="primary--text"
-                    style="
-                      font-size: 12px;
-                      margin-top: 5px;
-                      justify-content: end;
-                      display: flex;
-                    "
-                  >
-                    <span v-if="handleInfoCOD(selected.partnerID)">
-                      Partner available for COD service
-                    </span>
-
-                    <span v-else class="error--text">
-                      Partner not available for COD service
-                    </span>
-                  </div>
-
-                  <div
-                    v-if="
-                      !CODpartnerSelected.status &&
-                      selected.serviceIndex.value === 'LAST_MILE'
-                    "
-                    :class="`my-3 btn-COD ${
-                      selected.partnerID ? '' : 'disabled'
-                    } ${
-                      $fetchState.pending ? 'text--secondary' : 'primary--text'
-                    }`"
-                    :style="`${$fetchState.pending ? '' : 'cursor: pointer'}`"
-                    @click="handleCOD"
-                  >
-                    + Add COD Default Network Partner
-                  </div>
-
-                  <div
-                    v-if="
-                      CODpartnerSelected.status &&
-                      selected.serviceIndex.value === 'LAST_MILE'
-                    "
-                    class="d-flex mt-2"
-                  >
-                    <LcontrolDropdownCustom
-                      v-model="CODpartnerSelected.partnerID"
-                      :label="`COD Default Network Partner`"
-                      :placeholder="'COD Default Partner'"
-                      :data="marketplacesCOD"
-                      :disabled-drop="$fetchState.pending"
-                      :item-show="{ text: 'name', value: 'id' }"
-                      :is-delete="true"
-                      :is-info="true"
-                      @delete="handleDeleteRule({ isCOD: true })"
+                  <div v-else>
+                    <!-- handle default -->
+                    <DefaultPartnerForm
+                      v-model="userSelected"
+                      :is-on-service-type="isOnServiceType"
+                      :loading="$fetchState.pending"
                     />
-                  </div>
+                    <!-- end handle default -->
 
-                  <div
-                    v-if="selected.serviceIndex.value === 'LAST_MILE'"
-                    class="mt-2"
-                  >
-                    <!-- <div
-                      v-for="(z, i) in addNPData"
-                      :key="i"
-                    > -->
-                    <LcontrolDropdownCustomInput
-                      v-for="(z, i) in addNPData"
-                      :key="i"
-                      v-model="addNPData[i]"
-                      :label="`${dataPriority[i]} Network Partner`"
-                      :placeholder="'Default Partner'"
-                      :data="marketplaces"
-                      :disabled-drop="$fetchState.pending"
-                      :item-show="{ text: 'name', value: 'id' }"
-                      :is-delete="true"
-                      class="mb-2"
-                      @delete="
-                        handleDeleteRule({
-                          isVolume: { index: z.index, status: true },
-                        })
-                      "
+                    <!-- handle cod -->
+                    <CODPartnerForm
+                      v-model="userSelected"
+                      :loading="$fetchState.pending"
+                      :is-on-service-type="isOnServiceType"
+                      @handleDeleteCOD="handleDeleteForm('cod')"
                     />
+                    <!-- end handle cod -->
 
-                    <!-- </div> -->
-                  </div>
-
-                  <div
-                    v-if="
-                      selected.serviceIndex.value === 'LAST_MILE' &&
-                      addNPData.length < 3
-                    "
-                    :class="`
-                        my-3 btn-COD ${selected.partnerID ? '' : 'disabled'} ${
-                      $fetchState.pending ? 'text--secondary' : 'primary--text'
-                    }
-                      `"
-                    :style="`${$fetchState.pending ? '' : 'cursor: pointer'}`"
-                    @click="handleAddNP"
-                  >
-                    + Add Network Partner
+                    <!-- handle primary, secondary, tertiary network partner -->
+                    <OtherPartnerForm
+                      v-model="userSelected"
+                      :is-on-service-type="isOnServiceType"
+                      :loading="$fetchState.pending"
+                      @handleDeleteNetworkPartner="handleDeleteForm"
+                    />
+                    <!-- end handle primary, secondary, tertiary network partner -->
                   </div>
                 </div>
-              </div>
 
-              <v-btn
-                color="primary darken-1 white--text"
-                style="align-self: end"
-                :disabled="$fetchState.pending || handleDisabled()"
-                @click="btnAction"
-              >
-                SAVE CHANGES
-              </v-btn>
+                <v-btn
+                  color="primary"
+                  style="align-self: end"
+                  :disabled="isSaveButtonDisabled"
+                  @click="handleSubmit"
+                >
+                  SAVE CHANGES
+                </v-btn>
+              </div>
             </div>
-          </div>
-        </div>
+          </template>
+        </ZoneWrapper>
       </div>
     </v-card>
 
     <BaseModalConfirm
-      v-model="dialog.deleteRule"
+      v-model="dialog.isOpen"
       :dialog-settings="dialogSettings"
-      @doSubmit="deleteRules({ idRule: dialog.idRule })"
+      @doSubmit="handleDeleteModal"
     />
 
     <v-snackbar
@@ -392,283 +128,565 @@ import {
   defineComponent,
   useFetch,
   useStore,
-  watch,
   ref,
   Ref,
   onUnmounted,
+  ComputedRef,
 } from '@nuxtjs/composition-api'
-// Interfaces or types
-import { ServiceType, VuexModuleFilters } from '~/types/filters'
+// components
+import Heading from '@/components/lcontrol/Heading.vue'
+import CountriesWrapper from '@/components/lcontrol/CountriesWrapper.vue'
+import ServicesWrapper from '@/components/lcontrol/ServicesWrapper.vue'
+import ZoneWrapper from '@/components/lcontrol/ZoneWrapper.vue'
+import DefaultPartnerForm from '@/components/lcontrol/DefaultPartnerForm.vue'
+import CODPartnerForm from '@/components/lcontrol/CODPartnerForm.vue'
+import OtherPartnerForm from '@/components/lcontrol/OtherPartnerForm.vue'
+// types
 import {
+  CountryCode,
+  PortData,
+  ServiceType,
+  VuexModuleFilters,
+  ZoneData,
+} from '~/types/filters'
+import {
+  UserSelectedLControl,
   VuexModuleLControls,
-  Definition,
-  Rule,
-  RuleGroup,
 } from '~/types/lControl/lControl'
-import { VuexModuleMarketplaces } from '~/types/marketplace/marketplace'
-import { ModalConfirm, VuexModuleApplications } from '~/types/applications'
+import {
+  ModalConfirm,
+  Pagination,
+  VuexModuleApplications,
+} from '~/types/applications'
 
-export interface RulePayload {
-  data: {
-    definitions: Definition[]
-    partnerID: string
-    priority: number
-  }
-  id?: string
-  idRule?: string
-}
-
-export interface InputNPData {
-  partnerID: string
-  volume: number
-  index?: number
-  type?: string
-  idRule?: string
-  priority?: number
-  definitions?: Definition[]
+export interface IsOnServiceType {
+  customs: boolean
+  lastMile: boolean
 }
 
 export default defineComponent({
   name: 'LControl',
+  components: {
+    Heading,
+    CountriesWrapper,
+    ServicesWrapper,
+    ZoneWrapper,
+    DefaultPartnerForm,
+    CODPartnerForm,
+    OtherPartnerForm,
+  },
   layout: 'default',
   setup() {
+    // manage store
     const storeOfApplications = useStore<VuexModuleApplications>()
-    const storeMarketplaces = useStore<VuexModuleMarketplaces>()
+    const storeOfLControls = useStore<VuexModuleLControls>()
     const storeFilters = useStore<VuexModuleFilters>()
-    const storeLControls = useStore<VuexModuleLControls>()
-    const countryCodes = computed(() => storeFilters.state.filters.countryCodes)
-    const serviceTypes = computed(() => {
-      let filter = storeFilters.state.filters.serviceTypes
-      if (filter && filter.length > 0) {
-        filter = filter.filter(
-          (x: ServiceType) => x.name !== 'FREIGHT_FORWARDER'
-        )
-        const indexFM = filter.findIndex(
-          (x: ServiceType) => x.name === 'FIRST_MILE'
-        )
-        const indexCM = filter.findIndex(
-          (x: ServiceType) => x.name === 'CUSTOMS'
-        )
-        moveItem(indexFM, 0, filter)
-        moveItem(indexCM, 1, filter)
-      }
-      return filter
-    })
-    const zones = computed(() => storeFilters.state.filters.zones)
-    const ports = computed(() => storeFilters.state.filters.ports?.data) as any
-    const marketplaces = computed(
-      () =>
-        storeMarketplaces.state.marketplaces.marketplaces.marketplacesConnected
+    const lControlList = computed(
+      () => storeOfLControls.state.lControls.lControls
     )
-    const marketplacesCOD = computed(
-      () => storeMarketplaces.state.marketplaces.marketplaces.marketplacesCOD
-    )
-    const lControls = computed(() => {
-      return computeLControls(
-        storeLControls.state.lControls.lControls.lControls
-      )
-    })
+    const zones = computed(
+      () => storeFilters.state.filters.zones
+    ) as unknown as ComputedRef<ZoneData[]>
+    const ports = computed(
+      () => storeFilters.state.filters.ports?.data
+    ) as ComputedRef<PortData[]>
     const alert = computed(() => storeOfApplications.state.applications.alert)
-    const dialog = ref({
-      deleteRule: false,
-      idRule: '',
-      isChange: false,
-      status: '',
-    })
-    const dialogSettings = ref({
-      loading: false,
-      title: 'Are you sure you want to delete this?',
-      content: '',
-      cancelText: 'Cancel',
-      submitText: 'Delete',
-      submitColor: 'red white--text',
-    }) as Ref<ModalConfirm>
-    const lControlsCust = ref([]) as Ref<RuleGroup[] | []>
-    const zonesCust = ref([]) as Ref<any>
 
-    const CODpartnerSelected = ref({
-      status: false,
-      partnerID: '',
-      idRule: '',
-    }) as Ref<{ status: boolean; partnerID: string; idRule: string | unknown }>
-    const rulesComp = ref([]) as Ref<RulePayload[] | []>
+    const stateStore = { lControlList, zones, alert, ports }
+    // end manage store
 
-    const selected = ref({
-      countryIndex: null as { index: number; value: string } | null,
-      serviceIndex: null as { index: number; value: string } | null,
-      zoneIndex: null as { index: number; value: string; name?: string } | null,
-      portIndex: null as { index: number; value: string; name?: string } | null,
-      partnerID: '' as string,
-      useBOB: false as boolean,
-      ruleGroupID: '' as string,
-      rules: [] as any,
-      totalRulesPerZone: 0 as number,
-      ruleID: '' as string,
-      isUpdate: false as boolean,
-      priority: null as number | null,
-    })
+    const userSelected = ref({
+      useBOB: false,
+      country: {},
+      serviceType: {},
+      zone: {},
+      port: {},
+      defaultPartner: {
+        partnerID: '',
+      },
+      codPartner: {
+        partnerID: '',
+      },
+      primary: {
+        partnerID: '',
+        volume: 0,
+      },
+      secondary: {
+        partnerID: '',
+        volume: 0,
+      },
+      tertiary: {
+        partnerID: '',
+        volume: 0,
+      },
+    }) as Ref<UserSelectedLControl>
+    const resetUserSelected = {
+      serviceType: () => (userSelected.value.serviceType = {} as ServiceType),
+      zone: () => (userSelected.value.zone = {} as ZoneData),
+      port: () => (userSelected.value.port = {} as PortData),
+      form: () =>
+        (userSelected.value = {
+          ...userSelected.value,
+          defaultPartner: {
+            partnerID: '',
+          },
+          codPartner: {
+            partnerID: '',
+          },
+          primary: {
+            partnerID: '',
+            volume: 0,
+          },
+          secondary: {
+            partnerID: '',
+            volume: 0,
+          },
+          tertiary: {
+            partnerID: '',
+            volume: 0,
+          },
+        }),
+      cod: () =>
+        (userSelected.value = {
+          ...userSelected.value,
+          codPartner: {
+            partnerID: '',
+          },
+        }),
+      networkPartner: (index: number) => {
+        if (index === -1) return
 
-    const rulesByZone = ref({}) as any
+        if (index === 0) {
+          userSelected.value = {
+            ...userSelected.value,
+            primary: {
+              partnerID: '',
+              volume: 0,
+            },
+          }
+        } else if (index === 1) {
+          userSelected.value = {
+            ...userSelected.value,
+            secondary: {
+              partnerID: '',
+              volume: 0,
+            },
+          }
+        } else if (index === 2) {
+          userSelected.value = {
+            ...userSelected.value,
+            tertiary: {
+              partnerID: '',
+              volume: 0,
+            },
+          }
+        }
+      },
+    }
+    const showPortsOrZones = ref([]) as unknown as Ref<ZoneData[] | PortData[]>
+    // checking state for user selection service type
+    const isOnServiceType = computed(() => ({
+      customs: userSelected.value.serviceType.name === 'CUSTOMS',
+      lastMile: userSelected.value.serviceType.name === 'LAST_MILE',
+    })) as ComputedRef<IsOnServiceType>
+    const isSaveButtonDisabled = computed(
+      () => $fetchState.pending || !userSelected.value.defaultPartner.partnerID
+    )
 
+    // handle breadcrumbs
     const breadcrumbs = ref([
       {
-        text: isCustoms() ? 'PORT' : 'ZONE',
+        text: isOnServiceType.value.customs ? 'PORT' : 'ZONE',
         disabled: false,
         first: true,
-        // href: 'breadcrumbs_dashboard',
       },
     ]) as Ref<
       { text?: string; disabled: boolean; first?: boolean; href?: string }[]
     >
+    const resetBreadcrumbs = () =>
+      (breadcrumbs.value = [
+        {
+          text: isOnServiceType.value.customs ? 'PORT' : 'ZONE',
+          disabled: false,
+          first: true,
+        },
+      ])
+    // end handle breadcrumbs
 
-    // START Handle add network partner
-    const addNPData = ref([]) as Ref<InputNPData[] | []>
-    const dataPriority = ['Primary', 'Secondary', 'Tertiary']
+    // manage modal
+    const dialog = ref({
+      isOpen: false,
+      deleteOn: '',
+      indexNetworkPartner: -1,
+    })
+    const dialogSettings = ref({
+      loading: false,
+      title: 'Are you sure to delete this ?',
+      content: 'The data will be deleted permanently!',
+      cancelText: 'Cancel',
+      submitText: 'Delete',
+      submitColor: 'secondary white--text',
+    }) as Ref<ModalConfirm>
+    const stateModal = { dialog, dialogSettings }
+    // end manage modal
 
-    function handleAddNP() {
-      const newData = {
-        index: 0,
-        partnerID: '',
-        volume: 0,
-        type: 'RULE_TYPE_VOLUME_LIMIT',
-        idRule: '',
-      }
-      newData.index = addNPData.value.length
-      addNPData.value = [...addNPData.value, newData]
-    }
+    const handleSelections = {
+      // function for handle user country selection
+      country: async ({ data }: { data: CountryCode }) => {
+        // set country data based on user selected and reset service type, port, zone and form
+        userSelected.value.country = data
+        resetUserSelected.serviceType()
+        resetUserSelected.zone()
+        resetUserSelected.port()
+        resetUserSelected.form()
 
-    watch(
-      () => [addNPData],
-      ([newNPData]) => {
-        localStorage.setItem('addNPData', JSON.stringify(newNPData.value))
-      },
-      { deep: true }
-    )
+        try {
+          $fetchState.pending = true
 
-    watch(
-      () => [selected.value.rules, dialog.value.isChange],
-      ([newRules, newStatusChange], [oldRules]) => {
-        let rulesVolume = JSON.parse(
-          localStorage.getItem('addNPData') as string
-        ) as InputNPData[]
-        if (
-          (!rulesVolume ||
-            (rulesVolume && rulesVolume.length === 0) ||
-            newStatusChange ||
-            newRules.length !== oldRules.length) &&
-          dialog.value.status !== 'COD'
-        ) {
-          rulesVolume = newRules.filter((el: any) =>
-            el.data?.definitions.some(
-              (x: any) => x.type === 'RULE_TYPE_VOLUME_LIMIT'
-            )
-          )
-
-          rulesVolume = rulesVolume.map((x: any, i: number) => {
-            return {
-              index: i + 1,
-              partnerID: x.data.partnerID,
-              volume: Number(
-                x.data.definitions.filter(
-                  (y: Definition) => y.type === 'RULE_TYPE_VOLUME_LIMIT'
-                )[0].value
-              ),
-              type: 'RULE_TYPE_VOLUME_LIMIT',
-              idRule: x.idRule,
-              priority: x.data.priority,
-              definitions: x.data.definitions ?? [],
-            }
+          // fetch service type and lcontrol data
+          await fetchServices()
+          await getLControl({
+            country: data.value,
+            serviceType: 'LAST_MILE',
           })
-          dialog.value.isChange = false
+        } catch (error) {
+          return error
+        } finally {
+          setTimeout(() => {
+            $fetchState.pending = false
+          }, 1500)
         }
-        addNPData.value = rulesVolume
       },
-      { deep: true }
-    )
-    // END Handle add network partner
+      // function for handle user service selection
+      service: async ({ data }: { data: ServiceType }) => {
+        // set service type data based on user selected and reset zone, port, and form
+        userSelected.value.serviceType = data
+        resetBreadcrumbs()
+        resetUserSelected.zone()
+        resetUserSelected.port()
+        resetUserSelected.form()
 
-    watch(
-      () => [selected.value.serviceIndex],
-      ([newService]) => {
-        if (newService?.value === 'CUSTOMS') {
-          breadcrumbs.value = [
-            {
-              text: 'PORT',
-              disabled: false,
-              first: true,
-              // href: 'breadcrumbs_dashboard',
-            },
-          ]
+        try {
+          $fetchState.pending = true
+
+          // for customs will fetch ports, else will fetch zones
+          if (data.name === 'CUSTOMS') {
+            portsMeta.value = {
+              page: 1,
+              itemsPerPage: 10,
+            }
+            await getPorts(portsMeta.value)
+            showPortsOrZones.value = ports.value
+          } else {
+            await fetchZones()
+            showPortsOrZones.value = zones.value
+          }
+
+          // fetch partners connected and lcontrol data
+          await fetchMarketplace({
+            country: userSelected.value.country.value,
+            service: userSelected.value.serviceType.name,
+            isConnected: true,
+          })
+          await getLControl({
+            country: userSelected.value.country.value,
+            serviceType: data.name,
+          })
+        } catch (error) {
+          return error
+        } finally {
+          setTimeout(() => {
+            $fetchState.pending = false
+          }, 1500)
+        }
+      },
+      // function for handle user zone selection
+      zone: async ({ data }: { data: ZoneData | PortData }) => {
+        breadcrumbs.value = [
+          ...breadcrumbs.value,
+          {
+            text: isOnServiceType.value.customs
+              ? (data as PortData).name
+              : (data as ZoneData).zoneName,
+            disabled: false,
+          },
+        ]
+
+        // for customs will set to port dara, else will set zone data
+        if (isOnServiceType.value.customs) {
+          userSelected.value.port = data as PortData
         } else {
-          breadcrumbs.value = [
-            {
-              text: 'ZONE',
-              disabled: false,
-              first: true,
-              // href: 'breadcrumbs_dashboard',
-            },
-          ]
+          userSelected.value.zone = data as ZoneData
+        }
+
+        try {
+          $fetchState.pending = true
+
+          // fetch partners connected
+          await fetchMarketplace({
+            country: userSelected.value.country.value,
+            service: userSelected.value.serviceType.name,
+            zone: isOnServiceType.value.lastMile
+              ? userSelected.value.zone.id
+              : userSelected.value.port.id,
+            isConnected: true,
+          })
+
+          // fetch partners connected on cod for last mile
+          if (isOnServiceType.value.lastMile) {
+            await fetchMarketplace({
+              country: userSelected.value.country.value,
+              service: userSelected.value.serviceType.name,
+              zone: userSelected.value.zone.id,
+              isCOD: true,
+              isConnected: true,
+            })
+          }
+
+          await getLControl({
+            country: userSelected.value.country.value,
+            serviceType: userSelected.value.serviceType.name,
+            isForZone: true,
+          })
+        } catch (error) {
+          return error
+        } finally {
+          setTimeout(() => {
+            $fetchState.pending = false
+          }, 1500)
         }
       },
-      { deep: true }
-    )
-
-    function moveItem(from: number, to: number, data: any) {
-      // remove `from` item and store it
-      const f = data.splice(from, 1)[0]
-      // insert stored item into position `to`
-      data.splice(to, 0, f)
     }
-    const fetchCountryCodes = async () => {
+    const handleBackToZoneSelection = () => {
+      handleSelections.service({ data: userSelected.value.serviceType })
+    }
+    const handleDeleteForm = (deleteOn: string, indexNetworkPartner = -1) => {
+      dialogSettings.value.loading = true
+      dialog.value = {
+        isOpen: true,
+        deleteOn,
+        indexNetworkPartner,
+      }
+
+      setTimeout(() => {
+        dialogSettings.value.loading = false
+      }, 1500)
+    }
+    const handleDeleteModal = async () => {
+      if (!dialog.value.deleteOn) return
+
+      dialogSettings.value.loading = true
+      $fetchState.pending = true
+
+      switch (dialog.value.deleteOn) {
+        case 'cod':
+          resetUserSelected.cod()
+          break
+        case 'networkPartner':
+          resetUserSelected.networkPartner(dialog.value.indexNetworkPartner)
+          break
+      }
+
+      await handleSubmit()
+      setTimeout(() => {
+        $fetchState.pending = false
+        dialogSettings.value.loading = false
+        dialog.value = {
+          isOpen: false,
+          deleteOn: '',
+          indexNetworkPartner: -1,
+        }
+      }, 1500)
+    }
+    const handleSubmit = async () => {
+      const { customs, lastMile } = isOnServiceType.value
+      const {
+        country,
+        serviceType,
+        zone,
+        port,
+        defaultPartner,
+        codPartner,
+        primary,
+        secondary,
+        tertiary,
+      } = userSelected.value
+      // set data before hit endpoint
+      const data = {
+        country: country.value,
+        serviceType: serviceType.name,
+        zoneID: lastMile ? zone.id : '',
+        portID: customs ? port.id : '',
+        defaultPartner: {
+          partnerID: defaultPartner.partnerID || null,
+        },
+        codPartner: {
+          partnerID: codPartner.partnerID || null,
+        },
+        primaryPartner: {
+          partnerID: primary.partnerID || null,
+          volume: primary.volume ? primary.volume?.toString() : null,
+        },
+        secondaryPartner: {
+          partnerID: secondary.partnerID || null,
+          volume: secondary.volume ? secondary.volume?.toString() : null,
+        },
+        tertiaryPartner: {
+          partnerID: tertiary.partnerID || null,
+          volume: tertiary.volume ? tertiary.volume.toString() : null,
+        },
+      }
+
       try {
         $fetchState.pending = true
-
-        await storeFilters.dispatch('filters/getCountryCodes', {
-          params: { isActive: true },
+        await storeOfLControls.dispatch('lControls/updateLControl', data)
+        await getLControl({
+          country: userSelected.value.country.value,
+          serviceType: userSelected.value.serviceType.name,
+          isForZone: true,
         })
       } catch (error) {
         return error
       } finally {
+        $fetchState.pending = false
+      }
+    }
+    const stateOther = {
+      userSelected,
+      showPortsOrZones,
+      isOnServiceType,
+      isSaveButtonDisabled,
+      handleSelections,
+      handleBackToZoneSelection,
+      handleDeleteForm,
+      handleDeleteModal,
+      handleSubmit,
+    }
+
+    // manage bob
+    const handleBob = async (value: boolean) => {
+      try {
+        $fetchState.pending = true
+        resetUserSelected.serviceType()
+        resetUserSelected.port()
+        resetUserSelected.zone()
+        resetUserSelected.form()
+
+        if (value) {
+          // use bob
+          await storeOfLControls.dispatch(
+            `lControls/addBOB`,
+            userSelected.value.country.value
+          )
+        } else {
+          // delete bob
+          await storeOfLControls.dispatch(
+            'lControls/deleteBOB',
+            userSelected.value.country.value
+          )
+        }
+
+        await handleSelections.country({ data: userSelected.value.country })
+      } catch (error) {
+        return error
+      } finally {
         setTimeout(() => {
           $fetchState.pending = false
         }, 1500)
+      }
+    }
+    // end manage bob
+
+    // manage fetch
+    const getLControl = async ({
+      country,
+      serviceType,
+      isForZone = false,
+    }: {
+      country: string
+      serviceType: string
+      isForZone?: boolean
+    }) => {
+      try {
+        await storeOfLControls.dispatch('lControls/getAllLControl', {
+          country,
+          serviceType,
+        })
+      } catch (error) {
+        return error
+      }
+
+      const lControlDetail = lControlList.value.find((lcontrol) =>
+        isOnServiceType.value.lastMile
+          ? lcontrol.zoneID === userSelected.value.zone.id
+          : lcontrol.portID === userSelected.value.port.id
+      )
+
+      // is useBOB
+      userSelected.value.useBOB = lControlList.value.length
+        ? lControlList.value.every((lcontrol) => lcontrol.useBOB)
+        : false
+
+      if (!lControlList.value.length && lControlDetail && !isForZone) return
+
+      // set a user selected data based on lcontrol detail for the selected zone
+      userSelected.value = {
+        ...userSelected.value,
+        defaultPartner: {
+          partnerID: lControlDetail?.defaultPartner.partnerID || '',
+        },
+        codPartner: {
+          partnerID: lControlDetail?.codPartner?.partnerID || '',
+        },
+        primary: {
+          partnerID: lControlDetail?.primaryPartner?.partnerID || '',
+          volume: lControlDetail?.primaryPartner?.volume || 0,
+        },
+        secondary: {
+          partnerID: lControlDetail?.secondaryPartner?.partnerID || '',
+          volume: lControlDetail?.secondaryPartner?.volume || 0,
+        },
+        tertiary: {
+          partnerID: lControlDetail?.tertiaryPartner?.partnerID || '',
+          volume: lControlDetail?.tertiaryPartner?.volume || 0,
+        },
       }
     }
     const fetchServices = async () => {
       try {
-        $fetchState.pending = true
-
-        await storeFilters.dispatch('filters/getServiceTypes')
+        return await storeFilters.dispatch('filters/getServiceTypes')
       } catch (error) {
         return error
-      } finally {
-        setTimeout(() => {
-          $fetchState.pending = false
-        }, 1500)
       }
     }
-    const getPorts = async () => {
-      await storeFilters.dispatch('filters/getPorts', {
-        params: {
-          page: 1,
-          perPage: 1000,
-        },
-        country: selected.value.countryIndex?.value,
-      })
+    const portsMeta = ref({
+      page: 1,
+      itemsPerPage: 10,
+    }) as Ref<Pagination>
+    const getPorts = async (params: Pagination) => {
+      try {
+        const { page, itemsPerPage: perPage } = params
+
+        return await storeFilters.dispatch('filters/getPorts', {
+          params: {
+            page,
+            perPage,
+          },
+          country: userSelected.value.country.value,
+        })
+      } catch (error) {
+        return error
+      }
     }
     const fetchZones = async () => {
       try {
-        $fetchState.pending = true
-        const params = {
-          country: selected.value.countryIndex?.value,
-        }
-        await storeFilters.dispatch('filters/getZones', { params })
+        return await storeFilters.dispatch('filters/getZones', {
+          params: {
+            country: userSelected.value.country.value,
+          },
+        })
       } catch (error) {
         return error
-      } finally {
-        setTimeout(() => {
-          $fetchState.pending = false
-        }, 1500)
       }
     }
     const fetchMarketplace = async (params: {
@@ -693,7 +711,7 @@ export default defineComponent({
         zone?: string
         port?: string
       }
-      if (isCustoms()) {
+      if (isOnServiceType.value.customs) {
         delete dataParams?.zone
         dataParams = {
           ...dataParams,
@@ -702,9 +720,10 @@ export default defineComponent({
       }
 
       try {
-        $fetchState.pending = true
         let routePath = 'getMarketplaces'
+
         if (params.isConnected) routePath = 'getMarketplacesConnected'
+
         await storeFilters.dispatch(`marketplaces/marketplaces/${routePath}`, {
           params: dataParams,
           isLControl: params.isLControl,
@@ -712,920 +731,32 @@ export default defineComponent({
         })
       } catch (error) {
         return error
-      } finally {
-        setTimeout(() => {
-          $fetchState.pending = false
-        }, 1500)
       }
     }
-    const fetchRuleGroups = async () => {
-      try {
-        $fetchState.pending = true
-
-        await storeLControls.dispatch('lControls/lControls/getLControls', {
-          params: {},
-        })
-
-        if (selected.value.zoneIndex?.value) {
-          selected.value.rules = parsingRulesPayload(
-            rulesByZone.value[selected.value.zoneIndex?.value as string].rules
-          )
-          rulesComp.value = parsingRulesPayload(
-            rulesByZone.value[selected.value.zoneIndex?.value as string].rules
-          ) as RulePayload[]
-
-          selected.value.isUpdate = !!selected.value.ruleGroupID
-        }
-      } catch (error) {
-        return error
-      } finally {
-        setTimeout(() => {
-          $fetchState.pending = false
-        }, 1500)
-      }
-    }
-
-    const indexSelect = async (
-      data: { index: number; value: string; name?: string; data?: any },
-      type: string
-    ) => {
-      switch (type) {
-        case 'country':
-          selected.value.countryIndex = { index: data.index, value: data.value }
-          // FETCH SERVICE if vuex is still empty
-          if (serviceTypes.value?.length === 0) {
-            await fetchServices()
-          }
-          break
-        case 'service':
-          selected.value.serviceIndex = { index: data.index, value: data.value }
-          // FETCH ZONE BY COUNTRY
-          if (selected.value.serviceIndex.value === 'CUSTOMS') {
-            await getPorts()
-          } else {
-            await fetchZones()
-          }
-          break
-        case 'zone':
-          selected.value.zoneIndex = {
-            index: data.index,
-            value: data.value,
-            name: data.name,
-          }
-          breadcrumbs.value = [
-            ...breadcrumbs.value,
-            {
-              text: data.name,
-              disabled: false,
-              // href: 'breadcrumbs_link_1',
-            },
-          ]
-          // FETCH PARTNER BY COUNTRY, SERVICE, ZONE
-          await fetchMarketplace({
-            country: selected.value.countryIndex?.value,
-            service: selected.value.serviceIndex?.value,
-            zone: selected.value.zoneIndex.value,
-            isConnected: true,
-          })
-          if (selected.value.serviceIndex?.value === 'LAST_MILE') {
-            await fetchMarketplace({
-              country: selected.value.countryIndex?.value,
-              service: selected.value.serviceIndex?.value,
-              zone: selected.value.zoneIndex.value,
-              isCOD: true,
-              isConnected: true,
-            })
-          }
-
-          selected.value.partnerID = data.data.partnerID
-          selected.value.ruleGroupID = data.data.ruleGroupID
-          selected.value.totalRulesPerZone = data.data.totalRulesPerZone
-          selected.value.rules = data.data.rules
-          selected.value.ruleID = data.data.ruleID
-          // selected.value.priority = data.data.priority
-          selected.value.isUpdate = !!data.data.ruleGroupID
-
-          if (
-            checkDefinition({
-              data: [...selected.value.rules].map((y) => y.data),
-              type: 'RULE_TYPE_IS_COD',
-            })
-          ) {
-            const dataCOD = checkDefinition({
-              data: [...selected.value.rules].map((y) => y.data),
-              type: 'RULE_TYPE_IS_COD',
-              isFilter: true,
-            }) as Rule
-
-            CODpartnerSelected.value.partnerID = dataCOD.partnerID
-            CODpartnerSelected.value.status = true
-          }
-          break
-        default:
-          break
-      }
-    }
-    function checkDefinition({
-      data,
-      type,
-      isFilter,
-    }: {
-      data: Rule[]
-      type: string
-      isFilter?: boolean
-    }) {
-      if (isFilter) {
-        return (
-          [...data].filter(
-            (x: Rule) =>
-              x?.definitions && x.definitions.some((y) => y.type === type)
-          )[0] ?? {}
-        )
-      } else {
-        return [...data].some((x: Rule) => {
-          return (
-            x?.definitions &&
-            x.definitions.some((y) => {
-              return y.type === type
-            })
-          )
-        })
-      }
-    }
-    // LOGIC FETCH DATA
-    watch(
-      () => [
-        storeLControls.state.lControls.lControls.lControls,
-        selected.value.countryIndex?.value,
-        selected.value.serviceIndex?.value,
-        selected.value.partnerID,
-        CODpartnerSelected.value.partnerID,
-        selected.value.ruleGroupID,
-        dialog.value.deleteRule,
-        selected.value.rules,
-        selected.value.totalRulesPerZone,
-        selected.value.priority,
-        addNPData,
-      ],
-      ([
-        newLControl,
-        countryValue,
-        serviceValue,
-        partnerDefault,
-        CODpartner,
-        newRGID,
-        newDialogDelete,
-        newRules,
-        newTotalRules,
-        newPriority,
-        newNPdata,
-      ]) => {
-        let rules = [...newRules] as any
-        const totalRules = newTotalRules as number
-        const priorityTemp = newPriority ?? 0
-        const temp = {
-          id: selected.value.ruleGroupID,
-          data: {
-            partnerID: selected.value.partnerID,
-            priority: 1,
-            definitions: [
-              {
-                type: isCustoms() ? 'RULE_TYPE_PORT' : 'RULE_TYPE_ZONE',
-                value: selected.value.zoneIndex?.value,
-              },
-            ],
-          },
-        }
-
-        if (
-          !checkDefinition({
-            data: [...rules].map((y) => y.data),
-            type: isCustoms() ? 'RULE_TYPE_PORT' : 'RULE_TYPE_ZONE',
-          })
-        ) {
-          rules = [...rules, temp]
-        } else if (
-          checkDefinition({
-            data: [...rules].map((y) => y.data),
-            type: isCustoms() ? 'RULE_TYPE_PORT' : 'RULE_TYPE_ZONE',
-          })
-        ) {
-          const indexCOD = rules.findIndex((el: any) =>
-            el.data.definitions.some((x: any) =>
-              x.type === isCustoms() ? 'RULE_TYPE_PORT' : 'RULE_TYPE_ZONE'
-            )
-          )
-          rules[indexCOD].data.partnerID = partnerDefault
-        }
-
-        if (
-          CODpartnerSelected.value.partnerID &&
-          !checkDefinition({
-            data: [...rules].map((y) => y.data),
-            type: 'RULE_TYPE_IS_COD',
-          })
-        ) {
-          const cod = {
-            id: selected.value.ruleGroupID,
-            data: {
-              partnerID: CODpartnerSelected.value.partnerID,
-              priority: 99,
-              definitions: [
-                {
-                  type: 'RULE_TYPE_IS_COD',
-                  value: selected.value.zoneIndex?.value,
-                },
-              ],
-            },
-          }
-          rules = [...rules, cod]
-        } else if (
-          checkDefinition({
-            data: [...rules].map((y) => y.data),
-            type: 'RULE_TYPE_IS_COD',
-          })
-        ) {
-          const indexCOD = rules.findIndex((el: any) =>
-            el.data.definitions.some((x: any) => x.type === 'RULE_TYPE_IS_COD')
-          )
-          rules[indexCOD].data.partnerID = CODpartner
-        }
-
-        // START Input new data
-        let npData = newNPdata.value
-
-        npData = [...npData].map((x: InputNPData, i: number) => {
-          return {
-            idRule: x.idRule,
-            id: selected.value.ruleGroupID,
-            data: {
-              partnerID: x.partnerID,
-              priority: i + 2,
-              definitions:
-                x.definitions && x.definitions.length > 0
-                  ? x.definitions.map((z: Definition) => {
-                      let temp = z
-                      switch (z?.type) {
-                        case 'RULE_TYPE_ZONE':
-                          temp = {
-                            ...temp,
-                            value: selected.value.zoneIndex?.value ?? '',
-                          }
-                          break
-                        case 'RULE_TYPE_VOLUME_LIMIT':
-                          temp = {
-                            ...temp,
-                            value: String(x.volume),
-                          }
-                          break
-                        default:
-                          break
-                      }
-                      return temp
-                    })
-                  : [
-                      {
-                        type: 'RULE_TYPE_ZONE',
-                        value: selected.value.zoneIndex?.value,
-                      },
-                      {
-                        type: x.type,
-                        value: String(x.volume),
-                      },
-                    ],
-            },
-          }
-        })
-        rules = [...rules, ...npData]
-        // END Input new data
-
-        rulesComp.value = rules
-      },
-      { deep: true }
-    )
-    const updateDefinition = async (data: Definition[]) => {
-      try {
-        const payload = [...data]
-          .filter((y: Definition) => {
-            return (
-              y.type !== 'RULE_TYPE_ZONE' &&
-              y.type !== 'RULE_TYPE_IS_COD' &&
-              y.type !== 'RULE_TYPE_PORT'
-            )
-          })
-          .map((x: Definition) => {
-            return {
-              id: x.id,
-              data: {
-                value: x.value,
-              },
-            }
-          })
-
-        await Promise.all(
-          payload.map(async (el: any) => {
-            try {
-              await storeLControls.dispatch(
-                'lControls/lControls/updateDefinition',
-                el
-              )
-            } catch (error) {
-              return error
-            }
-          })
-        )
-      } catch (error) {
-        return error
-      }
-    }
-    // handle bob
-    const addBOB = async () => {
-      try {
-        $fetchState.pending = true
-
-        await storeLControls.dispatch(
-          `lControls/lControls/addBOB`,
-          selected.value.countryIndex?.value
-        )
-      } catch (error) {
-        return error
-      } finally {
-        setTimeout(() => {
-          $fetchState.pending = false
-        }, 1500)
-      }
-    }
-    const deleteBOB = async () => {
-      try {
-        $fetchState.pending = true
-
-        await storeLControls.dispatch(
-          'lControls/lControls/deleteBOB',
-          selected.value.countryIndex?.value
-        )
-      } catch (error) {
-        return error
-      } finally {
-        setTimeout(() => {
-          $fetchState.pending = false
-        }, 1500)
-      }
-    }
-
-    // fetch all
-    const { $fetchState } = useFetch(async () => {
+    const { $fetchState } = useFetch(() => {
       setTimeout(() => {
         storeOfApplications.commit('applications/RESET_ALERT')
       }, 3000)
-      // FETCH COUNTRY
-      await fetchMarketplace({
-        country: selected.value.countryIndex?.value,
-        service: selected.value.serviceIndex?.value,
-        isConnected: true,
-      })
-      await fetchCountryCodes()
-      await fetchRuleGroups()
-      lControlsCust.value = [
-        ...storeLControls.state.lControls.lControls.lControls,
-      ]
     })
-
-    // handle rule group and rules
-    const handleRuleGroup = {
-      add: async () => {
-        try {
-          $fetchState.pending = true
-
-          const data = {
-            defaultPartnerID: selected.value.partnerID,
-            serviceType: selected.value.serviceIndex?.value,
-            countryCode: selected.value.countryIndex?.value,
-          }
-          const res = await storeLControls.dispatch(
-            'lControls/lControls/addRuleGroup',
-            data
-          )
-
-          if (res) {
-            selected.value.ruleGroupID = res?.id
-          }
-
-          return res
-        } catch (error: any) {
-          return error
-        } finally {
-          $fetchState.pending = false
-        }
-      },
-      update: async () => {
-        try {
-          return await storeLControls.dispatch(
-            'lControls/lControls/updateRuleGroup',
-            {
-              defaultPartnerID: selected.value.partnerID,
-              ruleGroupID: selected.value.ruleGroupID,
-            }
-          )
-        } catch (error) {
-          return error
-        }
-      },
-    }
-    const handleRules = {
-      add: async (data: any) => {
-        try {
-          await storeLControls.dispatch('lControls/lControls/addRules', data)
-        } catch (error) {
-          return error
-        }
-      },
-      update: async (data: any) => {
-        try {
-          await storeLControls.dispatch('lControls/lControls/updateRules', {
-            id: data.idRule,
-            data: {
-              partnerID: data.data.partnerID,
-              priority: data.data.priority,
-            },
-          })
-        } catch (error) {
-          return error
-        }
-      },
-    }
-
-    const deleteRules = async ({ idRule }: { idRule?: string }) => {
-      try {
-        $fetchState.pending = true
-        dialogSettings.value.loading = true
-
-        await storeLControls.dispatch('lControls/lControls/deleteRules', {
-          ruleID: idRule,
-        })
-        // start localstorage
-        // const index = addNPData.value.findIndex((x: InputNPData) => x.idRule === dialog.value.idRule)
-        // addNPData.value.splice(index, 1);
-        // end localstorage
-        dialog.value.idRule = ''
-        dialog.value.isChange = true
-
-        if (dialog.value.status === 'COD') {
-          CODpartnerSelected.value.idRule = ''
-          CODpartnerSelected.value.partnerID = ''
-          CODpartnerSelected.value.status = false
-          // dialog.value.status = ''
-        }
-
-        await fetchRuleGroups()
-        await btnAction()
-      } catch (error) {
-        return error
-      } finally {
-        setTimeout(() => {
-          dialogSettings.value.loading = false
-          dialog.value.deleteRule = false
-          $fetchState.pending = false
-        }, 1500)
-      }
-    }
-    const handleInfoCOD = (partnerID: string) => {
-      return marketplacesCOD.value.some((x) => x.id === partnerID)
-    }
-    const btnAction = async () => {
-      let actionsMessage = ''
-
-      try {
-        $fetchState.pending = true
-
-        // handle update and add rule group
-        let responseRuleGroup = {} as any
-        if (selected.value.isUpdate && selected.value.ruleGroupID) {
-          actionsMessage = 'updated'
-          responseRuleGroup = await handleRuleGroup.update()
-        } else {
-          actionsMessage = 'added'
-          responseRuleGroup = await handleRuleGroup.add()
-        }
-
-        // eslint-disable-next-line no-prototype-builtins
-        if (!responseRuleGroup.hasOwnProperty('id'))
-          throw new Error(`Failed to ${actionsMessage} L-Control rules!`)
-
-        await Promise.all(
-          rulesComp.value.map(async (el: any) => {
-            /* SET DATA FOR CUSTOMS */
-            // set the type definition for Customs
-            if (isCustoms()) {
-              el.data.definitions[0].type = 'RULE_TYPE_PORT'
-            }
-
-            /* SET DATA FOR LAST MILE */
-            // set the priority for Network Partner (primary, secondary, tertiary) before hit endpoint (currently it's just for Last Mile)
-            if (el.data.definitions.length > 1 && el.idRule) {
-              const findPriorityNP = addNPData.value.find(
-                (rule) => rule.idRule === el.idRule
-              )
-
-              el.data.priority = Number(findPriorityNP?.index) + 1
-            }
-
-            // handle add and update rules
-            try {
-              if (el.idRule && selected.value.isUpdate) {
-                if (el.data.partnerID) await handleRules.update(el)
-                await updateDefinition(el.data.definitions)
-              } else {
-                await handleRules.add(el)
-              }
-            } catch (error) {
-              return error
-            }
-          })
-        )
-
-        storeOfApplications.commit('applications/SET_ALERT', {
-          isShow: true,
-          type: 'success',
-          message: `Successfully ${actionsMessage} L-Control rules!`,
-        })
-        dialog.value.status = `Successfully ${actionsMessage} L-Control!`
-        await fetchRuleGroups()
-      } catch (error: any) {
-        storeOfApplications.commit('applications/SET_ALERT', {
-          isShow: true,
-          type: 'error',
-          message: `Failed ${actionsMessage} L-Control rules!`,
-        })
-        dialog.value.status = error.message
-
-        return error
-      } finally {
-        setTimeout(() => {
-          dialog.value.status = ''
-          $fetchState.pending = false
-        }, 1500)
-        setTimeout(() => {
-          storeOfApplications.commit('applications/RESET_ALERT')
-        }, 3000)
-      }
-    }
-    const handleBob = async (e: boolean) => {
-      try {
-        if (e) {
-          await addBOB()
-        } else {
-          await deleteBOB()
-        }
-        await fetchRuleGroups()
-      } catch (error) {
-        return error
-      }
-    }
-    const backBtnHandler = () => {
-      selected.value.zoneIndex = null
-      breadcrumbs.value = [breadcrumbs.value[0]]
-    }
-    function computeLControls(data: RuleGroup[]) {
-      return data
-    }
-    function findNamePartner(id: string) {
-      if (marketplaces.value && marketplaces.value.length > 0) {
-        return marketplaces.value.filter((x) => x.id === id)[0]?.name
-      }
-    }
-    function isCustoms() {
-      return selected.value.serviceIndex?.value === 'CUSTOMS'
-    }
-    function handleCOD() {
-      CODpartnerSelected.value.status = !CODpartnerSelected.value.status
-    }
-    function handleDeleteRule({
-      isCOD,
-      isVolume,
-    }: {
-      isCOD?: Boolean
-      isVolume?: { index: number; status: Boolean }
-    }) {
-      dialog.value.status = ''
-      if (isCOD) {
-        const indexCOD = selected.value.rules.findIndex((el: RulePayload) =>
-          el.data.definitions.some(
-            (x: Definition) => x.type === 'RULE_TYPE_IS_COD'
-          )
-        )
-        const idRule = selected.value.rules[indexCOD]?.idRule
-
-        if (
-          indexCOD === -1 ||
-          selected.value.rules.some((el: RulePayload) => !el.idRule)
-        ) {
-          CODpartnerSelected.value.status = false
-          CODpartnerSelected.value.partnerID = ''
-        } else {
-          dialog.value.deleteRule = true
-          dialog.value.idRule = idRule
-          dialog.value.status = 'COD'
-        }
-
-        CODpartnerSelected.value.idRule = idRule
-      }
-
-      if (isVolume?.status) {
-        const index = addNPData.value.findIndex(
-          (x: InputNPData) => x.index === isVolume.index
-        )
-
-        if (
-          index > -1 &&
-          !addNPData.value[index].idRule
-          // addNPData.value.some((el: InputNPData) => !el.idRule)
-        ) {
-          addNPData.value.splice(index, 1)
-        } else {
-          dialog.value.deleteRule = true
-          dialog.value.idRule = addNPData.value[index]?.idRule ?? ''
-        }
-      }
-    }
+    const stateFetch = { getLControl, portsMeta, getPorts }
+    // end manage fetch
 
     onUnmounted(() => {
       storeOfApplications.commit('applications/RESET_ALERT')
-      // DELETE SERVICE ON VUEX
-      localStorage.removeItem('addNPData')
-      dialog.value.status = ''
     })
 
-    watch(
-      () => [selected.value.useBOB],
-      ([newUseBOB]) => {
-        if (newUseBOB) {
-          breadcrumbs.value = [breadcrumbs.value[0]]
-          selected.value.zoneIndex = null
-          selected.value.serviceIndex = null
-        }
-      },
-      { deep: true }
-    )
-
-    watch(
-      () => [selected.value.countryIndex],
-      ([newCountryIndex]) => {
-        if (newCountryIndex !== null) {
-          breadcrumbs.value = [breadcrumbs.value[0]]
-          selected.value.zoneIndex = null
-          selected.value.serviceIndex = null
-          selected.value.useBOB = false
-        }
-
-        if (newCountryIndex) {
-          const countryID = newCountryIndex.value
-          if (lControls.value && lControls.value.length > 0) {
-            const temp = [...lControls.value]
-            let isUseBOB = false
-            temp.forEach((el: RuleGroup) => {
-              if (el.countryCode === countryID && el.useBOB) {
-                isUseBOB = true
-              }
-            })
-            selected.value.useBOB = isUseBOB
-          }
-        }
-      },
-      { deep: true }
-    )
-
-    watch(
-      () => [selected.value.serviceIndex],
-      () => {
-        backBtnHandler()
-      },
-      { deep: true }
-    )
-
-    watch(
-      () => [
-        selected.value.countryIndex,
-        selected.value.serviceIndex,
-        selected.value.zoneIndex,
-      ],
-      () => {
-        selected.value.partnerID = ''
-        CODpartnerSelected.value.status = false
-        CODpartnerSelected.value.partnerID = ''
-        CODpartnerSelected.value.idRule = ''
-        rulesComp.value = []
-        addNPData.value = []
-        localStorage.removeItem('addNPData')
-        dialog.value.status = ''
-      },
-      { deep: true }
-    )
-
-    function parsingRulesPayload(data: Rule[]) {
-      const rules =
-        data &&
-        [...data].map((el) => {
-          return {
-            id: el.ruleGroupID,
-            idRule: el.id,
-            data: {
-              partnerID: el.partnerID,
-              priority: el.priority,
-              definitions:
-                el.definitions && el.definitions.length > 0
-                  ? el.definitions.map((x) => {
-                      return {
-                        id: x.id,
-                        type: x.type,
-                        value: x.value,
-                      }
-                    })
-                  : null,
-            },
-          }
-        })
-      return rules ?? []
-    }
-
-    watch(
-      () => [
-        selected.value.countryIndex,
-        selected.value.serviceIndex,
-        selected.value.zoneIndex,
-        selected.value.portIndex,
-        zones,
-        ports,
-        storeLControls.state.lControls.lControls.lControls,
-      ],
-      ([
-        newCountryIndex,
-        newServiceIndex,
-        newZoneIndex,
-        newPortIndex,
-        newZones,
-        newPorts,
-        newLControl,
-      ]) => {
-        let temp = [...lControls.value] as RuleGroup[]
-        if (newCountryIndex) {
-          temp = temp.filter(
-            (el: RuleGroup) => el.countryCode === newCountryIndex?.value
-          )
-        }
-        if (newServiceIndex) {
-          temp = temp.filter(
-            (el: RuleGroup) => el.serviceType === newServiceIndex?.value
-          )
-        }
-
-        const tempNewData = isCustoms() ? newPorts : newZones
-
-        if (tempNewData && tempNewData.value?.length > 0) {
-          let computeZone = isCustoms()
-            ? [...newPorts.value]
-            : [...newZones.value]
-
-          const ObjRulesByZone = {} as any
-          computeZone = computeZone.map((el: any) => {
-            let partnerID = '' as any
-            let partnerName = '' as any
-            let ruleID = '' as any
-            let ruleGroupID = '' as any
-            let serviceType = '' as any
-            let priority = null as any
-            let totalRulesPerZone = 0 as number
-            // let definitions = [] as any
-            let rules = [] as any
-            ObjRulesByZone[el.id] = {
-              rules: temp.map((d: RuleGroup) => {
-                const filter =
-                  d.Rules &&
-                  d.Rules.filter((x: Rule) =>
-                    x.definitions.some((y: Definition) => y.value === el.id)
-                  )
-                return filter
-              })[0],
-            }
-            selected.value.priority = temp.map((d: RuleGroup) => {
-              const filter =
-                d.Rules &&
-                [...d.Rules].sort((a, b) => b.priority - a.priority)[0]
-              return filter?.priority
-            })[0]
-              ? temp.map((d: RuleGroup) => {
-                  const filter =
-                    d.Rules &&
-                    [...d.Rules].sort((a, b) => b.priority - a.priority)[0]
-                  return filter?.priority
-                })[0]
-              : 0
-            if (temp && temp.length > 0) {
-              temp.forEach((d: RuleGroup) => {
-                ruleGroupID = d.id
-                serviceType = d.serviceType
-                if (d.Rules && d.Rules.length > 0)
-                  totalRulesPerZone = d.Rules.length
-                rules = parsingRulesPayload(ObjRulesByZone[el.id].rules)
-
-                if (
-                  ObjRulesByZone[el.id].rules &&
-                  ObjRulesByZone[el.id].rules.length > 0
-                ) {
-                  // selected.value.priority = Math.max(...ObjRulesByZone[el.id].rules.map((o: any) => o.priority))
-                  // const highestPriority = [...ObjRulesByZone[el.id].rules].sort((a, b) => b.priority - a.priority)
-                  // console.log({priority: Math.max(...ObjRulesByZone[el.id].rules.map((o: any) => o.priority)), highestPriority})
-                  ObjRulesByZone[el.id].rules &&
-                    ObjRulesByZone[el.id].rules.forEach((c: Rule) => {
-                      if (c.definitions && c.definitions.length > 0) {
-                        c.definitions.forEach((e: Definition) => {
-                          if (e.value === el.id) {
-                            const indexZone = ObjRulesByZone[
-                              el.id
-                            ].rules.findIndex((el: Rule) =>
-                              el.definitions.some(
-                                (x: Definition) =>
-                                  x.type === 'RULE_TYPE_ZONE' ||
-                                  'RULE_TYPE_PORT'
-                              )
-                            )
-                            partnerID =
-                              ObjRulesByZone[el.id].rules[indexZone]?.partnerID
-                            partnerName = findNamePartner(partnerID)
-                            priority = c.priority
-                            ruleID = e.ruleID
-                          }
-                        })
-                      }
-                    })
-                }
-              })
-            }
-            return {
-              ...el,
-              partnerID,
-              partnerName,
-              ruleID,
-              ruleGroupID,
-              priority,
-              rules,
-              totalRulesPerZone,
-              // definitions,
-              serviceType,
-            }
-          })
-          rulesByZone.value = ObjRulesByZone
-          if (isCustoms()) {
-            zonesCust.value = computeZone
-          } else {
-            zonesCust.value = computeZone
-          }
-        }
-      },
-      { deep: true }
-    )
-
-    watch(selected, () => {}, { deep: true })
-
-    function handleDisabled() {
-      if (
-        !selected.value.partnerID ||
-        (CODpartnerSelected.value.status &&
-          !CODpartnerSelected.value.partnerID) ||
-        addNPData.value.some((x: InputNPData) => !x.partnerID)
-      ) {
-        return true
-      } else {
-        return false
-      }
-    }
-
     return {
-      selected,
+      // manage store
+      ...stateStore,
+      // handle breadcrumbs
       breadcrumbs,
-      countryCodes,
-      serviceTypes,
-      ports,
-      zones,
-      zonesCust,
-      marketplaces,
-      indexSelect,
-      backBtnHandler,
-      btnAction,
+      // manage bob
       handleBob,
-      isCustoms,
-      CODpartnerSelected,
-      handleCOD,
-      marketplacesCOD,
-      handleInfoCOD,
-      handleAddNP,
-      addNPData,
-      dataPriority,
-      alert,
-      dialog,
-      dialogSettings,
-      deleteRules,
-      handleDeleteRule,
-      handleDisabled,
+      // manage fetch
+      ...stateFetch,
+      // manage modal
+      ...stateModal,
+      ...stateOther,
     }
   },
   head: {},

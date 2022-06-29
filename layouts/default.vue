@@ -150,7 +150,7 @@ export default defineComponent({
       },
       { deep: true }
     )
-    const { $fetchState } = useFetch(() => {
+    useFetch(() => {
       setTimeout(async () => {
         await storeChat.dispatch('sendbird/getUserChat')
         await fetchMarketplaceConnected()
@@ -188,16 +188,14 @@ export default defineComponent({
         page: 1,
         perPage: 10000,
       }
+
       try {
-        $fetchState.pending = true
         await storeMarketplaces.dispatch(
           'marketplaces/marketplaces/getMarketplacesConnected',
           { params: dataParams, isChat: true }
         )
       } catch (error) {
         return error
-      } finally {
-        $fetchState.pending = false
       }
     }
 
