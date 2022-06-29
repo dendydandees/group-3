@@ -42,8 +42,8 @@
             <v-col cols="12" md="12" :class="`${i === 0 ? 'mt-4' : ''} pb-0`">
               <div>
                 <span  class="font-weight-bold">Bag ID:</span>
-                {{x.group_name}}
-                <!-- {{mawbInput.generateManifest[x.id].groupName}} -->
+                <!-- {{x.group_name}} -->
+                {{mawbInput.generateManifest[x.id].groupName}}
               </div>
             </v-col>
           </v-row>
@@ -63,6 +63,7 @@
                 type="number"
                 class="input-filter"
                 append-icon="cm"
+                min="0"
               />
             </v-col>
             <v-col cols="12" md="3" class="px-2">
@@ -79,6 +80,7 @@
                 type="number"
                 class="input-filter"
                 append-icon="cm"
+                min="0"
               />
             </v-col>
             <v-col cols="12" md="3" class="px-2">
@@ -95,6 +97,7 @@
                 type="number"
                 class="input-filter"
                 append-icon="cm"
+                min="0"
               />
             </v-col>
             <v-col cols="12" md="3" class="px-2">
@@ -111,6 +114,7 @@
                 type="number"
                 class="input-filter"
                 append-icon="kg"
+                min="0"
               />
             </v-col>
           </v-row>
@@ -217,7 +221,7 @@ export default defineComponent({
       mawbInput,
       doClose,
       toggle,
-      disabledBtn
+      disabledBtn,
     }
   },
 })

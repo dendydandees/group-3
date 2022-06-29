@@ -24,7 +24,7 @@
               >
                 <v-timeline-item
                   v-for="(x, i) in data"
-                  :key="`${x.id}, ${x.status}`"
+                  :key="`${x.id}, ${x.status}, ${i}`"
                   small
                   :class="`${data.length - 1 !== i ? 'mb-10' : ''}`"
                   fill-dot
@@ -32,11 +32,13 @@
                 >
                   <template #opposite>
                     <span class="d-block body-2">
-                      {{ $dateFns.format(x.update_timestamp, 'HH:mm') }}
+                      <!-- {{ $dateFns.format(x.update_timestamp, 'HH:mm') }} -->
+                      {{formatDateTime({data: x.update_timestamp})}}
                     </span>
 
                     <span class="d-block body-2">
-                      {{ $dateFns.format(x.update_timestamp, 'E, MMM dd, yyyy') }}
+                      <!-- {{ $dateFns.format(x.update_timestamp, 'E, MMM dd, yyyy') }} -->
+                      {{formatDateTime({data: x.update_timestamp, isDate: true})}}
                     </span>
                   </template>
 
@@ -98,7 +100,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, computed } from '@nuxtjs/composition-api'
+import { defineComponent, PropType, computed , useContext} from '@nuxtjs/composition-api'
 // Interfaces and types
 import { ModalConfirm } from '~/types/applications'
 import { VuexModuleDetailBagging, FilterBagging, Unbagged, InputPostBag, BagUpdate, Bagged} from '~/types/bagging/bagging'
@@ -131,6 +133,7 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
+    const { $dateFns, app } = useContext()
     const dialog = computed({
       get: () => props.value,
       set: (value: boolean) => emit('input', value),
@@ -146,10 +149,24 @@ export default defineComponent({
       // this.$nuxt.$emit('toggle')
     }
 
+    function formatDateTime({data, isDate}: {data: string, isDate?: Boolean}) {
+      // $dateFns.format(data, 'E, MMM dd, yyyy')
+      const date = data.split('T')[0]
+      const time = (data.split('T')[1]).split(':00Z')[0]
+
+      if(isDate) {
+        return $dateFns.format(date as any, 'E, MMM dd, yyyy')
+      } else {
+        return time
+      }
+      // return data
+    }
+
     return {
       dialog,
       doClose,
-      toggle
+      toggle,
+      formatDateTime
     }
   },
 })
