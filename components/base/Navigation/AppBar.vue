@@ -72,7 +72,7 @@
             <!-- to profile -->
             <v-list-item nuxt to="/account-profiles" color="primary">
               <v-list-item-avatar color="primary">
-                <v-icon dark class="white--text mt-0 mt-md-1" size="32">
+                <v-icon dark class="white--text mt-0 mt-md-1 ml-md-1" size="32">
                   {{
                     $vuetify.breakpoint.mobile
                       ? 'mdi-account-circle'

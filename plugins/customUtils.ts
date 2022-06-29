@@ -20,10 +20,10 @@ export default defineNuxtPlugin((context, inject) => {
         return data === 'LAST_MILE'
           ? 'primary darken-1'
           : data === 'CUSTOMS'
-          ? 'success darken-1'
+          ? 'success darken-2'
           : data === 'FREIGHT_FORWARDER'
           ? 'warning'
-          : 'secondary darken-1'
+          : 'secondary darken-2'
       }
 
       return data === 'LAST_MILE'

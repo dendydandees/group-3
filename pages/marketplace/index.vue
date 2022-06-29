@@ -1,17 +1,34 @@
 <template>
   <section class="pa-4 pa-md-10 py-8 marketplace">
+    <BaseBackButton
+      v-if="!isOnMarketplaces"
+      :text="'Back to Marketplaces'"
+      @doBackTo="pageView = 'marketplaces'"
+    />
+
     <BaseHeadlinePage
-      title="Marketplace"
-      subtitle="Find and connect with our best vendors"
+      :title="isOnMarketplaces ? 'Marketplace' : 'My Network Partners'"
+      :subtitle="
+        isOnMarketplaces
+          ? 'Find and connect with our best vendors'
+          : 'List of all partners that connected to you'
+      "
     />
 
     <v-row class="mt-6">
       <v-col cols="7">
-        <BaseSearchFieldCustom v-model="filter.search" class="mb-14" />
+        <BaseSearchFieldCustom
+          v-model="filter.search"
+          :loading="$fetchState.pending"
+          class="mb-14"
+        />
 
         <div
           v-if="
-            !filter.search && !filter.country && filter.service.length === 0
+            !filter.search &&
+            !filter.country &&
+            filter.service.length === 0 &&
+            isOnMarketplaces
           "
         >
           <h1 class="title mb-2 text-capitalize">
@@ -20,6 +37,7 @@
           </h1>
 
           <carousel-3d
+            v-if="marketplaces.length"
             :perspective="0"
             :space="200"
             :display="3"
@@ -29,53 +47,59 @@
             :on-main-slide-click="changePage"
           >
             <slide
-              v-for="(slide, i) in marketplaces.slice(0, 5)"
+              v-for="(slide, i) in marketplaces"
               :key="i"
               :index="i"
               style="cursor: pointer"
             >
-              <v-img
-                height="100%"
-                class="align-end opacity opacity-custom custom-slide"
-                :src="
-                  slide.partnerGallery[0] ? slide.partnerGallery[0].path : null
-                "
-              >
-                <div class="gradation-custom">
-                  <!-- this is for gradation -->
-                </div>
-                <div
-                  class="py-7 px-10 text-custom d-flex align-center justify-space-between"
+              <v-hover v-slot="{ hover }">
+                <v-img
+                  height="100%"
+                  class="align-end opacity opacity-custom custom-slide"
+                  :style="`${hover && 'opacity: .8; filter: contrast(1.5);'}`"
+                  :src="
+                    slide.partnerGallery[0]
+                      ? slide.partnerGallery[0].path
+                      : null
+                  "
                 >
-                  <v-col class="text-h4 white--text pa-0">
-                    {{ slide.name }}
-                  </v-col>
+                  <div class="gradation-custom">
+                    <!-- this is for gradation -->
+                  </div>
 
-                  <v-col
-                    v-if="slide.partnerServiceTypes.length > 0"
-                    cols="6"
-                    class="pa-0"
+                  <div
+                    class="py-7 px-10 text-custom d-flex align-center justify-space-between"
                   >
-                    <v-chip
-                      v-for="(mile, index) in slide.partnerServiceTypes"
-                      :key="index"
-                      class="mr-1 my-1"
-                      :color="
-                        $customUtils.setColorServiceType(mile.name, 'chip')
-                      "
-                      text-color="white"
-                      small
-                      disabled
-                      :style="{
-                        opacity: 1,
-                        border: '1px solid white !important',
-                      }"
+                    <v-col class="text-h4 white--text pa-0">
+                      {{ slide.name }}
+                    </v-col>
+
+                    <v-col
+                      v-if="slide.partnerServiceTypes.length > 0"
+                      cols="6"
+                      class="pa-0"
                     >
-                      {{ $customUtils.setServiceType(mile.name) }}
-                    </v-chip>
-                  </v-col>
-                </div>
-              </v-img>
+                      <v-chip
+                        v-for="(mile, index) in slide.partnerServiceTypes"
+                        :key="index"
+                        class="mr-1 my-1"
+                        :color="
+                          $customUtils.setColorServiceType(mile.name, 'chip')
+                        "
+                        text-color="white"
+                        small
+                        disabled
+                        :style="{
+                          opacity: 1,
+                          border: '1px solid white !important',
+                        }"
+                      >
+                        {{ $customUtils.setServiceType(mile.name) }}
+                      </v-chip>
+                    </v-col>
+                  </div>
+                </v-img>
+              </v-hover>
             </slide>
           </carousel-3d>
         </div>
@@ -87,7 +111,7 @@
             <v-row>
               <v-col class="pa-0" cols="12" md="2">
                 <div
-                  class="d-flex align-center primary--text font-weight-bold"
+                  class="d-flex align-center primary--text font-weight-bold subtitle-1"
                   style="height: 40px"
                 >
                   Filter
@@ -100,6 +124,7 @@
                     <v-select
                       v-model="selectedZone.value"
                       :items="countryCodes"
+                      :disabled="$fetchState.pending"
                       item-text="name"
                       item-value="value"
                       label="Country"
@@ -109,13 +134,14 @@
                       color="primary"
                       class="custom-select"
                       clearable
-                    >
-                    </v-select>
+                    />
                   </v-col>
+
                   <v-col v-if="false" cols="12" md="6">
                     <v-select
                       v-model="selectedPort.value"
                       :items="!selectedZone.value ? [] : ports"
+                      :disabled="$fetchState.pending"
                       item-text="name"
                       item-value="id"
                       label="Ports"
@@ -127,20 +153,20 @@
                         !selectedZone.value ? 'disabled-drop' : ''
                       }`"
                       clearable
-                    >
-                    </v-select>
+                    />
                   </v-col>
                 </v-row>
 
-                <div class="mt-2">
+                <div class="mt-3">
                   <v-col
                     v-if="serviceTypes && serviceTypes.length > 0"
                     align-self="center"
                     class="pa-0"
                   >
-                    <div class="red--text font-weight-bold subtitle-2 mb-3">
+                    <div class="primary--text font-weight-bold subtitle-2 mb-3">
                       Types
                     </div>
+
                     <div class="chip-group-custom">
                       <v-chip-group
                         v-model="selectedServiceTypes.arrValue"
@@ -152,8 +178,9 @@
                           v-for="(chip, i) in serviceTypes"
                           :key="i"
                           :value="chip.name"
+                          :disabled="$fetchState.pending"
                           small
-                          class="custom-chips"
+                          class="custom-chips mb-2"
                         >
                           {{ $customUtils.setServiceType(chip.name) }}
                         </v-chip>
@@ -165,15 +192,20 @@
             </v-row>
           </v-card-text>
         </v-card>
+
         <div
           v-if="
-            !filter.search && !filter.country && filter.service.length === 0
+            !filter.search &&
+            !filter.country &&
+            filter.service.length === 0 &&
+            isOnMarketplaces
           "
         >
           <h1 class="title mb-6 mt-16 text-capitalize">
             Your Network <br />
             Partners
           </h1>
+
           <div class="container-your-partner">
             <div class="wrapper-your-partner">
               <v-row>
@@ -182,42 +214,48 @@
                   :key="i"
                   cols="4"
                 >
-                  <v-tooltip bottom>
+                  <v-tooltip bottom color="primary">
                     <template #activator="{ on, attrs }">
                       <v-hover v-slot="{ hover }">
                         <v-img
                           :aspect-ratio="156 / 156"
-                          class="rounded-circle"
+                          :class="`rounded-circle ${hover && 'elevation-6'}`"
                           :src="`data:image/png;base64,${x.logo}`"
                           v-bind="attrs"
                           contain
                           :style="`${
-                            hover ? 'cursor:pointer; opacity: .9;' : ''
+                            hover
+                              ? 'cursor: pointer; opacity: .8; transform: scale(1.1); filter: contrast(1.5);'
+                              : ''
                           } border: 1px solid #1961e4;`"
                           v-on="on"
                           @click="changePage(x.id)"
-                        >
-                          <!-- src="https://cdn.vuetifyjs.com/images/cards/cooking.png" -->
-                        </v-img>
+                        />
                       </v-hover>
                     </template>
+
                     <span>{{ x.name }}</span>
                   </v-tooltip>
                 </v-col>
               </v-row>
             </div>
-            <div
-              v-if="false"
-              class="button-your-partner d-flex justify-center mt-6"
-            >
-              <v-btn plain color="red"> View your connected vendors </v-btn>
+
+            <div class="button-your-partner d-flex justify-center mt-6">
+              <v-btn
+                text
+                color="secondary"
+                :disabled="$fetchState.pending"
+                @click="pageView = 'networkPartners'"
+              >
+                View your connected vendors
+              </v-btn>
             </div>
           </div>
         </div>
       </v-col>
     </v-row>
 
-    <v-row>
+    <v-row v-if="isOnMarketplaces">
       <v-col>
         <h1
           v-if="!filter.search && !filter.country && !filter.service"
@@ -226,9 +264,11 @@
           Network Partners in<br />
           your area
         </h1>
+
         <div v-else class="primary--text subtitle-2 pl-1">
           {{ meta.totalCount }} RESULTS
         </div>
+
         <v-container fluid class="px-0">
           <v-row>
             <v-col
@@ -237,31 +277,36 @@
               cols="3"
               class="d-flex align-center justify-space-between pa-4"
             >
-              <v-card
-                elevation="1"
-                shaped
-                tile
-                class="rounded-xl d-flex flex-column justify-space-between card-partner-custom"
-                width="100%"
-                height="245px"
-                color="white"
-                :disabled="$fetchState.pending"
-                @click="changePage(partner.id)"
-              >
-                <!-- :src="`data:image/png;base64,${partner.logo}`" -->
-                <v-img
-                  height="100%"
+              <v-hover v-slot="{ hover }">
+                <v-card
+                  :elevation="hover ? 6 : 2"
+                  :disabled="$fetchState.pending"
+                  shaped
+                  tile
+                  class="rounded-xl d-flex flex-column justify-space-between card-partner-custom"
+                  :style="`${
+                    hover &&
+                    'opacity: .8; transform: scale(1.1); filter: contrast(1.5);'
+                  }`"
                   width="100%"
-                  class="align-end"
-                  :src="`data:image/png;base64,${partner.logo}`"
-                  contain
+                  height="245px"
+                  color="white"
+                  @click="changePage(partner.id)"
                 >
-                  <!-- :src="
+                  <!-- :src="`data:image/png;base64,${partner.logo}`" -->
+                  <v-img
+                    height="100%"
+                    width="100%"
+                    class="align-end"
+                    :src="`data:image/png;base64,${partner.logo}`"
+                    cover
+                  >
+                    <!-- :src="
                     partner.partnerGallery[0]
                       ? partner.partnerGallery[0].path
                       : null
                   " -->
-                  <!-- <v-col class="pa-0 wrapper-service" cols="7">
+                    <!-- <v-col class="pa-0 wrapper-service" cols="7">
                     <div>
                       <v-chip
                         v-for="(mile, i) in partner.partnerServiceTypes"
@@ -275,40 +320,42 @@
                       </v-chip>
                     </div>
                   </v-col> -->
-                  <v-col
-                    class="body-2 white--text align-center d-flex pa-0 wrapper-service"
-                    cols="7"
-                  >
-                    <NuxtImg
-                      v-if="partner.partnerServiceZones.length > 0"
-                      src="/images/mapLocation.svg"
-                      preload
-                      height="22.69"
-                      class="mr-2"
-                    />
-                    <div
-                      class="primary--text"
-                      style="word-break: break-word; font-size: 10px"
+                    <v-col
+                      class="body-2 white--text align-center d-flex pa-0 wrapper-service"
+                      cols="7"
                     >
-                      {{ locationMapping(partner.partnerServiceZones) }}
-                    </div>
-                  </v-col>
-                  <div>
-                    <!-- this is for gradation -->
-                    <!-- <div class="gradation-custom">
-                    </div> -->
-                    <div
-                      class="pa-4 d-flex align-center justify-space-between primary"
-                    >
-                      <v-col
-                        class="white--text pa-0 title"
-                        :cols="!partner.partnerServiceZones ? 12 : 0"
-                      >
-                        {{ partner.name }}
-                      </v-col>
+                      <NuxtImg
+                        v-if="partner.partnerServiceZones.length > 0"
+                        src="/images/mapLocation.svg"
+                        preload
+                        height="22.69"
+                        class="mr-2"
+                      />
 
-                      <!-- v-if="partner.partnerServiceZones" -->
-                      <!-- <v-col
+                      <div
+                        class="primary--text"
+                        style="word-break: break-word; font-size: 10px"
+                      >
+                        {{ locationMapping(partner.partnerServiceZones) }}
+                      </div>
+                    </v-col>
+
+                    <div>
+                      <!-- this is for gradation -->
+                      <!-- <div class="gradation-custom">
+                    </div> -->
+                      <div
+                        class="pa-4 d-flex align-center justify-space-between primary"
+                      >
+                        <v-col
+                          class="white--text pa-0 title"
+                          :cols="!partner.partnerServiceZones ? 12 : 0"
+                        >
+                          {{ partner.name }}
+                        </v-col>
+
+                        <!-- v-if="partner.partnerServiceZones" -->
+                        <!-- <v-col
                         v-if="false"
                         class="body-2 white--text align-center d-flex pa-0 ml-3"
                         cols="4"
@@ -325,52 +372,55 @@
                           {{ locationMapping(partner.partnerServiceZones) }}
                         </div>
                       </v-col> -->
+                      </div>
                     </div>
-                  </div>
-                  <v-btn
-                    v-if="partner.status !== 'connected'"
-                    fab
-                    small
-                    plain
-                    absolute
-                    top
-                    right
-                    class="pt-12"
-                    :disabled="partner.status === 'pending'"
-                    @click.stop="addPartner(partner)"
-                  >
-                    <v-icon
-                      v-if="partner.status === 'none'"
-                      dense
-                      color="white"
+
+                    <v-btn
+                      v-if="partner.status !== 'connected'"
+                      fab
+                      small
+                      plain
+                      absolute
+                      top
+                      right
+                      class="pt-12"
+                      :disabled="partner.status === 'pending'"
+                      @click.stop="addPartner(partner)"
                     >
-                      mdi-account-plus
-                    </v-icon>
-                    <v-icon
-                      v-else-if="partner.status === 'pending'"
-                      dense
-                      color="white"
-                    >
-                      mdi-account-clock
-                    </v-icon>
-                    <v-icon v-else dense color="white">
-                      mdi-account-multiple-check
-                    </v-icon>
-                  </v-btn>
-                  <v-chip
-                    v-if="partner.status === 'connected'"
-                    color="green"
-                    text-color="white"
-                    x-small
-                    disabled
-                    class="custom-chip-connected"
-                  >
-                    <!-- Connected -->
-                  </v-chip>
-                </v-img>
-              </v-card>
+                      <v-icon
+                        v-if="partner.status === 'none'"
+                        dense
+                        color="white"
+                      >
+                        mdi-account-plus
+                      </v-icon>
+                      <v-icon
+                        v-else-if="partner.status === 'pending'"
+                        dense
+                        color="white"
+                      >
+                        mdi-account-clock
+                      </v-icon>
+                      <v-icon v-else dense color="white">
+                        mdi-account-multiple-check
+                      </v-icon>
+                    </v-btn>
+
+                    <v-chip
+                      v-if="partner.status === 'connected'"
+                      color="success"
+                      text-color="white"
+                      x-small
+                      disabled
+                      class="custom-chip-connected"
+                      title="Connected"
+                    />
+                  </v-img>
+                </v-card>
+              </v-hover>
             </v-col>
           </v-row>
+
           <div class="d-flex align-center justify-center pt-4">
             <div>
               <v-btn
@@ -403,6 +453,28 @@
         </v-container>
       </v-col>
     </v-row>
+
+    <template v-if="!isOnMarketplaces">
+      <NetworkPartnersList
+        :loading="$fetchState.pending"
+        class="mt-8 mb-10"
+        @handleToPartnerDetails="changePage"
+      />
+
+      <BasePaginationOnCenter
+        v-model="pagination"
+        :meta="meta"
+        :loading="$fetchState.pending"
+        :per-page-options="{
+          data: [5, 10, 15, 20, 25],
+          text: 'Partners / Page',
+        }"
+        :total-items="marketplacesConnected.length"
+        @handlePagination="nextOrPrev"
+        @resetPage="pagination.page = 1"
+      />
+    </template>
+
     <MarketplaceAddForm
       :dialog="dialog"
       :data="idPartner"
@@ -426,6 +498,8 @@ import {
   Ref,
   useMeta,
 } from '@nuxtjs/composition-api'
+// components
+import NetworkPartnersList from '@/components/marketplace/networkPartners/List.vue'
 // Interfaces or types
 import {
   Marketplace,
@@ -438,6 +512,9 @@ import { VuexModuleApplications } from '~/types/applications'
 
 export default defineComponent({
   name: 'MarketPlace',
+  components: {
+    NetworkPartnersList,
+  },
   layout: 'default',
   setup() {
     const router = useRouter()
@@ -466,6 +543,13 @@ export default defineComponent({
     const zones = computed(() => storeFilters.state.filters.zones)
     const serviceTypes = computed(() => storeFilters.state.filters.serviceTypes)
     const idPartner = ref({}) as Ref<Marketplace | {}>
+
+    // manage view
+    const pageView = ref(
+      storeMarketplaces.state.marketplaces.marketplaces.pageView
+    )
+    const isOnMarketplaces = computed(() => pageView.value === 'marketplaces')
+
     // status connect - none - pending - connected
     const statusConnect = reactive({
       status: 'none',
@@ -517,7 +601,9 @@ export default defineComponent({
         errorAdd.value = error
         return error
       } finally {
-        $fetchState.pending = false
+        setTimeout(() => {
+          $fetchState.pending = false
+        }, 1500)
       }
     }
 
@@ -541,14 +627,16 @@ export default defineComponent({
       } catch (error) {
         return error
       } finally {
-        $fetchState.pending = false
+        setTimeout(() => {
+          $fetchState.pending = false
+        }, 1500)
       }
     }
     const getPorts = async () => {
       await storeFilters.dispatch('filters/getPorts', {
         params: {
           page: 1,
-          perPage: 1000,
+          perPage: 100,
         },
         country: selectedZone.value,
       })
@@ -577,16 +665,18 @@ export default defineComponent({
       } catch (error) {
         return error
       } finally {
-        $fetchState.pending = false
+        setTimeout(() => {
+          $fetchState.pending = false
+        }, 1500)
       }
     }
     const fetchMarketplaceConnected = async (params: FilterDetails) => {
-      const { search, country, service } = params
+      const { page, itemsPerPage, search, country, service } = params
       // const { page, itemsPerPage, search, country, service } = params
       // const perPage = itemsPerPage !== -1 ? itemsPerPage : meta.value.totalCount
       const dataParams = {
-        page: 1,
-        perPage: 6,
+        page,
+        perPage: isOnMarketplaces.value ? 6 : itemsPerPage,
         search,
         country,
         service,
@@ -597,12 +687,14 @@ export default defineComponent({
 
         await storeMarketplaces.dispatch(
           'marketplaces/marketplaces/getMarketplacesConnected',
-          { params: dataParams }
+          { params: dataParams, isOnNetworkPartners: !isOnMarketplaces.value }
         )
       } catch (error) {
         return error
       } finally {
-        $fetchState.pending = false
+        setTimeout(() => {
+          $fetchState.pending = false
+        }, 1500)
       }
     }
 
@@ -614,16 +706,22 @@ export default defineComponent({
       } catch (error) {
         return error
       } finally {
-        $fetchState.pending = false
+        setTimeout(() => {
+          $fetchState.pending = false
+        }, 1500)
       }
     }
     const { $fetchState, fetch } = useFetch(async () => {
-      await fetchMarketplace({
-        ...filter.value,
-        ...pagination.value,
-      })
+      if (isOnMarketplaces.value) {
+        await fetchMarketplace({
+          ...filter.value,
+          ...pagination.value,
+        })
+      }
+
       await fetchMarketplaceConnected({
         ...filter.value,
+        ...pagination.value,
       })
       await fetchCountryCodes()
       await fetchServiceZoneOnce()
@@ -666,6 +764,16 @@ export default defineComponent({
       }
     }
 
+    // watching a changes state of page view
+    watch(pageView, (newValue) => {
+      pagination.value = {
+        ...pagination.value,
+        page: 1,
+        itemsPerPage: 5,
+      }
+
+      storeFilters.commit('marketplaces/marketplaces/SET_PAGE_VIEW', newValue)
+    })
     watch(
       [filter],
       ([newFilter]) => {
@@ -735,10 +843,18 @@ export default defineComponent({
     }
 
     // manage meta
-    useMeta(() => ({ title: `Client Portal | Marketplace` }))
+    useMeta(() => ({
+      title: `Client Portal | ${
+        pageView.value === 'marketplaces'
+          ? 'Marketplaces'
+          : 'My Network Partners'
+      }`,
+    }))
 
     return {
       marketplaces,
+      pageView,
+      isOnMarketplaces,
       filter,
       dialog,
       method,
@@ -800,7 +916,7 @@ export default defineComponent({
     .v-select__slot {
       label {
         font-size: 12px;
-        color: red;
+        color: $secondary;
         font-weight: bold;
       }
     }
