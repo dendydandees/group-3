@@ -7,7 +7,8 @@ import {
   InputPostBag,
   Bagged,
   Unbagged,
-  BagUpdate
+  BagUpdate,
+  TabState
 } from '~/types/bagging/bagging';
 import tempData from '~/static/tempData';
 
@@ -38,9 +39,12 @@ export const state = () => ({
   filter,
   isShowFilter: false,
   tab: {
-    orderView: 0,
+    orderView: {
+      '0': 0,
+      '1': 0
+    },
     step: 0
-  }
+  } as TabState
 });
 
 export type RootStateBagging = ReturnType<typeof state>;
@@ -54,7 +58,7 @@ export const mutations: MutationTree<RootStateBagging> = {
   SET_META: (state, value: Meta) => (state.meta = value),
   SET_FILTER: (state, value: FilterBagging) => (state.filter = value),
   SET_FILTER_BTN: (state) => (state.isShowFilter = !state.isShowFilter),
-  SET_TAB_BTN: (state, value: { orderView: number, step: number; }) => (state.tab = value),
+  SET_TAB_BTN: (state, value: TabState) => (state.tab = value),
   RESET_FILTER: (state) => (state.filter = filterBaggingInit),
 };
 

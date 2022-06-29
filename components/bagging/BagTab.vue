@@ -19,6 +19,7 @@
             @doGetDetails="doGetDetails"
             @doGetBatchDetails="goToBatchView"
             @doHandleModalTrack="doHandleModalTrack"
+            @doMovePageBagPartner="baggingPartnerActions.movePage"
           />
             <!-- @fetch="fetchOrders" -->
         </v-col>
@@ -153,6 +154,10 @@ export default defineComponent({
       type: Array,
       required: true,
     },
+    isCompleteTabPartner: {
+      type: Boolean,
+      default: false,
+    },
   },
   setup(props, { emit }) {
     const { $dateFns, app } = useContext()
@@ -206,9 +211,18 @@ export default defineComponent({
       },
     }) as Ref<Order[]>
     // const selectedOrders = ref([]) as Ref<Order[]>
-    const actionExist = ref({
-      updates: true,
-      download: true,
+    const actionExist = computed(() => {
+      let temp = {
+        updates: true,
+        download: true,
+      } as any
+      if(props.isCompleteTabPartner) {
+        temp = {
+          edit: true,
+          download: true,
+        }
+      }
+      return temp
     })
     const selectedViews = ref([
       'orderCode',
@@ -223,7 +237,54 @@ export default defineComponent({
       'LMTrackingNumber',
       'actions',
     ])
-    const headers = ref(initHeaders) as Ref<Header[]>
+    const headers = computed(() => {
+      let temp = initHeaders
+      if(props.isCompleteTabPartner) {
+        temp = [
+          {
+            text: 'Bag ID',
+            value: 'group_name',
+            width: 150,
+          },
+          {
+            text: 'Orders',
+            value: 'orderBags',
+            width: 150,
+          },
+          {
+            text: 'Sub-Bags',
+            value: 'statusBags',
+            sortable: false,
+            width: 200,
+          },
+          {
+            text: 'Origin Port',
+            value: 'origin_port',
+            sortable: false,
+            width: 150,
+          },
+          {
+            text: 'Destination Port',
+            value: 'dest_port',
+            sortable: false,
+            width: 180,
+          },
+          {
+            text: 'Weight',
+            value: 'flight',
+            sortable: false,
+            width: 150,
+          },
+          {
+            text: '',
+            value: 'actions',
+            sortable: false,
+            width: 150,
+          },
+        ]
+      }
+      return temp
+    }) as Ref<Header[]>
     const selectAllToggle = ({ items }: { items: Order[]; value: boolean }) => {
       if (selectedOrders.value.length === 0) {
         return (selectedOrders.value = [...items])
@@ -443,6 +504,13 @@ export default defineComponent({
       selectedOrders.value = []
     })
 
+    const baggingPartnerActions = {
+      movePage: (data: any) => {
+        // console.log(data)
+        router.push('/partner-portals/bagging/dsadsadsa')
+      },
+    }
+
     return {
       // manage store
       orders,
@@ -475,7 +543,9 @@ export default defineComponent({
       dialog,
       doHandleModalTrack,
       bagUpdates,
-      bagItem
+      bagItem,
+
+      baggingPartnerActions
     }
   },
   head: {},

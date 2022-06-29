@@ -1,7 +1,7 @@
 <template>
   <section class="pa-4 pa-md-10 py-8 baggedPage">
     <BaseHeadlinePage
-      title="Bagging"
+      title="Bagging Partner"
       subtitle="Bag parcels together and generate a single bag label for ease of shipping and tracking."
     >
       <!-- <template slot="addition">
@@ -17,16 +17,17 @@
         :selected-orders="selectedINFO"
         :is-show-filter="isShowFilter"
         :is-on-bags-tab="{
-          text: step === 0 || orderView === 0,
-          filter: step === 0
+          text: true,
+          filter: true
         }"
-        :is-unbagged="step === 1 && orderView === 0"
+        :is-unbagged="true"
         @doShowFilter="isShowFilter = !isShowFilter"
       />
         <!-- :loading="$fetchState.pending" -->
 
       <!-- Right options -->
       <OrdersRightOptions
+        v-if="step === 2 || step === 3"
       >
         <!-- :loading="$fetchState.pending" -->
         <template #toggleView>
@@ -39,6 +40,16 @@
       </OrdersRightOptions>
       <v-btn
         v-if="step === 1"
+        color="primary"
+        min-width="200px"
+        class="mr-2"
+        :disabled="!selectedOrders.length"
+        @click="handleManifest()"
+      >
+        Generate Manifest
+      </v-btn>
+      <v-btn
+        v-if="step === 2 || step === 3"
         color="primary"
         min-width="200px"
         :disabled="!Object.keys(selectedUnbagged).length && orderView !== 1"
@@ -57,9 +68,10 @@
 
       <v-btn
         v-else
-        color="primary"
+        :color="step === 1 ? 'green' : 'primary'"
         min-width="200px"
         :disabled="!selectedOrders.length"
+        :class="step === 1 ? 'white--text' : ''"
         @click="handleBagScanBag"
       >
         {{
@@ -70,7 +82,7 @@
 
     <v-expand-transition>
       <OrdersFiltersContainer
-        :is-show-filter="isShowFilter && (step === 0)"
+        :is-show-filter="isShowFilter"
         @doToggleFilter="isShowFilter = !isShowFilter"
         @doResetFilter="doResetFilter"
       >
@@ -106,12 +118,23 @@
     <v-card elevation="2">
       <v-window v-model="step">
         <v-window-item :value="0">
+        </v-window-item>
+        <v-window-item :value="1">
           <BaggingBagTab
             v-model="selectedOrders"
+            :is-complete-tab-partner="true"
           />
         </v-window-item>
+        <v-window-item :value="2">
+          <BaggingScanned
+            v-if="orderView === 1"
+            :data="dataMerged"
+            :is-bag-tab-partner="true"
+          />
+          <BaggingList v-else v-model="selectedUnbagged" :data="dataMerged"/>
+        </v-window-item>
 
-        <v-window-item :value="1">
+        <v-window-item :value="3">
           <BaggingScanned
             v-if="orderView === 1"
             :data="dataMerged"
@@ -140,13 +163,15 @@
       :dialog-settings="dialogSettings"
       :is-confirm="true"
       @doSubmit="submit"
-      @doCancel="handleCancel"
+      @doCancel="() => (dialog.confirm = false)"
     />
-    <!-- Modal after click no -->
-    <BaggingModalConfirm
-      v-model="dialog.cancel"
+    <!-- Modal Manifest -->
+    <BaggingGenerateManifest
+      v-model="inputMAWB"
+      :selected="selectedOrders"
       :dialog-settings="dialogSettings"
-      @doSubmit="() => (dialog.cancel = false)"
+      @doSubmit="() => (inputMAWB.manifest = false)"
+      @doCancel="() => (inputMAWB.manifest = false)"
     />
    <v-snackbar
       :value="alert.isShow"
@@ -186,12 +211,12 @@ import {
 } from '~/types/applications'
 import { VuexModuleFilters, Statuses } from '~/types/filters'
 import { filterBaggingInit} from '~/store/bagging/bagging'
-import { VuexModuleDetailBagging, FilterBagging, Unbagged, InputPostBag} from '~/types/bagging/bagging'
+import { VuexModuleDetailBagging, FilterBagging, Unbagged, InputPostBag, InputManifest, GenerateManifest} from '~/types/bagging/bagging'
 import tempData from '~/static/tempData'
 
 export default defineComponent({
   name: 'BaggingPages',
-  layout: 'default',
+  middleware: 'partner',
   setup() {
     const router = useRouter()
     const storeApplications = useStore<VuexModuleApplications>()
@@ -200,7 +225,7 @@ export default defineComponent({
     const alert = computed(() => storeOfApplications.state.applications.alert)
     const dialog = ref({
       confirm: false,
-      cancel: false
+      manifest: false
     })
     const dialogSettings = ref({
       loading: false,
@@ -218,6 +243,14 @@ export default defineComponent({
     const stepList = computed(() => {
       return [
         {
+          text: 'Manifest',
+          icon: '',
+        },
+        {
+          text: 'Complete',
+          icon: '',
+        },
+        {
           text: 'Bags',
           icon: '',
         },
@@ -227,27 +260,35 @@ export default defineComponent({
         },
       ]
     })
-    const isActive = (data: number) => step.value === data
-    const doChangeWindow = (data: number) => {
-      step.value = data
-    }
-    const nameBtn = computed(() => {
-        let temp = ''
-        if(step.value === 1) {
-          if(orderView.value === 0) {
-            temp = 'BAG'
-          } else {
-            temp = 'START SCAN'
-          }
-        } else {
-          temp = 'DOWNLOAD BAG LABEL'
-        }
-        return temp
-    })
     // manage view
     const orderView = ref((storeBagging.state.bagging as any).bagging.tab.orderView[step.value])
     // manage table
     const selectedOrders = ref([]) as Ref<any>
+    const inputMAWB = ref({
+      manifest: false,
+    }) as Ref<InputManifest>
+
+    watch(
+      () => [selectedOrders.value],
+      ([newSelectedOrders]) => {
+          const generateManifest = {} as GenerateManifest
+          newSelectedOrders.forEach((x: any) => {
+            generateManifest[x.id] = {
+              groupName: x.group_name,
+              length: '',
+              width: '',
+              height: '',
+              weight: '',
+            }
+          });
+          inputMAWB.value = {
+            ...inputMAWB.value,
+            mawb: '',
+            generateManifest
+          }
+      },
+      { deep: true }
+    )
     // manage filter order
     const isShowFilter = ref((storeBagging.state.bagging as any).bagging.isShowFilter)
     const doResetFilter = () => {
@@ -276,12 +317,13 @@ export default defineComponent({
 
     const newScanned = computed(() => {
       const user = localStorage.getItem('auth.user') ? JSON.parse(localStorage.getItem('auth.user') as string) : {}
-      if(!localStorage.getItem(`newScanned.${user.email}`) || (!user && !user.email)) {
+      if(!localStorage.getItem(`newScanned.${step.value === 2 ? 'bagsTab' : 'scannedTab'}.partner.${user.email}`) || (!user && !user.email)) {
         return []
       } else {
-        return localStorage.getItem(`newScanned.${user.email}`) ? JSON.parse(localStorage.getItem(`newScanned.${user.email}`) as string) : []
+        return localStorage.getItem(`newScanned.${step.value === 2 ? 'bagsTab' : 'scannedTab'}.partner.${user.email}`) ? JSON.parse(localStorage.getItem(`newScanned.${step.value === 2 ? 'bagsTab' : 'scannedTab'}.partner.${user.email}`) as string) : []
       }
     })
+
 
     // const dataTemp = tempData.bagging.data.unbagged as Unbagged[]
     const dataMerged =  computed(() => {
@@ -332,6 +374,23 @@ export default defineComponent({
     //   dataMerged.value = dataTemp.value
     // })
 
+    const isActive = (data: number) => step.value === data
+    const doChangeWindow = (data: number) => {
+      step.value = data
+    }
+    const nameBtn = computed(() => {
+        let temp = ''
+        if(step.value === 2 || step.value === 3) {
+          if(orderView.value === 0) {
+            temp = step.value === 3 ? 'BAG' : 'COMPLETE'
+          } else {
+            temp = 'START SCAN'
+          }
+        } else {
+          temp = 'DOWNLOAD BAG LABEL'
+        }
+        return temp
+    })
 
     // manage filter on changed
     watch(
@@ -359,6 +418,7 @@ export default defineComponent({
     watch(
       [orderView, step],
       ([newOrderView, newStep]) => {
+
         storeApplications.commit('bagging/bagging/SET_TAB_BTN', {
           orderView: {
             ...(storeBagging.state.bagging as any).bagging.tab.orderView,
@@ -387,11 +447,15 @@ export default defineComponent({
         submitText: 'Yes',
         submitColor: 'primary',
       }
-      if(step.value === 1) {
+      if(step.value === 2 || step.value === 3) {
         if(orderView.value === 0 ) {
           dialog.value.confirm = true
         } else {
-          router.push(`/bagging/scan`)
+          router.push(`/partner-portals/bagging/scan${
+            step.value === 2
+            ? '?bag=1'
+            : ''
+          }`)
         }
       } else {
         dialog.value.confirm = true
@@ -432,7 +496,7 @@ export default defineComponent({
       } finally {
         dialogSettings.value.loading = false
         if(params?.isCancel) {
-          dialog.value.cancel = false
+          inputMAWB.value.manifest = false
         } else {
           dialog.value.confirm = false
         }
@@ -441,17 +505,16 @@ export default defineComponent({
         }, 3000)
       }
     }
-    async function handleCancel() {
-      await submit({isCancel: true})
+    function handleManifest() {
       dialogSettings.value = {
         loading: false,
-        title: 'Make sure bags are arranged properly to prevent mix-up',
+        title: 'Generate Manifest',
         content: '',
-        cancelText: '',
-        submitText: 'Ok',
+        cancelText: 'Cancel',
+        submitText: 'Update',
         submitColor: 'primary',
       }
-      dialog.value.cancel = true
+      inputMAWB.value.manifest = true
 
     }
 
@@ -473,7 +536,7 @@ export default defineComponent({
       await fetchBags()
     })
 
-    useMeta(() => ({ title: 'Client Portal | Bagging' }))
+    useMeta(() => ({ title: 'Partner Portal | Bagging' }))
 
     return {
       isShowFilter,
@@ -488,14 +551,15 @@ export default defineComponent({
       submit,
       dialog,
       dialogSettings,
-      handleCancel,
+      handleManifest,
       filterBagging,
       nameBtn,
       // dataTemp,
       dataMerged,
       selectedUnbagged,
       alert,
-      selectedINFO
+      selectedINFO,
+      inputMAWB
     }
   },
   head: {},

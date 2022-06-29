@@ -4,12 +4,32 @@ export interface VuexModuleDetailBagging {
   bagging: RootStateBagging;
 }
 
+export interface TabState {
+  orderView: {
+    [key: string]: number,
+  };
+  step: number;
+}
 
 export interface FilterBagging {
   createdFrom: string;
   createdTo: string;
   client: string;
   destination: string;
+}
+export interface GenerateManifest {
+  [key: string | number]: {
+    groupName?: string,
+    length: string | number,
+    width: string | number,
+    height: string | number,
+    weight: string | number,
+  },
+}
+export interface InputManifest {
+  manifest: boolean,
+  mawb: string;
+  generateManifest: GenerateManifest | {};
 }
 
 export interface InputPostBag {
