@@ -56,7 +56,7 @@ export default defineComponent({
       set: (value) => emit('input', value),
     })
     const itemsPerPageOptions = computed(() => {
-      const textDefault = 'Items/Page'
+      const textDefault = 'Items / Page'
       const values = [5, 10, 25, 50, 100]
 
       return values.map((value) => ({

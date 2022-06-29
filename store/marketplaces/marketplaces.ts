@@ -1,7 +1,11 @@
 // Interfaces
 import { MutationTree, ActionTree } from 'vuex'
 import { Meta } from '~/types/applications'
-import { Marketplace, FilterDetails } from '~/types/marketplace/marketplace'
+import {
+  Marketplace,
+  FilterDetails,
+  PageView,
+} from '~/types/marketplace/marketplace'
 import {
   DetailMarketplace,
   Gallery,
@@ -23,9 +27,10 @@ interface GetMarketplaces {
   isConnected?: Boolean
   isCOD?: Boolean
   isChat?: Boolean
+  isOnNetworkPartners?: Boolean
 }
 
-const filter = {
+export const initMarketplaceFilter = {
   // page: 1,
   // itemsPerPage: 8,
   search: '',
@@ -49,11 +54,13 @@ export const state = () => ({
     totalPage: 1,
     totalCount: 8,
   } as Meta,
-  filter,
+  filter: { ...initMarketplaceFilter },
   detail: {} as DetailMarketplace | {},
   galleries: [] as Gallery[] | [],
   detailProfile: {} as DetailProfile | {},
   ratings: [] as Ratings[],
+  // manage network partners view
+  pageView: 'marketplaces' as PageView,
 })
 
 export type RootStateMarketplaces = ReturnType<typeof state>
@@ -79,7 +86,7 @@ export const mutations: MutationTree<RootStateMarketplaces> = {
     (state.loadedLControl = value),
   SET_META: (state, value: Meta) => (state.meta = value),
   SET_FILTER: (state, value: FilterDetails) => (state.filter = value),
-  RESET_FILTER: (state) => (state.filter = filter),
+  RESET_FILTER: (state) => (state.filter = { ...initMarketplaceFilter }),
   SET_DETAIL_MARKETPLACE: (state, value: DetailMarketplace | {}) =>
     (state.detail = value),
   SET_GALLERY: (state, value: Gallery[] | []) => (state.galleries = value),
@@ -88,6 +95,8 @@ export const mutations: MutationTree<RootStateMarketplaces> = {
   RESET_DETAIL_MARKETPLACE: (state) =>
     (state.detail = {} as DetailMarketplace | {}),
   SET_RATINGS: (state, value: Ratings[]) => (state.ratings = value),
+  SET_PAGE_VIEW: (state, value: PageView) => (state.pageView = value),
+  RESET_PAGE_VIEW: (state) => (state.pageView = 'marketplaces'),
 }
 
 export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
@@ -160,7 +169,7 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
     },
     async getMarketplacesConnected(
       { commit, dispatch },
-      { params, isCOD, isChat }: GetMarketplaces
+      { params, isCOD, isChat, isOnNetworkPartners = false }: GetMarketplaces
     ) {
       let serviceParams = 'service='
       if (params && params?.service && params?.service.length > 0) {
@@ -181,7 +190,7 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
         : ''
       try {
         const response = await this?.$axios?.$get(`/api/clients/partners${uri}`)
-        const { data } = response
+        const { data, page, totalPage, totalCount } = response
 
         if (!data) throw response
 
@@ -224,7 +233,14 @@ export const actions: ActionTree<RootStateMarketplaces, RootStateMarketplaces> =
         if (isCOD) {
           commit('SET_MARKETPLACES_COD', data)
         }
-        // commit('SET_META', meta)
+        // if it's on network partners view set meta to this connected network partners
+        if (isOnNetworkPartners) {
+          commit('SET_META', {
+            page,
+            totalPage,
+            totalCount,
+          })
+        }
 
         return response
       } catch (error) {

@@ -13,6 +13,7 @@
     rounded
     outlined
     class="input-custom"
+    :disabled="loading"
     :append-icon="customAppendIcon(showFilterComp.status, search, icon)"
     @click:append="showFilterComp.status = !showFilterComp.status"
   />
@@ -34,6 +35,10 @@ export default defineComponent({
     icon: {
       type: Object as PropType<{ active: string; passive: string }>,
       default: () => ({ active: null, passive: null }),
+    },
+    loading: {
+      type: Boolean,
+      default: false,
     },
   },
   setup(props, { emit }) {

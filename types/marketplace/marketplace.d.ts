@@ -21,6 +21,7 @@ export interface Marketplace {
   name: string
   slug: string
   clientId: string
+  status: 'connected' | 'pending'
   partnerServiceTypes: PartnerServiceType[]
   partnerServiceZones: PartnerServiceZone[]
 }
@@ -42,3 +43,5 @@ export interface PaginationMarketplaces {
   page: Number
   itemsPerPage: Number
 }
+
+export type PageView = 'marketplaces' | 'networkPartners'

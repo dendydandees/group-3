@@ -12,6 +12,7 @@ export default defineNuxtMiddleware(({ from, route, store }) => {
     } else if (route.name?.includes('marketplace')) {
       store.commit('marketplaces/marketplaces/RESET_FILTER')
       store.commit('marketplaces/marketplaces/RESET_DETAIL_MARKETPLACE')
+      store.commit('marketplaces/marketplaces/RESET_PAGE_VIEW')
     }
   }
 })

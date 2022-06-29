@@ -40,7 +40,7 @@
                     <img
                       :src="`data:image/png;base64,${profiles.logo}`"
                       :alt="form.name"
-                      style="object-fit: cover"
+                      style="object-fit: contain"
                     />
                   </v-avatar>
                 </v-fade-transition>
