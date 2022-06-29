@@ -158,7 +158,7 @@ import { VuexModuleDetailBagging, FilterBagging, Unbagged, InputPostBag, Order, 
 
 export default defineComponent({
   name: 'ScanPages',
-  middleware: 'partner',
+  layout: 'default',
   setup() {
     const { app, $dateFns } = useContext()
     const router = useRouter()
