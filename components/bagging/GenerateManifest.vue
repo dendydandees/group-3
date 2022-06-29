@@ -22,7 +22,6 @@
               outlined
               dense
               rounded
-              single-line
               hide-details
               label="MAWB No"
               placeholder="Enter your MAWB..."
