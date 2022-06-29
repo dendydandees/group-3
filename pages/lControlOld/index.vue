@@ -72,12 +72,7 @@ import {
   Ref,
 } from '@nuxtjs/composition-api'
 // Interfaces or types
-import {
-  VuexModuleLControls,
-  Definition,
-  Rule,
-  RuleGroup,
-} from '~/types/lControl/lControl'
+import { VuexModuleLControls } from '~/types/lControl/lControl'
 import { VuexModuleApplications, ModalConfirm } from '~/types/applications'
 
 export default defineComponent({
@@ -92,9 +87,11 @@ export default defineComponent({
     //   () => storeMarketplaces.state.marketplaces.marketplaces.marketplaces
     // )
     const lControls = computed(
-      () => storeLControls.state.lControls.lControls.lControls
+      () => (storeLControls.state.lControls.lControls as any).lControls
     )
-    const meta = computed(() => storeLControls.state.lControls.lControls.meta)
+    const meta = computed(
+      () => (storeLControls.state.lControls.lControls as any).meta
+    )
     const pagination = ref({
       ...storeApplications.state.applications.pagination,
     })
@@ -167,7 +164,7 @@ export default defineComponent({
       toggle('ruleGroup')
     }
 
-    const addRuleModal = (data: RuleGroup) => {
+    const addRuleModal = (data: any) => {
       service.value = data.serviceType
       countryCode.value = data.countryCode
       ruleGroupID.value = data.id
@@ -203,11 +200,11 @@ export default defineComponent({
         $fetchState.pending = false
       }
     }
-    const addRules = async (data: Rule) => {
+    const addRules = async (data: any) => {
       try {
         const id = ruleGroupID.value
         if (data.definitions) {
-          data.definitions = data.definitions.map((el: Definition) => {
+          data.definitions = data.definitions.map((el: any) => {
             delete el.id
             return el
           })

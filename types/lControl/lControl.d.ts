@@ -1,32 +1,37 @@
-import { RootStateLControls } from '~/store/lControls/lControls'
+import { CountryCode, PortData, ServiceType, ZoneData } from '../filters'
+import { RootStateLControls } from '~/store/lControls'
 
 export interface VuexModuleLControls {
-  lControls: {
-    lControls: RootStateLControls
-  }
+  lControls: RootStateLControls
 }
 
-export interface Definition {
-  id?: string | number
-  ruleID?: string
-  type: string
-  value: string | boolean | number
-}
-
-export interface Rule {
-  id: string
-  ruleGroupID: string
+export interface LControlDetail {
   partnerID: string
-  priority: number
-  definitions: Definition[]
-  rules: Rule[]
+  volume?: number
 }
 
-export interface RuleGroup {
-  id: string
-  defaultPartnerID: string
-  serviceType: string
-  countryCode: string
-  Rules: Rule[]
+export interface UserSelectedLControl {
   useBOB: boolean
+  country: CountryCode
+  serviceType: ServiceType
+  zone: ZoneData
+  port: PortData
+  defaultPartner: LControlDetail
+  codPartner: LControlDetail
+  primary: LControlDetail
+  secondary: LControlDetail
+  tertiary: LControlDetail
+}
+
+export interface LControl {
+  useBOB?: boolean
+  country: string
+  serviceType: string
+  zoneID?: string
+  portID?: string
+  defaultPartner: LControlDetail
+  codPartner?: LControlDetail
+  primaryPartner?: LControlDetail
+  secondaryPartner?: LControlDetail
+  tertiaryPartner?: LControlDetail
 }

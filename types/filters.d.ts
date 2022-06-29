@@ -17,6 +17,13 @@ export interface Zone {
   serviceType?: string
 }
 
+export interface ZoneData {
+  code: string
+  countryCode: string
+  id: string
+  zoneName: string
+}
+
 export interface ServiceType {
   id: string
   name: string
@@ -37,6 +44,13 @@ export interface Ports {
   page: number
   totalCount: number
   totalPage: number
+}
+
+export interface PortData {
+  code: string
+  countryCode: string
+  id: string
+  name: string
 }
 
 export interface Statuses {
