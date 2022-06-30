@@ -68,7 +68,7 @@
 
     <v-fade-transition hide-on-leave>
       <!-- List data for order -->
-      <v-row v-if="isOnListView" align="center" class="my-4">
+      <v-row v-show="isOnListView" align="center" class="my-4">
         <v-col cols="12">
           <BaseTable
             v-model="selectedOrders"
@@ -86,10 +86,15 @@
           />
         </v-col>
       </v-row>
+    </v-fade-transition>
 
-      <!-- List data for batch -->
-      <v-row v-else align="center" class="my-4">
-        <OrdersBatchList @doGetBatchDetails="goToBatchView" />
+    <!-- List data for batch -->
+    <v-fade-transition hide-on-leave>
+      <v-row v-if="!isOnListView" align="center" class="my-4">
+        <OrdersBatchList
+          :loading="$fetchState.pending"
+          @doGetBatchDetails="goToBatchView"
+        />
       </v-row>
     </v-fade-transition>
 
@@ -222,7 +227,6 @@ export default defineComponent({
     const pagination = ref({
       ...storeApplications.state.applications.pagination,
     })
-    const orderTabView = ref(storeOrders.state.orders.orderTabView)
     const filterOrder = ref({
       ...storeOrders.state.orders.filterOrder,
     })
@@ -232,7 +236,7 @@ export default defineComponent({
     const alert = computed(() => storeApplications.state.applications.alert)
 
     // manage view
-    const orderView = ref(orderTabView.value)
+    const orderView = ref(storeOrders.state.orders.orderTabView)
     const isOnListView = computed(() => {
       return orderView.value === 0
     })
@@ -305,8 +309,8 @@ export default defineComponent({
     const fetchDebounced = () => {
       clearTimeout(fetchTimer.value)
 
-      fetchTimer.value = setTimeout(() => {
-        fetch()
+      fetchTimer.value = setTimeout(async () => {
+        await fetchOrders(pagination.value)
       }, 300)
     }
     const fetchOrders = async (params: FilterDetails) => {
@@ -343,14 +347,15 @@ export default defineComponent({
       } catch (error) {
         return error
       } finally {
-        $fetchState.pending = false
+        setTimeout(() => {
+          $fetchState.pending = false
+        }, 1500)
       }
     }
-    const { $fetchState, fetch } = useFetch(async () => {
+    const { $fetchState } = useFetch(() => {
       setTimeout(() => {
         storeApplications.commit('applications/RESET_ALERT')
       }, 3000)
-      await fetchOrders(pagination.value)
     })
 
     const doDownloadSelectedLabel = async () => {
@@ -376,7 +381,9 @@ export default defineComponent({
       } catch (error) {
         return error
       } finally {
-        $fetchState.pending = false
+        setTimeout(() => {
+          $fetchState.pending = false
+        }, 1500)
       }
     }
     const doExportOrders = async () => {
@@ -400,7 +407,9 @@ export default defineComponent({
       } catch (error) {
         return error
       } finally {
-        $fetchState.pending = false
+        setTimeout(() => {
+          $fetchState.pending = false
+        }, 1500)
       }
     }
 
