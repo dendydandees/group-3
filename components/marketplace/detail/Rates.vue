@@ -23,9 +23,9 @@
   <div v-else class="text-star-wrapper">
     <!-- for overall -->
     <div>
-      <template v-for="{ id, status, rating } in overallRates">
+      <template v-for="({ id, status, rating }, i) in overallRates">
         <div
-          :key="id"
+          :key="id + ' ' + i"
           class="text-star d-flex align-center mb-2"
           :style="
             lastMileRates.length !== 0 || customRates.length !== 0
@@ -62,7 +62,7 @@
       <template v-for="({ id, status, rating }, LMRatesIndex) in lastMileRates">
         <span
           v-if="LMRatesIndex === 0"
-          :key="id"
+          :key="id + ' ' + LMRatesIndex"
           class="text-center d-block font-weight-bold subtitle-2 mt-3"
         >
           Last Mile

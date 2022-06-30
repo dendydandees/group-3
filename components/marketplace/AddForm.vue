@@ -24,30 +24,46 @@
         </div>
         <div
           v-if="data.partnerServiceTypes && data.partnerServiceTypes.length > 0"
-          class="service d-flex align-center"
+          class="wrapper-your-partner pt-2"
         >
-          <div
-            v-for="(x, i) in data.partnerServiceTypes"
-            :key="i"
-            :class="`chip-custom ${$customUtils.setColorServiceType(
-              x.name,
-              'chip'
-            )}`"
-            :style="{
-              fontSize: '10px',
-              color: 'white',
-              padding: '4px 8px',
-              borderRadius: '100px',
-              background: 'blue',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '100%',
-              marginRight: i !== 1 ? '11px' : 'unset',
-            }"
-          >
-            {{ $customUtils.setServiceType(x.name) }}
-          </div>
+          <v-row>
+            <v-col
+              v-for="(x, i) in data.partnerServiceTypes"
+              :key="i"
+              :cols="`${data.partnerServiceTypes.length % 2 !== 0 && i === data.partnerServiceTypes.length - 1 ? '12' : '6'}`"
+              class="pa-1"
+            >
+              <div
+                :class="`chip-custom ${$customUtils.setColorServiceType(
+                  x.name,
+                  'chip'
+                )}`"
+                :style="{
+                  fontSize: '10px',
+                  color: 'white',
+                  padding: '4px 8px',
+                  borderRadius: '100px',
+                  background: 'blue',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '100%',
+                  marginRight: i !== 1 ? '11px' : 'unset',
+                }"
+              >
+                <span
+                :style="{
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }"
+                >
+                  {{ $customUtils.setServiceType(x.name) }}
+
+                </span>
+              </div>
+            </v-col>
+          </v-row>
         </div>
         <div
           v-if="data.description"
