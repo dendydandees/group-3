@@ -23,7 +23,7 @@
               >
                 <v-col cols="12" md="auto" class="text-center">
                   <v-avatar
-                    :size="$vuetify.breakpoint.mobile ? 120 : 80"
+                    :size="$vuetify.breakpoint.mobile ? 120 : 100"
                     class="elevation-2"
                   >
                     <v-img
@@ -36,7 +36,7 @@
                     <v-icon
                       v-else
                       dark
-                      :size="$vuetify.breakpoint.mobile ? 80 : 50"
+                      :size="$vuetify.breakpoint.mobile ? 80 : 60"
                       color="primary"
                       class="mt-0 mt-md-1"
                     >
@@ -98,7 +98,8 @@
                       </div>
                     </div>
 
-                    <div class="d-flex d-md-inline-flex">
+                    <!-- COMING SOON -->
+                    <!-- <div class="d-flex d-md-inline-flex">
                       <v-icon
                         size="24"
                         color="primary"
@@ -120,7 +121,7 @@
                           }}
                         </span>
                       </div>
-                    </div>
+                    </div> -->
                   </div>
                 </v-col>
 

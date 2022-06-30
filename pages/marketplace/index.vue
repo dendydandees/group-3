@@ -198,7 +198,8 @@
             !filter.search &&
             !filter.country &&
             filter.service.length === 0 &&
-            isOnMarketplaces
+            isOnMarketplaces &&
+            marketplacesConnected.length
           "
         >
           <h1 class="title mb-6 mt-16 text-capitalize">
@@ -244,10 +245,10 @@
               <v-btn
                 text
                 color="secondary"
-                :disabled="$fetchState.pending"
+                :disabled="$fetchState.pending || !marketplacesConnected.length"
                 @click="pageView = 'networkPartners'"
               >
-                View your connected vendors
+                View your connected partners
               </v-btn>
             </div>
           </div>
