@@ -459,8 +459,8 @@ export default defineComponent({
     const fetchDebounced = () => {
       clearTimeout(fetchTimer.value)
 
-      fetchTimer.value = setTimeout(() => {
-        fetch()
+      fetchTimer.value = setTimeout(async () => {
+        await fetchIncomingOrders(pagination.value)
       }, 300)
     }
     const fetchIncomingOrders = async (_params: FilterDetails) => {
@@ -489,10 +489,8 @@ export default defineComponent({
         $fetchState.pending = false
       }
     }
-    const { $fetchState, fetch } = useFetch(async () => {
+    const { $fetchState } = useFetch(() => {
       storeApplications.commit('applications/RESET_ALERT')
-
-      await fetchIncomingOrders(pagination.value)
     })
 
     onMounted(() => {
