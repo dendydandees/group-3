@@ -81,7 +81,7 @@ import {
 import { ValidationObserver } from 'vee-validate'
 
 // interfaces and types
-import { VForm, VuexModuleApplications } from '~/types/applications'
+import { ErrorAPI, VForm, VuexModuleApplications } from '~/types/applications'
 import {
   OrderCrossBorder,
   OrderDomestic,
@@ -90,13 +90,6 @@ import {
 
 export interface Select {
   country: string
-}
-
-interface ErrorUpload {
-  data: {
-    error: string
-    ErrorDetails: { field: string; reason: string; note: string }[]
-  }
 }
 
 export default defineComponent({
@@ -199,7 +192,7 @@ export default defineComponent({
       } catch (error: any) {
         const {
           data: { error: normalError = '', ErrorDetails: listError = [] } = {},
-        } = error as ErrorUpload
+        } = error as ErrorAPI
         let message =
           alert.value.message ||
           ('Order upload data invalid, The data contained in the file you uploaded is incorrect. Please add data according to the existing sample file!' as

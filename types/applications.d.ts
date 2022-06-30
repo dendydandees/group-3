@@ -77,3 +77,11 @@ export interface Header {
   sortable?: boolean
   width?: number
 }
+
+export interface ErrorAPI {
+  data: {
+    error?: string
+    ErrorDetails: { field: string; reason: string; note: string }[]
+    Message?: string
+  }
+}
