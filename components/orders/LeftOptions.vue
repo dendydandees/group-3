@@ -27,9 +27,9 @@
     <v-btn
       :depressed="isShowFilter"
       :outlined="isShowFilter"
-      :disabled="loading || !isOnBagsTab.filter"
+      :disabled="loading || (currentRoute === 'bagging' && !isOnBagsTab.filter)"
       color="primary"
-      :class="[isOnListView ? 'mr-2' : '']"
+      class="mr-2"
       @click="$emit('doShowFilter')"
     >
       Filter
@@ -38,14 +38,20 @@
     <span v-if="isOnListView" class="subtitle-2 text--secondary">
       {{ selectedOrders.length }} Orders selected
     </span>
+
     <span v-if="isOnBagsTab.text" class="subtitle-2 text--secondary">
-      {{ selectedOrders.length }} {{isUnbagged ? 'Unbagged' : 'Bag'}} selected
+      {{ selectedOrders.length }} {{ isUnbagged ? 'Unbagged' : 'Bag' }} selected
     </span>
   </v-col>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from '@nuxtjs/composition-api'
+import {
+  defineComponent,
+  PropType,
+  useRoute,
+  computed,
+} from '@nuxtjs/composition-api'
 import { Order } from '~/types/orders'
 
 export default defineComponent({
@@ -57,7 +63,7 @@ export default defineComponent({
       type: Object,
       default: () => ({
         text: false,
-        filter: false
+        filter: false,
       }),
     },
     loading: {
@@ -79,6 +85,15 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+  },
+  setup() {
+    // manage route
+    const route = useRoute()
+    const currentRoute = computed(() => route.value.name)
+
+    return {
+      currentRoute,
+    }
   },
 })
 </script>
