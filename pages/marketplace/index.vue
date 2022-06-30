@@ -56,7 +56,7 @@
                 <v-img
                   height="100%"
                   class="align-end opacity opacity-custom custom-slide"
-                  :style="`${hover && 'opacity: .8; filter: contrast(1.5);'}`"
+                  :style="`${hover && 'filter: brightness(95%);'}`"
                   :src="
                     slide.partnerGallery[0]
                       ? slide.partnerGallery[0].path
@@ -225,7 +225,7 @@
                           contain
                           :style="`${
                             hover
-                              ? 'cursor: pointer; opacity: .8; transform: scale(1.1); filter: contrast(1.5);'
+                              ? 'cursor: pointer; transform: scale(1.1); filter: brightness(95%);'
                               : ''
                           } border: 1px solid #1961e4;`"
                           v-on="on"
@@ -285,8 +285,7 @@
                   tile
                   class="rounded-xl d-flex flex-column justify-space-between card-partner-custom"
                   :style="`${
-                    hover &&
-                    'opacity: .8; transform: scale(1.1); filter: contrast(1.5);'
+                    hover && 'transform: scale(1.1); filter: brightness(95%);'
                   }`"
                   width="100%"
                   height="245px"
