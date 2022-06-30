@@ -247,7 +247,7 @@
                 :disabled="$fetchState.pending"
                 @click="pageView = 'networkPartners'"
               >
-                View your connected vendors
+                View your connected partners
               </v-btn>
             </div>
           </div>
