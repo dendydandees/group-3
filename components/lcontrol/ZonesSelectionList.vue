@@ -92,7 +92,7 @@ export default defineComponent({
       required: true,
     },
   },
-  setup({ portsMeta, showPortsOrZones, isOnServiceType }, { emit }) {
+  setup(props, { emit }) {
     // manage store
     const storeOfLControls = useStore<VuexModuleLControls>()
     const storeMarketplaces = useStore<VuexModuleMarketplaces>()
@@ -108,7 +108,7 @@ export default defineComponent({
 
     const isRulesExist = (data: ZoneData | PortData, checkOn: string) => {
       const lControlDetail = lControlList.value.find((lcontrol) =>
-        isOnServiceType.lastMile
+        props.isOnServiceType.lastMile
           ? lcontrol.zoneID === data.id
           : lcontrol.portID === data.id
       )
@@ -130,14 +130,14 @@ export default defineComponent({
     ) => {
       if (
         !isIntersecting ||
-        portsMeta.itemsPerPage >= showPortsOrZones.length
+        props.portsMeta.itemsPerPage >= props.showPortsOrZones.length
       ) {
         return
       }
 
       emit('changePortsMeta', {
         page: 1,
-        itemsPerPage: portsMeta.itemsPerPage + 10,
+        itemsPerPage: props.portsMeta.itemsPerPage + 10,
       })
       await emit('getPorts')
     }

@@ -58,6 +58,7 @@
                   <BaseLoadingLinear
                     v-if="$fetchState.pending"
                     :title="'Getting form data...'"
+                    class="mt-6"
                   />
 
                   <div v-else>
@@ -499,6 +500,10 @@ export default defineComponent({
       }, 1500)
     }
     const handleSubmit = async () => {
+      const countryName = `${
+        userSelected.value.country.name.charAt(0) +
+        userSelected.value.country.name.slice(1).toLowerCase()
+      }`
       const { customs, lastMile } = isOnServiceType.value
       const {
         country,
@@ -539,16 +544,36 @@ export default defineComponent({
 
       try {
         $fetchState.pending = true
-        await storeOfLControls.dispatch('lControls/updateLControl', data)
+        storeOfApplications.commit('applications/RESET_ALERT')
+        const responseUpdate = await storeOfLControls.dispatch(
+          'lControls/updateLControl',
+          data
+        )
+
+        if (responseUpdate && responseUpdate.response.status >= 400)
+          throw responseUpdate.response.data
+
         await getLControl({
           country: userSelected.value.country.value,
           serviceType: userSelected.value.serviceType.name,
           isForZone: true,
         })
+        storeOfApplications.commit('applications/SET_ALERT', {
+          isShow: true,
+          type: 'success',
+          message: `Successfully to updated L-Control rules for ${countryName}!`,
+        })
       } catch (error) {
+        storeOfApplications.commit('applications/SET_ALERT', {
+          isShow: true,
+          type: 'error',
+          message: `Failed to updated L-Control rules for ${countryName}!`,
+        })
         return error
       } finally {
-        $fetchState.pending = false
+        setTimeout(() => {
+          $fetchState.pending = false
+        }, 1500)
       }
     }
     const stateOther = {

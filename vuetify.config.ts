@@ -28,7 +28,7 @@ export default {
         secondary: '#FF3D17',
         base: '#FFFFFF',
         info: colors.teal.lighten1,
-        success: colors.green.accent4,
+        success: colors.green,
       },
     },
   },
