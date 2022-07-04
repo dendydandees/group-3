@@ -18,7 +18,6 @@
           <v-col cols="12" md="12" class="px-2 py-4">
             <v-text-field
               v-model="mawbInput.mawb"
-              clearable
               outlined
               dense
               rounded
@@ -52,7 +51,7 @@
             <v-col cols="12" md="3" class="px-2">
               <v-text-field
                 v-model="mawbInput.generateManifest[x.id].length"
-                clearable
+
                 outlined
                 dense
                 rounded
@@ -64,12 +63,13 @@
                 class="input-filter"
                 append-icon="cm"
                 min="0"
+                oninput="validity.valid||(value='')"
               />
             </v-col>
             <v-col cols="12" md="3" class="px-2">
               <v-text-field
                 v-model="mawbInput.generateManifest[x.id].width"
-                clearable
+
                 outlined
                 dense
                 rounded
@@ -81,12 +81,13 @@
                 class="input-filter"
                 append-icon="cm"
                 min="0"
+                oninput="validity.valid||(value='')"
               />
             </v-col>
             <v-col cols="12" md="3" class="px-2">
               <v-text-field
                 v-model="mawbInput.generateManifest[x.id].height"
-                clearable
+
                 outlined
                 dense
                 rounded
@@ -98,12 +99,13 @@
                 class="input-filter"
                 append-icon="cm"
                 min="0"
+                oninput="validity.valid||(value='')"
               />
             </v-col>
             <v-col cols="12" md="3" class="px-2">
               <v-text-field
                 v-model="mawbInput.generateManifest[x.id].weight"
-                clearable
+
                 outlined
                 dense
                 rounded
@@ -115,6 +117,7 @@
                 class="input-filter"
                 append-icon="kg"
                 min="0"
+                oninput="validity.valid||(value='')"
               />
             </v-col>
           </v-row>
@@ -213,7 +216,7 @@ export default defineComponent({
             isEmpty: !(x.length && x.width && x.height && x.weight)
           }
         })
-        return arrIsEmpty.some((x) => x.isEmpty)
+        return arrIsEmpty.some((x) => x.isEmpty) || !mawbInput.value.mawb
       }
     }
 
