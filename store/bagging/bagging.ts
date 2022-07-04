@@ -108,5 +108,21 @@ export const actions: ActionTree<RootStateBagging, RootStateBagging> =
       return error;
     }
   },
+  async getMAWBUpdate({ commit }, { bagID, payload }: { bagID: string, payload: { mawb: string; }; }) {
+    try {
+      const response = await this.$axios.$patch(
+        `/api/clients/bags/${ bagID }`,
+        payload
+      );
+
+      if (!response) throw response;
+
+      commit('SET_BAG_UPDATE', response.bag_updates);
+
+      return response;
+    } catch (error) {
+      return error;
+    }
+  },
 
 };

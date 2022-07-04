@@ -53,6 +53,7 @@ export interface Bagged {
   origin_port: string,
   status: string,
   orders: Order[];
+  mawb: string;
 }
 
 export interface Unbagged {

@@ -1,5 +1,10 @@
 <template>
-  <v-dialog v-model="dialog" max-width="800" @click:outside="toggle()">
+  <v-dialog
+    v-model="dialog"
+    max-width="800"
+    :persistent="mawbInputLoading"
+    @click:outside="toggle()"
+  >
     <v-card
       class=" timeline-wrapper-bagging pa-6"
       :loading="fetchState.pending"
@@ -8,6 +13,38 @@
       <v-card-title class="text-h5">
         {{dataItem.group_name && dataItem.group_name}}
       </v-card-title>
+
+      <v-row
+        class="px-6 py-4"
+      >
+        <v-col cols="12" md="10" class="px-2 py-4">
+          <v-text-field
+            v-model="mawbInput"
+            outlined
+            dense
+            rounded
+            hide-details
+            label="MAWB No"
+            placeholder="Enter your MAWB..."
+            background-color="white"
+            type="search"
+            :disabled="mawbInputLoading"
+            :loading="mawbInputLoading"
+          />
+        </v-col>
+        <v-col cols="12" md="2" class="px-2 py-4" align-self="center">
+          <v-btn
+            :loading="mawbInputLoading"
+            :disabled="mawbInputLoading || !mawbInput || (dataItem.mawb === mawbInput)"
+            color="primary"
+            class=""
+            width="100%"
+            @click="submitMAWB()"
+          >
+            Submit
+          </v-btn>
+        </v-col>
+      </v-row>
       <div
         v-if="data && data.length"
       >
@@ -100,7 +137,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, computed , useContext} from '@nuxtjs/composition-api'
+import { defineComponent, PropType, computed , useContext, ref, useStore, watch} from '@nuxtjs/composition-api'
 // Interfaces and types
 import { ModalConfirm } from '~/types/applications'
 import { VuexModuleDetailBagging, FilterBagging, Unbagged, InputPostBag, BagUpdate, Bagged} from '~/types/bagging/bagging'
@@ -134,10 +171,13 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const { $dateFns, app } = useContext()
+    const mawbInput = ref('')
+    const mawbInputLoading = ref(false)
     const dialog = computed({
       get: () => props.value,
       set: (value: boolean) => emit('input', value),
     })
+    const storeBagging = useStore<VuexModuleDetailBagging>()
     const doClose = () => {
       if(props.isConfirm) {
         emit('doCancel')
@@ -162,11 +202,56 @@ export default defineComponent({
       // return data
     }
 
+    const fetchMAWBUpdates = async () => {
+
+      try {
+        mawbInputLoading.value = true
+        await storeBagging.dispatch(
+          'bagging/bagging/getMAWBUpdate',
+          {
+            bagID: props.dataItem.id,
+            payload: {mawb: mawbInput.value}
+          }
+        )
+        await fetchBags()
+        mawbInputLoading.value = false
+      } catch (error) {
+        return error
+      }
+    }
+
+    function submitMAWB() {
+      fetchMAWBUpdates()
+    }
+    async function fetchBags () {
+
+      try {
+        await storeBagging.dispatch('bagging/bagging/getBags')
+      } catch (error) {
+        return error
+      }
+    }
+    watch(
+      dialog,
+      (newDialog) => {
+        if(!newDialog) {
+
+          mawbInput.value = ''
+        } else {
+          mawbInput.value = props.dataItem.mawb
+        }
+      },
+      { deep: true }
+    )
+
     return {
       dialog,
       doClose,
       toggle,
-      formatDateTime
+      formatDateTime,
+      mawbInput,
+      mawbInputLoading,
+      submitMAWB
     }
   },
 })
