@@ -8,7 +8,8 @@ import {
   Bagged,
   Unbagged,
   BagUpdate,
-  TabState
+  TabState,
+  BagDataPartner
 } from '~/types/bagging/bagging';
 import tempData from '~/static/tempData';
 
@@ -44,7 +45,9 @@ export const state = () => ({
       '1': 0
     },
     step: 0
-  } as TabState
+  } as TabState,
+  bagsPartner: [] as Unbagged[],
+  unbaggedPartner: [] as Unbagged[],
 });
 
 export type RootStateBagging = ReturnType<typeof state>;
@@ -60,6 +63,10 @@ export const mutations: MutationTree<RootStateBagging> = {
   SET_FILTER_BTN: (state) => (state.isShowFilter = !state.isShowFilter),
   SET_TAB_BTN: (state, value: TabState) => (state.tab = value),
   RESET_FILTER: (state) => (state.filter = filterBaggingInit),
+  SET_DATA_PARTNER_BAG: (state, value: BagDataPartner) => {
+    state.bagsPartner = value.bagged ?? [];
+    state.unbaggedPartner = value.unbagged ?? [];
+  },
 };
 
 export const actions: ActionTree<RootStateBagging, RootStateBagging> =
@@ -86,9 +93,12 @@ export const actions: ActionTree<RootStateBagging, RootStateBagging> =
       return error;
     }
   },
-  async postScanOrder({ commit }, { orderID }: { orderID: string; }) {
+  async postScanPartner({ commit }, { orderIDs }: { orderIDs: string[]; }) {
     try {
-      const response = await this.$axios.$post(`/api/clients/scan-order/${ orderID }`);
+      const response = await this.$axios.$post(
+        `/api/clients/scan`,
+        { order_ids: orderIDs }
+      );
       return response;
     } catch (error) {
       return error;
@@ -119,6 +129,19 @@ export const actions: ActionTree<RootStateBagging, RootStateBagging> =
 
       commit('SET_BAG_UPDATE', response.bag_updates);
 
+      return response;
+    } catch (error) {
+      return error;
+    }
+  },
+  async getBagsPartner({ commit }, { partnerID }: { partnerID: string; }) {
+    try {
+      const response = await this.$axios.$get(`/api/clients/partners/${ partnerID }/bags`);
+
+      if (!response) throw response;
+
+      commit('SET_DATA_PARTNER_BAG', response);
+      // commit('SET_META', meta);
       return response;
     } catch (error) {
       return error;

@@ -74,3 +74,8 @@ export interface BagData {
   bagged: Bagged[],
   unbagged: Unbagged[],
 }
+
+export interface BagDataPartner {
+  bagged: Unbagged[],
+  unbagged: Unbagged[],
+}

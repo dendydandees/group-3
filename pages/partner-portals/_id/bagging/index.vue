@@ -218,6 +218,7 @@ export default defineComponent({
   name: 'BaggingPages',
   middleware: 'partner',
   setup() {
+    const route = useRoute()
     const router = useRouter()
     const storeApplications = useStore<VuexModuleApplications>()
     const storeBagging = useStore<VuexModuleDetailBagging>()
@@ -520,10 +521,13 @@ export default defineComponent({
 
 
     async function fetchBags () {
+      const id = route.value.params.id
+      // console.log(id)
 
       try {
         $fetchState.pending = true
         await storeBagging.dispatch('bagging/bagging/getBags')
+        await storeBagging.dispatch('bagging/bagging/getBagsPartner', {partnerID: id})
       } catch (error) {
         return error
       } finally {
