@@ -77,6 +77,11 @@ export default defineComponent({
         icon: '$profile',
         to: `/partner-portals/${partnerId.value}/profiles`,
       },
+      // {
+      //   title: 'Partner Profile',
+      //   icon: 'mdi-bag-suitcase-outline',
+      //   to: `/partner-portals/${partnerId.value}/bagging`,
+      // },
     ]) as Ref<NavigationLinks[]>
     const isGroupShown = ref(true)
 
