@@ -218,6 +218,7 @@ export default defineComponent({
   name: 'BaggingPages',
   middleware: 'partner',
   setup() {
+    const route = useRoute()
     const router = useRouter()
     const storeApplications = useStore<VuexModuleApplications>()
     const storeBagging = useStore<VuexModuleDetailBagging>()
@@ -327,7 +328,8 @@ export default defineComponent({
 
     // const dataTemp = tempData.bagging.data.unbagged as Unbagged[]
     const dataMerged =  computed(() => {
-      const data = (storeBagging.state.bagging as any).bagging.unbagged as Unbagged[]
+      const data =  (storeBagging.state.bagging as any).bagging.unbagged as Unbagged[]
+      // const data = step.value === 2 ? (storeBagging.state.bagging as any).bagging.bagsPartner as Unbagged[]  : (storeBagging.state.bagging as any).bagging.unbaggedPartner as Unbagged[]
       let tempArr = [] as {group_name: string, id: string, orderCode: string, new?: boolean}[]
       data.forEach(x => {
         newScanned.value.forEach((k: {orderCode: string, new?: boolean}) => {
@@ -520,10 +522,13 @@ export default defineComponent({
 
 
     async function fetchBags () {
+      const id = route.value.params.id
+      // console.log(id)
 
       try {
         $fetchState.pending = true
         await storeBagging.dispatch('bagging/bagging/getBags')
+        // await storeBagging.dispatch('bagging/bagging/getBagsPartner', {partnerID: id})
       } catch (error) {
         return error
       } finally {

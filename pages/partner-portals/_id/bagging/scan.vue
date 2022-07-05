@@ -144,6 +144,7 @@ import {
   useRouter,
   useContext,
   onMounted,
+  onUnmounted
 } from '@nuxtjs/composition-api'
 // Interface and types
 import {
@@ -224,6 +225,15 @@ export default defineComponent({
       localStorage.setItem(`newScanned.${isBagsTabPartner.value ? 'bagsTab' : 'scannedTab'}.partner.${user.email}`, JSON.stringify( temp))
 
     })
+    onUnmounted(() => {
+      const payloadArr = parseInput()
+      let orderIDs = payloadArr.map((x: InputPostBag) => {
+        return x.order_ids
+      })
+      orderIDs = [].concat.apply([], orderIDs);
+      if(orderIDs && orderIDs.length) postScanPartner(orderIDs)
+
+    })
 
     function parseInput() {
       let orderGroups = unbaggedData.value.map((x: Unbagged) => x.order_group && x.order_group).filter((z: any) => z && z.length > 0)
@@ -245,6 +255,11 @@ export default defineComponent({
       try {
         dialogSettings.value.loading = true
         const payloadArr = parseInput()
+        let orderIDs = payloadArr.map((x: InputPostBag) => {
+          return x.order_ids
+        })
+        orderIDs = [].concat.apply([], orderIDs);
+        // console.log({payloadArr})
         await Promise.all(
           payloadArr.map(async (el: InputPostBag) => {
             try {
@@ -257,6 +272,8 @@ export default defineComponent({
             }
           })
         )
+
+        await postScanPartner(orderIDs)
         await fetchBags()
         allScanned.value = allScanned.value.map((x: any) => {
           return {
@@ -290,6 +307,20 @@ export default defineComponent({
         setTimeout(() => {
           storeApplications.commit('applications/RESET_ALERT')
         }, 3000)
+      }
+    }
+    async function postScanPartner (orderIDs: string[]) {
+
+      try {
+        $fetchState.pending = true
+        await storeBagging.dispatch(
+          'bagging/bagging/postScanPartner',
+          {orderIDs}
+        )
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
       }
     }
     async function handleCancel() {
