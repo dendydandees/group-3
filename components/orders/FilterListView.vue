@@ -299,6 +299,7 @@ import {
   VuexModuleFilters,
   Ports,
   Statuses,
+  ServiceType,
 } from '~/types/filters'
 import { FilterOrders } from '~/types/orders'
 
@@ -400,7 +401,11 @@ export default defineComponent({
 
     // manage service types
     const formatServiceTypes = () => {
-      return storeFilter.state.filters.serviceTypes.map((type) => ({
+      const serviceTypes = app.$customUtils.sortServiceTypes([
+        ...storeFilter.state.filters.serviceTypes,
+      ]) as ServiceType[]
+
+      return serviceTypes.map((type) => ({
         text: app.$customUtils.setServiceType(type.name),
         value: type.name,
       }))
@@ -423,18 +428,27 @@ export default defineComponent({
           return 0
         }
       ) as Statuses[]
+      const formattedStatus = [
+        ...status.filter((item) => item.ServiceType === 'FIRST_MILE'),
+        ...status.filter(
+          (item) =>
+            item.ServiceType !== 'FIRST_MILE' &&
+            item.ServiceType !== 'LAST_MILE'
+        ),
+        ...status.filter((item) => item.ServiceType === 'LAST_MILE'),
+      ]
 
       let currentType = ''
-      status.forEach((item, index) => {
+      formattedStatus.forEach((item, index) => {
         const serviceType = app.$customUtils.setServiceType(item.ServiceType)
 
         if (currentType === serviceType) return
 
         currentType = serviceType
-        status.splice(index, 0, { header: serviceType } as any)
+        formattedStatus.splice(index, 0, { header: serviceType } as any)
       })
 
-      return status
+      return formattedStatus
     }
 
     useFetch(async () => {

@@ -1,9 +1,31 @@
 import { defineNuxtPlugin } from '@nuxtjs/composition-api'
+// types
+import { ServiceType } from '~/types/filters'
 
 export default defineNuxtPlugin((context, inject) => {
   const { $dateFns } = context
 
   const customUtils = {
+    /* sort the service types
+     * 1. First Mile
+     * 2. Customs
+     * 3. Freight Forwarder
+     * 4. Last Mile
+     */
+    sortServiceTypes: (data: ServiceType[]) => {
+      const serviceTypes = [...data]
+
+      if (serviceTypes.length === 0) return []
+
+      return [
+        ...serviceTypes.filter((service) => service.name === 'FIRST_MILE'),
+        ...serviceTypes.filter(
+          (service) =>
+            service.name !== 'FIRST_MILE' && service.name !== 'LAST_MILE'
+        ),
+        ...serviceTypes.filter((service) => service.name === 'LAST_MILE'),
+      ]
+    },
     capitalize: (text: string) => {
       return text.charAt(0) + text.slice(1)
     },
