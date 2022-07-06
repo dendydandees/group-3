@@ -1,5 +1,10 @@
 <template>
-  <v-menu bottom offset-y :close-on-content-click="false">
+  <v-menu
+    bottom
+    offset-y
+    :close-on-content-click="false"
+    transition="slide-y-transition"
+  >
     <template #activator="{ attrs, on }">
       <v-btn
         text
@@ -15,7 +20,7 @@
       </v-btn>
     </template>
 
-    <v-card color="transparent" style="backdrop-filter: blur(8px)">
+    <v-card color="transparent" style="backdrop-filter: blur(16px)">
       <v-row no-gutters class="py-4">
         <v-col cols="12" class="px-4">
           <span class="text--secondary subtitle-2">Only Show : </span>
