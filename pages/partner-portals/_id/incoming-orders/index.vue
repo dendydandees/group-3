@@ -267,7 +267,7 @@ export default defineComponent({
     // manage table
     const selectedOrders = ref([]) as Ref<IncomingOrder[]>
     const actionExist = ref({
-      download: true,
+      downloadSelection: true,
     })
     const isExternalTrackingExist = computed(() => {
       return incomingOrders.value.some((order: IncomingOrder) => {

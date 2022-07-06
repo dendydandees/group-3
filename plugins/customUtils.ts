@@ -4,6 +4,9 @@ export default defineNuxtPlugin((context, inject) => {
   const { $dateFns } = context
 
   const customUtils = {
+    capitalize: (text: string) => {
+      return text.charAt(0) + text.slice(1)
+    },
     setAddress: (data: string[]): string => {
       const setItem = data.filter((item: string) => item)
 

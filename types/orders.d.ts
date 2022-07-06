@@ -25,6 +25,7 @@ export interface UpdatesOrderAllocation {
   status: string
   updateTimestamp: string
 }
+
 export interface OrderAllocationData {
   id: string
   externalTrackingNumber: string
@@ -80,6 +81,7 @@ export interface OrderAllocationUpdate {
     partnerUpdates: PartnerUpdates
   }
   updates: PartnerUpdates[]
+  labelURL: string
 }
 
 export interface Order {

@@ -138,13 +138,13 @@
 
     <!-- START BAGGING PAGE -->
     <!-- order bags -->
-    <template #[`item.orderBags`]="{ item}">
+    <template #[`item.orderBags`]="{ item }">
       <div class="text--secondary">
         {{ item.orders.length }}
       </div>
     </template>
     <!-- status bags -->
-    <template #[`item.statusBags`]="{ item}">
+    <template #[`item.statusBags`]="{ item }">
       <div class="text--secondary">
         {{ item.status }}
       </div>
@@ -153,56 +153,12 @@
 
     <!-- ACTIONS -->
     <template #[`item.actions`]="{ item }">
-      <div class="d-flex align-center">
-        <v-btn
-          v-if="actionExist.export"
-          small
-          dark
-          :loading="loading"
-          color="cyan darken-1"
-          class="ma-2"
-          @click="doExportOrder(item.id)"
-        >
-          Export
-        </v-btn>
-
-        <v-btn
-          v-if="actionExist.edit"
-          small
-          :dark="!!item.labelPath"
-          :loading="loading"
-          color="teal darken-1"
-          class="ma-2 white--text"
-          @click="doMovePageBagPartner(item)"
-        >
-          Edit
-        </v-btn>
-
-        <v-btn
-          v-if="actionExist.download"
-          small
-          download
-          :dark="!!item.labelPath"
-          :href="item.labelPath || ''"
-          :loading="loading"
-          :disabled="!item.labelPath"
-          color="teal darken-1"
-          class="ma-2"
-        >
-          Download
-        </v-btn>
-        <v-btn
-          v-if="actionExist.updates"
-          small
-          dark
-          :loading="loading"
-          color="cyan darken-1"
-          class="ma-2"
-          @click="track(item)"
-        >
-          Track
-        </v-btn>
-      </div>
+      <BaseTableActions
+        :item="item"
+        :action-exist="actionExist"
+        @doHandleModalTrack="(value) => $emit('doHandleModalTrack', value)"
+        @doMovePageBagPartner="(value) => $emit('doMovePageBagPartner', value)"
+      />
     </template>
     <!-- END ACTIONS -->
 
@@ -251,19 +207,14 @@ import {
   computed,
   PropType,
   useRoute,
-  useStore,
-  useContext,
-  useFetch
 } from '@nuxtjs/composition-api'
-import { saveAs } from 'file-saver'
 // types
 import { FilterDetails, Pagination } from '~/types/applications'
-import { Order, OrderAllocationUpdate, VuexModuleOrders } from '~/types/orders'
+import { Order, OrderAllocationUpdate } from '~/types/orders'
 import {
   IncomingOrder,
   OrderAllocation,
 } from '~/types/partnerPortals/incomingOrders'
-import { VuexModuleDetailBagging, FilterBagging, Unbagged, InputPostBag, Bagged} from '~/types/bagging/bagging'
 
 export default defineComponent({
   name: 'BaseTable',
@@ -303,7 +254,8 @@ export default defineComponent({
       type: Object,
       default: () => ({
         export: false,
-        download: false,
+        downloadSingle: false,
+        downloadSelection: false,
       }),
     },
   },
@@ -330,13 +282,7 @@ export default defineComponent({
       return false
     }
 
-    // START FOR BAGGING
-    const storeBagging = useStore<VuexModuleDetailBagging>()
-    // END FOR BAGGING
-
     // FOR ORDER AND INCOMING ORDER
-    const storeOrders = useStore<VuexModuleOrders>()
-    const { $dateFns } = useContext()
     const setStatusOrder = (orderAllocations: OrderAllocationUpdate[]) => {
       const allocations = orderAllocations?.filter(
         (allocations) => allocations.updates && allocations.updates.length !== 0
@@ -353,29 +299,7 @@ export default defineComponent({
         )?.externalTrackingNumber ?? ''
       )
     }
-    const doExportOrder = async (id: string) => {
-      const response = await storeOrders.dispatch('orders/getSelectedExports', {
-        data: [id],
-      })
-      const fileName = `order_exports_${$dateFns.format(
-        new Date(),
-        'yyyy-MM-dd_HH-mm'
-      )}.xlsx`
-
-      saveAs(response, fileName)
-    }
     // END FOR ORDER AND INCOMING ORDER
-
-
-
-    function track (data: Bagged) {
-      emit('doHandleModalTrack', data)
-    }
-
-    function doMovePageBagPartner(data: any) {
-
-      emit('doMovePageBagPartner', data)
-    }
 
     return {
       selected,
@@ -385,9 +309,6 @@ export default defineComponent({
       // FOR ORDER AND INCOMING ORDER
       setStatusOrder,
       setLMTrackNumber,
-      doExportOrder,
-      track,
-      doMovePageBagPartner
     }
   },
 })
