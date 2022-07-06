@@ -497,6 +497,8 @@ import {
   useRouter,
   Ref,
   useMeta,
+  ComputedRef,
+  useContext,
 } from '@nuxtjs/composition-api'
 // components
 import NetworkPartnersList from '@/components/marketplace/networkPartners/List.vue'
@@ -507,7 +509,7 @@ import {
   FilterDetails,
   PartnerServiceZone,
 } from '~/types/marketplace/marketplace'
-import { VuexModuleFilters } from '~/types/filters'
+import { ServiceType, VuexModuleFilters } from '~/types/filters'
 import { VuexModuleApplications } from '~/types/applications'
 
 export default defineComponent({
@@ -518,6 +520,7 @@ export default defineComponent({
   layout: 'default',
   setup() {
     const router = useRouter()
+    const { app } = useContext()
     // store manage
     const storeMarketplaces = useStore<VuexModuleMarketplaces>()
     const storeFilters = useStore<VuexModuleFilters>()
@@ -541,7 +544,12 @@ export default defineComponent({
       ...storeMarketplaces.state.marketplaces.marketplaces.filter,
     })
     const zones = computed(() => storeFilters.state.filters.zones)
-    const serviceTypes = computed(() => storeFilters.state.filters.serviceTypes)
+    const serviceTypes = computed(
+      () =>
+        app.$customUtils.sortServiceTypes([
+          ...storeFilters.state.filters.serviceTypes,
+        ]) as ServiceType[]
+    ) as ComputedRef<ServiceType[]>
     const idPartner = ref({}) as Ref<Marketplace | {}>
 
     // manage view
