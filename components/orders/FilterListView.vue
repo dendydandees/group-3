@@ -406,7 +406,9 @@ export default defineComponent({
       ]) as ServiceType[]
 
       return serviceTypes.map((type) => ({
-        text: app.$customUtils.setServiceType(type.name),
+        text: app.$customUtils.capitalize(
+          app.$customUtils.setServiceType(type.name)
+        ),
         value: type.name,
       }))
     }
