@@ -9,7 +9,8 @@ import {
   Unbagged,
   BagUpdate,
   TabState,
-  BagDataPartner
+  BagDataPartner,
+  InputLabelBags
 } from '~/types/bagging/bagging';
 import tempData from '~/static/tempData';
 
@@ -142,6 +143,15 @@ export const actions: ActionTree<RootStateBagging, RootStateBagging> =
 
       commit('SET_DATA_PARTNER_BAG', response);
       // commit('SET_META', meta);
+      return response;
+    } catch (error) {
+      return error;
+    }
+  },
+  async postLabelBags({ commit }, { payload }: { payload: InputLabelBags; }) {
+    try {
+      const response = await this.$axios.$post('/api/clients/label/bags', payload
+      );
       return response;
     } catch (error) {
       return error;

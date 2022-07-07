@@ -154,7 +154,7 @@ import {
   Header,
 } from '~/types/applications'
 import { VuexModuleFilters, Statuses, CountryCode } from '~/types/filters'
-import { VuexModuleDetailBagging, FilterBagging, Unbagged, InputPostBag, Order, Bagged} from '~/types/bagging/bagging'
+import { VuexModuleDetailBagging, FilterBagging, Unbagged, InputPostBag, Order, Bagged, InputLabelBags} from '~/types/bagging/bagging'
 
 export default defineComponent({
   name: 'ScanPages',
@@ -242,10 +242,19 @@ export default defineComponent({
         await Promise.all(
           payloadArr.map(async (el: InputPostBag) => {
             try {
-              await storeBagging.dispatch(
+              const returnPostBag = await storeBagging.dispatch(
                 'bagging/bagging/postBags',
                 {payload: el}
               )
+              if(
+                returnPostBag &&
+                Object.keys(returnPostBag).length > 0 &&
+                returnPostBag.id &&
+                returnPostBag.group_name
+              ) {
+                const label = await postLabelBags({bag_id: returnPostBag.id, group_name: returnPostBag.group_name})
+                if(!params?.isCancel && label) await window.open(label, '_self')
+              }
             } catch (error) {
               return error
             }
@@ -473,6 +482,18 @@ export default defineComponent({
 
     function disabledCloseBag() {
       return !allScanned.value.some((x: any) => x.new)
+    }
+
+    async function postLabelBags (payload: InputLabelBags) {
+
+      try {
+        $fetchState.pending = true
+        return await storeBagging.dispatch('bagging/bagging/postLabelBags', {payload})
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
     }
 
     useMeta(() => ({ title: 'Client Portal | Scan' }))

@@ -105,7 +105,7 @@ import {
   useContext
 } from '@nuxtjs/composition-api'
 import { ModalConfirm, VuexModuleApplications } from '~/types/applications'
-import { VuexModuleDetailBagging, FilterBagging, Unbagged, Bagged, Order, InputPostBag} from '~/types/bagging/bagging'
+import { VuexModuleDetailBagging, FilterBagging, Unbagged, Bagged, Order, InputPostBag, InputLabelBags} from '~/types/bagging/bagging'
 
 export default defineComponent({
   name: 'BaggingScanned',
@@ -169,10 +169,19 @@ export default defineComponent({
     async function submit(params: {isCancel?: boolean}) {
       try {
         dialogSettings.value.loading = true
-        await storeBagging.dispatch(
+        const returnPostBag = await storeBagging.dispatch(
           'bagging/bagging/postBags',
           {payload: selectedUnbagged.value}
         )
+        if(
+          returnPostBag &&
+          Object.keys(returnPostBag).length > 0 &&
+          returnPostBag.id &&
+          returnPostBag.group_name
+        ) {
+          const label = await postLabelBags({bag_id: returnPostBag.id, group_name: returnPostBag.group_name})
+          if(!params?.isCancel && label) window.open(label, '_self')
+        }
         await fetchBags()
         const textMsg = params?.isCancel ? 'Close Bag' : 'Print label'
 
@@ -222,6 +231,18 @@ export default defineComponent({
       }
       dialog.value.cancel = true
 
+    }
+
+    async function postLabelBags (payload: InputLabelBags) {
+
+      try {
+        // $fetchState.pending = true
+        return await storeBagging.dispatch('bagging/bagging/postLabelBags', {payload})
+      } catch (error) {
+        return error
+      } finally {
+        // $fetchState.pending = false
+      }
     }
     return {
       dataComp,

@@ -89,6 +89,19 @@
     </v-menu>
 
     <v-btn
+      v-if="actionExist.downloadBagging"
+      small
+      download
+      :dark="!!item.label_url"
+      :href="item.label_url || ''"
+      :loading="loading"
+      :disabled="!item.label_url"
+      color="teal darken-1"
+      class="ma-2"
+    >
+      Download
+    </v-btn>
+    <v-btn
       v-if="actionExist.updates"
       small
       dark

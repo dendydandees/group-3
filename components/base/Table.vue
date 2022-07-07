@@ -210,6 +210,7 @@ import {
 } from '@nuxtjs/composition-api'
 // types
 import { FilterDetails, Pagination } from '~/types/applications'
+import { Bagged } from '~/types/bagging/bagging'
 import { Order, OrderAllocationUpdate } from '~/types/orders'
 import {
   IncomingOrder,
@@ -272,11 +273,14 @@ export default defineComponent({
       emit('doSelectAll', data)
     }
 
-    const validateSelect = (item: Order | IncomingOrder) => {
+    const validateSelect = (item: Order | IncomingOrder | Bagged) => {
       if (route.value.name === 'partner-portals-id-incoming-orders') {
         return !(item as IncomingOrder).orderAllocations.some(
           (el: OrderAllocation) => el.externalTrackingNumber
         )
+      }
+      if (route.value.name === 'bagging') {
+        return !(item as Bagged).label_url
       }
 
       return false

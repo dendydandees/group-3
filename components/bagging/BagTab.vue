@@ -173,7 +173,11 @@ export default defineComponent({
 
     const meta = computed(() => storeOrders.state.orders.meta)
     const pagination = ref({
-      ...storeApplications.state.applications.pagination,
+      // ...storeApplications.state.applications.pagination,
+      page: 1,
+      itemsPerPage: 1000,
+      sortBy: [''],
+      sortDesc: [true],
     })
     const filterOrder = ref({
       ...storeOrders.state.orders.filterOrder,
@@ -209,17 +213,17 @@ export default defineComponent({
       set: (value) => {
         emit('input', value)
       },
-    }) as Ref<Order[]>
+    }) as Ref<Bagged[]>
     // const selectedOrders = ref([]) as Ref<Order[]>
     const actionExist = computed(() => {
       let temp = {
         updates: true,
-        download: true,
+        downloadBagging: true,
       } as any
       if(props.isCompleteTabPartner) {
         temp = {
           edit: true,
-          download: true,
+          downloadBagging: true,
         }
       }
       return temp
@@ -285,9 +289,10 @@ export default defineComponent({
       }
       return temp
     }) as Ref<Header[]>
-    const selectAllToggle = ({ items }: { items: Order[]; value: boolean }) => {
+    const selectAllToggle = ({ items }: { items: Bagged[]; value: boolean }) => {
       if (selectedOrders.value.length === 0) {
-        return (selectedOrders.value = [...items])
+        const filterItems = [...items].filter((x) => x.label_url)
+        return (selectedOrders.value = filterItems)
       } else {
         return (selectedOrders.value = [])
       }
