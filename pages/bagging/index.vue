@@ -42,6 +42,7 @@
         color="primary"
         min-width="200px"
         :disabled="!Object.keys(selectedUnbagged).length && orderView !== 1"
+        :loading ="$fetchState.pending"
         @click="handleBagScanBag"
       >
         <v-icon
@@ -59,7 +60,8 @@
         v-else
         color="primary"
         min-width="200px"
-        :disabled="!selectedOrders.length"
+        :disabled="!selectedOrders.length || $fetchState.pending"
+        :loading ="$fetchState.pending"
         @click="handleBagScanBag"
       >
         {{
@@ -186,7 +188,7 @@ import {
 } from '~/types/applications'
 import { VuexModuleFilters, Statuses } from '~/types/filters'
 import { filterBaggingInit} from '~/store/bagging/bagging'
-import { VuexModuleDetailBagging, FilterBagging, Unbagged, InputPostBag} from '~/types/bagging/bagging'
+import { VuexModuleDetailBagging, FilterBagging, Unbagged, InputPostBag, InputLabelBags, Bagged} from '~/types/bagging/bagging'
 import tempData from '~/static/tempData'
 
 export default defineComponent({
@@ -247,7 +249,7 @@ export default defineComponent({
     // manage view
     const orderView = ref((storeBagging.state.bagging as any).bagging.tab.orderView[step.value])
     // manage table
-    const selectedOrders = ref([]) as Ref<any>
+    const selectedOrders = ref([]) as Ref<Bagged[] | []>
     // manage filter order
     const isShowFilter = ref((storeBagging.state.bagging as any).bagging.isShowFilter)
     const doResetFilter = () => {
@@ -378,7 +380,7 @@ export default defineComponent({
       { deep: true }
     )
 
-    function handleBagScanBag() {
+    async function handleBagScanBag() {
       dialogSettings.value = {
         loading: false,
         title: 'Print label now ?',
@@ -394,8 +396,30 @@ export default defineComponent({
           router.push(`/bagging/scan`)
         }
       } else {
-        dialog.value.confirm = true
+        await downloadAllLabel()
+        // dialog.value.confirm = true
       }
+    }
+    async function downloadAllLabel() {
+      const returnLabels =  await Promise.all(
+        selectedOrders.value.map(async (el: Bagged) => {
+          try {
+            if(
+              el &&
+              Object.keys(el).length > 0 &&
+              el.id &&
+              el.group_name
+            ) {
+              const label = await postLabelBags({bag_id: el.id, group_name: el.group_name})
+              await window.open(label, '_self')
+              return label
+            }
+          } catch (error) {
+            return error
+          }
+        })
+      )
+
     }
     async function submit(params: {isCancel?: boolean}) {
       const textMsg = params?.isCancel ? 'Close Bag' : 'Print label'
@@ -403,10 +427,20 @@ export default defineComponent({
       try {
         dialogSettings.value.loading = true
         if(step.value !== 0) {
-          await storeBagging.dispatch(
+          const returnPostBag = await storeBagging.dispatch(
             'bagging/bagging/postBags',
             {payload: selectedUnbagged.value}
           )
+          // console.log({returnPostBag})
+          if(
+            returnPostBag &&
+            Object.keys(returnPostBag).length > 0 &&
+            returnPostBag.id &&
+            returnPostBag.group_name
+          ) {
+            const label = await postLabelBags({bag_id: returnPostBag.id, group_name: returnPostBag.group_name})
+            if(!params?.isCancel && label) window.open(label, '_self')
+          }
           await fetchBags()
           storeApplications.commit('applications/SET_ALERT', {
             isShow: true,
@@ -455,6 +489,18 @@ export default defineComponent({
 
     }
 
+
+    async function postLabelBags (payload: InputLabelBags) {
+
+      try {
+        $fetchState.pending = true
+        return await storeBagging.dispatch('bagging/bagging/postLabelBags', {payload})
+      } catch (error) {
+        return error
+      } finally {
+        $fetchState.pending = false
+      }
+    }
 
     async function fetchBags () {
 

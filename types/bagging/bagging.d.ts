@@ -31,6 +31,10 @@ export interface InputManifest {
   mawb: string;
   generateManifest: GenerateManifest | {};
 }
+export interface InputLabelBags {
+  bag_id: string,
+  group_name: string;
+}
 
 export interface InputPostBag {
   bag_name: string;
@@ -54,6 +58,7 @@ export interface Bagged {
   status: string,
   orders: Order[];
   mawb: string;
+  label_url: string;
 }
 
 export interface Unbagged {
