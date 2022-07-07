@@ -182,7 +182,10 @@ export const actions: ActionTree<RootStateOrders, RootStateOrders> = {
       return error
     }
   },
-  async getSelectedLabels(_store, { data }: { data: { orderIds: string[] } }) {
+  async getSelectedLabels(
+    _store,
+    { data }: { data: { orderIds: string[]; serviceType: string } }
+  ) {
     try {
       return await this.$axios.$post(`api/clients/orders/labels`, data, {
         responseType: 'blob',

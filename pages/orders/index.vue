@@ -107,11 +107,7 @@
     />
 
     <v-snackbar
-      :value="
-        alert.isShow &&
-        alert.message.includes('Order') &&
-        alert.type === 'success'
-      "
+      :value="alert.isShow"
       rounded="pill"
       right
       bottom
@@ -136,8 +132,9 @@ import {
   useContext,
 } from '@nuxtjs/composition-api'
 import { saveAs } from 'file-saver'
+import { AxiosResponse } from 'axios'
 import { filterOrderInit, filterBatchInit } from '@/store/orders'
-// Interfaces or types
+// types
 import { BatchOrders, Order, VuexModuleOrders } from '~/types/orders'
 import {
   FilterDetails,
@@ -358,28 +355,63 @@ export default defineComponent({
       }, 3000)
     })
 
-    const doDownloadSelectedLabel = async () => {
+    const doDownloadSelectedLabel = async (serviceType = '') => {
       if (selectedOrders.value.length === 0) return
 
+      const messageServicetype = `${
+        serviceType &&
+        `on ${app.$customUtils.setServiceType(serviceType.toLowerCase())}`
+      }`
+
       try {
+        storeApplications.commit('applications/RESET_ALERT')
         $fetchState.pending = true
 
+        // * actually return Blob or AxiosResponse<Blob> depends it's success or failed
         const response = await storeOrders.dispatch(
           'orders/getSelectedLabels',
           {
             data: {
               orderIds: selectedOrders.value.map((order) => order.id),
+              serviceType,
             },
           }
         )
-        const fileName = `order_labels_${$dateFns.format(
-          new Date(),
-          'yyyy-MM-dd_HH-mm'
-        )}.pdf`
 
-        saveAs(response, fileName)
+        // * check it's the response is blob with size 0 (means no file)
+        if ((response as Blob).size === 0) throw response
+        // * check it's the response
+        if (
+          (response as { response: AxiosResponse<Blob> })?.response?.status >=
+          400
+        )
+          throw new Error(
+            JSON.parse(
+              await (
+                response as { response: AxiosResponse<Blob> }
+              ).response.data.text()
+            ).error
+          )
+
+        saveAs(
+          response,
+          `order_labels${
+            serviceType && `_${serviceType.toLowerCase()}`
+          }_${$dateFns.format(new Date(), 'yyyy-MM-dd_HH-mm')}.pdf`
+        )
+        storeApplications.commit('applications/SET_ALERT', {
+          isShow: true,
+          type: 'success',
+          message: `Order labels ${messageServicetype} successfully downloaded!`,
+        })
       } catch (error) {
-        return error
+        storeApplications.commit('applications/SET_ALERT', {
+          isShow: true,
+          type: 'error',
+          message:
+            (error as Error)?.message ??
+            `Orders haven't labels ${messageServicetype}`,
+        })
       } finally {
         setTimeout(() => {
           $fetchState.pending = false
