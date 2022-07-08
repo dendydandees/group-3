@@ -36,72 +36,76 @@
             Partners
           </h1>
 
-          <carousel-3d
-            v-if="marketplaces.length"
-            :perspective="0"
-            :space="200"
-            :display="3"
-            :height="475"
-            :width="586"
-            :autoplay="true"
-            :on-main-slide-click="changePage"
-          >
-            <slide
-              v-for="(slide, i) in marketplaces"
-              :key="i"
-              :index="i"
-              style="cursor: pointer"
+          <BaseLoading v-if="$fetchState.pending" />
+
+          <template v-else>
+            <carousel-3d
+              v-if="marketplaces.length"
+              :perspective="0"
+              :space="200"
+              :display="3"
+              :height="475"
+              :width="586"
+              :autoplay="true"
+              :on-main-slide-click="changePage"
             >
-              <v-hover v-slot="{ hover }">
-                <v-img
-                  height="100%"
-                  class="align-end opacity opacity-custom custom-slide"
-                  :style="`${hover && 'filter: brightness(95%);'}`"
-                  :src="
-                    slide.partnerGallery[0]
-                      ? slide.partnerGallery[0].path
-                      : null
-                  "
-                >
-                  <div class="gradation-custom">
-                    <!-- this is for gradation -->
-                  </div>
-
-                  <div
-                    class="py-7 px-10 text-custom d-flex align-center justify-space-between"
+              <slide
+                v-for="(slide, i) in marketplaces"
+                :key="i"
+                :index="i"
+                style="cursor: pointer"
+              >
+                <v-hover v-slot="{ hover }">
+                  <v-img
+                    height="100%"
+                    class="align-end opacity opacity-custom custom-slide"
+                    :style="`${hover && 'filter: brightness(95%);'}`"
+                    :src="
+                      slide.partnerGallery[0]
+                        ? slide.partnerGallery[0].path
+                        : null
+                    "
                   >
-                    <v-col class="text-h4 white--text pa-0">
-                      {{ slide.name }}
-                    </v-col>
+                    <div class="gradation-custom">
+                      <!-- this is for gradation -->
+                    </div>
 
-                    <v-col
-                      v-if="slide.partnerServiceTypes.length > 0"
-                      cols="6"
-                      class="pa-0"
+                    <div
+                      class="py-7 px-10 text-custom d-flex align-center justify-space-between"
                     >
-                      <v-chip
-                        v-for="(mile, index) in slide.partnerServiceTypes"
-                        :key="index"
-                        class="mr-1 my-1"
-                        :color="
-                          $customUtils.setColorServiceType(mile.name, 'chip')
-                        "
-                        text-color="white"
-                        small
-                        disabled
-                        :style="{
-                          opacity: 1,
-                          border: '1px solid white !important',
-                        }"
+                      <v-col class="text-h4 white--text pa-0">
+                        {{ slide.name }}
+                      </v-col>
+
+                      <v-col
+                        v-if="slide.partnerServiceTypes.length > 0"
+                        cols="6"
+                        class="pa-0"
                       >
-                        {{ $customUtils.setServiceType(mile.name) }}
-                      </v-chip>
-                    </v-col>
-                  </div>
-                </v-img>
-              </v-hover>
-            </slide>
-          </carousel-3d>
+                        <v-chip
+                          v-for="(mile, index) in slide.partnerServiceTypes"
+                          :key="index"
+                          class="mr-1 my-1"
+                          :color="
+                            $customUtils.setColorServiceType(mile.name, 'chip')
+                          "
+                          text-color="white"
+                          small
+                          disabled
+                          :style="{
+                            opacity: 1,
+                            border: '1px solid white !important',
+                          }"
+                        >
+                          {{ $customUtils.setServiceType(mile.name) }}
+                        </v-chip>
+                      </v-col>
+                    </div>
+                  </v-img>
+                </v-hover>
+              </slide>
+            </carousel-3d>
+          </template>
         </div>
       </v-col>
 
@@ -270,7 +274,9 @@
           {{ meta.totalCount }} RESULTS
         </div>
 
-        <v-container fluid class="px-0">
+        <BaseLoading v-if="$fetchState.pending" />
+
+        <v-container v-else fluid class="px-0">
           <v-row>
             <v-col
               v-for="(partner, u) in marketplaces"
@@ -299,7 +305,7 @@
                     width="100%"
                     class="align-end"
                     :src="`data:image/png;base64,${partner.logo}`"
-                    cover
+                    contain
                   >
                     <!-- :src="
                     partner.partnerGallery[0]
@@ -394,6 +400,7 @@
                       >
                         mdi-account-plus
                       </v-icon>
+
                       <v-icon
                         v-else-if="partner.status === 'pending'"
                         dense
@@ -401,6 +408,7 @@
                       >
                         mdi-account-clock
                       </v-icon>
+
                       <v-icon v-else dense color="white">
                         mdi-account-multiple-check
                       </v-icon>
