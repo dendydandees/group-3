@@ -177,6 +177,7 @@ import {
   useContext,
   onMounted,
 } from '@nuxtjs/composition-api'
+import multiDownload from 'multi-download';
 // Interface and types
 import { PropType } from 'vue'
 import {
@@ -195,6 +196,7 @@ export default defineComponent({
   name: 'BaggingPages',
   layout: 'default',
   setup() {
+    const {$axios} = useContext()
     const router = useRouter()
     const storeApplications = useStore<VuexModuleApplications>()
     const storeBagging = useStore<VuexModuleDetailBagging>()
@@ -411,7 +413,7 @@ export default defineComponent({
               el.group_name
             ) {
               const label = await postLabelBags({bag_id: el.id, group_name: el.group_name})
-              await window.open(label, '_self')
+              // await window.open(label, '_self')
               return label
             }
           } catch (error) {
@@ -419,8 +421,14 @@ export default defineComponent({
           }
         })
       )
-
+      try {
+        multiDownload(returnLabels);
+      } catch (error) {
+        return error
+      }
     }
+
+
     async function submit(params: {isCancel?: boolean}) {
       const textMsg = params?.isCancel ? 'Close Bag' : 'Print label'
 
