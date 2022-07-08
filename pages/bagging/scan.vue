@@ -146,6 +146,7 @@ import {
   onMounted,
 } from '@nuxtjs/composition-api'
 // Interface and types
+import multiDownload from 'multi-download';
 import {
   FilterDetails,
   ModalConfirm,
@@ -239,7 +240,7 @@ export default defineComponent({
       try {
         dialogSettings.value.loading = true
         const payloadArr = parseInput()
-        await Promise.all(
+        const returnLabels =  await Promise.all(
           payloadArr.map(async (el: InputPostBag) => {
             try {
               const returnPostBag = await storeBagging.dispatch(
@@ -253,13 +254,15 @@ export default defineComponent({
                 returnPostBag.group_name
               ) {
                 const label = await postLabelBags({bag_id: returnPostBag.id, group_name: returnPostBag.group_name})
-                if(!params?.isCancel && label) await window.open(label, '_self')
+                // if(!params?.isCancel && label) await window.open(label, '_self')
+                return label
               }
             } catch (error) {
               return error
             }
           })
         )
+        multiDownload(returnLabels);
         await fetchBags()
         allScanned.value = allScanned.value.map((x: any) => {
           return {
