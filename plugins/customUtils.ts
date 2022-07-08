@@ -1,9 +1,10 @@
-import { defineNuxtPlugin } from '@nuxtjs/composition-api'
+import { defineNuxtPlugin } from '@nuxtjs/composition-api';
 // types
-import { ServiceType } from '~/types/filters'
+import { ServiceType } from '~/types/filters';
+import { delay, download } from '~/static/js/multiDownload';
 
 export default defineNuxtPlugin((context, inject) => {
-  const { $dateFns } = context
+  const { $dateFns } = context;
 
   const customUtils = {
     /* sort the service types
@@ -13,9 +14,9 @@ export default defineNuxtPlugin((context, inject) => {
      * 4. Last Mile
      */
     sortServiceTypes: (data: ServiceType[]) => {
-      const serviceTypes = [...data]
+      const serviceTypes = [...data];
 
-      if (serviceTypes.length === 0) return []
+      if (serviceTypes.length === 0) return [];
 
       return [
         ...serviceTypes.filter((service) => service.name === 'FIRST_MILE'),
@@ -24,74 +25,90 @@ export default defineNuxtPlugin((context, inject) => {
             service.name !== 'FIRST_MILE' && service.name !== 'LAST_MILE'
         ),
         ...serviceTypes.filter((service) => service.name === 'LAST_MILE'),
-      ]
+      ];
     },
     capitalize: (text: string) => {
-      return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase() || ''
+      return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase() || '';
     },
     setAddress: (data: string[]): string => {
-      const setItem = data.filter((item: string) => item)
+      const setItem = data.filter((item: string) => item);
 
-      return setItem.join(', ')
+      return setItem.join(', ');
     },
     setServiceType: (data: string): string => {
-      return data.replaceAll('_', ' ')
+      return data.replaceAll('_', ' ');
     },
     setRuleType: (data: string): string => {
-      return data.split('RULE_TYPE_')[1]
+      return data.split('RULE_TYPE_')[1];
     },
     setColorServiceType: (data: string, type = '') => {
       if (type === 'chip') {
         return data === 'LAST_MILE'
           ? 'primary darken-1'
           : data === 'CUSTOMS'
-          ? 'success darken-2'
-          : data === 'FREIGHT_FORWARDER'
-          ? 'warning'
-          : 'secondary darken-2'
+            ? 'success darken-2'
+            : data === 'FREIGHT_FORWARDER'
+              ? 'warning'
+              : 'secondary darken-2';
       }
 
       return data === 'LAST_MILE'
         ? 'primary'
         : data === 'CUSTOMS'
-        ? 'success'
-        : data === 'FREIGHT_FORWARDER'
-        ? 'warning'
-        : 'secondary'
+          ? 'success'
+          : data === 'FREIGHT_FORWARDER'
+            ? 'warning'
+            : 'secondary';
     },
     setURLParams: (data: Object) => {
-      const paramsFilterOrders = new URLSearchParams()
+      const paramsFilterOrders = new URLSearchParams();
 
       for (const [key, value] of Object.entries(data)) {
-        if (!value) continue
+        if (!value) continue;
 
         // format createdTo and createdFrom params to ISO datetime
         if (key === 'createdTo' || key === 'createdFrom') {
           const date = $dateFns.formatISO(
             $dateFns.parseISO(value as string) as Date
-          ) as unknown as string
+          ) as unknown as string;
 
-          paramsFilterOrders.append(key, date)
-          continue
+          paramsFilterOrders.append(key, date);
+          continue;
         }
 
         // format array value to separated params but same key
         if (key === 'serviceType') {
-          const items = value as string[]
+          const items = value as string[];
 
           items.forEach((item) => {
-            paramsFilterOrders.append(key, item)
-          })
+            paramsFilterOrders.append(key, item);
+          });
 
-          continue
+          continue;
         }
 
-        paramsFilterOrders.append(key, value as string)
+        paramsFilterOrders.append(key, value as string);
       }
 
-      return paramsFilterOrders
+      return paramsFilterOrders;
     },
-  }
+    multiDownload: async (
+      urls: string[],
+      // params: { rename?: Object | Function | {}; }
+    ) => {
+      if (!urls) {
+        throw new Error('`urls` required');
+      }
 
-  inject('customUtils', customUtils)
-})
+      for (const [index, url] of urls.entries()) {
+        // const name = typeof params.rename === 'function' ? params.rename({ url, index, urls }) : '';
+        const name = '';
+
+        await delay(index * 1000);
+        download(url, name);
+      }
+    }
+  };
+
+  inject('customUtils', customUtils);
+});

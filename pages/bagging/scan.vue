@@ -146,7 +146,6 @@ import {
   onMounted,
 } from '@nuxtjs/composition-api'
 // Interface and types
-import multiDownload from 'multi-download';
 import {
   FilterDetails,
   ModalConfirm,
@@ -262,7 +261,7 @@ export default defineComponent({
             }
           })
         )
-        multiDownload(returnLabels);
+        app.$customUtils.multiDownload(returnLabels);
         await fetchBags()
         allScanned.value = allScanned.value.map((x: any) => {
           return {
