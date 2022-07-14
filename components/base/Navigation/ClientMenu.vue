@@ -13,7 +13,7 @@
             :class="[mini ? 'subtitle-2' : '']"
             :style="{ whiteSpace: mini ? 'unset' : '' }"
           >
-            Client Portal
+            All of the ideas
           </v-list-item-title>
         </v-list-item-content>
       </template>
@@ -47,10 +47,12 @@ export default defineComponent({
   },
   setup(_props, { emit }) {
     const clientMenu = ref([
-      { title: 'Dashboard', icon: '$dashboard', to: '/dashboard' },
-      { title: 'Orders', icon: '$order', to: '/orders' },
-      { title: 'Marketplace', icon: '$marketplace', to: '/marketplace' },
-      { title: 'L-Control', icon: '$lControl', to: '/lControl' },
+      { title: 'Idea 1', icon: '$dashboard', to: '/group-3/idea-1' },
+      { title: 'Idea 2', icon: '$dashboard', to: '/group-3/idea-2' },
+      // { title: 'Dashboard', icon: '$dashboard', to: '/dashboard' },
+      // { title: 'Orders', icon: '$order', to: '/orders' },
+      // { title: 'Marketplace', icon: '$marketplace', to: '/marketplace' },
+      // { title: 'L-Control', icon: '$lControl', to: '/lControl' },
       // { title: 'Bagging', icon: 'mdi-bag-suitcase-outline', to: '/bagging' },
     ]) as Ref<NavigationLinks[]>
     const isGroupShown = ref(true)

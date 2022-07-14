@@ -11,7 +11,7 @@
 
     <v-main class="base">
       <Nuxt class="main-content" />
-      <v-menu
+      <!-- <v-menu
         v-model="menu"
         :close-on-content-click="false"
         offset-x
@@ -66,7 +66,7 @@
             </v-tab-item>
           </v-tabs-items>
         </v-card>
-      </v-menu>
+      </v-menu> -->
 
       <BaseNavigationFooter />
     </v-main>
@@ -91,7 +91,6 @@ import { VuexModuleChat } from '~/types/sendbird'
 
 export default defineComponent({
   name: 'DefaultLayout',
-  middleware: 'auth',
   setup() {
     const { $config } = useContext()
     const context = useContext()

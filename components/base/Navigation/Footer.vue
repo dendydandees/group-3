@@ -2,13 +2,13 @@
   <v-footer absolute padless dark color="primary">
     <v-col cols="12" md="4">
       <v-col cols="auto">
-        <v-btn
+        <!-- <v-btn
           text
           href="https://luwjistik.document360.io/docs"
           target="_blank"
         >
           FAQ
-        </v-btn>
+        </v-btn> -->
       </v-col>
       <!-- <v-col
         cols="auto"

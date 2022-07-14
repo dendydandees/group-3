@@ -16,13 +16,13 @@
       @hideMiniSideNav="$emit('hideMiniSideNav')"
     />
 
-    <BaseNavigationPartnerMenu
+    <!-- <BaseNavigationPartnerMenu
       v-if="isPartners"
       :mini="mini"
       @hideMiniSideNav="$emit('hideMiniSideNav')"
-    />
+    /> -->
 
-    <template #append>
+    <template #prepend>
       <v-fade-transition hide-on-leave>
         <NuxtImg
           v-if="mini"

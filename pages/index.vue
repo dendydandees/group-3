@@ -9,7 +9,7 @@ export default defineComponent({
   name: 'IndexPage',
   layout: 'default',
   middleware({ redirect }) {
-    return redirect('/marketplace')
+    return redirect('/group-3/idea-1')
   },
 })
 </script>

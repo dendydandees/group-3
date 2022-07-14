@@ -7,11 +7,11 @@
     active-class="item-group-sidebar-active"
     class="my-0 rounded-0 item-group-sidebar"
   >
-    <v-list-item-icon :style="{ marginRight: mini ? '0 !important' : '' }">
+    <!-- <v-list-item-icon :style="{ marginRight: mini ? '0 !important' : '' }">
       <v-icon size="32" v-text="items.icon" />
-    </v-list-item-icon>
+    </v-list-item-icon> -->
 
-    <v-list-item-content>
+    <v-list-item-content class="pa-6">
       <v-list-item-title v-text="items.title" />
     </v-list-item-content>
   </v-list-item>
