@@ -94,7 +94,7 @@
             style="cursor: pointer"
             @click="show.revenue = !show.revenue"
           >
-            Revenue
+            Improvement
           </h4>
 
           <v-expand-transition>
