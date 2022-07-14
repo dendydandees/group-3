@@ -76,6 +76,14 @@
                       <li>SME Logistics Provider</li>
                     </ul>
                   </p>
+
+                  <p class="title">
+                    <span class="font-weight-bold">Service To Sell</span>
+                    <ul>
+                      <li>Domestic and Crossborder Door to Port</li>
+                      <li>Domestic and Crossborder Port to Port</li>
+                    </ul>
+                  </p>
                 </div>
 
                 <div class="pt-6">
